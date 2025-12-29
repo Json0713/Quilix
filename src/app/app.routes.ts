@@ -1,13 +1,12 @@
 import { Routes } from '@angular/router';
-import { Index } from './public/index';
+import { PUBLIC_ROUTES } from './public/public.routes';
 
 export const routes: Routes = [
-  {
-    path: '',
-    component: Index
-  },
-  {
-    path: '**',
-    redirectTo: ''
-  }
+  
+  ...PUBLIC_ROUTES,
+  { path: '**', redirectTo: '' },
+
+
+
+
 ];
