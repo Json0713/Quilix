@@ -1,0 +1,9 @@
+.public-template {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.public-content {
+  flex: 1;
+}
