@@ -14,35 +14,40 @@ export class Storage {
 
   private getItem<T>(key: string): T | null {
     const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : null;
+    return raw ? JSON.parse(raw) as T : null;
   }
 
   private removeItem(key: string): void {
     localStorage.removeItem(key);
   }
 
-  clearAll(): void {
-    localStorage.clear();
+  /* USERS */
+  getUsers(): User[] {
+    return this.getItem<User[]>(STORAGE_KEYS.USERS) ?? [];
   }
 
-  /* USER */
-
-  saveUser(user: User): void {
-    this.setItem<User>(STORAGE_KEYS.USER, user);
+  saveUsers(users: User[]): void {
+    this.setItem(STORAGE_KEYS.USERS, users);
   }
 
-  getUser(): User | null {
-    return this.getItem<User>(STORAGE_KEYS.USER);
+  addUser(user: User): void {
+    const users = this.getUsers();
+    if (users.some(u => u.name === user.name)) return;
+    this.saveUsers([...users, user]);
   }
 
-  clearUser(): void {
-    this.removeItem(STORAGE_KEYS.USER);
+  removeUser(userId: string): void {
+    const users = this.getUsers().filter(u => u.id !== userId);
+    this.saveUsers(users);
+  }
+
+  getUserById(id: string): User | null {
+    return this.getUsers().find(u => u.id === id) ?? null;
   }
 
   /* SESSION */
-
   saveSession(session: Session): void {
-    this.setItem<Session>(STORAGE_KEYS.SESSION, session);
+    this.setItem(STORAGE_KEYS.SESSION, session);
   }
 
   getSession(): Session | null {

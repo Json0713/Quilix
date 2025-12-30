@@ -9,51 +9,63 @@ import { Session } from '../interfaces/session';
 export class AuthService {
   constructor(private storage: Storage) {}
 
-  login(name: string, role: UserRole): User {
+  createUser(name: string, role: UserRole): User {
     const user: User = {
       id: crypto.randomUUID(),
       name: name.trim(),
       role,
-      createdAt: Date.now(),
+      createdAt: Date.now()
     };
 
-    const session: Session = {
-      isLoggedIn: true,
-      userId: user.id,
-      startedAt: Date.now(),
-      lastActiveAt: Date.now(),
-    };
-
-    this.storage.saveUser(user);
-    this.storage.saveSession(session);
+    this.storage.addUser(user);
+    this.startSession(user.id);
 
     return user;
+  }
+
+  loginExisting(user: User): void {
+    this.startSession(user.id);
+  }
+
+  private startSession(userId: string): void {
+    const session: Session = {
+      isLoggedIn: true,
+      userId,
+      startedAt: Date.now(),
+      lastActiveAt: Date.now()
+    };
+
+    this.storage.saveSession(session);
+  }
+
+  getCurrentUser(): User | null {
+    const session = this.storage.getSession();
+    if (!session?.isLoggedIn || !session.userId) return null;
+    return this.storage.getUserById(session.userId);
+  }
+
+  getAllUsers(): User[] {
+    return this.storage.getUsers();
+  }
+
+  restoreSession(): boolean {
+    return !!this.getCurrentUser();
+  }
+
+  hasRole(role: UserRole): boolean {
+    return this.getCurrentUser()?.role === role;
   }
 
   logout(): void {
     this.storage.clearSession();
   }
 
-  isLoggedIn(): boolean {
-    return !!this.storage.getSession()?.isLoggedIn;
-  }
+  deleteUser(userId: string): void {
+    this.storage.removeUser(userId);
 
-  getCurrentUser(): User | null {
     const session = this.storage.getSession();
-    const user = this.storage.getUser();
-
-    if (!session?.isLoggedIn) return null;
-    if (!user || user.id !== session.userId) return null;
-
-    return user;
-  }
-
-  hasRole(role: UserRole): boolean {
-    const user = this.getCurrentUser();
-    return !!user && user.role === role;
-  }
-
-  restoreSession(): boolean {
-    return !!this.getCurrentUser();
+    if (session?.userId === userId) {
+      this.logout();
+    }
   }
 }

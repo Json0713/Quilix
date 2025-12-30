@@ -1,81 +1,125 @@
 <section class="login-wrapper">
 
-  <div class="login-card" role="form" aria-labelledby="login-title">
-    
-    <!-- Header -->
-    <header class="login-header">
-      <div class="logo">
-        <i class="bi bi-feather"></i>
-      </div>
-      <h1 id="login-title">Welcome to Quilix</h1>
-      <p>Sign in to continue to your workspace</p>
-    </header>
+  <div class="login-layout">
 
-    <!-- Form -->
-    <form (ngSubmit)="submit()" novalidate>
+    <!-- LEFT: New Workspace -->
+    <div class="login-card" role="form" aria-labelledby="login-title">
 
-      <!-- Name -->
-      <div class="field">
-        <label for="name">Your name</label>
-        <input
-          id="name"
-          type="text"
-          placeholder="Enter your name"
-          [(ngModel)]="name"
-          name="name"
-          required
-          minlength="2"
-        />
-      </div>
-
-      <!-- Role -->
-      <div class="field">
-        <label>Choose role</label>
-
-        <div class="role-select">
-          <button
-            type="button"
-            class="role-btn"
-            [class.active]="role === 'student'"
-            (click)="role = 'student'"
-            aria-label="Login as Student"
-          >
-            <i class="bi bi-mortarboard"></i>
-            <span>Student</span>
-          </button>
-
-          <button
-            type="button"
-            class="role-btn"
-            [class.active]="role === 'teacher'"
-            (click)="role = 'teacher'"
-            aria-label="Login as Teacher"
-          >
-            <i class="bi bi-person-badge"></i>
-            <span>Teacher</span>
-          </button>
+      <!-- Header -->
+      <header class="login-header">
+        <div class="logo">
+          <i class="bi bi-feather"></i>
         </div>
-      </div>
+        <h1 id="login-title">Welcome to Quilix</h1>
+        <p>Create or continue your workspace</p>
+      </header>
 
-      <!-- Submit -->
-      <button
-        type="submit"
-        class="primary-action"
-        [disabled]="!isValid()"
-        title="Continue to your workspace"
-      >
-        <span>Continue</span>
-        <i class="bi bi-arrow-right"></i>
-      </button>
+      <!-- Form -->
+      <form (ngSubmit)="createWorkspace()" class="login-form">
 
-    </form>
+        <div class="field">
+          <label for="name">Your name</label>
+          <input
+            id="name"
+            type="text"
+            placeholder="Enter your name"
+            [(ngModel)]="name"
+            name="name"
+            required
+            minlength="2"
+          />
+        </div>
 
-    <!-- Footer -->
-    <footer class="login-footer">
-      <p>
-        By continuing, you agree to use Quilix responsibly.
-      </p>
-    </footer>
+        <div class="field">
+          <label>Choose role</label>
+
+          <div class="role-select">
+            <button
+              type="button"
+              class="role-btn"
+              [class.active]="role === 'student'"
+              (click)="role = 'student'"
+            >
+              <i class="bi bi-mortarboard"></i>
+              <span>Student</span>
+            </button>
+
+            <button
+              type="button"
+              class="role-btn"
+              [class.active]="role === 'teacher'"
+              (click)="role = 'teacher'"
+            >
+              <i class="bi bi-person-badge"></i>
+              <span>Teacher</span>
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="primary-action"
+          [disabled]="name.trim().length < 2 || !role"
+        >
+          <span>Start Workspace</span>
+          <i class="bi bi-arrow-right"></i>
+        </button>
+
+      </form>
+
+      <footer class="login-footer">
+        <p>Local workspaces are stored securely on this device.</p>
+      </footer>
+    </div>
+
+    <!-- RIGHT: Recent Workspaces -->
+    @if (users.length > 0) {
+      <aside class="recent-card">
+
+        <header class="recent-header">
+          <h2>Recent Workspaces</h2>
+          <p>Continue where you left off</p>
+        </header>
+
+        <ul class="user-list">
+          @for (user of users; track user.id) {
+            <li class="user-card">
+
+              <div
+                class="user-info"
+                (click)="continueWorkspace(user)"
+                role="button"
+                tabindex="0"
+              >
+                <div class="avatar">
+                  <i
+                    class="bi"
+                    [class.bi-mortarboard]="user.role === 'student'"
+                    [class.bi-person-badge]="user.role === 'teacher'"
+                  ></i>
+                </div>
+
+                <div class="user-meta">
+                  <strong>{{ user.name }}</strong>
+                  <small>{{ user.role === 'student' ? 'Student' : 'Teacher' }}</small>
+                </div>
+              </div>
+
+              <button
+                class="delete-btn"
+                (click)="deleteWorkspace(user)"
+                aria-label="Delete workspace"
+                title="Delete workspace"
+              >
+                <i class="bi bi-x"></i>
+              </button>
+
+            </li>
+          }
+        </ul>
+
+      </aside>
+    }
 
   </div>
 
