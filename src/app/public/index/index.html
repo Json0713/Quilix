@@ -1,21 +1,37 @@
-<div class="entry">
+<div class="container">
 
   <!-- Brand -->
   <header class="brand">
     <div class="brand-icon">
       <i class="bi bi-feather"></i>
+        Quilix
     </div>
-    <h1>Quilix</h1>
     <p class="brand-subtitle">
       A universal workspace for learning and focused planning.
     </p>
   </header>
+
+  <!-- Preview Controls -->
+  <div class="preview-controls">
+    <!-- GitHub Button -->
+    <a
+      href="https://github.com/Json0713"
+      target="_blank"
+      rel="noopener"
+      class="control-btn"
+      aria-label="View Author on GitHub"
+      title="View Author on GitHub"
+    >
+      <i class="bi bi-github"></i>
+    </a>
+  </div>
 
   <!-- Preview Card -->
   <section class="preview-card">
     <div class="preview-header">
       <span class="badge">Kanban</span>
       <span class="badge">Tasks</span>
+      <span class="badge">Progress</span>
       <span class="badge">Assignments</span>
     </div>
 
@@ -40,7 +56,7 @@
           <div class="task done"></div>
         </div>
 
-        <!-- SET 2 (clone for seamless loop) -->
+        <!-- SET 2 -->
         <div class="column">
           <h4>To Do</h4>
           <div class="task"></div>
@@ -62,15 +78,19 @@
   </section>
 
   <div class="workspace-start-button">
-    <a routerLink="/login" class="primary-action">
-      Start Workspace
+    <a
+      routerLink="/login"
+      class="primary-action"
+      title="Create or continue your personal workspace"
+    >
+      <span>Start Workspace</span>
     </a>
   </div>
 
   <footer class="actions">
     <p class="description">
-      Plan tasks | Organize projects | Academic Workflows <br/>
-      All in one focused workspace.
+      • Plan tasks • Organize projects • Academic workflows <br/>
+      A focused, workspace built for modern learning.
     </p>
   </footer>
 
