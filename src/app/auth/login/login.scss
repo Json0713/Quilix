@@ -1,0 +1,137 @@
+.login-wrapper {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+/* ---------- CARD ---------- */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border-radius: 1.25rem;
+  padding: 1.75rem 1.5rem;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ---------- BRAND ---------- */
+.login-brand {
+  text-align: center;
+}
+
+.brand-icon {
+  font-size: 2.5rem;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.login-brand h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-main);
+}
+
+.login-brand p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ---------- FORM ---------- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+input {
+  padding: 0.7rem 0.75rem;
+  border-radius: 0.6rem;
+  border: 1px solid #dce6e8;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(63, 186, 194, 0.2);
+}
+
+/* ---------- ROLES ---------- */
+.role-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.role-title {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.role-options {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.role-card {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.role-card i {
+  font-size: 1.25rem;
+  color: var(--primary);
+}
+
+.role-card span {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.role-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------- CTA ---------- */
+.login-action {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.login-action i {
+  transition: transform 0.15s ease;
+}
+
+.login-action:hover i {
+  transform: translateX(3px);
+}
+
+.login-action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}

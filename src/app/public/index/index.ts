@@ -4,11 +4,11 @@ import { Header } from '../common/header/header';
 import { Footer } from '../common/footer/footer';
 
 @Component({
-  selector: 'app-index',
+  selector: 'app-public-index',
   imports: [RouterModule, Header, Footer],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
-export class Index {
+export class PublicIndex {
 
 }
