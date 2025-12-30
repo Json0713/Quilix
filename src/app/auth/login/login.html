@@ -1,63 +1,82 @@
-<div class="login-wrapper">
+<section class="login-wrapper">
 
-  <section class="login-card">
-
-    <!-- Brand -->
-    <div class="login-brand">
-      <div class="brand-icon">
+  <div class="login-card" role="form" aria-labelledby="login-title">
+    
+    <!-- Header -->
+    <header class="login-header">
+      <div class="logo">
         <i class="bi bi-feather"></i>
       </div>
-      <h1>Welcome to Quilix</h1>
-      <p>Enter your name and choose your workspace</p>
-    </div>
+      <h1 id="login-title">Welcome to Quilix</h1>
+      <p>Sign in to continue to your workspace</p>
+    </header>
 
-    <!-- Name Input -->
-    <div class="form-group">
-      <label for="name">Your Name</label>
-      <input
-        id="name"
-        type="text"
-        placeholder="e.g. Alex"
-        autocomplete="off"
-        maxlength="20"
-      />
-    </div>
+    <!-- Form -->
+    <form (ngSubmit)="submit()" novalidate>
 
-    <!-- Role Selection -->
-    <div class="role-section">
-      <p class="role-title">Select your role</p>
-
-      <div class="role-options">
-
-        <button
-          type="button"
-          class="role-card"
-        >
-          <i class="bi bi-mortarboard"></i>
-          <span>Student</span>
-        </button>
-
-        <button
-          type="button"
-          class="role-card"
-        >
-          <i class="bi bi-journal-bookmark"></i>
-          <span>Teacher</span>
-        </button>
-
+      <!-- Name -->
+      <div class="field">
+        <label for="name">Your name</label>
+        <input
+          id="name"
+          type="text"
+          placeholder="Enter your name"
+          [(ngModel)]="name"
+          name="name"
+          required
+          minlength="2"
+        />
       </div>
-    </div>
 
-    <!-- CTA -->
-    <button
-      class="primary-action login-action"
-      disabled
-      title="Enter your workspace"
-    >
-      <span>Start Workspace</span>
-      <i class="bi bi-arrow-right"></i>
-    </button>
+      <!-- Role -->
+      <div class="field">
+        <label>Choose role</label>
 
-  </section>
+        <div class="role-select">
+          <button
+            type="button"
+            class="role-btn"
+            [class.active]="role === 'student'"
+            (click)="role = 'student'"
+            aria-label="Login as Student"
+          >
+            <i class="bi bi-mortarboard"></i>
+            <span>Student</span>
+          </button>
 
-</div>
+          <button
+            type="button"
+            class="role-btn"
+            [class.active]="role === 'teacher'"
+            (click)="role = 'teacher'"
+            aria-label="Login as Teacher"
+          >
+            <i class="bi bi-person-badge"></i>
+            <span>Teacher</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button
+        type="submit"
+        class="primary-action"
+        [disabled]="!isValid()"
+        title="Continue to your workspace"
+      >
+        <span>Continue</span>
+        <i class="bi bi-arrow-right"></i>
+      </button>
+
+    </form>
+
+    <!-- Footer -->
+    <footer class="login-footer">
+      <p>
+        By continuing, you agree to use Quilix responsibly.
+      </p>
+    </footer>
+
+  </div>
+
+</section>
