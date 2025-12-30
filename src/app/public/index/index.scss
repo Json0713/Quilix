@@ -137,8 +137,8 @@
 .primary-action {
   display: inline-flex;
   justify-content: center;
-  align-items: center;
   background: white;
+  width: 440px;
   color: var(--primary);
   padding: 0.85rem 1.75rem;
   border-radius: 999px;
@@ -157,9 +157,44 @@
   transform: scale(0.97);
 }
 
+/* Responsive */
 /* Mobile */
 @media (max-width: 600px) {
   .primary-action {
     width: 100%;
+  }
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .preview-card,
+  .workspace-start-button {
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .column {
+    min-width: 160px;
+    padding: 0.75rem;
+  }
+
+  .task {
+    height: 0.7rem;
+  }
+
+  .preview-track {
+    animation-duration: 24s;
+  }
+
+  .brand h1 {
+    font-size: 2rem;
+  }
+
+  .brand-subtitle {
+    font-size: 1rem;
   }
 }
