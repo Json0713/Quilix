@@ -4,7 +4,11 @@ import { PUBLIC_ROUTES } from './public/public.routes';
 export const routes: Routes = [
   
   ...PUBLIC_ROUTES,
-  { path: '**', redirectTo: '' },
+  { 
+    path: '**', 
+    redirectTo: '' 
+  },
+
 
 
 

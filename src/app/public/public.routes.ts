@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Index } from './index/index';
 import { PublicTemplate } from './template/template';
+import { Login } from '../auth/login/login';
 
 export const PUBLIC_ROUTES: Routes = [
   {
@@ -8,9 +9,9 @@ export const PUBLIC_ROUTES: Routes = [
     component: PublicTemplate,
     children: [
       { path: '', component: Index },
+      { path: 'login', component: Login }
 
 
-      { path: '**', redirectTo: '' }
     ]
   }
 
