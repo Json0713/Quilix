@@ -1,76 +1,120 @@
 :host {
   --primary: #1a3a3f;
-  --primary-soft: #244f55;
   --accent: #3fbac2;
-  --bg-light: #f4f8f9;
-  --text-dark: #102426;
+  --bg: #f4f8f9;
+  --surface: #ffffff;
+  --text-main: #102426;
   --text-muted: #6c8a8f;
 }
 
-.landing {
+.entry {
   min-height: 100vh;
-  background: linear-gradient(
-    160deg,
-    var(--primary),
-    var(--primary-soft)
-  );
-  padding: 1rem;
+  background: linear-gradient(160deg, #1a3a3f, #244f55);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.landing-card {
-  background: var(--bg-light);
+/* ---------- BRAND ---------- */
+.brand {
+  text-align: center;
+  color: white;
+}
+
+.brand-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.brand h1 {
+  font-weight: 700;
+  margin: 0;
+}
+
+.brand-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* ---------- PREVIEW ---------- */
+.preview-card {
+  background: var(--bg);
   border-radius: 1.25rem;
-  max-width: 420px;
-  width: 100%;
+  padding: 1rem;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
-.logo {
-  font-size: 3rem;
-  color: var(--primary);
-}
-
-.app-title {
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-.tagline {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-}
-
-.features {
+.preview-header {
   display: flex;
   gap: 0.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
 }
 
-.feature-pill {
+.badge {
   background: white;
+  padding: 0.25rem 0.6rem;
   border-radius: 999px;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--primary);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-.btn-primary {
-  background-color: var(--primary);
-  border: none;
+.preview-columns {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+}
+
+.column {
+  background: var(--surface);
   border-radius: 0.75rem;
-  padding: 0.75rem;
+  padding: 0.5rem;
+  min-width: 120px;
 }
 
-.btn-primary:hover {
-  background-color: var(--primary-soft);
+.column h4 {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.task {
+  height: 0.6rem;
+  background: var(--accent);
+  border-radius: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.task.muted {
+  opacity: 0.4;
+}
+
+.task.done {
+  background: #9adbcf;
+}
+
+/* ---------- ACTIONS ---------- */
+.actions {
+  text-align: center;
+  margin-top: auto;
+}
+
+.primary-action {
+  display: block;
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.primary-action:hover {
+  background: #244f55;
 }
 
 .hint {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  margin-top: 0.5rem;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.75);
 }
