@@ -1,13 +1,13 @@
 <div class="entry">
 
-  <!-- Top Brand -->
+  <!-- Brand -->
   <header class="brand">
     <div class="brand-icon">
-      <i class="bi bi-kanban-fill"></i>
+      <i class="bi bi-feather"></i>
     </div>
     <h1>Quilix</h1>
     <p class="brand-subtitle">
-      A focused workspace for learning and planning.
+      A universal workspace for learning and focused planning.
     </p>
   </header>
 
@@ -19,32 +19,58 @@
       <span class="badge">Assignments</span>
     </div>
 
-    <div class="preview-columns">
-      <div class="column">
-        <h4>To Do</h4>
-        <div class="task"></div>
-        <div class="task muted"></div>
-      </div>
+    <!-- Animated Columns ONLY -->
+    <div class="preview-viewport">
+      <div class="preview-track">
 
-      <div class="column">
-        <h4>In Progress</h4>
-        <div class="task"></div>
-      </div>
+        <!-- SET 1 -->
+        <div class="column">
+          <h4>To Do</h4>
+          <div class="task"></div>
+          <div class="task muted"></div>
+        </div>
 
-      <div class="column">
-        <h4>Done</h4>
-        <div class="task done"></div>
+        <div class="column">
+          <h4>In Progress</h4>
+          <div class="task"></div>
+        </div>
+
+        <div class="column">
+          <h4>Done</h4>
+          <div class="task done"></div>
+        </div>
+
+        <!-- SET 2 (clone for seamless loop) -->
+        <div class="column">
+          <h4>To Do</h4>
+          <div class="task"></div>
+          <div class="task muted"></div>
+        </div>
+
+        <div class="column">
+          <h4>In Progress</h4>
+          <div class="task"></div>
+        </div>
+
+        <div class="column">
+          <h4>Done</h4>
+          <div class="task done"></div>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- Primary Action -->
-  <footer class="actions">
+  <div class="workspace-start-button">
     <a routerLink="/login" class="primary-action">
-      Open Workspace
+      Start Workspace
     </a>
-    <p class="hint">
-      No accounts • Works offline • Your data stays local
+  </div>
+
+  <footer class="actions">
+    <p class="description">
+      Plan tasks | Organize projects | Manage academic workflows <br/>
+      All in one focused workspace.
     </p>
   </footer>
 
