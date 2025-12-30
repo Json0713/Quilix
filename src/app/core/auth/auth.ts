@@ -6,7 +6,7 @@ import { Session } from '../interfaces/session';
 @Injectable({
   providedIn: 'root',
 })
-export class Auth {
+export class AuthService {
   constructor(private storage: Storage) {}
 
   login(name: string, role: UserRole): User {
@@ -14,14 +14,14 @@ export class Auth {
       id: crypto.randomUUID(),
       name: name.trim(),
       role,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
 
     const session: Session = {
       isLoggedIn: true,
       userId: user.id,
       startedAt: Date.now(),
-      lastActiveAt: Date.now()
+      lastActiveAt: Date.now(),
     };
 
     this.storage.saveUser(user);
@@ -35,28 +35,25 @@ export class Auth {
   }
 
   isLoggedIn(): boolean {
-    const session = this.storage.getSession();
-    return !!session?.isLoggedIn;
+    return !!this.storage.getSession()?.isLoggedIn;
   }
 
   getCurrentUser(): User | null {
     const session = this.storage.getSession();
-    if (!session?.isLoggedIn || !session.userId) return null;
-
     const user = this.storage.getUser();
+
+    if (!session?.isLoggedIn) return null;
     if (!user || user.id !== session.userId) return null;
 
     return user;
   }
 
+  hasRole(role: UserRole): boolean {
+    const user = this.getCurrentUser();
+    return !!user && user.role === role;
+  }
+
   restoreSession(): boolean {
-    const session = this.storage.getSession();
-    const user = this.storage.getUser();
-
-    if (!session || !user) return false;
-    if (!session.isLoggedIn) return false;
-    if (session.userId !== user.id) return false;
-
-    return true;
+    return !!this.getCurrentUser();
   }
 }
