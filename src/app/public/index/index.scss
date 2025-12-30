@@ -7,28 +7,6 @@
   gap: 1.75rem;
 }
 
-/* ---------- BRAND ---------- */
-.brand {
-  text-align: center;
-  color: white;
-}
-
-.brand-icon {
-  font-size: 3.75rem;
-  margin-bottom: 0.35rem;
-}
-
-.brand h1 {
-  font-weight: 700;
-  margin: 0;
-  letter-spacing: 0.5px;
-}
-
-.brand-subtitle {
-  font-size: 0.9rem;
-  opacity: 0.85;
-}
-
 /* ---------- PREVIEW CONTROLS ---------- */
 .preview-controls {
   display: flex;
@@ -152,19 +130,6 @@
   background: #9adbcf;
 }
 
-/* ---------- ACTIONS ---------- */
-.actions {
-  text-align: center;
-  margin-top: auto;
-}
-
-.description {
-  font-size: 0.85rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 1.25rem;
-}
-
 /* CTA */
 .primary-action {
   display: inline-flex;
@@ -187,6 +152,11 @@
 
 .primary-action:active {
   transform: scale(0.97);
+}
+
+/*  Footer */
+.footer {
+  margin-top: auto;
 }
 
 /* Responsive */

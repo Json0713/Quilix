@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { Header } from '../common/header/header';
+import { Footer } from '../common/footer/footer';
 
 @Component({
   selector: 'app-index',
-  imports: [RouterModule],
+  imports: [RouterModule, Header, Footer],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
