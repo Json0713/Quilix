@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth';
 import { User, UserRole } from '../../core/interfaces/user';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +8,7 @@ import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, Spinner, DatePipe],
+  imports: [FormsModule, Spinner, DatePipe, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -18,8 +18,8 @@ export class Login {
   role: UserRole | null = null;
   users: User[] = [];
   deletingUserId: string | null = null;
-  isSubmitting = false;
   loadingUserId: string | null = null;
+  isSubmitting = false;
   errorMessage: string | null = null;
   loading = false;
 
@@ -30,48 +30,44 @@ export class Login {
     this.users = this.auth.getAllUsers();
   }
 
-  createWorkspace(): void {
-    if (this.name.trim().length < 2 || !this.role || this.isSubmitting) {
-      return;
-    }
+  ngOnInit() {
+    this.loading = true;
+    setTimeout(() => (this.loading = false), 1200);
+  }
 
-    this.errorMessage = null;
+  createWorkspace(): void {
+    if (this.name.trim().length < 2 || !this.role || this.isSubmitting) return;
+
     this.isSubmitting = true;
+    this.errorMessage = null;
 
     const result = this.auth.createUser(this.name, this.role);
 
     if (!result.success) {
       this.isSubmitting = false;
-
       if (result.error === 'DUPLICATE_NAME') {
         this.errorMessage = 'A workspace with this name already exists.';
       }
-
       return;
     }
 
     setTimeout(() => {
       this.redirect(result.user!.role);
       this.isSubmitting = false;
-    }, 3000);
+    }, 1800);
   }
 
   continueWorkspace(user: User): void {
-    this.auth.loginExisting(user);
-    this.redirect(user.role);
+    if (this.loadingUserId) return;
+
+    this.loadingUserId = user.id;
+
+    setTimeout(() => {
+      this.auth.loginExisting(user);
+      this.redirect(user.role);
+    }, 900);
   }
 
-  deleteWorkspace(user: User): void {
-    if (!confirm(`Delete workspace for "${user.name}"?`)) return;
-    this.auth.deleteUser(user.id);
-    this.users = this.auth.getAllUsers();
-  }
-
-  private redirect(role: UserRole): void {
-    this.router.navigate([role === 'student' ? '/student' : '/teacher']);
-  }
-
-  //Delete User
   requestDelete(user: User): void {
     this.deletingUserId = user.id;
   }
@@ -88,18 +84,19 @@ export class Login {
       this.users = this.auth.getAllUsers();
       this.deletingUserId = null;
       this.loadingUserId = null;
-    }, 1600);
+    }, 1200);
   }
 
-  // UI
-  getAvatarColor(userId: string): string {
-    const colors = ['#dd791bff', '#13c9e9ff', '#29e114ff', '#c7cc37ff', '#a90fbaff', '#e30b5bff'];
-    let hash = 0;
+  private redirect(role: UserRole): void {
+    this.router.navigate([role === 'student' ? '/student' : '/teacher']);
+  }
 
+  getAvatarColor(userId: string): string {
+    const colors = ['#dd791b', '#0a8ba1ff', '#c7cc37', '#a90fba', '#e30b5b'];
+    let hash = 0;
     for (let i = 0; i < userId.length; i++) {
       hash = userId.charCodeAt(i) + ((hash << 5) - hash);
     }
-
     return colors[Math.abs(hash) % colors.length];
   }
 

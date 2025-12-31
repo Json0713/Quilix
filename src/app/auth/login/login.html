@@ -1,36 +1,35 @@
 <section class="login-wrapper">
 
-  <div class="login-layout">
+  <!-- ONE UNIFIED CARD -->
+  <article class="auth-card">
 
-    <!-- ================= LEFT : NEW WORKSPACE ================= -->
+    <!-- LEFT : CREATE / LOGIN -->
     <section
-      class="login-card"
+      class="auth-section auth-primary"
       role="form"
       aria-labelledby="login-title"
     >
 
-      <!-- Header -->
-      <header class="login-header">
-        <div class="logo" aria-hidden="true">
+      <header class="auth-header">
+        <div class="logo" aria-hidden="true" routerLink="/">
           <i class="bi bi-feather"></i>
         </div>
 
         <h1 id="login-title">Welcome to Quilix</h1>
         <p class="subtitle">
-          Create a new workspace or continue an existing one
+          Create a workspace or continue where you left off
         </p>
       </header>
 
-      <!-- Create Workspace Form -->
       <form
-        class="login-form"
+        class="auth-form"
         (ngSubmit)="createWorkspace()"
         novalidate
       >
 
-        <!-- Name -->
+        <!-- NAME -->
         <div class="field">
-          <label for="name">Your name</label>
+          <label for="name">Workspace name</label>
           <input
             id="name"
             type="text"
@@ -42,16 +41,15 @@
             autocomplete="off"
             [class.invalid]="errorMessage"
           />
+
           @if (errorMessage) {
-            <p class="error-text">
-              {{ errorMessage }}
-            </p>
+            <p class="error-text">{{ errorMessage }}</p>
           }
         </div>
 
-        <!-- Role -->
+        <!-- ROLE -->
         <div class="field">
-          <label>Choose role</label>
+          <label>Role</label>
 
           <div class="role-select">
             <button
@@ -78,11 +76,12 @@
           </div>
         </div>
 
-        <!-- Submit -->
+        <!-- ACTION -->
         <button
           type="submit"
           class="primary-action"
           [disabled]="name.trim().length < 2 || !role || isSubmitting"
+          aria-busy="{{ isSubmitting }}"
         >
           @if (isSubmitting) {
             <app-spinner [size]="18"></app-spinner>
@@ -94,119 +93,137 @@
 
       </form>
 
-      <footer class="login-footer">
-        <p>
-          Workspaces are stored locally and never uploaded.
-        </p>
+      <footer class="auth-footer">
+        <small>Stay Focus · Feel Free · Manage Easy</small>
       </footer>
+
     </section>
 
-
-    <!-- ================= RIGHT : RECENT WORKSPACES ================= -->
-    <aside class="recent-card">
+    <!-- RIGHT : RECENT WORKSPACES -->
+    <aside class="auth-section auth-secondary">
 
       <header class="recent-header">
         <h2>Recent Workspaces</h2>
-        <p>Pick up where you left off</p>
+        <p>Select a workspace to continue</p>
       </header>
 
-      <!-- Empty State -->
-      @if (users.length === 0) {
-        <div class="recent-empty">
-          <i class="bi bi-clock-history"></i>
-          <p>No recent workspaces yet</p>
-          <small>Create one to get started</small>
+      <!-- INITIAL LOADING -->
+      @if (loading) {
+        <div class="recent-loading" aria-busy="true">
+          <app-spinner [size]="28"></app-spinner>
+          <p>Preparing your workspaces…</p>
         </div>
       }
 
-      <!-- User List -->
-      @if (users.length > 0) {
-        <ul class="user-list">
-          @for (user of users; track user.id) {
+      @else {
 
-            <li
-              class="user-card"
-              [class.confirm]="deletingUserId === user.id"
-            >
+        <!-- EMPTY -->
+        @if (users.length === 0) {
+          <div class="recent-empty">
+            <i class="bi bi-clock-history"></i>
+            <p>No recent workspaces</p>
+            <small>Create one to get started</small>
+          </div>
+        }
 
-              <!-- NORMAL STATE -->
-              @if (deletingUserId !== user.id) {
-                <div
-                  class="user-info"
-                  role="button"
-                  tabindex="0"
-                  (click)="continueWorkspace(user)"
-                >
+        <!-- LIST -->
+        @if (users.length > 0) {
+          <ul class="user-list" role="list">
+
+            @for (user of users; track user.id) {
+
+              <li
+                class="user-card"
+                [class.confirm]="deletingUserId === user.id"
+              >
+
+                <!-- NORMAL -->
+                @if (deletingUserId !== user.id) {
+
                   <div
-                    class="avatar"
-                    [style.background]="getAvatarColor(user.id)"
-                    aria-hidden="true"
+                    class="user-info"
+                    role="button"
+                    tabindex="0"
+                    (click)="continueWorkspace(user)"
+                    [attr.aria-busy]="loadingUserId === user.id"
                   >
-                    <i
-                      class="bi"
-                      [class.bi-mortarboard]="user.role === 'student'"
-                      [class.bi-person-badge]="user.role === 'teacher'"
-                    ></i>
-                  </div>
 
-                  <div class="user-meta">
-                    <strong>{{ user.name }}</strong>
-                    <small>
-                      {{ user.role === 'student' ? 'Student' : 'Teacher' }}
-                      • Last active
-                      {{ user.lastActiveAt | date:'short' }}
-                    </small>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  class="delete-btn"
-                  aria-label="Delete workspace"
-                  title="Delete workspace"
-                  (click)="requestDelete(user)"
-                >
-                  <i class="bi bi-x"></i>
-                </button>
-              }
-
-              <!-- CONFIRM DELETE STATE -->
-              @else {
-                <div class="confirm-delete">
-                  <p>Delete this workspace?</p>
-
-                  <div class="confirm-actions">
-                    <button
-                      type="button"
-                      class="danger"
-                      (click)="confirmDelete(user)"
+                    <div
+                      class="avatar"
+                      [style.background]="getAvatarColor(user.id)"
+                      aria-hidden="true"
                     >
-                      @if (loadingUserId === user.id) {
-                        <app-spinner [size]="18"></app-spinner>
-                      } @else {
-                        Yes, delete
-                      }
-                    </button>
+                      <i
+                        class="bi"
+                        [class.bi-mortarboard]="user.role === 'student'"
+                        [class.bi-person-badge]="user.role === 'teacher'"
+                      ></i>
+                    </div>
 
-                    <button
-                      type="button"
-                      class="ghost"
-                      (click)="cancelDelete()"
-                    >
-                      Cancel
-                    </button>
+                    <div class="user-meta">
+                      <strong>{{ user.name }}</strong>
+                      <small>
+                        {{ user.role === 'student' ? 'Student' : 'Teacher' }}
+                        · {{ user.lastActiveAt | date:'short' }}
+                      </small>
+                    </div>
+
+                    @if (loadingUserId === user.id) {
+                      <app-spinner [size]="16"></app-spinner>
+                    }
                   </div>
-                </div>
-              }
 
-            </li>
+                  <button
+                    type="button"
+                    class="delete-btn"
+                    aria-label="Delete workspace"
+                    (click)="requestDelete(user); $event.stopPropagation()"
+                  >
+                    <i class="bi bi-x"></i>
+                  </button>
 
-          }
-        </ul>
+                }
+
+                <!-- CONFIRM DELETE -->
+                @else {
+                  <div class="confirm-delete">
+                    <p>Delete this workspace?</p>
+
+                    <div class="confirm-actions">
+                      <button
+                        type="button"
+                        class="danger"
+                        (click)="confirmDelete(user)"
+                      >
+                        @if (loadingUserId === user.id) {
+                          <app-spinner [size]="14"></app-spinner>
+                        } @else {
+                          Delete
+                        }
+                      </button>
+
+                      <button
+                        type="button"
+                        class="ghost"
+                        (click)="cancelDelete()"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                }
+
+              </li>
+
+            }
+
+          </ul>
+        }
+
       }
 
     </aside>
 
-  </div>
+  </article>
 
 </section>
