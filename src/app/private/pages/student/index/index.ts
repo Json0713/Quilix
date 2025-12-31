@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './index.scss',
 })
 export class StudentIndex {
-
+  
 }

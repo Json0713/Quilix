@@ -1,0 +1,16 @@
+:host {
+  --primary: #1a3a3f;
+  --primary-soft: #244f55;
+  --accent: #3fbac2;
+  --bg: #f4f8f9;
+  --surface: #ffffff;
+  --text-main: #102426;
+  --text-muted: #6c8a8f;
+}
+
+.root-container {
+  background: linear-gradient(160deg, var(--primary), var(--primary-soft));
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
