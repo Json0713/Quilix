@@ -40,8 +40,19 @@ export class Storage {
     this.saveUsers(users);
   }
 
-  getUserById(id: string): User | null {
+  getUserById(id: string): User | null {``
     return this.getUsers().find(u => u.id === id) ?? null;
+  }
+  
+  /* Last Active */
+  updateUserLastActive(userId: string): void {
+    const users = this.getUsers().map(user =>
+      user.id === userId
+        ? { ...user, lastActiveAt: Date.now() }
+        : user
+    );
+
+    this.saveUsers(users);
   }
 
   /* SESSION */

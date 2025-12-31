@@ -2,34 +2,48 @@
 
   <div class="login-layout">
 
-    <!-- LEFT: New Workspace -->
-    <div class="login-card" role="form" aria-labelledby="login-title">
+    <!-- ================= LEFT : NEW WORKSPACE ================= -->
+    <section
+      class="login-card"
+      role="form"
+      aria-labelledby="login-title"
+    >
 
       <!-- Header -->
       <header class="login-header">
-        <div class="logo">
+        <div class="logo" aria-hidden="true">
           <i class="bi bi-feather"></i>
         </div>
+
         <h1 id="login-title">Welcome to Quilix</h1>
-        <p>Create or continue your workspace</p>
+        <p class="subtitle">
+          Create a new workspace or continue an existing one
+        </p>
       </header>
 
-      <!-- Form -->
-      <form (ngSubmit)="createWorkspace()" class="login-form">
+      <!-- Create Workspace Form -->
+      <form
+        class="login-form"
+        (ngSubmit)="createWorkspace()"
+        novalidate
+      >
 
+        <!-- Name -->
         <div class="field">
           <label for="name">Your name</label>
           <input
             id="name"
             type="text"
+            name="name"
             placeholder="Enter your name"
             [(ngModel)]="name"
-            name="name"
             required
             minlength="2"
+            autocomplete="off"
           />
         </div>
 
+        <!-- Role -->
         <div class="field">
           <label>Choose role</label>
 
@@ -39,6 +53,7 @@
               class="role-btn"
               [class.active]="role === 'student'"
               (click)="role = 'student'"
+              aria-pressed="{{ role === 'student' }}"
             >
               <i class="bi bi-mortarboard"></i>
               <span>Student</span>
@@ -49,6 +64,7 @@
               class="role-btn"
               [class.active]="role === 'teacher'"
               (click)="role = 'teacher'"
+              aria-pressed="{{ role === 'teacher' }}"
             >
               <i class="bi bi-person-badge"></i>
               <span>Teacher</span>
@@ -56,6 +72,7 @@
           </div>
         </div>
 
+        <!-- Submit -->
         <button
           type="submit"
           class="primary-action"
@@ -68,58 +85,117 @@
       </form>
 
       <footer class="login-footer">
-        <p>Local workspaces are stored securely on this device.</p>
+        <p>
+          Workspaces are stored locally and never uploaded.
+        </p>
       </footer>
-    </div>
+    </section>
 
-    <!-- RIGHT: Recent Workspaces -->
-    @if (users.length > 0) {
-      <aside class="recent-card">
 
-        <header class="recent-header">
-          <h2>Recent Workspaces</h2>
-          <p>Continue where you left off</p>
-        </header>
+    <!-- ================= RIGHT : RECENT WORKSPACES ================= -->
+    <aside class="recent-card">
 
+      <header class="recent-header">
+        <h2>Recent Workspaces</h2>
+        <p>Pick up where you left off</p>
+      </header>
+
+      <!-- Empty State -->
+      @if (users.length === 0) {
+        <div class="recent-empty">
+          <i class="bi bi-clock-history"></i>
+          <p>No recent workspaces yet</p>
+          <small>Create one to get started</small>
+        </div>
+      }
+
+      <!-- User List -->
+      @if (users.length > 0) {
         <ul class="user-list">
           @for (user of users; track user.id) {
-            <li class="user-card">
 
-              <div
-                class="user-info"
-                (click)="continueWorkspace(user)"
-                role="button"
-                tabindex="0"
-              >
-                <div class="avatar">
-                  <i
-                    class="bi"
-                    [class.bi-mortarboard]="user.role === 'student'"
-                    [class.bi-person-badge]="user.role === 'teacher'"
-                  ></i>
+            <li
+              class="user-card"
+              [class.confirm]="deletingUserId === user.id"
+            >
+
+              <!-- NORMAL STATE -->
+              @if (deletingUserId !== user.id) {
+                <div
+                  class="user-info"
+                  role="button"
+                  tabindex="0"
+                  (click)="continueWorkspace(user)"
+                >
+                  <div
+                    class="avatar"
+                    [style.background]="getAvatarColor(user.id)"
+                    aria-hidden="true"
+                  >
+                    <i
+                      class="bi"
+                      [class.bi-mortarboard]="user.role === 'student'"
+                      [class.bi-person-badge]="user.role === 'teacher'"
+                    ></i>
+                  </div>
+
+                  <div class="user-meta">
+                    <strong>{{ user.name }}</strong>
+                    <small>
+                      {{ user.role === 'student' ? 'Student' : 'Teacher' }}
+                      • Last active
+                      {{ user.lastActiveAt | date:'short' }}
+                    </small>
+                  </div>
                 </div>
 
-                <div class="user-meta">
-                  <strong>{{ user.name }}</strong>
-                  <small>{{ user.role === 'student' ? 'Student' : 'Teacher' }}</small>
-                </div>
-              </div>
+                <button
+                  type="button"
+                  class="delete-btn"
+                  aria-label="Delete workspace"
+                  title="Delete workspace"
+                  (click)="requestDelete(user)"
+                >
+                  <i class="bi bi-x"></i>
+                </button>
+              }
 
-              <button
-                class="delete-btn"
-                (click)="deleteWorkspace(user)"
-                aria-label="Delete workspace"
-                title="Delete workspace"
-              >
-                <i class="bi bi-x"></i>
-              </button>
+              <!-- CONFIRM DELETE STATE -->
+              @else {
+                <div class="confirm-delete">
+                  <p>Delete this workspace?</p>
+
+                  <div class="confirm-actions">
+                    <button
+                      type="button"
+                      class="danger"
+                      (click)="confirmDelete(user)"
+                    >
+                      @if (loadingUserId === user.id) {
+                        <app-spinner [size]="18"></app-spinner>
+                      } @else {
+                        Yes, delete
+                      }
+                    </button>
+
+                    <button
+                      type="button"
+                      class="ghost"
+                      (click)="cancelDelete()"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              }
 
             </li>
+
           }
         </ul>
+      }
 
-      </aside>
-    }
+    </aside>
 
   </div>
 

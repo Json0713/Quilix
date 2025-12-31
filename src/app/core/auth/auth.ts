@@ -9,18 +9,26 @@ import { Session } from '../interfaces/session';
 export class AuthService {
   constructor(private storage: Storage) {}
 
-  createUser(name: string, role: UserRole): User {
+  createUser(name: string, role: UserRole): CreateUserResult {
+    const normalizedName = name.trim().toLowerCase();
+    const users = this.storage.getUsers();
+
+    if (users.some(u => u.name.toLowerCase() === normalizedName)) {
+      return { success: false, error: 'DUPLICATE_NAME' };
+    }
+
     const user: User = {
       id: crypto.randomUUID(),
       name: name.trim(),
       role,
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      lastActiveAt: Date.now()
     };
 
     this.storage.addUser(user);
     this.startSession(user.id);
 
-    return user;
+    return { success: true, user };
   }
 
   loginExisting(user: User): void {
@@ -28,6 +36,7 @@ export class AuthService {
   }
 
   private startSession(userId: string): void {
+    const now = Date.now();
     const session: Session = {
       isLoggedIn: true,
       userId,
@@ -36,6 +45,7 @@ export class AuthService {
     };
 
     this.storage.saveSession(session);
+    this.storage.updateUserLastActive(userId);
   }
 
   getCurrentUser(): User | null {
@@ -45,11 +55,18 @@ export class AuthService {
   }
 
   getAllUsers(): User[] {
-    return this.storage.getUsers();
+    return this.storage
+      .getUsers()
+      .sort((a, b) => (b.lastActiveAt ?? 0) - (a.lastActiveAt ?? 0));
   }
 
   restoreSession(): boolean {
-    return !!this.getCurrentUser();
+    const user = this.getCurrentUser();
+
+    if (!user) return false;
+
+    this.storage.updateUserLastActive(user.id);
+    return true;
   }
 
   hasRole(role: UserRole): boolean {
@@ -68,4 +85,10 @@ export class AuthService {
       this.logout();
     }
   }
+}
+
+export interface CreateUserResult {
+  success: boolean;
+  error?: 'DUPLICATE_NAME';
+  user?: User;
 }

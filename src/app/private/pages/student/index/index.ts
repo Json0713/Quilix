@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { SpinnerService } from "../../../../services/ui/spinner/spinner";
+import { AuthService } from '../../../../core/auth/auth';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-student-index',
@@ -8,7 +10,17 @@ import { SpinnerService } from "../../../../services/ui/spinner/spinner";
   styleUrl: './index.scss',
 })
 export class StudentIndex {
-  constructor(private spinner: SpinnerService) {}
+
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private spinner: SpinnerService
+  ) {}
+
+  logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
 
   loadData(): void {
     this.spinner.show();
