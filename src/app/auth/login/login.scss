@@ -3,22 +3,17 @@
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: clamp(1rem, 4vw, 2.5rem);
-  background: linear-gradient(160deg, var(--primary), var(--primary-soft));
+  padding: 1.5rem 0.15rem;
 }
 
 /* UNIFIED AUTH CARD */
 .auth-card {
   width: 100%;
-  max-width: 1200px;
+  max-width: 900px;
   background: var(--surface);
   border-radius: 18px;
   display: grid;
-  grid-template-columns: 1fr;
   overflow: hidden;
-  box-shadow:
-    0 30px 60px rgba(0, 0, 0, 0.28),
-    0 6px 14px rgba(0, 0, 0, 0.18);
 
   @media (min-width: 900px) {
     grid-template-columns: 1.1fr 0.9fr;
@@ -27,8 +22,7 @@
 
 /* SHARED SECTION BASE */
 .auth-section {
-  padding: clamp(0.2rem, 4vw, 3rem);
-  display: flex;
+  padding: 2.5rem 1.15rem;
   flex-direction: column;
 }
 
@@ -45,36 +39,6 @@
 /* RIGHT (SECONDARY) */
 .auth-secondary {
   background: var(--bg);
-}
-
-/* HEADER */
-.auth-header {
-  text-align: center;
-  margin-bottom: 2.2rem;
-
-  .logo {
-    width: 56px;
-    height: 56px;
-    margin: 0 auto 1rem;
-    border-radius: 14px;
-    background: var(--primary);
-    display: grid;
-    place-items: center;
-    color: #fff;
-    font-size: 1.6rem;
-  }
-
-  h1 {
-    font-size: clamp(1.6rem, 4vw, 2rem);
-    font-weight: 700;
-    color: var(--text-main);
-  }
-
-  .subtitle {
-    margin-top: 0.3rem;
-    font-size: 0.95rem;
-    color: var(--text-muted);
-  }
 }
 
 /* FORM */
@@ -250,7 +214,7 @@
   overflow-y: auto;
   padding-right: 14px;
   padding-left: 0;
-  max-height: 380px;
+  max-height: 300px;
 }
 
 /* USER CARD */
@@ -279,6 +243,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 6px;
   cursor: pointer;
   flex: 1;
 

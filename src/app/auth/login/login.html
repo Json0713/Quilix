@@ -1,5 +1,7 @@
 <section class="login-wrapper">
 
+  <app-header></app-header>
+
   <!-- ONE UNIFIED CARD -->
   <article class="auth-card">
 
@@ -10,16 +12,10 @@
       aria-labelledby="login-title"
     >
 
-      <header class="auth-header">
-        <div class="logo" aria-hidden="true" routerLink="/">
-          <i class="bi bi-feather"></i>
-        </div>
-
-        <h1 id="login-title">Welcome to Quilix</h1>
-        <p class="subtitle">
-          Create a workspace or continue where you left off
-        </p>
-      </header>
+    <header class="create-header">
+      <h2>Create Workspaces</h2>
+      <p>Start your workspace</p>
+    </header>
 
       <form
         class="auth-form"
@@ -38,6 +34,7 @@
             [(ngModel)]="name"
             required
             minlength="2"
+            maxlength="20"
             autocomplete="off"
             [class.invalid]="errorMessage"
           />
@@ -179,7 +176,7 @@
                     aria-label="Delete workspace"
                     (click)="requestDelete(user); $event.stopPropagation()"
                   >
-                    <i class="bi bi-x"></i>
+                    <i class="bi bi-x-diamond"></i>
                   </button>
 
                 }
@@ -225,5 +222,9 @@
     </aside>
 
   </article>
+
+  <div class="footer mt-3">
+    <app-footer></app-footer>
+  </div>
 
 </section>

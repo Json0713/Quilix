@@ -1,14 +1,17 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth';
 import { User, UserRole } from '../../core/interfaces/user';
 import { FormsModule } from '@angular/forms';
 import { Spinner } from '../../shared/ui/spinner/spinner';
 import { DatePipe } from '@angular/common';
+import { Header } from '../../public/common/header/header';
+import { Footer } from '../../public/common/footer/footer';
+
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, Spinner, DatePipe, RouterLink],
+  imports: [FormsModule, Spinner, DatePipe, Header , Footer],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
