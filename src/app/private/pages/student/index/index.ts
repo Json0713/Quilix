@@ -17,6 +17,10 @@ export class StudentIndex {
     private spinner: SpinnerService
   ) {}
 
+  ngOnInit(): void {
+    this.loadData();
+  }
+
   logout(): void {
     this.auth.logout();
     this.router.navigate(['/login']);

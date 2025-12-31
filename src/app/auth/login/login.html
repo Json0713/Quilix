@@ -40,7 +40,13 @@
             required
             minlength="2"
             autocomplete="off"
+            [class.invalid]="errorMessage"
           />
+          @if (errorMessage) {
+            <p class="error-text">
+              {{ errorMessage }}
+            </p>
+          }
         </div>
 
         <!-- Role -->
@@ -76,10 +82,14 @@
         <button
           type="submit"
           class="primary-action"
-          [disabled]="name.trim().length < 2 || !role"
+          [disabled]="name.trim().length < 2 || !role || isSubmitting"
         >
-          <span>Start Workspace</span>
-          <i class="bi bi-arrow-right"></i>
+          @if (isSubmitting) {
+            <app-spinner [size]="18"></app-spinner>
+          } @else {
+            <span>Start Workspace</span>
+            <i class="bi bi-arrow-right"></i>
+          }
         </button>
 
       </form>

@@ -18,6 +18,7 @@ export class Login {
   role: UserRole | null = null;
   users: User[] = [];
   deletingUserId: string | null = null;
+  isSubmitting = false;
   loadingUserId: string | null = null;
   errorMessage: string | null = null;
   loading = false;
@@ -30,26 +31,30 @@ export class Login {
   }
 
   createWorkspace(): void {
-    if (this.name.trim().length < 2 || !this.role) return;
+    if (this.name.trim().length < 2 || !this.role || this.isSubmitting) {
+      return;
+    }
 
-    this.loading = true;
     this.errorMessage = null;
+    this.isSubmitting = true;
 
-    setTimeout(() => {
-      const result = this.auth.createUser(this.name, this.role!);
+    const result = this.auth.createUser(this.name, this.role);
 
-      this.loading = false;
+    if (!result.success) {
+      this.isSubmitting = false;
 
-      if (!result.success) {
-        this.errorMessage =
-          result.error === 'DUPLICATE_NAME'
-            ? 'This name already exists.'
-            : 'Only one Student and one Teacher workspace are allowed.';
-        return;
+      if (result.error === 'DUPLICATE_NAME') {
+        this.errorMessage = 'A workspace with this name already exists.';
       }
 
+      return;
+    }
+
+    // UX delay 
+    setTimeout(() => {
       this.redirect(result.user!.role);
-    }, 500);
+      this.isSubmitting = false;
+    }, 3000);
   }
 
   continueWorkspace(user: User): void {
@@ -84,12 +89,12 @@ export class Login {
       this.users = this.auth.getAllUsers();
       this.deletingUserId = null;
       this.loadingUserId = null;
-    }, 600);
+    }, 1600);
   }
 
   // UI
   getAvatarColor(userId: string): string {
-    const colors = ['#3fbac2', '#6c8a8f', '#1a3a3f', '#244f55'];
+    const colors = ['#dd791bff', '#13c9e9ff', '#29e114ff', '#c7cc37ff'];
     let hash = 0;
 
     for (let i = 0; i < userId.length; i++) {
