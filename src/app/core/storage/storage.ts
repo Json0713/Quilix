@@ -32,7 +32,6 @@ export class Storage {
 
   addUser(user: User): void {
     const users = this.getUsers();
-    if (users.some(u => u.name === user.name)) return;
     this.saveUsers([...users, user]);
   }
 

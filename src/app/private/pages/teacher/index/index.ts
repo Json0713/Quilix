@@ -16,7 +16,7 @@ export class TeacherIndex {
 
     setTimeout(() => {
       this.spinner.hide();
-    }, 11500);
+    }, 3500);
   }
 
 }
