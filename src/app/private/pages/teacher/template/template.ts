@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Spinner } from '../../../../shared/ui/spinner/spinner';
+import { GlobalSpinner } from '../../../../shared/ui/spinner/global-spinner/global-spinner';
+
 
 @Component({
   selector: 'app-teacher-template',
-  imports: [RouterOutlet, Spinner],
+  imports: [RouterOutlet, GlobalSpinner],
   templateUrl: './template.html',
   styleUrl: './template.scss',
 })

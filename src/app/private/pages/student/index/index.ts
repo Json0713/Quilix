@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { SpinnerService } from "../../../../services/ui/spinner/spinner";
 
 @Component({
   selector: 'app-student-index',
@@ -7,5 +8,14 @@ import { Component } from '@angular/core';
   styleUrl: './index.scss',
 })
 export class StudentIndex {
-  
+  constructor(private spinner: SpinnerService) {}
+
+  loadData(): void {
+    this.spinner.show();
+
+    setTimeout(() => {
+      this.spinner.hide();
+    }, 11500);
+  }
+
 }
