@@ -27,7 +27,7 @@
 
 /* SHARED SECTION BASE */
 .auth-section {
-  padding: clamp(2rem, 4vw, 3rem);
+  padding: clamp(0.2rem, 4vw, 3rem);
   display: flex;
   flex-direction: column;
 }
