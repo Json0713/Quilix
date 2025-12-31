@@ -67,7 +67,7 @@
               (click)="role = 'teacher'"
               aria-pressed="{{ role === 'teacher' }}"
             >
-              <i class="bi bi-person-badge"></i>
+              <i class="bi bi-person-workspace"></i>
               <span>Teacher</span>
             </button>
           </div>
@@ -153,7 +153,7 @@
                       <i
                         class="bi"
                         [class.bi-mortarboard]="user.role === 'student'"
-                        [class.bi-person-badge]="user.role === 'teacher'"
+                        [class.bi-person-workspace]="user.role === 'teacher'"
                       ></i>
                     </div>
 
