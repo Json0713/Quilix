@@ -50,7 +50,6 @@ export class Login {
       return;
     }
 
-    // UX delay 
     setTimeout(() => {
       this.redirect(result.user!.role);
       this.isSubmitting = false;
@@ -94,7 +93,7 @@ export class Login {
 
   // UI
   getAvatarColor(userId: string): string {
-    const colors = ['#dd791bff', '#13c9e9ff', '#29e114ff', '#c7cc37ff'];
+    const colors = ['#dd791bff', '#13c9e9ff', '#29e114ff', '#c7cc37ff', '#a90fbaff', '#e30b5bff'];
     let hash = 0;
 
     for (let i = 0; i < userId.length; i++) {

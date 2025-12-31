@@ -1,6 +1,4 @@
-/* ===============================
-   ROOT WRAPPER
-================================ */
+/* ROOT WRAPPER */
 .login-wrapper {
   min-height: 100vh;
   display: flex;
@@ -9,9 +7,7 @@
   padding: 2rem;
 }
 
-/* ===============================
-   MAIN LAYOUT
-================================ */
+/* MAIN LAYOUT */
 .login-layout {
   width: 100%;
   max-width: 1100px;
@@ -24,9 +20,7 @@
   }
 }
 
-/* ===============================
-   LEFT CARD (NEW WORKSPACE)
-================================ */
+/* LEFT CARD (NEW WORKSPACE) */
 .login-card {
   background: #ffffff;
   border-radius: 18px;
@@ -69,9 +63,7 @@
   }
 }
 
-/* ===============================
-   FORM
-================================ */
+/* FORM */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -105,9 +97,7 @@
   }
 }
 
-/* ===============================
-   ROLE SELECT
-================================ */
+/* ROLE SELECT */
 .role-select {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -144,9 +134,7 @@
   }
 }
 
-/* ===============================
-   PRIMARY ACTION
-================================ */
+/* PRIMARY ACTION */
 .primary-action {
   margin-top: 1rem;
   height: 46px;
@@ -182,9 +170,7 @@
   color: #64748b;
 }
 
-/* ===============================
-   RIGHT CARD (RECENT)
-================================ */
+/* RIGHT CARD (RECENT) */
 .recent-card {
   background: #ffffff;
   border-radius: 18px;
@@ -211,9 +197,7 @@
   }
 }
 
-/* ===============================
-   EMPTY STATE
-================================ */
+/* EMPTY STATE */
 .recent-empty {
   flex: 1;
   display: flex;
@@ -237,9 +221,7 @@
   }
 }
 
-/* ===============================
-   USER LIST
-================================ */
+/* USER LIST */
 .user-list {
   display: flex;
   flex-direction: column;
@@ -261,9 +243,7 @@
   }
 }
 
-/* ===============================
-   USER CARD
-================================ */
+/* USER CARD */
 .user-card {
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -315,9 +295,7 @@
   }
 }
 
-/* ===============================
-   DELETE / CONFIRM
-================================ */
+/* DELETE / CONFIRM */
 .delete-btn {
   background: transparent;
   border: none;
