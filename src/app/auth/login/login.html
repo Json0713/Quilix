@@ -166,7 +166,9 @@
                     </div>
 
                     @if (loadingUserId === user.id) {
-                      <app-spinner [size]="16"></app-spinner>
+                      <div class="user-info-spinner" aria-hidden="true">
+                        <app-spinner [size]="24"></app-spinner>
+                      </div>
                     }
                   </div>
 

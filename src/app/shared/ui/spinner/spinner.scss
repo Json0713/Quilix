@@ -8,7 +8,7 @@
   border-top-color: #1a3a3f;
   animation:
     spin 1s linear infinite,
-    colorShift 3s ease-in-out infinite;
+    colorShift 1.5s ease-in-out infinite;
 }
 
 /* Google-like rotation */
@@ -21,7 +21,7 @@
 /* Dynamic color cycling */
 @keyframes colorShift {
   0% {
-    border-top-color: #1a3a3f;
+    border-top-color: #306a72;
   }
   33% {
     border-top-color: #244f55;

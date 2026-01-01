@@ -68,7 +68,7 @@ export class Login {
     setTimeout(() => {
       this.auth.loginExisting(user);
       this.redirect(user.role);
-    }, 900);
+    }, 1900);
   }
 
   requestDelete(user: User): void {
