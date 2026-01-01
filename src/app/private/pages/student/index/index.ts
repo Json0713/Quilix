@@ -31,7 +31,7 @@ export class StudentIndex {
 
     setTimeout(() => {
       this.spinner.hide();
-    }, 3500);
+    }, 1800);
   }
 
 }

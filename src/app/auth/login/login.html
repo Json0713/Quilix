@@ -195,7 +195,7 @@
                         (click)="confirmDelete(user)"
                       >
                         @if (loadingUserId === user.id) {
-                          <app-spinner [size]="14"></app-spinner>
+                          <app-spinner class="px-2" [size]="14"></app-spinner>
                         } @else {
                           Delete
                         }
