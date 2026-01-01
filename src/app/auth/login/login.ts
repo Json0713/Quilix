@@ -7,6 +7,8 @@ import { Spinner } from '../../shared/ui/spinner/spinner';
 import { Header } from '../../public/common/header/header';
 import { Footer } from '../../public/common/footer/footer';
 import { TimeAgoPipe } from '../../shared/ui/time-ago/time-ago-pipe';
+import { ExportImportService } from '../../core/storage/export-import';
+import { UserExportImportService } from '../../core/storage/user-export-import';
 
 
 @Component({
@@ -28,9 +30,22 @@ export class Login {
 
   constructor(
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private ei: ExportImportService,
+    private userEI: UserExportImportService
   ) {
     this.users = this.auth.getAllUsers();
+  }
+  
+  private redirect(role: UserRole): void {
+    this.router.navigate([role === 'student' ? '/student' : '/teacher']);
+  }
+
+  // Import/Export Workspace
+  private async confirmReplace(name: string): Promise<boolean> {
+    return confirm(
+      `A workspace named "${name}" already exists.\n\nDo you want to replace it?`
+    );
   }
 
   ngOnInit() {
@@ -90,10 +105,6 @@ export class Login {
     }, 1200);
   }
 
-  private redirect(role: UserRole): void {
-    this.router.navigate([role === 'student' ? '/student' : '/teacher']);
-  }
-
   getAvatarColor(userId: string): string {
     const colors = ['#dd791b', '#0a8ba1ff', '#c7cc37', '#a90fba', '#e30b5b'];
     let hash = 0;
@@ -101,6 +112,40 @@ export class Login {
       hash = userId.charCodeAt(i) + ((hash << 5) - hash);
     }
     return colors[Math.abs(hash) % colors.length];
+  }
+
+  // Import/Export
+  async importWorkspace(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    try {
+      await this.ei.importWorkspace(
+        input.files[0],
+        (name) => this.confirmReplace(name)
+      );
+
+      location.reload();
+    } catch (err) {
+      alert((err as Error).message);
+    }
+  }
+
+  // Import/Export User
+  async importUser(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    try {
+      await this.userEI.importUser(
+        input.files[0],
+        (name) => this.confirmReplace(name)
+      );
+
+      location.reload();
+    } catch (err) {
+      alert((err as Error).message);
+    }
   }
 
 }

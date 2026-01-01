@@ -340,3 +340,54 @@
   }
 }
 
+// Ixport/Import 
+.import-wrapper {
+  display: flex;
+  width: 100%;
+  max-width: 900px;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.import-item {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: var(--bs-primary);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  }
+
+  h6 {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  span {
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  label {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    border-radius: 999px;
+    background: var(--bs-primary);
+    color: #fff;
+    cursor: pointer;
+  }
+
+  input {
+    display: none;
+  }
+}

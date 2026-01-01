@@ -2,6 +2,41 @@
 
   <app-header></app-header>
 
+  <div class="import-wrapper mb-3">
+    <div class="import-item">
+      <div>
+        <h6>Workspace Import</h6>
+        <span>Upload workspace JSON file</span>
+      </div>
+
+      <label>
+        Import
+        <input
+          type="file"
+          accept="application/json"
+          (change)="importWorkspace($event)"
+        />
+      </label>
+    </div>
+
+    <div class="import-item">
+      <div>
+        <h6>User Backup Import</h6>
+        <span>Restore user backup from JSON</span>
+      </div>
+
+      <label>
+        Import
+        <input
+          type="file"
+          accept="application/json"
+          (change)="importUser($event)"
+        />
+      </label>
+    </div>
+  </div>
+
+
   <!-- ONE UNIFIED CARD -->
   <article class="auth-card">
 

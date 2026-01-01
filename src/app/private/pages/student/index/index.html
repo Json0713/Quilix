@@ -8,3 +8,29 @@
   </button>
 </header>
 
+<main class="dashboard-main">
+
+  <section class="welcome-section">
+    <h2>Welcome, Student!</h2>
+    <p>This is your dashboard where you can access your courses and track your progress.</p>
+  </section>
+
+  <section class="actions-section">
+    <div class="actions-header">
+      <h6>Workspace Actions</h6>
+      <span>Manage settings and export data</span>
+    </div>
+
+    <div class="actions-buttons">
+      <button class="action-btn primary" (click)="export()">
+        Export Workspace
+      </button>
+
+      <button class="action-btn secondary" (click)="exportUser()">
+        Export User Backup
+      </button>
+    </div>
+  </section>
+
+
+</main>
