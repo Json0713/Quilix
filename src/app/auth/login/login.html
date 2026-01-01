@@ -161,7 +161,7 @@
                       <strong>{{ user.name }}</strong>
                       <small>
                         {{ user.role === 'student' ? 'Student' : 'Teacher' }}
-                        · {{ user.lastActiveAt | date:'short' }}
+                        · {{ user.lastActiveAt | timeAgo }}
                       </small>
                     </div>
 

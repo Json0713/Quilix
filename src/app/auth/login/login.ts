@@ -4,14 +4,14 @@ import { AuthService } from '../../core/auth/auth';
 import { User, UserRole } from '../../core/interfaces/user';
 import { FormsModule } from '@angular/forms';
 import { Spinner } from '../../shared/ui/spinner/spinner';
-import { DatePipe } from '@angular/common';
 import { Header } from '../../public/common/header/header';
 import { Footer } from '../../public/common/footer/footer';
+import { TimeAgoPipe } from '../../shared/ui/time-ago/time-ago-pipe';
 
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, Spinner, DatePipe, Header , Footer],
+  imports: [FormsModule, Spinner, TimeAgoPipe, Header , Footer],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
