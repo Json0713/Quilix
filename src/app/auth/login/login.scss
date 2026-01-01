@@ -268,9 +268,14 @@
   place-items: center;
   color: #fff;
   font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
 .user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
   strong {
     display: block;
     font-size: 0.9rem;
