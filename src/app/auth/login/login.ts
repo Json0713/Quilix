@@ -9,11 +9,13 @@ import { Footer } from '../../public/common/footer/footer';
 import { TimeAgoPipe } from '../../shared/ui/time-ago/time-ago-pipe';
 import { ExportImportService } from '../../core/storage/export-import/export-import';
 import { UserExportImportService } from '../../core/storage/export-import/user-export-import';
+import { ToastService } from '../../services/ui/toast/toast';
+import { Toast } from "../../shared/ui/toast/toast";
 
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, Spinner, TimeAgoPipe, Header , Footer],
+  imports: [FormsModule, Spinner, TimeAgoPipe, Header, Footer, Toast],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -32,7 +34,8 @@ export class Login {
     private auth: AuthService,
     private router: Router,
     private ei: ExportImportService,
-    private userEI: UserExportImportService
+    private userEI: UserExportImportService,
+    private toast: ToastService
   ) {
     this.users = this.auth.getAllUsers();
   }
@@ -125,9 +128,10 @@ export class Login {
         (name) => this.confirmReplace(name)
       );
 
-      location.reload();
+      this.toast.success('Workspace imported successfully.');
+      setTimeout(() => location.reload(), 3800);
     } catch (err) {
-      alert((err as Error).message);
+      this.toast.error((err as Error).message);
     }
   }
 
@@ -142,9 +146,10 @@ export class Login {
         (name) => this.confirmReplace(name)
       );
 
-      location.reload();
+      this.toast.success('User backup imported.');
+      setTimeout(() => location.reload(), 3800);
     } catch (err) {
-      alert((err as Error).message);
+      this.toast.error((err as Error).message);
     }
   }
 

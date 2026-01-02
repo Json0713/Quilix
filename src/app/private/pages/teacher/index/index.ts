@@ -45,23 +45,23 @@ export class TeacherIndex {
   async export(): Promise<void> {
     try {
       await this.ei.exportWorkspace();
-      alert('Workspace exported successfully.');
+      this.toast.success('Workspace exported successfully.');
     } catch (e) {
-      alert((e as Error).message);
+      this.toast.error((e as Error).message || 'Export failed.');
     }
   }
 
   async exportUser(): Promise<void> {
     try {
       await this.userEI.exportCurrentUser();
-      alert('User backup exported.');
+      this.toast.success('User backup exported.');
     } catch (e) {
-      alert((e as Error).message);
+      this.toast.error((e as Error).message || 'User export failed.');
     }
   }
 
-    //Error handling is done in interceptor
-    success(): void {
+  //Error handling is done in interceptor
+  success(): void {
     this.toast.success('Saved successfully');
   }
 
