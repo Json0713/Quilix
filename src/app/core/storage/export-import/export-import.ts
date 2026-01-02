@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { STORAGE_KEYS } from './storage.key';
-import { User } from '../interfaces/user';
+import { STORAGE_KEYS } from '../storage.key';
+import { User } from '../../interfaces/user';
 
 export interface WorkspaceExport {
   app: 'Quilix';

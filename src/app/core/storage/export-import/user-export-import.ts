@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Storage } from './storage';
-import { AuthService } from '../auth/auth';
-import { User } from '../interfaces/user';
-import { Session } from '../interfaces/session';
+import { Storage } from '../storage';
+import { AuthService } from '../../auth/auth';
+import { User } from '../../interfaces/user';
+import { Session } from '../../interfaces/session';
 
 export interface UserExport {
   app: 'Quilix';

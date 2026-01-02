@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { SpinnerService } from "../../../../services/ui/spinner/spinner";
 import { AuthService } from '../../../../core/auth/auth';
 import { Router } from '@angular/router';
-import { UserExportImportService } from '../../../../core/storage/user-export-import';
-import { ExportImportService } from '../../../../core/storage/export-import';
+import { UserExportImportService } from '../../../../core/storage/export-import/user-export-import';
+import { ExportImportService } from '../../../../core/storage/export-import/export-import';
 
 @Component({
   selector: 'app-teacher-index',

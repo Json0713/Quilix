@@ -7,8 +7,8 @@ import { Spinner } from '../../shared/ui/spinner/spinner';
 import { Header } from '../../public/common/header/header';
 import { Footer } from '../../public/common/footer/footer';
 import { TimeAgoPipe } from '../../shared/ui/time-ago/time-ago-pipe';
-import { ExportImportService } from '../../core/storage/export-import';
-import { UserExportImportService } from '../../core/storage/user-export-import';
+import { ExportImportService } from '../../core/storage/export-import/export-import';
+import { UserExportImportService } from '../../core/storage/export-import/user-export-import';
 
 
 @Component({
