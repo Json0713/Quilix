@@ -38,14 +38,22 @@ export class TeacherIndex {
     }, 1800);
   }
 
-    export(): void {
-    this.ei.exportWorkspace();
-    alert('Workspace exported successfully.');
+  async export(): Promise<void> {
+    try {
+      await this.ei.exportWorkspace();
+      alert('Workspace exported successfully.');
+    } catch (e) {
+      alert((e as Error).message);
+    }
   }
 
-  exportUser(): void {
-    this.userEI.exportCurrentUser();
-    alert('User backup exported.');
+  async exportUser(): Promise<void> {
+    try {
+      await this.userEI.exportCurrentUser();
+      alert('User backup exported.');
+    } catch (e) {
+      alert((e as Error).message);
+    }
   }
 
 }

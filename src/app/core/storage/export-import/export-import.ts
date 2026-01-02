@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { STORAGE_KEYS } from '../storage.key';
 import { User } from '../../interfaces/user';
+import { BackupShareService } from '../share/backup-share';
 
 export interface WorkspaceExport {
   app: 'Quilix';
@@ -19,14 +20,20 @@ export interface WorkspaceExport {
   providedIn: 'root',
 })
 export class ExportImportService {
+
   private readonly VERSION = '0.1.0';
 
-  exportWorkspace(): void {
+  constructor(private share: BackupShareService) {}
+
+  /** EXPORT WORKSPACE */
+  async exportWorkspace(): Promise<void> {
     const data: WorkspaceExport['data'] = {};
 
     for (const key of Object.values(STORAGE_KEYS)) {
       const raw = localStorage.getItem(key);
-      if (raw) data[key.replace('quilix_', '')] = JSON.parse(raw);
+      if (raw) {
+        data[key.replace('quilix_', '')] = JSON.parse(raw);
+      }
     }
 
     const payload: WorkspaceExport = {
@@ -37,9 +44,13 @@ export class ExportImportService {
       data,
     };
 
-    this.download(payload, 'quilix-workspace');
+    await this.share.shareOrDownload(
+      payload,
+      `quilix-workspace-${Date.now()}.json`
+    );
   }
 
+  /** IMPORT WORKSPACE */
   async importWorkspace(
     file: File,
     confirmReplace: (name: string) => Promise<boolean>
@@ -70,7 +81,7 @@ export class ExportImportService {
       );
     }
 
-    // Meta, future data types (safe merge)
+    // Merge all other future-safe keys
     for (const [key, value] of Object.entries(parsed.data)) {
       if (key === 'users') continue;
       localStorage.setItem(`quilix_${key}`, JSON.stringify(value));
@@ -90,19 +101,6 @@ export class ExportImportService {
   private validate(payload: WorkspaceExport, scope: 'workspace'): void {
     if (payload.app !== 'Quilix') throw new Error('Invalid Quilix backup.');
     if (payload.scope !== scope) throw new Error('Invalid backup scope.');
-  }
-
-  private download(payload: unknown, name: string): void {
-    const blob = new Blob(
-      [JSON.stringify(payload, null, 2)],
-      { type: 'application/json' }
-    );
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${name}-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
   }
 
 }

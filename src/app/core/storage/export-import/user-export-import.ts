@@ -3,6 +3,7 @@ import { Storage } from '../storage';
 import { AuthService } from '../../auth/auth';
 import { User } from '../../interfaces/user';
 import { Session } from '../../interfaces/session';
+import { BackupShareService } from '../share/backup-share';
 
 export interface UserExport {
   app: 'Quilix';
@@ -24,10 +25,12 @@ export class UserExportImportService {
 
   constructor(
     private storage: Storage,
-    private auth: AuthService
+    private auth: AuthService,
+    private share: BackupShareService
   ) {}
 
-  exportCurrentUser(): void {
+  /** EXPORT CURRENT USER */
+  async exportCurrentUser(): Promise<void> {
     const user = this.auth.getCurrentUser();
     if (!user) throw new Error('No active user.');
 
@@ -47,9 +50,13 @@ export class UserExportImportService {
       },
     };
 
-    this.download(payload, `quilix-user-${user.name}`);
+    await this.share.shareOrDownload(
+      payload,
+      `quilix-user-${user.name}-${Date.now()}.json`
+    );
   }
 
+  /** IMPORT USER */
   async importUser(
     file: File,
     confirmReplace: (name: string) => Promise<boolean>
@@ -79,21 +86,8 @@ export class UserExportImportService {
   }
 
   private validate(payload: UserExport): void {
-    if (payload.app !== 'Quilix') throw new Error('Invalid Quilix file.');
-    if (payload.scope !== 'user') throw new Error('Invalid scope.');
-  }
-
-  private download(payload: unknown, name: string): void {
-    const blob = new Blob(
-      [JSON.stringify(payload, null, 2)],
-      { type: 'application/json' }
-    );
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${name}-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    if (payload.app !== 'Quilix') throw new Error('Invalid Quilix backup.');
+    if (payload.scope !== 'user') throw new Error('Invalid backup scope.');
   }
   
 }
