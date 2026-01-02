@@ -4,10 +4,12 @@ import { AuthService } from '../../../../core/auth/auth';
 import { Router } from '@angular/router';
 import { ExportImportService } from '../../../../core/storage/export-import/export-import';
 import { UserExportImportService } from '../../../../core/storage/export-import/user-export-import';
+import { ToastService } from '../../../../services/ui/toast/toast';
+import { Toast } from '../../../../shared/ui/toast/toast';
 
 @Component({
   selector: 'app-student-index',
-  imports: [],
+  imports: [Toast],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
@@ -18,7 +20,8 @@ export class StudentIndex {
     private router: Router,
     private spinner: SpinnerService,
     private ei: ExportImportService,
-    private userEI: UserExportImportService
+    private userEI: UserExportImportService,
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -38,6 +41,7 @@ export class StudentIndex {
     }, 1800);
   }
 
+  // Import-Export Testing
   async export(): Promise<void> {
     try {
       await this.ei.exportWorkspace();
@@ -54,6 +58,23 @@ export class StudentIndex {
     } catch (e) {
       alert((e as Error).message);
     }
+  }
+
+  //Error handling is done in interceptor
+    success(): void {
+    this.toast.success('Saved successfully');
+  }
+
+  error(): void {
+    this.toast.error('Failed to load data');
+  }
+
+  warning(): void {
+    this.toast.warning('Unsaved changes');
+  }
+
+  info(): void {
+    this.toast.info('Loading profile…');
   }
 
 }

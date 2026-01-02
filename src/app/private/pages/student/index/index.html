@@ -10,6 +10,7 @@
 
 <main class="dashboard-main">
 
+  <!-- Import-Export Testing -->
   <section class="welcome-section">
     <h2>Welcome, Student!</h2>
     <p>This is your dashboard where you can access your courses and track your progress.</p>
@@ -31,6 +32,32 @@
       </button>
     </div>
   </section>
+
+
+  <!-- Toast Testing Buttons -->
+  <app-toast></app-toast>
+  <div class="container mt-4">
+    <h5>Toast Test</h5>
+
+    <div class="d-flex gap-2 flex-wrap">
+      <button class="btn btn-success" (click)="success()">
+        Success
+      </button>
+
+      <button class="btn btn-danger" (click)="error()">
+        Error
+      </button>
+
+      <button class="btn btn-warning text-dark" (click)="warning()">
+        Warning
+      </button>
+
+      <button class="btn btn-info text-dark" (click)="info()">
+        Info
+      </button>
+    </div>
+  </div>
+
 
 
 </main>
