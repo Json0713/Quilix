@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { Spinner } from '../../shared/ui/common/spinner/spinner';
 import { Header } from '../../public/common/header/header';
 import { Footer } from '../../public/common/footer/footer';
-import { TimeAgoPipe } from '../../shared/ui/time-ago/time-ago-pipe';
+import { TimeAgoPipe } from '../../shared/ui/common/time-ago/time-ago-pipe';
 import { ExportImportService } from '../../core/storage/export-import/export-import';
 import { UserExportImportService } from '../../core/storage/export-import/user-export-import';
 import { ToastService } from '../../services/ui/toast/toast';
