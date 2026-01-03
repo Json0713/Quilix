@@ -9,7 +9,7 @@ import { Footer } from '../../public/common/footer/footer';
 import { TimeAgoPipe } from '../../shared/ui/common/time-ago/time-ago-pipe';
 import { ExportImportService } from '../../core/storage/export-import/export-import';
 import { UserExportImportService } from '../../core/storage/export-import/user-export-import';
-import { ToastService } from '../../services/ui/toast/toast';
+import { ToastService } from '../../services/ui/common/toast/toast';
 import { Toast } from "../../shared/ui/common/toast/toast";
 
 

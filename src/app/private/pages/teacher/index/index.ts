@@ -4,7 +4,7 @@ import { AuthService } from '../../../../core/auth/auth';
 import { Router } from '@angular/router';
 import { UserExportImportService } from '../../../../core/storage/export-import/user-export-import';
 import { ExportImportService } from '../../../../core/storage/export-import/export-import';
-import { ToastService } from '../../../../services/ui/toast/toast';
+import { ToastService } from '../../../../services/ui/common/toast/toast';
 import { Toast } from "../../../../shared/ui/common/toast/toast";
 
 
