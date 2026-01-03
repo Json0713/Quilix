@@ -12,11 +12,12 @@ import { UserExportImportService } from '../../core/storage/export-import/user-e
 import { ToastService } from '../../services/ui/common/toast/toast';
 import { Toast } from "../../shared/ui/common/toast/toast";
 import { ToastRelay as ToastRelayService } from '../../services/ui/common/toast/toast-relay';
+import { ModalService } from '../../services/ui/common/modal/modal';
 
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, Spinner, TimeAgoPipe, Header, Footer, Toast],
+  imports: [ FormsModule, Spinner, TimeAgoPipe, Header, Footer, Toast ],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -37,7 +38,8 @@ export class Login {
     private ei: ExportImportService,
     private userEI: UserExportImportService,
     private toast: ToastService,
-    private toastRelay: ToastRelayService
+    private toastRelay: ToastRelayService,
+    private modal: ModalService
   ) {
     this.users = this.auth.getAllUsers();
     toastRelay.consume();
@@ -49,8 +51,13 @@ export class Login {
 
   // Import/Export Workspace
   private async confirmReplace(name: string): Promise<boolean> {
-    return confirm(
-      `A workspace named "${name}" already exists.\n\nDo you want to replace it?`
+    return this.modal.confirm(
+      `A workspace named "${name}" already exists. Do you want to replace it?`,
+      {
+        title: 'Replace Workspace',
+        confirmText: 'Replace',
+        cancelText: 'Cancel',
+      }
     );
   }
 

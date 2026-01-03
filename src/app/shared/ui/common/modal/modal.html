@@ -1,0 +1,23 @@
+@if (modal.modal()) {
+  <div class="modal-backdrop" (click)="cancel()"></div>
+
+  <div class="modal-card" role="dialog">
+    <h3 class="modal-title">{{ modal.modal()?.title }}</h3>
+
+    <p class="modal-message">
+      {{ modal.modal()?.message }}
+    </p>
+
+    <div class="modal-actions">
+      @if (modal.modal()?.type === 'confirm') {
+        <button class="btn secondary" (click)="cancel()">
+          {{ modal.modal()?.cancelText }}
+        </button>
+      }
+
+      <button class="btn primary" (click)="confirm()">
+        {{ modal.modal()?.confirmText }}
+      </button>
+    </div>
+  </div>
+}
