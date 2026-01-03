@@ -11,6 +11,7 @@ import { ExportImportService } from '../../core/storage/export-import/export-imp
 import { UserExportImportService } from '../../core/storage/export-import/user-export-import';
 import { ToastService } from '../../services/ui/common/toast/toast';
 import { Toast } from "../../shared/ui/common/toast/toast";
+import { ToastRelay as ToastRelayService } from '../../services/ui/common/toast/toast-relay';
 
 
 @Component({
@@ -35,9 +36,11 @@ export class Login {
     private router: Router,
     private ei: ExportImportService,
     private userEI: UserExportImportService,
-    private toast: ToastService
+    private toast: ToastService,
+    private toastRelay: ToastRelayService
   ) {
     this.users = this.auth.getAllUsers();
+    toastRelay.consume();
   }
   
   private redirect(role: UserRole): void {
@@ -128,14 +131,17 @@ export class Login {
         (name) => this.confirmReplace(name)
       );
 
-      this.toast.success('Workspace imported successfully.');
-      setTimeout(() => location.reload(), 3800);
+      this.toastRelay.set(
+        'success',
+        'Workspace imported successfully.'
+      );
+
+      location.reload();
     } catch (err) {
       this.toast.error((err as Error).message);
     }
   }
 
-  // Import/Export User
   async importUser(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
@@ -146,8 +152,12 @@ export class Login {
         (name) => this.confirmReplace(name)
       );
 
-      this.toast.success('User backup imported.');
-      setTimeout(() => location.reload(), 3800);
+      this.toastRelay.set(
+        'success',
+        'User backup imported successfully.'
+      );
+
+      location.reload();
     } catch (err) {
       this.toast.error((err as Error).message);
     }
