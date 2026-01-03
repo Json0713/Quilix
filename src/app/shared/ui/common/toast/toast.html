@@ -1,29 +1,37 @@
 <div class="toast-container">
   @for (t of toast.toasts(); track t.id) {
-    <div class="toast-card" [class]="t.type" (click)="toast.remove(t.id)">
-      
-      <div class="icon-wrapper">
-        @if (t.type === 'success') {
-          <i class="bi bi-check-lg"></i>
-        }
-        @if (t.type === 'error') {
-          <i class="bi bi-x-lg"></i>
-        }
-        @if (t.type === 'warning') {
-          <i class="bi bi-exclamation-lg"></i>
-        }
-        @if (t.type === 'info') {
-          <i class="bi bi-info-lg"></i>
-        }
-      </div>
+    <div
+      class="toast-card"
+      [class]="t.type"
+      (click)="toast.remove(t.id)"
+    >
+      <div class="toast-body">
+        <div class="icon-wrapper">
+          @if (t.type === 'success') {
+            <i class="bi bi-check-lg"></i>
+          }
+          @if (t.type === 'error') {
+            <i class="bi bi-x-lg"></i>
+          }
+          @if (t.type === 'warning') {
+            <i class="bi bi-exclamation-lg"></i>
+          }
+          @if (t.type === 'info') {
+            <i class="bi bi-info-lg"></i>
+          }
+        </div>
 
-      <div class="toast-content">
-        <div class="toast-message">{{ t.message }}</div>
-        <div
-          class="toast-progress"
-          [style.animation-duration.ms]="t.duration">
+        <div class="toast-content">
+          <div class="toast-message">
+            {{ t.message }}
+          </div>
         </div>
       </div>
+
+      <div
+        class="toast-progress"
+        [style.animation-duration.ms]="t.duration"
+      ></div>
     </div>
   }
 </div>
