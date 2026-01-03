@@ -10,7 +10,7 @@ import { TimeAgoPipe } from '../../shared/ui/time-ago/time-ago-pipe';
 import { ExportImportService } from '../../core/storage/export-import/export-import';
 import { UserExportImportService } from '../../core/storage/export-import/user-export-import';
 import { ToastService } from '../../services/ui/toast/toast';
-import { Toast } from "../../shared/ui/toast/toast";
+import { Toast } from "../../shared/ui/common/toast/toast";
 
 
 @Component({
