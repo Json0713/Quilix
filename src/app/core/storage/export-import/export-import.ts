@@ -54,7 +54,7 @@ export class ExportImportService {
   async importWorkspace(
     file: File,
     confirmReplace: (name: string) => Promise<boolean>
-  ): Promise<void> {
+  ): Promise<boolean> {
     const parsed = await this.read(file);
     this.validate(parsed, 'workspace');
 
@@ -71,7 +71,12 @@ export class ExportImportService {
           existingUsers.push(imported);
         } else {
           const shouldReplace = await confirmReplace(imported.name);
-          if (shouldReplace) existingUsers[index] = imported;
+
+          if (!shouldReplace) {
+            return false;
+          }
+
+          existingUsers[index] = imported;
         }
       }
 
@@ -81,11 +86,12 @@ export class ExportImportService {
       );
     }
 
-    // Merge all other future-safe keys
     for (const [key, value] of Object.entries(parsed.data)) {
       if (key === 'users') continue;
       localStorage.setItem(`quilix_${key}`, JSON.stringify(value));
     }
+
+    return true;
   }
 
   private getUsers(): User[] {

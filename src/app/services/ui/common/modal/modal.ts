@@ -41,9 +41,17 @@ export class ModalService {
     });
   }
 
-  close(result = false): void {
+  /** Called only by Confirm button */
+  confirmResult(): void {
     const modal = this._modal();
-    modal?.resolve?.(result);
+    modal?.resolve?.(true);
+    this._modal.set(null);
+  }
+
+  /** Called by Cancel, backdrop, ESC */
+  cancelResult(): void {
+    const modal = this._modal();
+    modal?.resolve?.(false);
     this._modal.set(null);
   }
   

@@ -49,7 +49,7 @@ export class Login {
     this.router.navigate([role === 'student' ? '/student' : '/teacher']);
   }
 
-  // Import/Export Workspace
+  // Import/Export Helprer
   private async confirmReplace(name: string): Promise<boolean> {
     return this.modal.confirm(
       `A workspace named "${name}" already exists. Do you want to replace it?`,
@@ -127,16 +127,20 @@ export class Login {
     return colors[Math.abs(hash) % colors.length];
   }
 
-  // Import/Export
+  // IMPORT - WORKSPACE
   async importWorkspace(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
 
     try {
-      await this.ei.importWorkspace(
+      const success = await this.ei.importWorkspace(
         input.files[0],
-        (name) => this.confirmReplace(name)
+        name => this.confirmReplace(name)
       );
+
+      input.value = '';
+
+      if (!success) return;
 
       this.toastRelay.set(
         'success',
@@ -145,19 +149,25 @@ export class Login {
 
       location.reload();
     } catch (err) {
+      input.value = '';
       this.toast.error((err as Error).message);
     }
   }
 
+  // IMPORT USER
   async importUser(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
 
     try {
-      await this.userEI.importUser(
+      const success = await this.userEI.importUser(
         input.files[0],
-        (name) => this.confirmReplace(name)
+        name => this.confirmReplace(name)
       );
+
+      input.value = '';
+
+      if (!success) return;
 
       this.toastRelay.set(
         'success',
@@ -166,6 +176,7 @@ export class Login {
 
       location.reload();
     } catch (err) {
+      input.value = '';
       this.toast.error((err as Error).message);
     }
   }

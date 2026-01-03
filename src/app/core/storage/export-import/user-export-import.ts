@@ -60,7 +60,7 @@ export class UserExportImportService {
   async importUser(
     file: File,
     confirmReplace: (name: string) => Promise<boolean>
-  ): Promise<void> {
+  ): Promise<boolean> {
     const parsed = await this.read(file);
     this.validate(parsed);
 
@@ -71,7 +71,7 @@ export class UserExportImportService {
 
     if (index !== -1) {
       const shouldReplace = await confirmReplace(parsed.user.name);
-      if (!shouldReplace) return;
+      if (!shouldReplace) return false;
       users[index] = parsed.user;
     } else {
       users.push(parsed.user);
@@ -79,6 +79,8 @@ export class UserExportImportService {
 
     this.storage.saveUsers(users);
     this.storage.saveSession(parsed.data.session);
+
+    return true;
   }
 
   private async read(file: File): Promise<UserExport> {

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { inject } from '@angular/core';
+import { inject, HostListener } from '@angular/core';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
 
 @Component({
@@ -12,10 +12,16 @@ export class Modal {
   readonly modal = inject(ModalService);
 
   confirm(): void {
-    this.modal.close(true);
+    this.modal.confirmResult();
   }
 
   cancel(): void {
-    this.modal.close(false);
+    this.modal.cancelResult();
   }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.cancel();
+  }
+  
 }
