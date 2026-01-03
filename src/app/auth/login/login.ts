@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth';
 import { User, UserRole } from '../../core/interfaces/user';
 import { FormsModule } from '@angular/forms';
-import { Spinner } from '../../shared/ui/spinner/spinner';
+import { Spinner } from '../../shared/ui/common/spinner/spinner';
 import { Header } from '../../public/common/header/header';
 import { Footer } from '../../public/common/footer/footer';
 import { TimeAgoPipe } from '../../shared/ui/time-ago/time-ago-pipe';
