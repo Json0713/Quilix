@@ -76,6 +76,15 @@
     color: var(--text-main);
   }
 
+  .file-name {
+    max-width: 100%;
+    display: block;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   span {
     font-size: 0.75rem;
     color: var(--text-muted);
@@ -143,8 +152,6 @@
     border-radius: 50px;
   }
 }
-
-
 
 /* LOADING / DISABLED STATES */
 button[disabled] {

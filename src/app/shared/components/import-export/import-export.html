@@ -41,7 +41,12 @@
     }
 
     @if (file) {
-      <strong>{{ file.name }}</strong>
+      <strong
+        class="file-name"
+        [title]="file.name"
+      >
+        {{ file.name }}
+      </strong>
       <span>{{ (file.size / 1024).toFixed(1) }} KB</span>
     }
 
