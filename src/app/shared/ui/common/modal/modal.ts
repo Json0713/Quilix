@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { inject, HostListener } from '@angular/core';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
+import { ImportExport } from '../../../components/import-export/import-export';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-modal',
-  imports: [],
+  imports: [ CommonModule, ImportExport],
   templateUrl: './modal.html',
   styleUrl: './modal.scss',
 })

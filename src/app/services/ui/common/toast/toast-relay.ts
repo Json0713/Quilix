@@ -11,11 +11,15 @@ interface PendingToast {
 @Injectable({
   providedIn: 'root',
 })
-export class ToastRelay {
+export class ToastRelayService {
   
   private readonly KEY = 'quilix_post_reload_toast';
 
-  constructor(private toast: ToastService) {}
+  constructor(
+    private toast: ToastService
+  ) {
+
+  }
 
   /** Call BEFORE reload */
   set(type: ToastType, message: string, duration?: number): void {

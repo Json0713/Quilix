@@ -54,5 +54,14 @@ export class ModalService {
     modal?.resolve?.(false);
     this._modal.set(null);
   }
-  
+
+  openImportExport(): void {
+    this._modal.set({
+      id: ++this.id,
+      type: 'custom',
+      title: 'Import Backup',
+      view: 'import-export',
+    });
+  }
+
 }

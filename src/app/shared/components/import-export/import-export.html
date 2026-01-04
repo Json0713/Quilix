@@ -1,0 +1,35 @@
+<div class="import-wrapper">
+  <div class="import-item">
+    <div>
+      <h6>Workspace Import</h6>
+      <span>Upload workspace backup</span>
+    </div>
+
+    <label class="btn secondary">
+      Import
+      <input
+        type="file"
+        accept="application/json"
+        hidden
+        (change)="importWorkspace($event)"
+      />
+    </label>
+  </div>
+
+  <div class="import-item">
+    <div>
+      <h6>User Backup Import</h6>
+      <span>Restore user backup</span>
+    </div>
+
+    <label class="btn secondary">
+      Import
+      <input
+        type="file"
+        accept="application/json"
+        hidden
+        (change)="importUser($event)"
+      />
+    </label>
+  </div>
+</div>

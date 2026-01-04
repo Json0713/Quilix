@@ -9,7 +9,7 @@ import { Footer } from '../../public/common/footer/footer';
 import { TimeAgoPipe } from '../../shared/ui/common/time-ago/time-ago-pipe';
 import { ExportImportService } from '../../core/storage/export-import/export-import';
 import { UserExportImportService } from '../../core/storage/export-import/user-export-import';
-import { ToastRelay as ToastRelayService } from '../../services/ui/common/toast/toast-relay';
+import { ToastRelayService as ToastRelayService } from '../../services/ui/common/toast/toast-relay';
 import { ToastService } from '../../services/ui/common/toast/toast';
 import { ModalService } from '../../services/ui/common/modal/modal';
 
@@ -37,11 +37,11 @@ export class Login {
     private ei: ExportImportService,
     private userEI: UserExportImportService,
     private toast: ToastService,
-    private toastRelay: ToastRelayService,
+    private ToastRelayService: ToastRelayService,
     private modal: ModalService
   ) {
     this.users = this.auth.getAllUsers();
-    toastRelay.consume();
+    ToastRelayService.consume();
   }
   
   private redirect(role: UserRole): void {
@@ -126,58 +126,8 @@ export class Login {
     return colors[Math.abs(hash) % colors.length];
   }
 
-  // IMPORT - WORKSPACE
-  async importWorkspace(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
-
-    try {
-      const success = await this.ei.importWorkspace(
-        input.files[0],
-        name => this.confirmReplace(name)
-      );
-
-      input.value = '';
-
-      if (!success) return;
-
-      this.toastRelay.set(
-        'success',
-        'Workspace imported successfully.'
-      );
-
-      location.reload();
-    } catch (err) {
-      input.value = '';
-      this.toast.error((err as Error).message);
-    }
-  }
-
-  // IMPORT USER
-  async importUser(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
-
-    try {
-      const success = await this.userEI.importUser(
-        input.files[0],
-        name => this.confirmReplace(name)
-      );
-
-      input.value = '';
-
-      if (!success) return;
-
-      this.toastRelay.set(
-        'success',
-        'User backup imported successfully.'
-      );
-
-      location.reload();
-    } catch (err) {
-      input.value = '';
-      this.toast.error((err as Error).message);
-    }
+  openImport(): void {
+    this.modal.openImportExport();
   }
 
 }

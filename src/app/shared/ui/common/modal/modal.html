@@ -7,21 +7,33 @@
         {{ modal.modal()?.title }}
       </h3>
 
-      <p class="modal-message">
-        {{ modal.modal()?.message }}
-      </p>
+      @switch (modal.modal()?.type) {
 
-      <div class="modal-actions">
-        @if (modal.modal()?.type === 'confirm') {
-          <button class="btn secondary" (click)="cancel()">
-            {{ modal.modal()?.cancelText }}
-          </button>
+        @case ('custom') {
+          @if (modal.modal()?.view === 'import-export') {
+            <app-import-export />
+          }
         }
 
-        <button class="btn primary" (click)="confirm()">
-          {{ modal.modal()?.confirmText }}
-        </button>
-      </div>
+        @default {
+          <p class="modal-message">
+            {{ modal.modal()?.message }}
+          </p>
+
+          <div class="modal-actions">
+            @if (modal.modal()?.type === 'confirm') {
+              <button class="btn secondary" (click)="cancel()">
+                {{ modal.modal()?.cancelText }}
+              </button>
+            }
+
+            <button class="btn primary" (click)="confirm()">
+              {{ modal.modal()?.confirmText }}
+            </button>
+          </div>
+        }
+
+      }
     </div>
   </div>
 }
