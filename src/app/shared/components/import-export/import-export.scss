@@ -125,13 +125,26 @@
 .actions {
   display: flex;
   justify-content: flex-end;
+
   gap: 0.5rem;
-  margin-top: 0.5rem;
+
+  .primary {
+    color: #cbd5f5;
+    background-color: #1336ac;
+  }
+
+  .secondary {
+    color: #cbd5f5;
+    background-color: #c70f0f;
+  }
 
   .btn {
     min-width: 88px;
+    border-radius: 50px;
   }
 }
+
+
 
 /* LOADING / DISABLED STATES */
 button[disabled] {
