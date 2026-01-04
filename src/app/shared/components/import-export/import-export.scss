@@ -7,7 +7,6 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-
 }
 
 /* HEADER */
@@ -175,13 +174,13 @@
   gap: 0.5rem;
 
   .primary {
-    color: #cbd5f5;
-    background-color: #1336ac;
+    color: #ffff;
+    background-color: #0d47b3e8;
   }
 
   .secondary {
-    color: #cbd5f5;
-    background-color: #c70f0f;
+    color: #ffff;
+    background-color: #d32e2e;
   }
 
   .btn {

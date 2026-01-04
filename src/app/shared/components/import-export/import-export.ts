@@ -30,7 +30,6 @@ export class ImportExport {
   ) {}
 
   /* File handling */
-
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
@@ -56,7 +55,6 @@ export class ImportExport {
   }
 
   /* Import submit (SINGLE FLOW) */
-
   async submitImport(): Promise<void> {
     if (!this.file || this.loading) return;
 
@@ -98,7 +96,6 @@ export class ImportExport {
   }
 
   /*  Duplicate confirmation */
-
   private confirmReplace(name: string): Promise<boolean> {
     return this.modal.confirm(
       `"${name}" already exists. Do you want to replace it?`,
