@@ -1,12 +1,15 @@
-<div class="import-wrapper">
-  <div class="import-item">
-    <div>
-      <h6>Workspace Import</h6>
-      <span>Upload workspace backup</span>
+<section class="import-wrapper" role="group" aria-label="Import options">
+
+  <!-- Workspace Import -->
+  <article class="import-card">
+    <div class="import-meta">
+      <h6 class="import-title">Workspace Import</h6>
+      <p class="import-subtitle">Upload workspace backup</p>
     </div>
 
-    <label class="btn secondary">
-      Import
+    <label class="import-action" role="button">
+      <i class="bi bi-upload"></i>
+      <span>Import</span>
       <input
         type="file"
         accept="application/json"
@@ -14,16 +17,18 @@
         (change)="importWorkspace($event)"
       />
     </label>
-  </div>
+  </article>
 
-  <div class="import-item">
-    <div>
-      <h6>User Backup Import</h6>
-      <span>Restore user backup</span>
+  <!-- User Import -->
+  <article class="import-card">
+    <div class="import-meta">
+      <h6 class="import-title">User Backup Import</h6>
+      <p class="import-subtitle">Restore user backup</p>
     </div>
 
-    <label class="btn secondary">
-      Import
+    <label class="import-action" role="button">
+      <i class="bi bi-upload"></i>
+      <span>Import</span>
       <input
         type="file"
         accept="application/json"
@@ -31,5 +36,6 @@
         (change)="importUser($event)"
       />
     </label>
-  </div>
-</div>
+  </article>
+
+</section>

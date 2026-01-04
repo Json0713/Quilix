@@ -2,10 +2,6 @@
 
   <app-header></app-header>
 
-  <button class="btn secondary" (click)="openImport()">
-    Import Backup
-  </button>
-
   <!-- ONE UNIFIED CARD -->
   <article class="auth-card">
 
@@ -102,10 +98,22 @@
     <!-- RIGHT : RECENT WORKSPACES -->
     <aside class="auth-section auth-secondary">
 
-      <header class="recent-header">
+    <header class="recent-header">
+      <div class="recent-header-text">
         <h2>Recent Workspaces</h2>
         <p>Select a workspace to continue</p>
-      </header>
+      </div>
+
+      <button
+        type="button"
+        class="btn secondary import-trigger"
+        (click)="openImport()"
+        aria-label="Import backup"
+      >
+        <i class="bi bi-cloud-arrow-down"></i>
+        Import
+      </button>
+    </header>
 
       <!-- INITIAL LOADING -->
       @if (loading) {

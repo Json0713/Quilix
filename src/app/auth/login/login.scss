@@ -169,20 +169,35 @@
   color: var(--text-muted);
 }
 
-/* RECENT WORKSPACES */
+/* RECENT WORKSPACES HEADER */
 .recent-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+
   margin-bottom: 1.2rem;
+}
 
-  h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-main);
-  }
+/* LEFT TEXT GROUP */
+.recent-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
 
-  p {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-  }
+.recent-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.recent-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 /* LOADING / EMPTY */
@@ -340,54 +355,40 @@
   }
 }
 
-// Ixport/Import 
-.import-wrapper {
-  display: flex;
-  width: 100%;
-  max-width: 900px;
-  gap: 1rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-}
-
-.import-item {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
+/* IMPORT TRIGGER BUTTON */
+.import-trigger {
+  display: inline-flex;
   align-items: center;
-  padding: 1rem 1.25rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #fff;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color:rgba(63, 185, 194, 0.147);
+  gap: 0.45rem;
+
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+
+  i {
+    font-size: 1.2rem;
+  }
 
   &:hover {
-    border-color: var(--bs-primary);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+    outline: 3px solid rgba(63, 186, 194, 0.35);
   }
 
-  h6 {
-    margin: 0;
-    font-weight: 600;
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
   }
 
-  span {
-    font-size: 0.85rem;
-    color: #6b7280;
-  }
-
-  label {
-    padding: 0.4rem 0.9rem;
-    font-size: 0.85rem;
-    border-radius: 999px;
-    background: var(--primary);
-    color: #fff;
-    cursor: pointer;
-  }
-
-  input {
-    display: none;
+  &:focus-visible {
+    outline: 3px solid rgba(63, 186, 194, 0.35);
   }
 }
