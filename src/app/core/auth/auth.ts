@@ -1,71 +1,45 @@
 import { Injectable } from '@angular/core';
-import { Storage } from '../storage/storage';
 import { User, UserRole } from '../interfaces/user';
-import { Session } from '../interfaces/session';
+import { UserService } from '../users/user.service';
+import { SessionService } from '../session/session.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private storage: Storage) {}
+  constructor(
+    private users: UserService,
+    private sessions: SessionService
+  ) {}
 
   createUser(name: string, role: UserRole): CreateUserResult {
-    const normalizedName = name.trim().toLowerCase();
-    const users = this.storage.getUsers();
-
-    if (users.some(u => u.name.toLowerCase() === normalizedName)) {
+    if (this.users.existsByName(name)) {
       return { success: false, error: 'DUPLICATE_NAME' };
     }
 
-    const user: User = {
-      id: crypto.randomUUID(),
-      name: name.trim(),
-      role,
-      createdAt: Date.now(),
-      lastActiveAt: Date.now()
-    };
-
-    this.storage.addUser(user);
-    this.startSession(user.id);
+    const user = this.users.create(name, role);
+    this.sessions.start(user.id);
+    this.users.updateLastActive(user.id);
 
     return { success: true, user };
   }
 
   loginExisting(user: User): void {
-    this.startSession(user.id);
-  }
-
-  private startSession(userId: string): void {
-    const now = Date.now();
-    const session: Session = {
-      isLoggedIn: true,
-      userId,
-      startedAt: Date.now(),
-      lastActiveAt: Date.now()
-    };
-
-    this.storage.saveSession(session);
-    this.storage.updateUserLastActive(userId);
+    this.sessions.start(user.id);
+    this.users.updateLastActive(user.id);
   }
 
   getCurrentUser(): User | null {
-    const session = this.storage.getSession();
+    const session = this.sessions.get();
     if (!session?.isLoggedIn || !session.userId) return null;
-    return this.storage.getUserById(session.userId);
-  }
-
-  getAllUsers(): User[] {
-    return this.storage
-      .getUsers()
-      .sort((a, b) => (b.lastActiveAt ?? 0) - (a.lastActiveAt ?? 0));
+    return this.users.getById(session.userId);
   }
 
   restoreSession(): boolean {
     const user = this.getCurrentUser();
-
     if (!user) return false;
 
-    this.storage.updateUserLastActive(user.id);
+    this.users.updateLastActive(user.id);
     return true;
   }
 
@@ -74,13 +48,13 @@ export class AuthService {
   }
 
   logout(): void {
-    this.storage.clearSession();
+    this.sessions.clear();
   }
 
   deleteUser(userId: string): void {
-    this.storage.removeUser(userId);
+    this.users.delete(userId);
 
-    const session = this.storage.getSession();
+    const session = this.sessions.get();
     if (session?.userId === userId) {
       this.logout();
     }
