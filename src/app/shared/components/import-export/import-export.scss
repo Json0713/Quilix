@@ -22,26 +22,63 @@
     font-size: 0.75rem;
     color: var(--text-muted);
   }
+    
+  .scope-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 
-  select {
-    font-size: 0.75rem;
     padding: 0.35rem 0.75rem;
     border-radius: 999px;
     border: 1px solid #d1d5db;
     background: #f8fafc;
+
+    font-size: 0.75rem;
     cursor: pointer;
-    outline: none;
+  }
 
-    transition: border-color 0.15s ease, background 0.15s ease;
+  .scope-menu {
+    position: absolute;
+    top: calc(100% + 0.2rem); // spacing from button
+    right: 0;
 
-    &:hover {
-      border-color: var(--primary);
+    z-index: 50;
+
+    min-width: 140px;
+
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    padding: 0.25rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    button {
+      all: unset;
+      cursor: pointer;
+
+      padding: 0.45rem 0.75rem;
+      border-radius: 10px;
+      font-size: 0.75rem;
+
+      &:hover {
+        background: #eef6ff;
+      }
     }
+  }
 
-    &:focus {
-      border-color: var(--primary);
-      background: #ffffff;
-    }
+  .scope-select {
+    position: relative; 
+  }
+
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
   }
 }
 

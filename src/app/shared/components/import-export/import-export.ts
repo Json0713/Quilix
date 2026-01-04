@@ -19,6 +19,7 @@ export class ImportExport {
   scope: ImportScope = 'workspace';
   file: File | null = null;
   loading = false;
+  scopeOpen = false;
 
   constructor(
     private workspaceEI: ExportImportService,
@@ -107,6 +108,11 @@ export class ImportExport {
         cancelText: 'Cancel',
       }
     );
+  }
+
+  setScope(value: 'workspace' | 'user') {
+    this.scope = value;
+    this.scopeOpen = false;
   }
 
 }
