@@ -1,13 +1,14 @@
-/* Backdrop */
+/* BACKDROP */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.55); /* slate-900/55 */
+  background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(6px);
   z-index: 999;
+  animation: fadeIn 0.2s ease;
 }
 
-/* Wrapper (centering + animation) */
+/* WRAPPER */
 .modal-wrapper {
   position: fixed;
   inset: 0;
@@ -16,54 +17,94 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
-  animation: fadeIn 0.25s ease;
 }
 
-/* Card */
+/* CARD */
 .modal-card {
+  position: relative;
   width: 100%;
   max-width: 420px;
   background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 18px;
+  padding: 24px 22px 22px;
   box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.15),
     0 8px 16px rgba(0, 0, 0, 0.08);
-  animation: scaleIn 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: scaleIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Title */
+/* CLOSE BUTTON */
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: none;
+  background: #f1f5f9;
+  color: #475569;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
+
+  i {
+    font-size: 0.85rem;
+  }
+
+  &:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(63, 186, 194, 0.35);
+  }
+}
+
+/* TITLE */
 .modal-title {
-  font-size: 18px;
+  font-size: 1.05rem;
   font-weight: 600;
-  color: #0f172a; /* slate-900 */
-  margin-bottom: 12px;
+  color: #0f172a;
+  margin-bottom: 0.75rem;
+  padding-right: 2rem; /* space for X button */
 }
 
-/* Message */
+/* MESSAGE */
 .modal-message {
-  font-size: 14.5px;
+  font-size: 0.9rem;
   line-height: 1.6;
-  color: #334155; /* slate-700 */
-  margin-bottom: 24px;
+  color: #334155;
+  margin-bottom: 1.5rem;
 }
 
-/* Actions */
+/* ACTIONS */
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 0.6rem;
 }
 
-/* Buttons (Tailwind-like) */
+/* BUTTONS */
 .btn {
   min-width: 96px;
-  padding: 10px 16px;
-  border-radius: 50px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
   border: none;
+
   transition:
     background-color 0.15s ease,
     box-shadow 0.15s ease,
@@ -74,41 +115,40 @@
   transform: translateY(1px);
 }
 
-/* Primary */
+/* PRIMARY */
 .btn.primary {
-  background: #2563eb; /* blue-600 */
+  background: linear-gradient(
+    160deg,
+    var(--primary),
+    var(--primary-soft)
+  );
   color: #ffffff;
 }
 
 .btn.primary:hover {
-  background: #1d4ed8; /* blue-700 */
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
 }
 
-/* Secondary */
+/* SECONDARY */
 .btn.secondary {
-  background: #f1f5f9; /* slate-100 */
+  background: #f1f5f9;
   color: #0f172a;
 }
 
 .btn.secondary:hover {
-  background: #e2e8f0; /* slate-200 */
+  background: #e2e8f0;
 }
 
-/* Animations */
+/* ANIMATIONS */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
   to {
     opacity: 1;

@@ -3,6 +3,18 @@
 
   <div class="modal-wrapper" role="dialog" aria-modal="true">
     <div class="modal-card">
+
+      <!-- CLOSE BUTTON -->
+      <button
+        type="button"
+        class="modal-close"
+        aria-label="Close modal"
+        (click)="cancel()"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <!-- TITLE -->
       <h3 class="modal-title">
         {{ modal.modal()?.title }}
       </h3>
