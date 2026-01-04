@@ -1,34 +1,49 @@
-<section class="import-card" role="dialog" aria-labelledby="import-title">
-
-  <!-- Header -->
+<section
+  class="import-card"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="import-title"
+  aria-describedby="import-description"
+>
+  <!-- HEADER -->
   <header class="import-header">
     <div>
-      <p>Select scope and upload a backup file</p>
+      <p id="import-description">
+        Select a scope and upload a backup file
+      </p>
     </div>
 
-    <select [(ngModel)]="scope" aria-label="Import scope">
+    <select
+      [(ngModel)]="scope"
+      aria-label="Import scope"
+    >
       <option value="workspace">Workspace</option>
       <option value="user">User</option>
     </select>
   </header>
 
-  <!-- Dropzone -->
+  <!-- DROPZONE -->
   <label
     class="import-dropzone"
     role="button"
     tabindex="0"
+    aria-label="Upload backup file"
 
     (dragover)="onDragOver($event)"
     (dragleave)="onDragLeave($event)"
     (drop)="onDrop($event)"
   >
-    <i class="bi bi-cloud-arrow-down"></i>
+    <i class="bi bi-cloud-arrow-down" aria-hidden="true"></i>
 
-    <strong *ngIf="!file">Drop file here</strong>
-    <strong *ngIf="file">{{ file.name }}</strong>
+    @if (!file) {
+      <strong>Drop file here</strong>
+      <span>or click to browse (.json)</span>
+    }
 
-    <span *ngIf="!file">or click to browse (.json)</span>
-    <span *ngIf="file">{{ (file.size / 1024).toFixed(1) }} KB</span>
+    @if (file) {
+      <strong>{{ file.name }}</strong>
+      <span>{{ (file.size / 1024).toFixed(1) }} KB</span>
+    }
 
     <input
       #fileInput
@@ -39,9 +54,10 @@
     />
   </label>
 
-  <!-- Actions -->
+  <!-- ACTIONS -->
   <div class="actions">
     <button
+      type="button"
       class="btn secondary"
       (click)="clearFile()"
       [disabled]="!file || loading"
@@ -50,12 +66,16 @@
     </button>
 
     <button
+      type="button"
       class="btn primary"
       (click)="submitImport()"
       [disabled]="!file || loading"
     >
-      {{ loading ? 'Importing…' : 'Import' }}
+      @if (loading) {
+        Importing…
+      } @else {
+        Import
+      }
     </button>
   </div>
-
 </section>
