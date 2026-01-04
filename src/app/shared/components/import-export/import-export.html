@@ -1,41 +1,61 @@
-<section class="import-wrapper" role="group" aria-label="Import options">
+<section class="import-card" role="dialog" aria-labelledby="import-title">
 
-  <!-- Workspace Import -->
-  <article class="import-card">
-    <div class="import-meta">
-      <h6 class="import-title">Workspace Import</h6>
-      <p class="import-subtitle">Upload workspace backup</p>
+  <!-- Header -->
+  <header class="import-header">
+    <div>
+      <p>Select scope and upload a backup file</p>
     </div>
 
-    <label class="import-action" role="button">
-      <i class="bi bi-cloud-arrow-down"></i>
-      <span>Import</span>
-      <input
-        type="file"
-        accept="application/json"
-        hidden
-        (change)="importWorkspace($event)"
-      />
-    </label>
-  </article>
+    <select [(ngModel)]="scope" aria-label="Import scope">
+      <option value="workspace">Workspace</option>
+      <option value="user">User</option>
+    </select>
+  </header>
 
-  <!-- User Import -->
-  <article class="import-card">
-    <div class="import-meta">
-      <h6 class="import-title">User Backup Import</h6>
-      <p class="import-subtitle">Restore user backup</p>
-    </div>
+  <!-- Dropzone -->
+  <label
+    class="import-dropzone"
+    role="button"
+    tabindex="0"
 
-    <label class="import-action" role="button">
-      <i class="bi bi-cloud-arrow-down"></i>
-      <span>Import</span>
-      <input
-        type="file"
-        accept="application/json"
-        hidden
-        (change)="importUser($event)"
-      />
-    </label>
-  </article>
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <i class="bi bi-cloud-arrow-down"></i>
+
+    <strong *ngIf="!file">Drop file here</strong>
+    <strong *ngIf="file">{{ file.name }}</strong>
+
+    <span *ngIf="!file">or click to browse (.json)</span>
+    <span *ngIf="file">{{ (file.size / 1024).toFixed(1) }} KB</span>
+
+    <input
+      #fileInput
+      type="file"
+      accept="application/json"
+      hidden
+      (change)="onFileSelected($event)"
+    />
+  </label>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button
+      class="btn secondary"
+      (click)="clearFile()"
+      [disabled]="!file || loading"
+    >
+      Remove
+    </button>
+
+    <button
+      class="btn primary"
+      (click)="submitImport()"
+      [disabled]="!file || loading"
+    >
+      {{ loading ? 'Importing…' : 'Import' }}
+    </button>
+  </div>
 
 </section>
