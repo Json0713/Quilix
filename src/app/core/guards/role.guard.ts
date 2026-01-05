@@ -11,12 +11,7 @@ export const roleGuard = (requiredRole: UserRole): CanActivateFn => {
 
     const user = auth.getCurrentUser();
 
-    if (!user) {
-      router.navigate(['/login']);
-      return false;
-    }
-
-    if (user.role !== requiredRole) {
+    if (user?.role !== requiredRole) {
       router.navigate(['/']);
       return false;
     }
