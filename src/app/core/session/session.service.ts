@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Storage } from '../storage/storage';
+import { StorageFacade } from '../storage/storage.facade';
 import { Session } from '../interfaces/session';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class SessionService {
-  constructor(private storage: Storage) {}
+
+  
+  constructor(private storage: StorageFacade) {}
 
   start(userId: string): void {
     const now = Date.now();
@@ -28,4 +31,5 @@ export class SessionService {
   clear(): void {
     this.storage.clearSession();
   }
+
 }
