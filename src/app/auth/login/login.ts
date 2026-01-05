@@ -12,8 +12,8 @@ import { Header } from '../../public/common/header/header';
 import { Footer } from '../../public/common/footer/footer';
 import { TimeAgoPipe } from '../../shared/ui/common/time-ago/time-ago-pipe';
 
-import { ExportImportService } from '../../core/storage/export-import/export-import';
-import { UserExportImportService } from '../../core/storage/export-import/user-export-import';
+import { UserExportImportService } from '../../services/components/export-import/user-export-import';
+import { ExportImportService } from '../../services/components/export-import/export-import';
 
 import { ToastRelayService } from '../../services/ui/common/toast/toast-relay';
 import { ToastService } from '../../services/ui/common/toast/toast';

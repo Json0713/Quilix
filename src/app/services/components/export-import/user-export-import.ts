@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Storage } from '../storage';
-import { AuthService } from '../../auth/auth';
-import { User } from '../../interfaces/user';
-import { Session } from '../../interfaces/session';
+import { Storage } from '../../../core/storage/storage';
+import { AuthService } from '../../../core/auth/auth';
+import { User } from '../../../core/interfaces/user';
+import { Session } from '../../../core/interfaces/session';
 import { BackupShareService } from '../share/backup-share';
 
 export interface UserExport {

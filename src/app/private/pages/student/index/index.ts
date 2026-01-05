@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { SpinnerService } from "../../../../services/ui/common/spinner/spinner";
 import { AuthService } from '../../../../core/auth/auth';
 import { Router } from '@angular/router';
-import { ExportImportService } from '../../../../core/storage/export-import/export-import';
-import { UserExportImportService } from '../../../../core/storage/export-import/user-export-import';
+import { UserExportImportService } from '../../../../services/components/export-import/user-export-import';
+import { ExportImportService } from '../../../../services/components/export-import/export-import';
 import { ToastService } from '../../../../services/ui/common/toast/toast';
 
 @Component({

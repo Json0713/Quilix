@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { UserExportImportService } from '../../../core/storage/export-import/user-export-import';
-import { ExportImportService } from '../../../core/storage/export-import/export-import';
+import { UserExportImportService } from '../../../services/components/export-import/user-export-import';
+import { ExportImportService } from '../../../services/components/export-import/export-import';
 import { ModalService } from '../../../services/ui/common/modal/modal';
 import { ToastService } from '../../../services/ui/common/toast/toast';
 import { ToastRelayService } from '../../../services/ui/common/toast/toast-relay';

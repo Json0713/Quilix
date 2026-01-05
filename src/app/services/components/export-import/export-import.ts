@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { STORAGE_KEYS } from '../storage.key';
-import { User } from '../../interfaces/user';
+import { STORAGE_KEYS } from '../../../core/storage/storage.key';
+import { User } from '../../../core/interfaces/user';
 import { BackupShareService } from '../share/backup-share';
 
 export interface WorkspaceExport {
