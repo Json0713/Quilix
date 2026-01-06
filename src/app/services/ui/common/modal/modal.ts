@@ -55,12 +55,12 @@ export class ModalService {
     this._modal.set(null);
   }
 
-  openImportExport(): void {
+  openImport(): void {
     this._modal.set({
       id: ++this.id,
       type: 'custom',
       title: 'Import Backup',
-      view: 'import-export',
+      view: 'import',
     });
   }
 

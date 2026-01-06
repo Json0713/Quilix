@@ -13,5 +13,5 @@ export interface ModalConfig {
 
   resolve?: (result: boolean) => void;
   
-  view?: 'import-export';
+  view?: 'import';
 }

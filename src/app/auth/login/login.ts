@@ -12,9 +12,6 @@ import { Header } from '../../public/common/header/header';
 import { Footer } from '../../public/common/footer/footer';
 import { TimeAgoPipe } from '../../shared/ui/common/time-ago/time-ago-pipe';
 
-import { UserExportImportService } from '../../services/components/export-import/user-export-import';
-import { ExportImportService } from '../../services/components/export-import/export-import';
-
 import { ToastRelayService } from '../../services/ui/common/toast/toast-relay';
 import { ToastService } from '../../services/ui/common/toast/toast';
 import { ModalService } from '../../services/ui/common/modal/modal';
@@ -44,8 +41,6 @@ export class Login {
     private auth: AuthService,
     private usersService: UserService,
     private router: Router,
-    private ei: ExportImportService,
-    private userEI: UserExportImportService,
     private toast: ToastService,
     private toastRelay: ToastRelayService,
     private modal: ModalService
@@ -133,7 +128,7 @@ export class Login {
 
   /* Import-modal */
   openImport(): void {
-    this.modal.openImportExport();
+    this.modal.openImport();
   }
 
 }
