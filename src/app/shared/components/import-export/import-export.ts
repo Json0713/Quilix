@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
-import { UserExportImportService } from '../../../services/components/export-import/user-export-import';
-import { ExportImportService } from '../../../services/components/export-import/export-import';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { BackupService } from '../../../core/backup/backup.service';
 import { ModalService } from '../../../services/ui/common/modal/modal';
 import { ToastService } from '../../../services/ui/common/toast/toast';
 import { ToastRelayService } from '../../../services/ui/common/toast/toast-relay';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+
 
 type ImportScope = 'workspace' | 'user';
+
 @Component({
   selector: 'app-import-export',
-  imports: [CommonModule, FormsModule ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './import-export.html',
   styleUrl: './import-export.scss',
 })
@@ -22,18 +23,18 @@ export class ImportExport {
   scopeOpen = false;
 
   constructor(
-    private workspaceEI: ExportImportService,
-    private userEI: UserExportImportService,
+    private backup: BackupService,
     private modal: ModalService,
     private toast: ToastService,
     private toastRelay: ToastRelayService
   ) {}
 
-  /* File handling */
+  /* ───────────── FILE HANDLING ───────────── */
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
-    this.file = input.files[0];
+    if (input.files?.length) {
+      this.file = input.files[0];
+    }
   }
 
   onDragOver(event: DragEvent): void {
@@ -46,48 +47,59 @@ export class ImportExport {
 
   onDrop(event: DragEvent): void {
     event.preventDefault();
-    const file = event.dataTransfer?.files?.[0];
-    if (file) this.file = file;
+    this.file = event.dataTransfer?.files?.[0] ?? null;
   }
 
   clearFile(): void {
     this.file = null;
   }
 
-  /* Import submit (SINGLE FLOW) */
+  /* ───────────── IMPORT ───────────── */
   async submitImport(): Promise<void> {
     if (!this.file || this.loading) return;
 
     this.loading = true;
 
     try {
-      const success =
-        this.scope === 'workspace'
-          ? await this.workspaceEI.importWorkspace(
-              this.file,
-              name => this.confirmReplace(name)
-            )
-          : await this.userEI.importUser(
-              this.file,
-              name => this.confirmReplace(name)
-            );
+      const result = await this.backup.importBackup(
+        this.file,
+        this.scope,
+        name => this.confirmReplace(name)
+      );
 
-      if (!success) return;
+      if (this.scope === 'workspace') {
+        this.toastRelay.set(
+          'success',
+          'Workspace imported successfully.'
+        );
+
+        this.modal.cancelResult();
+        location.reload();
+        return;
+      }
+
+      // USER IMPORT
+      if (!result.importedUsers.length) {
+        throw new Error('No users were imported.');
+      }
 
       this.toastRelay.set(
         'success',
-        this.scope === 'workspace'
-          ? 'Workspace imported successfully.'
-          : 'User backup imported successfully.'
+        `User "${result.importedUsers[0].name}" imported successfully.`
       );
 
-      this.modal.cancelResult(); // close modal
-      location.reload();
+      this.modal.cancelResult();
+
+      // IMPORTANT:
+      // If you don't have a UserStore yet, reload once
+      setTimeout(() => location.reload(), 100);
 
     } catch (err) {
-      this.toast.error(
-        (err as Error)?.message || 'Import failed.'
-      );
+      if ((err as Error)?.message !== 'IMPORT_CANCELLED') {
+        this.toast.error(
+          (err as Error)?.message || 'Import failed.'
+        );
+      }
       this.modal.cancelResult();
     } finally {
       this.loading = false;
@@ -95,7 +107,7 @@ export class ImportExport {
     }
   }
 
-  /*  Duplicate confirmation */
+  /* ───────────── HELPERS ───────────── */
   private confirmReplace(name: string): Promise<boolean> {
     return this.modal.confirm(
       `"${name}" already exists. Do you want to replace it?`,
@@ -107,9 +119,9 @@ export class ImportExport {
     );
   }
 
-  setScope(value: 'workspace' | 'user') {
+  setScope(value: ImportScope): void {
     this.scope = value;
     this.scopeOpen = false;
   }
-
+  
 }
