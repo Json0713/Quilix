@@ -1,41 +1,44 @@
 import { QuilixBackup } from './backup.types';
 
-interface InternalBackup {
-  app: 'Quilix';
-  version: number; // migration-only numeric version
-  scope: string;
-  exportedAt: number;
-  data: any;
+export interface NormalizedBackup extends Omit<QuilixBackup, 'version'> {
+  version: number;
 }
 
 export class BackupMigrator {
 
+  static normalize(backup: QuilixBackup): NormalizedBackup {
+    return {
+      ...backup,
+      version: backup.version === '0.1.0' ? 0 : backup.version,
+    };
+  }
+
   static migrate(
-    backup: InternalBackup,
+    backup: NormalizedBackup,
     targetVersion: number
-  ): InternalBackup {
+  ): NormalizedBackup {
 
-    let migrated = { ...backup };
+    let current = { ...backup };
 
-    while (migrated.version < targetVersion) {
-      switch (migrated.version) {
+    while (current.version < targetVersion) {
+      switch (current.version) {
         case 0:
-          migrated = this.migrateV0toV1(migrated);
+          current = this.migrateV0toV1(current);
           break;
 
         default:
           throw new Error(
-            `No migrator for version ${migrated.version}`
+            `No migrator available for version ${current.version}`
           );
       }
     }
 
-    return migrated;
+    return current;
   }
 
   private static migrateV0toV1(
-    backup: InternalBackup
-  ): InternalBackup {
+    backup: NormalizedBackup
+  ): NormalizedBackup {
 
     return {
       ...backup,
@@ -43,7 +46,7 @@ export class BackupMigrator {
       data: {
         ...backup.data,
         meta: {
-          ...backup.data.meta,
+          ...backup.data?.meta,
           migratedFromVersion: 0,
           migratedAt: Date.now(),
         },

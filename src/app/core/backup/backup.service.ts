@@ -1,39 +1,38 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '../storage/storage';
 import { AuthService } from '../auth/auth';
+import { Session } from '../interfaces/session';
 import { BackupShareService } from './backup.share';
-import { QuilixBackup } from './backup.types';
+import { QuilixBackup, BackupScope } from './backup.types';
 import { BackupValidator } from './backup.validator';
-import { BackupMigrator } from './backup.migrator';
+import {
+  BackupMigrator,
+  NormalizedBackup,
+} from './backup.migrator';
 import { User } from '../interfaces/user';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class BackupService {
-  /**
-   * Increment ONLY when a breaking backup change happens.
-   */
+
   private readonly VERSION = 1;
 
   constructor(
-    private storage: Storage,
-    private auth: AuthService,
-    private share: BackupShareService
+    private readonly storage: Storage,
+    private readonly auth: AuthService,
+    private readonly share: BackupShareService
   ) {}
 
   /* ───────────────────────── EXPORT ───────────────────────── */
+
   async exportWorkspace(): Promise<void> {
-    const payload: QuilixBackup = {
-      app: 'Quilix',
-      version: this.VERSION,
-      scope: 'workspace',
-      exportedAt: Date.now(),
-      data: {
-        users: this.storage.getUsers(),
-        session: this.storage.getSession(),
-      },
-    };
+    const payload = this.buildBackupPayload(
+      'workspace',
+      this.storage.getUsers(),
+      this.storage.getSession()
+    );
 
     await this.share.shareOrDownload(
       payload,
@@ -47,16 +46,11 @@ export class BackupService {
       throw new Error('No active user.');
     }
 
-    const payload: QuilixBackup = {
-      app: 'Quilix',
-      version: this.VERSION,
-      scope: 'user',
-      exportedAt: Date.now(),
-      data: {
-        users: [user],
-        session: this.storage.getSession(),
-      },
-    };
+    const payload = this.buildBackupPayload(
+      'user',
+      [user],
+      this.storage.getSession()
+    );
 
     await this.share.shareOrDownload(
       payload,
@@ -65,65 +59,82 @@ export class BackupService {
   }
 
   /* ───────────────────────── IMPORT ───────────────────────── */
+
   async importBackup(
     file: File,
-    scope: 'workspace' | 'user',
+    expectedScope: BackupScope,
     confirmReplace: (name: string) => Promise<boolean>
   ): Promise<{ importedUsers: User[] }> {
 
     const raw = await this.read(file);
-    this.validate(raw);
 
-    // Scope safety
-    if (raw.scope !== scope) {
-      throw new Error(
-        `This file is a ${raw.scope} backup, not a ${scope} backup.`
-      );
-    }
+    BackupValidator.validate(raw);
 
-    const internal: any = {
-      ...raw,
-      version: raw.version === '0.1.0' ? 0 : raw.version,
-    };
+    this.ensureScope(raw, expectedScope);
 
-    if (
-      scope === 'user' &&
-      !internal.data?.users &&
-      internal.user
-    ) {
-      internal.data = {
-        ...internal.data,
-        users: [internal.user],
-      };
-    }
+    const normalized = BackupMigrator.normalize(raw);
 
     const migrated =
-      internal.version < this.VERSION
-        ? BackupMigrator.migrate(internal, this.VERSION)
-        : internal;
+      normalized.version < this.VERSION
+        ? BackupMigrator.migrate(normalized, this.VERSION)
+        : normalized;
+
+    return this.applyBackup(migrated, expectedScope, confirmReplace);
+  }
+
+  /* ───────────────────────── APPLY ───────────────────────── */
+
+  private async applyBackup(
+    backup: NormalizedBackup,
+    scope: BackupScope,
+    confirmReplace: (name: string) => Promise<boolean>
+  ): Promise<{ importedUsers: User[] }> {
 
     let importedUsers: User[] = [];
 
-    // Users
-    if (migrated.data?.users?.length) {
+    if (backup.data?.users?.length) {
       const users = await this.mergeUsers(
-        migrated.data.users,
+        backup.data.users,
         confirmReplace
       );
 
       this.storage.saveUsers(users);
-      importedUsers = migrated.data.users;
+      importedUsers = backup.data.users;
     }
 
-    // Session ONLY for workspace import
-    if (scope === 'workspace' && migrated.data?.session) {
-      this.storage.saveSession(migrated.data.session);
+    if (scope === 'workspace' && backup.data?.session) {
+      this.storage.saveSession(backup.data.session);
     }
 
     return { importedUsers };
   }
 
   /* ───────────────────────── HELPERS ───────────────────────── */
+  private buildBackupPayload(
+    scope: BackupScope,
+    users?: User[],
+    session?: Session | null
+  ): QuilixBackup {
+    return {
+      app: 'Quilix',
+      version: this.VERSION,
+      scope,
+      exportedAt: Date.now(),
+      data: { users, session },
+    };
+  }
+
+  private ensureScope(
+    backup: QuilixBackup,
+    expected: BackupScope
+  ): void {
+    if (backup.scope !== expected) {
+      throw new Error(
+        `This file is a ${backup.scope} backup, not a ${expected} backup.`
+      );
+    }
+  }
+
   private async mergeUsers(
     imported: User[],
     confirmReplace: (name: string) => Promise<boolean>
@@ -153,20 +164,7 @@ export class BackupService {
   }
 
   private async read(file: File): Promise<QuilixBackup> {
-      return JSON.parse(await file.text());
-    }
-    private validate(payload: QuilixBackup): void {
-    if (payload.app !== 'Quilix') {
-      throw new Error('Invalid Quilix backup.');
-    }
-
-    if (payload.version !== 1 && payload.version !== '0.1.0') {
-      throw new Error('Unsupported backup version.');
-    }
-
-    if (!payload.scope) {
-      throw new Error('Invalid backup scope.');
-    }
+    return JSON.parse(await file.text());
   }
 
 }

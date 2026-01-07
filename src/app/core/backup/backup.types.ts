@@ -31,7 +31,6 @@ export interface QuilixBackup {
   data: BackupData;
 }
 
-
 /**
  * Container for all persisted entities.
  * Optional fields allow partial backups and future expansion.
@@ -59,6 +58,7 @@ export interface BackupMeta {
   // numeric, not string
   migratedFromVersion?: number;
   migratedAt?: number;
+  
 }
 
 
