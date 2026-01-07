@@ -22,7 +22,7 @@
         aria-haspopup="listbox"
         aria-expanded="{{ scopeOpen }}"
       >
-        {{ scope === 'workspace' ? 'Workspace' : 'UserOnly' }}
+        {{ scope === 'workspace' ? 'Workspace' : 'Userspace' }}
         <i class="bi bi-chevron-down"></i>
       </button>
 
@@ -32,7 +32,7 @@
             Workspace
           </button>
           <button role="option" (click)="setScope('user')">
-            UserOnly
+            Userspace
           </button>
         </div>
       }
