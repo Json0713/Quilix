@@ -5,10 +5,11 @@ import { Router } from '@angular/router';
 import { UserExportImportService } from '../../../../services/components/export-import/user-export-import';
 import { ExportImportService } from '../../../../services/components/export-import/export-import';
 import { ToastService } from '../../../../services/ui/common/toast/toast';
+import { Export } from "../../../../shared/components/export/export";
 
 @Component({
   selector: 'app-student-index',
-  imports: [],
+  imports: [Export],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })

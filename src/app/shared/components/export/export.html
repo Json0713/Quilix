@@ -1,1 +1,32 @@
-<p>export works!</p>
+<div class="export-container">
+  <h3>Export Backup</h3>
+
+  <div class="export-options">
+    <label>
+      <input
+        type="radio"
+        name="scope"
+        value="workspace"
+        [(ngModel)]="selectedScope"
+      />
+      Workspace
+    </label>
+
+    <label>
+      <input
+        type="radio"
+        name="scope"
+        value="user"
+        [(ngModel)]="selectedScope"
+      />
+      User
+    </label>
+  </div>
+
+  <button
+    (click)="export()"
+    [disabled]="!selectedScope || isExporting"
+  >
+    {{ isExporting ? 'Exporting…' : 'Export' }}
+  </button>
+</div>
