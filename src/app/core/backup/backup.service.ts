@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '../storage/storage';
 import { AuthService } from '../auth/auth';
-import { BackupShareService } from '../../services/components/share/backup-share';
+import { BackupShareService } from './backup.share';
 import { QuilixBackup } from './backup.types';
 import { BackupValidator } from './backup.validator';
 import { BackupMigrator } from './backup.migrator';
