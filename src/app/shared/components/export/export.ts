@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { BackupService } from '../../../core/backup/backup.service';
 import { ToastService } from '../../../services/ui/common/toast/toast';
+import { ModalService } from '../../../services/ui/common/modal/modal';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -13,49 +14,56 @@ type ExportScope = 'workspace' | 'user';
   styleUrl: './export.scss',
 })
 export class Export {
-  selectedScope: ExportScope | null = null;
+  
   isExporting = false;
 
   constructor(
-    private backup: BackupService,
-    private toast: ToastService
+    private readonly backup: BackupService,
+    private readonly toast: ToastService,
+    private readonly modal: ModalService
   ) {}
 
-  async export(): Promise<void> {
-    if (!this.selectedScope || this.isExporting) {
-      return;
-    }
+  async exportWorkspace(): Promise<void> {
+    const confirmed = await this.modal.confirm(
+      'Export the entire workspace backup?'
+    );
+    if (!confirmed) return;
 
+    await this.run(async () => {
+      await this.backup.exportWorkspace();
+      this.toast.success('Workspace exported successfully');
+    });
+  }
+
+  async exportCurrentUser(): Promise<void> {
+    const confirmed = await this.modal.confirm(
+      'Export your user backup?'
+    );
+    if (!confirmed) return;
+
+    await this.run(async () => {
+      await this.backup.exportCurrentUser();
+      this.toast.success('User exported successfully');
+    });
+  }
+
+  private async run(action: () => Promise<void>): Promise<void> {
     this.isExporting = true;
 
     try {
-      if (this.selectedScope === 'workspace') {
-        await this.backup.exportWorkspace();
-      } else {
-        await this.backup.exportCurrentUser();
-      }
-
-      this.toast.success(
-        `${this.capitalize(this.selectedScope)} backup exported successfully`
-      );
-    } catch (error: any) {
-      this.handleError(error);
+      await action();
+    } catch (err) {
+      this.toast.error(this.resolveError(err));
     } finally {
       this.isExporting = false;
     }
   }
 
-  private handleError(error: any): void {
-    if (error?.message === 'No active user.') {
-      this.toast.error('You must be logged in to export your user backup.');
-      return;
+  private resolveError(err: unknown): string {
+    if (err instanceof Error) {
+      return err.message;
     }
-
-    this.toast.error('Export failed. Please try again.');
-    console.error('[Export]', error);
+    return 'Export failed. Please try again.';
   }
 
-  private capitalize(value: string): string {
-    return value.charAt(0).toUpperCase() + value.slice(1);
-  }
 }

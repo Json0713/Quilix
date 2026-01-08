@@ -1,32 +1,40 @@
-<div class="export-container">
-  <h3>Export Backup</h3>
+<section class="export">
+  <header class="export__header">
+    <h2>Export Backup</h2>
+    <p>Download your data as a secure JSON backup.</p>
+  </header>
 
-  <div class="export-options">
-    <label>
-      <input
-        type="radio"
-        name="scope"
-        value="workspace"
-        [(ngModel)]="selectedScope"
-      />
-      Workspace
-    </label>
+  <div class="export__actions">
+    <button
+      type="button"
+      class="btn primary"
+      (click)="exportWorkspace()"
+      [disabled]="isExporting"
+    >
+      @if (isExporting) {
+        Exporting…
+      } @else {
+        Export Workspace
+      }
+    </button>
 
-    <label>
-      <input
-        type="radio"
-        name="scope"
-        value="user"
-        [(ngModel)]="selectedScope"
-      />
-      User
-    </label>
+    <button
+      type="button"
+      class="btn secondary"
+      (click)="exportCurrentUser()"
+      [disabled]="isExporting"
+    >
+      @if (isExporting) {
+        Exporting…
+      } @else {
+        Export Current User
+      }
+    </button>
   </div>
 
-  <button
-    (click)="export()"
-    [disabled]="!selectedScope || isExporting"
-  >
-    {{ isExporting ? 'Exporting…' : 'Export' }}
-  </button>
-</div>
+  @if (isExporting) {
+    <div class="export__status loading">
+      Preparing backup file…
+    </div>
+  }
+</section>
