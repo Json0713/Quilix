@@ -26,7 +26,6 @@ export class BackupService {
   ) {}
 
   /* ───────────────────────── EXPORT ───────────────────────── */
-
   async exportWorkspace(): Promise<void> {
     const payload = this.buildBackupPayload(
       'workspace',
@@ -59,7 +58,6 @@ export class BackupService {
   }
 
   /* ───────────────────────── IMPORT ───────────────────────── */
-
   async importBackup(
     file: File,
     expectedScope: BackupScope,
@@ -83,7 +81,6 @@ export class BackupService {
   }
 
   /* ───────────────────────── APPLY ───────────────────────── */
-
   private async applyBackup(
     backup: NormalizedBackup,
     scope: BackupScope,
