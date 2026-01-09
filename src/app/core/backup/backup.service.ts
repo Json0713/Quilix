@@ -1,23 +1,28 @@
 import { Injectable } from '@angular/core';
+
 import { Storage } from '../storage/storage';
 import { AuthService } from '../auth/auth';
+
 import { Session } from '../interfaces/session';
+import { User } from '../interfaces/user';
+
 import { BackupShareService } from './backup.share';
-import { QuilixBackup, BackupScope } from './backup.types';
+import {
+  QuilixBackup,
+  BackupScope,
+  BACKUP_VERSION,
+} from './backup.types';
+
 import { BackupValidator } from './backup.validator';
 import {
   BackupMigrator,
   NormalizedBackup,
 } from './backup.migrator';
-import { User } from '../interfaces/user';
-
 
 @Injectable({
   providedIn: 'root',
 })
 export class BackupService {
-
-  private readonly VERSION = 1;
 
   constructor(
     private readonly storage: Storage,
@@ -35,7 +40,7 @@ export class BackupService {
 
     await this.share.shareOrDownload(
       payload,
-      `quilix-workspace-${Date.now()}.json`
+      `quilix-workspace-${Date.now()}`
     );
   }
 
@@ -53,7 +58,7 @@ export class BackupService {
 
     await this.share.shareOrDownload(
       payload,
-      `quilix-user-${user.name}-${Date.now()}.json`
+      `quilix-user-${user.name}-${Date.now()}`
     );
   }
 
@@ -64,17 +69,16 @@ export class BackupService {
     confirmReplace: (name: string) => Promise<boolean>
   ): Promise<{ importedUsers: User[] }> {
 
-    const raw = await this.read(file);
+    const raw = await this.readBackupFile(file);
 
     BackupValidator.validate(raw);
-
     this.ensureScope(raw, expectedScope);
 
     const normalized = BackupMigrator.normalize(raw);
 
     const migrated =
-      normalized.version < this.VERSION
-        ? BackupMigrator.migrate(normalized, this.VERSION)
+      normalized.version < BACKUP_VERSION
+        ? BackupMigrator.migrate(normalized, BACKUP_VERSION)
         : normalized;
 
     return this.applyBackup(migrated, expectedScope, confirmReplace);
@@ -114,7 +118,7 @@ export class BackupService {
   ): QuilixBackup {
     return {
       app: 'Quilix',
-      version: this.VERSION,
+      version: BACKUP_VERSION,
       scope,
       exportedAt: Date.now(),
       data: { users, session },
@@ -160,8 +164,9 @@ export class BackupService {
     return existing;
   }
 
-  private async read(file: File): Promise<QuilixBackup> {
-    return JSON.parse(await file.text());
+  private async readBackupFile(file: File): Promise<QuilixBackup> {
+    const text = await file.text();
+    return JSON.parse(text);
   }
 
 }

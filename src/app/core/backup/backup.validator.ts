@@ -2,6 +2,8 @@ import {
   QuilixBackup,
   BackupScope,
   AnyBackupVersion,
+  BACKUP_VERSION,
+  LegacyBackupVersion,
 } from './backup.types';
 
 
@@ -52,7 +54,10 @@ export class BackupValidator {
   private static isSupportedVersion(
     version: AnyBackupVersion
   ): boolean {
-    return version === 1 || version === '0.1.0';
+    return (
+      version === BACKUP_VERSION ||
+      version === '0.1.0'
+    );
   }
 
 }

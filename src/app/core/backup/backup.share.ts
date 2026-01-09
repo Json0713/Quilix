@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 
+const BACKUP_EXTENSION = '.quilix-backup';
+const BACKUP_MIME = 'application/octet-stream';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -9,13 +12,11 @@ export class BackupShareService {
     payload: unknown,
     filename: string
   ): Promise<void> {
-    const json = JSON.stringify(payload, null, 2);
-    const file = new File([json], filename, {
-      type: 'application/json',
-    });
 
-    // Try share ONLY if clearly supported
-    if (this.canShareFile(file)) {
+    const normalizedFilename = this.normalizeFilename(filename);
+    const file = this.createBackupFile(payload, normalizedFilename);
+
+    if (this.canNativeShare(file)) {
       try {
         await navigator.share({
           title: 'Quilix Backup',
@@ -23,14 +24,32 @@ export class BackupShareService {
         });
         return;
       } catch {
-        // Fallback to download
+        // Fallback
       }
     }
 
-    this.download(file);
+    this.forceDownload(file);
   }
 
-  private canShareFile(file: File): boolean {
+  /* ───────────────────────── INTERNAL ───────────────────────── */
+  private createBackupFile(
+    payload: unknown,
+    filename: string
+  ): File {
+    const content = JSON.stringify(payload, null, 2);
+
+    return new File([content], filename, {
+      type: BACKUP_MIME,
+    });
+  }
+
+  private normalizeFilename(filename: string): string {
+    return filename.endsWith(BACKUP_EXTENSION)
+      ? filename
+      : filename.replace(/\.json$/i, '') + BACKUP_EXTENSION;
+  }
+
+  private canNativeShare(file: File): boolean {
     return (
       typeof navigator !== 'undefined' &&
       typeof navigator.share === 'function' &&
@@ -39,19 +58,19 @@ export class BackupShareService {
     );
   }
 
-  private download(file: File): void {
+  private forceDownload(file: File): void {
     const url = URL.createObjectURL(file);
-    const a = document.createElement('a');
+    const anchor = document.createElement('a');
 
-    a.href = url;
-    a.download = file.name;
-    a.style.display = 'none';
+    anchor.href = url;
+    anchor.download = file.name;
+    anchor.style.display = 'none';
 
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
 
     URL.revokeObjectURL(url);
   }
-  
+
 }

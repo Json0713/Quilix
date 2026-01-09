@@ -1,4 +1,10 @@
-import { QuilixBackup } from './backup.types';
+import {
+  QuilixBackup,
+  BACKUP_VERSION,
+} from './backup.types';
+
+const LEGACY_V0 = 0;
+
 
 export interface NormalizedBackup extends Omit<QuilixBackup, 'version'> {
   version: number;
@@ -9,7 +15,7 @@ export class BackupMigrator {
   static normalize(backup: QuilixBackup): NormalizedBackup {
     return {
       ...backup,
-      version: backup.version === '0.1.0' ? 0 : backup.version,
+      version: BACKUP_VERSION,
     };
   }
 
@@ -39,15 +45,15 @@ export class BackupMigrator {
   private static migrateV0toV1(
     backup: NormalizedBackup
   ): NormalizedBackup {
-
+    
     return {
       ...backup,
-      version: 1,
+      version: BACKUP_VERSION,
       data: {
         ...backup.data,
         meta: {
           ...backup.data?.meta,
-          migratedFromVersion: 0,
+          migratedFromVersion: LEGACY_V0,
           migratedAt: Date.now(),
         },
       },

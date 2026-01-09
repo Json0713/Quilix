@@ -5,7 +5,9 @@ import { Session } from '../interfaces/session';
  * Increment ONLY when a breaking change happens.
  * Never reuse version numbers.
  */
-export type BackupVersion = 1;
+export const BACKUP_VERSION = 1 as const;
+
+export type BackupVersion = typeof BACKUP_VERSION;
 
 /** Legacy versions supported for migration */
 export type LegacyBackupVersion = '0.1.0';
