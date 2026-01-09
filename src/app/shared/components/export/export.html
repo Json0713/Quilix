@@ -8,52 +8,76 @@
   <!-- HEADER -->
   <header class="export-header">
     <i class="bi bi-feather export-icon" aria-hidden="true"></i>
+
     <div>
-      <p id="export-title">Export your data</p>
-      <span class="subtitle">
+      <p id="export-title" class="export-title">
+        Export your data
+      </p>
+
+      <span class="export-subtitle">
         Save a backup of your workspace or user data
       </span>
     </div>
   </header>
 
   <!-- FORMAT SELECT -->
-  <div class="export-format">
+  <div
+    class="export-format"
+    role="radiogroup"
+    aria-label="Export format"
+  >
     <p class="label">Export format</p>
 
-    <label class="format-option">
-      <input
-        type="radio"
-        name="format"
-        value="backup"
-        [(ngModel)]="format"
-      />
-      <i class="bi bi-archive"></i>
-      <div>
-        <strong>Quilix Backup</strong>
-        <span>Recommended · Best for mobile & sharing</span>
-      </div>
-    </label>
+    <div class="format-grid">
+      <label
+        class="format-option"
+        [class.active]="format === 'backup'"
+      >
+        <input
+          type="radio"
+          name="format"
+          value="backup"
+          [(ngModel)]="format"
+        />
 
-    <label class="format-option">
-      <input
-        type="radio"
-        name="format"
-        value="json"
-        [(ngModel)]="format"
-      />
-      <i class="bi bi-braces"></i>
-      <div>
-        <strong>JSON</strong>
-        <span>Advanced · Manual or developer use</span>
-      </div>
-    </label>
+        <div class="icon-wrap">
+          <i class="bi bi-archive"></i>
+        </div>
+
+        <div class="format-text">
+          <strong>Quilix Backup</strong>
+          <span>Recommended · Best for mobile & sharing</span>
+        </div>
+      </label>
+
+      <label
+        class="format-option"
+        [class.active]="format === 'json'"
+      >
+        <input
+          type="radio"
+          name="format"
+          value="json"
+          [(ngModel)]="format"
+        />
+
+        <div class="icon-wrap">
+          <i class="bi bi-braces"></i>
+        </div>
+
+        <div class="format-text">
+          <strong>JSON</strong>
+          <span>Advanced · Manual or developer use</span>
+        </div>
+      </label>
+    </div>
   </div>
 
   <!-- ACTIONS -->
   <div class="actions">
     <button
       type="button"
-      class="btn secondary"
+      class="btn primary user-export"
       (click)="exportCurrentUser()"
       [disabled]="isExporting"
     >
@@ -63,9 +87,10 @@
 
     <button
       type="button"
-      class="btn primary"
+      class="btn secondary"
       (click)="exportWorkspace()"
       [disabled]="isExporting"
+      aria-busy="{{ isExporting }}"
     >
       @if (isExporting) {
         Exporting…
