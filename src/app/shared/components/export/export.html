@@ -1,10 +1,66 @@
-<section class="export">
-  <header class="export__header">
-    <h2>Export Backup</h2>
-    <p>Download your data as a secure JSON backup.</p>
+<section
+  class="export-card"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="export-title"
+>
+
+  <!-- HEADER -->
+  <header class="export-header">
+    <i class="bi bi-feather export-icon" aria-hidden="true"></i>
+    <div>
+      <p id="export-title">Export your data</p>
+      <span class="subtitle">
+        Save a backup of your workspace or user data
+      </span>
+    </div>
   </header>
 
-  <div class="export__actions">
+  <!-- FORMAT SELECT -->
+  <div class="export-format">
+    <p class="label">Export format</p>
+
+    <label class="format-option">
+      <input
+        type="radio"
+        name="format"
+        value="backup"
+        [(ngModel)]="format"
+      />
+      <i class="bi bi-archive"></i>
+      <div>
+        <strong>Quilix Backup</strong>
+        <span>Recommended · Best for mobile & sharing</span>
+      </div>
+    </label>
+
+    <label class="format-option">
+      <input
+        type="radio"
+        name="format"
+        value="json"
+        [(ngModel)]="format"
+      />
+      <i class="bi bi-braces"></i>
+      <div>
+        <strong>JSON</strong>
+        <span>Advanced · Manual or developer use</span>
+      </div>
+    </label>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button
+      type="button"
+      class="btn secondary"
+      (click)="exportCurrentUser()"
+      [disabled]="isExporting"
+    >
+      <i class="bi bi-person"></i>
+      Export User
+    </button>
+
     <button
       type="button"
       class="btn primary"
@@ -14,27 +70,10 @@
       @if (isExporting) {
         Exporting…
       } @else {
+        <i class="bi bi-box-seam"></i>
         Export Workspace
-      }
-    </button>
-
-    <button
-      type="button"
-      class="btn secondary"
-      (click)="exportCurrentUser()"
-      [disabled]="isExporting"
-    >
-      @if (isExporting) {
-        Exporting…
-      } @else {
-        Export Current User
       }
     </button>
   </div>
 
-  @if (isExporting) {
-    <div class="export__status loading">
-      Preparing backup file…
-    </div>
-  }
 </section>

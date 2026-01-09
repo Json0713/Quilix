@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 
-const BACKUP_EXTENSION = '.quilix-backup';
-const BACKUP_MIME = 'application/octet-stream';
+export type BackupFileFormat = 'json' | 'backup';
 
 @Injectable({
   providedIn: 'root',
@@ -10,11 +9,11 @@ export class BackupShareService {
 
   async shareOrDownload(
     payload: unknown,
-    filename: string
+    filename: string,
+    format: BackupFileFormat
   ): Promise<void> {
 
-    const normalizedFilename = this.normalizeFilename(filename);
-    const file = this.createBackupFile(payload, normalizedFilename);
+    const file = this.createFile(payload, filename, format);
 
     if (this.canNativeShare(file)) {
       try {
@@ -24,7 +23,7 @@ export class BackupShareService {
         });
         return;
       } catch {
-        // Fallback
+        // fallback
       }
     }
 
@@ -32,21 +31,31 @@ export class BackupShareService {
   }
 
   /* ───────────────────────── INTERNAL ───────────────────────── */
-  private createBackupFile(
+  private createFile(
     payload: unknown,
-    filename: string
+    filename: string,
+    format: BackupFileFormat
   ): File {
+
     const content = JSON.stringify(payload, null, 2);
 
-    return new File([content], filename, {
-      type: BACKUP_MIME,
-    });
+    if (format === 'json') {
+      return new File([content], this.ensureExtension(filename, '.json'), {
+        type: 'application/json',
+      });
+    }
+
+    return new File(
+      [content],
+      this.ensureExtension(filename, '.quilix-backup'),
+      { type: 'application/octet-stream' }
+    );
   }
 
-  private normalizeFilename(filename: string): string {
-    return filename.endsWith(BACKUP_EXTENSION)
-      ? filename
-      : filename.replace(/\.json$/i, '') + BACKUP_EXTENSION;
+  private ensureExtension(name: string, ext: string): string {
+    return name.toLowerCase().endsWith(ext)
+      ? name
+      : name.replace(/\.[^/.]+$/, '') + ext;
   }
 
   private canNativeShare(file: File): boolean {
@@ -72,5 +81,5 @@ export class BackupShareService {
 
     URL.revokeObjectURL(url);
   }
-
+  
 }

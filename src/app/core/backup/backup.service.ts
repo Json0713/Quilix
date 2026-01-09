@@ -6,7 +6,11 @@ import { AuthService } from '../auth/auth';
 import { Session } from '../interfaces/session';
 import { User } from '../interfaces/user';
 
-import { BackupShareService } from './backup.share';
+import { 
+  BackupShareService, 
+  BackupFileFormat 
+} from './backup.share';
+
 import {
   QuilixBackup,
   BackupScope,
@@ -31,7 +35,11 @@ export class BackupService {
   ) {}
 
   /* ───────────────────────── EXPORT ───────────────────────── */
-  async exportWorkspace(): Promise<void> {
+  async exportWorkspace(
+    format: BackupFileFormat,
+    filename?: string
+  ): Promise<void> {
+
     const payload = this.buildBackupPayload(
       'workspace',
       this.storage.getUsers(),
@@ -40,15 +48,18 @@ export class BackupService {
 
     await this.share.shareOrDownload(
       payload,
-      `quilix-workspace-${Date.now()}`
+      filename ?? `quilix-workspace-${Date.now()}`,
+      format
     );
   }
 
-  async exportCurrentUser(): Promise<void> {
+  async exportCurrentUser(
+    format: BackupFileFormat,
+    filename?: string
+  ): Promise<void> {
+
     const user = this.auth.getCurrentUser();
-    if (!user) {
-      throw new Error('No active user.');
-    }
+    if (!user) throw new Error('No active user.');
 
     const payload = this.buildBackupPayload(
       'user',
@@ -56,9 +67,15 @@ export class BackupService {
       this.storage.getSession()
     );
 
+    const safeName = user.name
+      .trim()
+      .replace(/\s+/g, '-')
+      .toLowerCase();
+
     await this.share.shareOrDownload(
       payload,
-      `quilix-user-${user.name}-${Date.now()}`
+      filename ?? `quilix-user-${safeName}-${Date.now()}`,
+      format
     );
   }
 
