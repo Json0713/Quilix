@@ -67,23 +67,22 @@
   <div class="actions">
     <button
       type="button"
-      class="btn primary"
-      (click)="exportCurrentUser()"
-      [disabled]="isExporting"
-    >
-      <i class="bi bi-person"></i>
-      Export User
-    </button>
-
-    <button
-      type="button"
       class="btn icon"
       (click)="exportWorkspace()"
       [disabled]="isExporting"
       aria-label="Export Workspace"
       title="Export Workspace"
     >
-      <i class="bi bi-box-seam"></i>
+      <i class="bi bi-menu-button-wide"></i>
+    </button>
+
+    <button
+      type="button"
+      class="btn primary"
+      (click)="exportCurrentUser()"
+      [disabled]="isExporting"
+    >
+      Export User
     </button>
   </div>
   
