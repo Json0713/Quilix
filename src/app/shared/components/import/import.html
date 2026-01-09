@@ -20,7 +20,7 @@
         type="button"
         (click)="scopeOpen = !scopeOpen"
         aria-haspopup="listbox"
-        aria-expanded="{{ scopeOpen }}"
+        [attr.aria-expanded]="scopeOpen"
       >
         {{ scope === 'workspace' ? 'Workspace' : 'Userspace' }}
         <i class="bi bi-chevron-down"></i>
@@ -54,7 +54,7 @@
 
     @if (!file) {
       <strong>Drop file here</strong>
-      <span>or click to browse (.json)</span>
+      <span>or click to browse (.json, .quilix-backup)</span>
     }
 
     @if (file) {
@@ -70,7 +70,7 @@
     <input
       #fileInput
       type="file"
-      accept="application/json"
+      accept=".json,.quilix-backup"
       hidden
       (change)="onFileSelected($event)"
     />

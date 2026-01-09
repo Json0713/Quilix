@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { BackupService } from '../../../core/backup/backup.service';
 import { ModalService } from '../../../services/ui/common/modal/modal';
 import { ToastService } from '../../../services/ui/common/toast/toast';
@@ -8,8 +9,14 @@ import { ToastRelayService } from '../../../services/ui/common/toast/toast-relay
 
 type ImportScope = 'workspace' | 'user';
 
+const ALLOWED_EXTENSIONS = [
+  '.json',
+  '.quilix-backup',
+];
+
 @Component({
   selector: 'app-import',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './import.html',
   styleUrl: './import.scss',
@@ -22,18 +29,18 @@ export class Import {
   scopeOpen = false;
 
   constructor(
-    private backup: BackupService,
-    private modal: ModalService,
-    private toast: ToastService,
-    private toastRelay: ToastRelayService
+    private readonly backup: BackupService,
+    private readonly modal: ModalService,
+    private readonly toast: ToastService,
+    private readonly toastRelay: ToastRelayService
   ) {}
 
   /* ───────────── FILE HANDLING ───────────── */
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      this.file = input.files[0];
-    }
+    const selected = input.files?.[0] ?? null;
+
+    this.setFile(selected);
   }
 
   onDragOver(event: DragEvent): void {
@@ -46,7 +53,9 @@ export class Import {
 
   onDrop(event: DragEvent): void {
     event.preventDefault();
-    this.file = event.dataTransfer?.files?.[0] ?? null;
+    const dropped = event.dataTransfer?.files?.[0] ?? null;
+
+    this.setFile(dropped);
   }
 
   clearFile(): void {
@@ -77,7 +86,6 @@ export class Import {
         return;
       }
 
-      // USER IMPORT
       if (!result.importedUsers.length) {
         throw new Error('No users were imported.');
       }
@@ -88,15 +96,12 @@ export class Import {
       );
 
       this.modal.cancelResult();
-
-      // IMPORTANT:
-      // If you don't have a UserStore yet, reload once
       setTimeout(() => location.reload(), 100);
 
     } catch (err) {
       if ((err as Error)?.message !== 'IMPORT_CANCELLED') {
         this.toast.error(
-          (err as Error)?.message || 'Import failed.'
+          this.resolveError(err)
         );
       }
       this.modal.cancelResult();
@@ -104,6 +109,29 @@ export class Import {
       this.loading = false;
       this.file = null;
     }
+  }
+
+  /* ───────────── VALIDATION ───────────── */
+  private setFile(file: File | null): void {
+    if (!file) {
+      this.file = null;
+      return;
+    }
+
+    if (!this.isAllowedFile(file)) {
+      this.toast.error(
+        'Unsupported file type. Please select a valid backup file.'
+      );
+      this.file = null;
+      return;
+    }
+
+    this.file = file;
+  }
+
+  private isAllowedFile(file: File): boolean {
+    const name = file.name.toLowerCase();
+    return ALLOWED_EXTENSIONS.some(ext => name.endsWith(ext));
   }
 
   /* ───────────── HELPERS ───────────── */
@@ -116,6 +144,13 @@ export class Import {
         cancelText: 'Cancel',
       }
     );
+  }
+
+  private resolveError(error: unknown): string {
+    if (error instanceof Error && error.message) {
+      return error.message;
+    }
+    return 'Import failed. Please try again.';
   }
 
   setScope(value: ImportScope): void {
