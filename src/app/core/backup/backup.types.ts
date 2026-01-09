@@ -1,10 +1,7 @@
 import { User } from '../interfaces/user';
 import { Session } from '../interfaces/session';
 
-/**
- * Increment ONLY when a breaking change happens.
- * Never reuse version numbers.
- */
+/* SINGLE SOURCE OF TRUTH */
 export const BACKUP_VERSION = 1 as const;
 
 export type BackupVersion = typeof BACKUP_VERSION;
