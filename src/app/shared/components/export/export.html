@@ -4,16 +4,10 @@
   aria-modal="true"
   aria-labelledby="export-title"
 >
-
   <!-- HEADER -->
   <header class="export-header">
-    <i class="bi bi-feather export-icon" aria-hidden="true"></i>
-
-    <div>
-      <p id="export-title" class="export-title">
-        Export your data
-      </p>
-
+    <div class="header-text">
+      <p id="export-title" class="export-title">Export your data</p>
       <span class="export-subtitle">
         Save a backup of your workspace or user data
       </span>
@@ -21,16 +15,12 @@
   </header>
 
   <!-- FORMAT SELECT -->
-  <div
-    class="export-format"
-    role="radiogroup"
-    aria-label="Export format"
-  >
+  <div class="export-format" role="radiogroup" aria-label="Export format">
     <p class="label">Export format</p>
 
     <div class="format-grid">
       <label
-        class="format-option"
+        class="format-option is-primary"
         [class.active]="format === 'backup'"
       >
         <input
@@ -40,13 +30,13 @@
           [(ngModel)]="format"
         />
 
-        <div class="icon-wrap">
+        <div class="format-icon">
           <i class="bi bi-archive"></i>
         </div>
 
         <div class="format-text">
           <strong>Quilix Backup</strong>
-          <span>Recommended · Best for mobile & sharing</span>
+          <span>Recommended for most users</span>
         </div>
       </label>
 
@@ -61,13 +51,13 @@
           [(ngModel)]="format"
         />
 
-        <div class="icon-wrap">
+        <div class="format-icon">
           <i class="bi bi-braces"></i>
         </div>
 
         <div class="format-text">
           <strong>JSON</strong>
-          <span>Advanced · Manual or developer use</span>
+          <span>Advanced · Developer use</span>
         </div>
       </label>
     </div>
@@ -77,7 +67,7 @@
   <div class="actions">
     <button
       type="button"
-      class="btn primary user-export"
+      class="btn primary"
       (click)="exportCurrentUser()"
       [disabled]="isExporting"
     >
@@ -87,18 +77,14 @@
 
     <button
       type="button"
-      class="btn secondary"
+      class="btn icon"
       (click)="exportWorkspace()"
       [disabled]="isExporting"
-      aria-busy="{{ isExporting }}"
+      aria-label="Export Workspace"
+      title="Export Workspace"
     >
-      @if (isExporting) {
-        Exporting…
-      } @else {
-        <i class="bi bi-box-seam"></i>
-        Export Workspace
-      }
+      <i class="bi bi-box-seam"></i>
     </button>
   </div>
-
+  
 </section>
