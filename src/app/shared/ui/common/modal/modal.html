@@ -30,24 +30,39 @@
         @default {
 
           <!-- (info / success / warning / error) -->
-          @if (modal.modal()?.notice) {
+          @if (
+            modal.modal()?.notice &&
+            !noticeDismissed &&
+            modal.modal()?.notice?.scope !== 'always'
+          ) {
             <div
               class="modal-notice"
               [attr.data-type]="modal.modal()?.notice?.type"
             >
               <i
-                class="bi"
+                class="bi modal-notice-icon"
                 [ngClass]="{
                   'bi-info-circle': modal.modal()?.notice?.type === 'info',
                   'bi-check-circle': modal.modal()?.notice?.type === 'success',
-                  'bi-exclamation-triangle': modal.modal()?.notice?.type === 'warning',
+                  'bi-exclamation-circle': modal.modal()?.notice?.type === 'warning',
                   'bi-x-circle': modal.modal()?.notice?.type === 'error'
                 }"
               ></i>
 
-              <span>
+              <span class="modal-notice-text">
                 {{ modal.modal()?.notice?.message }}
               </span>
+
+              @if (modal.modal()?.notice?.scope === 'once') {
+                <button
+                  type="button"
+                  class="modal-notice-close"
+                  aria-label="Dismiss notice"
+                  (click)="dismissNotice()"
+                >
+                  <i class="bi bi-x"></i>
+                </button>
+              }
             </div>
           }
 

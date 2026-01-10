@@ -39,6 +39,7 @@ export class Export {
         cancelText: 'Cancel',
         notice: {
           type: 'info',
+          scope: 'once',
           message:
             'User export includes only your account and session data. ' +
             'It does not affect other users.',
