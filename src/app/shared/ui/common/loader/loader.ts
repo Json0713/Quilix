@@ -3,12 +3,13 @@ import { inject } from '@angular/core';
 import { SpinnerService } from '../../../../services/ui/common/spinner/spinner';
 
 @Component({
-  selector: 'app-global-spinner',
+  selector: 'app-loader',
   imports: [],
-  templateUrl: './global-spinner.html',
-  styleUrl: './global-spinner.scss',
+  templateUrl: './loader.html',
+  styleUrl: './loader.scss',
 })
-export class GlobalSpinner {
-  readonly spinner = inject(SpinnerService);
+export class Loader {
+  
+    readonly spinner = inject(SpinnerService);
 
 }

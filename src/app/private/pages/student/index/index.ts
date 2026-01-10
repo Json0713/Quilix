@@ -37,21 +37,4 @@ export class StudentIndex {
     }, 1800);
   }
 
-  //Error handling is done in interceptor
-    success(): void {
-    this.toast.success('Saved successfully');
-  }
-
-  error(): void {
-    this.toast.error('Failed to load data');
-  }
-
-  warning(): void {
-    this.toast.warning('Unsaved changes');
-  }
-
-  info(): void {
-    this.toast.info('Loading profile…');
-  }
-
 }

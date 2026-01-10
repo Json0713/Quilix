@@ -1,17 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GlobalSpinner } from './global-spinner';
 
-describe('GlobalSpinner', () => {
-  let component: GlobalSpinner;
-  let fixture: ComponentFixture<GlobalSpinner>;
+import { Loader } from './loader';
+
+describe('Loader', () => {
+  let component: Loader;
+  let fixture: ComponentFixture<Loader>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GlobalSpinner]
+      imports: [Loader]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(GlobalSpinner);
+    fixture = TestBed.createComponent(Loader);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
