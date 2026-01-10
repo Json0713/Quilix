@@ -181,6 +181,9 @@
   font-size: 0.85rem;
   line-height: 1.5;
 
+  white-space: pre-line;
+  line-height: 1.6;
+
   &[data-type='info'] {
     background: rgba(63, 186, 194, 0.12);
     color: var(--primary);

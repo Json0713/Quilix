@@ -31,6 +31,8 @@ export class Export {
   async exportCurrentUser(): Promise<void> {
     if (this.isExporting) return;
 
+    const { label, extension } = this.getFormatInfo();
+
     const confirmed = await this.modal.confirm(
       this.buildUserExportMessage(),
       {
@@ -41,8 +43,8 @@ export class Export {
           type: 'info',
           scope: 'once',
           message:
-            'User export this "Account" will be saved as " " file' +
-            '',
+          `Your account will be saved as a ${label} file. ` +
+          ``,
         },
       }
     );
@@ -64,6 +66,8 @@ export class Export {
   async exportWorkspace(): Promise<void> {
     if (this.isExporting) return;
 
+    const { label, extension } = this.getFormatInfo();
+
     const confirmed = await this.modal.confirm(
       this.buildWorkspaceExportMessage(),
       {
@@ -73,8 +77,8 @@ export class Export {
         notice: {
           type: 'warning',
           message:
-            'Workspace export saved all your "Accounts" that existing on this app as "" file. ' +
-            '',
+          `All accounts in this app will be exported as a ${label} file. ` +
+          ``,
         },
       }
     );
@@ -117,7 +121,7 @@ export class Export {
       '• App data and settings',
       '',
       'The file will be saved locally on your device.',
-      'Nothing is uploaded or shared automatically.',
+      'This file can be imported later to restore the entire workspace.',
     ].join('\n');
   }
 
@@ -144,6 +148,16 @@ export class Export {
     }
 
     return 'Something went wrong while creating the backup. Please try again.';
+  }
+
+  private getFormatInfo(): { label: string; extension: string } {
+    switch (this.format) {
+      case 'json':
+        return { label: 'JSON', extension: '.json' };
+      case 'backup':
+      default:
+        return { label: 'Quilix Backup', extension: '.backup' };
+    }
   }
 
 }
