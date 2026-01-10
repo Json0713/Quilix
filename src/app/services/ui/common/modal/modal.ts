@@ -23,6 +23,7 @@ export class ModalService {
         title: options?.title ?? 'Confirm',
         confirmText: options?.confirmText ?? 'Confirm',
         cancelText: options?.cancelText ?? 'Cancel',
+        notice: options?.notice,
         resolve,
       });
     });

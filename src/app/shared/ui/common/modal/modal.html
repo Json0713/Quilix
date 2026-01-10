@@ -28,10 +28,35 @@
         }
 
         @default {
+
+          <!-- (info / success / warning / error) -->
+          @if (modal.modal()?.notice) {
+            <div
+              class="modal-notice"
+              [attr.data-type]="modal.modal()?.notice?.type"
+            >
+              <i
+                class="bi"
+                [ngClass]="{
+                  'bi-info-circle': modal.modal()?.notice?.type === 'info',
+                  'bi-check-circle': modal.modal()?.notice?.type === 'success',
+                  'bi-exclamation-triangle': modal.modal()?.notice?.type === 'warning',
+                  'bi-x-circle': modal.modal()?.notice?.type === 'error'
+                }"
+              ></i>
+
+              <span>
+                {{ modal.modal()?.notice?.message }}
+              </span>
+            </div>
+          }
+
+          <!-- MESSAGE -->
           <p class="modal-message">
             {{ modal.modal()?.message }}
           </p>
 
+          <!-- ACTIONS -->
           <div class="modal-actions">
             @if (modal.modal()?.type === 'confirm') {
               <button class="btn secondary" (click)="cancel()">

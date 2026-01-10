@@ -37,6 +37,12 @@ export class Export {
         title: 'Export Your Data',
         confirmText: 'Export',
         cancelText: 'Cancel',
+        notice: {
+          type: 'info',
+          message:
+            'User export includes only your account and session data. ' +
+            'It does not affect other users.',
+        },
       }
     );
 
@@ -63,6 +69,12 @@ export class Export {
         title: 'Export Workspace',
         confirmText: 'Export Workspace',
         cancelText: 'Cancel',
+        notice: {
+          type: 'info',
+          message:
+            'Export Workspace includes only your account and session data. ' +
+            '',
+        },
       }
     );
 
