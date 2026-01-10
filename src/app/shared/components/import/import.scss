@@ -1,9 +1,7 @@
 /* IMPORT CARD */
 .import-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
   border-radius: 18px;
-  padding: 1.25rem;
+  padding: 0.25rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -175,12 +173,12 @@
 
   .primary {
     color: #ffff;
-    background-color:rgba(5, 104, 111, 0.986);
+    background: rgba(12, 70, 75, 0.889);
   }
 
   .secondary {
     color: #ffff;
-    background-color:rgba(168, 53, 21, 0.638);
+    background-color:rgba(223, 54, 25, 0.884);
   }
 
   .btn {
