@@ -1,19 +1,25 @@
-<header class="dashboard-header">
-  <h1>Teacher Dashboard</h1>
+<div class="root-container">
+  <div class="container">
 
-  <button class="btn btn-danger rounded-5" (click)="logout()">
-    Logout
-  </button>
-</header>
 
-<section class="welcome-section">
-  <h2>Welcome, Teacher!</h2>
-  <p>This is your dashboard where you can access your courses and track your progress.</p>
+    <header class="dashboard-header">
+      <h1>Teacher Dashboard</h1>
 
-  <div class="export-card mt-2 py-2">
-    <app-export></app-export>
+      <button class="btn btn-danger rounded-5" (click)="logout()">
+        Logout
+      </button>
+    </header>
+
+    <h2>Welcome, Teacher!</h2>
+    <p>This is your dashboard where you can access your courses and track your progress.</p>
+
+    <div class="export-card mt-2 py-2">
+      <app-export></app-export>
+    </div>
+
+
+
   </div>
-
-</section>
+</div>
 
 
