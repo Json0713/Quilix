@@ -83,9 +83,21 @@
 /* MESSAGE */
 .modal-message {
   font-size: 0.9rem;
+  word-spacing: 0.05em;
+
   line-height: 1.6;
   color: #334155;
   margin-bottom: 1.5rem;
+
+  white-space: pre-line;
+  line-height: 1.6;
+
+  color: var(--text-main);
+}
+
+.modal-message::first-line {
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 /* ACTIONS */
@@ -131,12 +143,12 @@
 
 /* SECONDARY */
 .btn.secondary {
-  background: #f1f5f9;
+  background: #e8edf3d4;
   color: #0f172a;
 }
 
 .btn.secondary:hover {
-  background: #e2e8f0;
+  background: #e8edf3;
 }
 
 /* ANIMATIONS */

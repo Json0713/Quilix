@@ -19,7 +19,7 @@ type ExportScope = 'workspace' | 'user';
 export class Export {
 
   isExporting = false;
-  format: BackupFileFormat = 'backup'; // default = mobile-safe
+  format: BackupFileFormat = 'backup';
 
   constructor(
     private readonly backup: BackupService,
@@ -28,25 +28,18 @@ export class Export {
   ) {}
 
   /* ───────────────────────── EXPORT ACTIONS ───────────────────────── */
-  async exportWorkspace(): Promise<void> {
-    const confirmed = await this.modal.confirm(
-      'Export the entire workspace backup?'
-    );
-    if (!confirmed) return;
-
-    await this.run(async () => {
-      await this.backup.exportWorkspace(
-        this.format,
-        this.buildFilename('workspace')
-      );
-      this.toast.success('Workspace exported successfully.');
-    });
-  }
-
   async exportCurrentUser(): Promise<void> {
+    if (this.isExporting) return;
+
     const confirmed = await this.modal.confirm(
-      'Export your user backup?'
+      this.buildUserExportMessage(),
+      {
+        title: 'Export Your Data',
+        confirmText: 'Export',
+        cancelText: 'Cancel',
+      }
     );
+
     if (!confirmed) return;
 
     await this.run(async () => {
@@ -54,8 +47,65 @@ export class Export {
         this.format,
         this.buildFilename('user')
       );
-      this.toast.success('User exported successfully.');
+
+      this.toast.success(
+        'Your backup file has been saved on your device.'
+      );
     });
+  }
+
+  async exportWorkspace(): Promise<void> {
+    if (this.isExporting) return;
+
+    const confirmed = await this.modal.confirm(
+      this.buildWorkspaceExportMessage(),
+      {
+        title: 'Export Workspace',
+        confirmText: 'Export Workspace',
+        cancelText: 'Cancel',
+      }
+    );
+
+    if (!confirmed) return;
+
+    await this.run(async () => {
+      await this.backup.exportWorkspace(
+        this.format,
+        this.buildFilename('workspace')
+      );
+
+      this.toast.success(
+        'The workspace backup has been saved on your device.'
+      );
+    });
+  }
+
+  /* ───────────────────────── MESSAGE BUILDERS ───────────────────────── */
+  private buildUserExportMessage(): string {
+    return [
+      'You are about to export your user backup.',
+      '',
+      'This includes:',
+      '• Your profile',
+      '• Your session data',
+      '',
+      'The file will be saved locally on your device.',
+      'You can keep it as a backup or restore it later if needed.',
+    ].join('\n');
+  }
+
+  private buildWorkspaceExportMessage(): string {
+    return [
+      'You are about to export the entire workspace.',
+      '',
+      'This includes:',
+      '• All users',
+      '• Sessions',
+      '• App data and settings',
+      '',
+      'The file will be saved locally on your device.',
+      'Nothing is uploaded or shared automatically.',
+    ].join('\n');
   }
 
   /* ───────────────────────── HELPERS ───────────────────────── */
@@ -76,10 +126,11 @@ export class Export {
   }
 
   private resolveError(err: unknown): string {
-    if (err instanceof Error) {
+    if (err instanceof Error && err.message) {
       return err.message;
     }
-    return 'Export failed. Please try again.';
+
+    return 'Something went wrong while creating the backup. Please try again.';
   }
 
 }
