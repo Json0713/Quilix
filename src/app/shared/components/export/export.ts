@@ -58,7 +58,7 @@ export class Export {
       );
 
       this.toast.success(
-        'Your backup file has been saved on your device.'
+        'Your backup file will saved on your device.'
       );
     });
   }
@@ -92,7 +92,7 @@ export class Export {
       );
 
       this.toast.success(
-        'The workspace backup has been saved on your device.'
+        'The workspace backup will saved on your device.'
       );
     });
   }
