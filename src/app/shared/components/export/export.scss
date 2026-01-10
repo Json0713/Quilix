@@ -130,7 +130,9 @@
 }
 
 .btn.primary {
-  padding: 0.6rem 1.2rem;
+  width: auto;
+  height: 42px;
+  padding: 0 22px 0 22px;
   background: var(--primary);
   color: #fff;
   display: inline-flex;
@@ -144,17 +146,20 @@
 }
 
 .btn.icon {
-  width: 45px;
-  height: 45px;
-  background-color:rgba(63, 185, 194, 0.125);
+  width: 65px;
+  height: 42px;
+  padding: 0 22px 0 22px;
+  background: var(--primary);
+  color: #fff;
   place-items: center;
 
   i {
     font-size: 1.3rem;
-    color: var(--text-main);
+    color: #fff;
   }
 
   &:hover:not(:disabled) {
-    background-color:rgba(63, 185, 194, 0.182);
+    background: var(--primary-soft);
+    transform: translateY(-1px);
   }
 }
