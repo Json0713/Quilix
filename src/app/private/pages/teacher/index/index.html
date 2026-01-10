@@ -1,22 +1,19 @@
 <header class="dashboard-header">
   <h1>Teacher Dashboard</h1>
 
-  <button class="logout-btn" (click)="logout()">
-    <i class="bi bi-box-arrow-right"></i>
+  <button class="btn btn-danger rounded-5" (click)="logout()">
     Logout
   </button>
 </header>
 
+<section class="welcome-section">
+  <h2>Welcome, Teacher!</h2>
+  <p>This is your dashboard where you can access your courses and track your progress.</p>
 
-<main class="dashboard-main">
-  <section class="welcome-section">
-    <h2>Welcome, Teacher!</h2>
-    <p>This is your dashboard where you can access your courses and track your progress.</p>
-  </section>
-
-  <div>
+  <div class="export-card mt-2 py-2">
     <app-export></app-export>
   </div>
 
+</section>
 
-</main>
+
