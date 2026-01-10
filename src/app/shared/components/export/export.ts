@@ -70,9 +70,9 @@ export class Export {
         confirmText: 'Export Workspace',
         cancelText: 'Cancel',
         notice: {
-          type: 'info',
+          type: 'warning',
           message:
-            'Export Workspace includes only your account and session data. ' +
+            'Export Workspace includes all your accounts that existing on this app. ' +
             '',
         },
       }
@@ -98,11 +98,11 @@ export class Export {
       'You are about to export your user backup.',
       '',
       'This includes:',
-      '• Your profile',
-      '• Your session data',
+      '• Your Profile',
+      '• Your Account data',
       '',
-      'The file will be saved locally on your device.',
-      'You can keep it as a backup or restore it later if needed.',
+      'The file will be saved locally on your device as file.',
+      'You can keep it as a backup or restore it later (Import).',
     ].join('\n');
   }
 
@@ -111,8 +111,8 @@ export class Export {
       'You are about to export the entire workspace.',
       '',
       'This includes:',
-      '• All users',
-      '• Sessions',
+      '• All Workspaces',
+      '• Workspace data',
       '• App data and settings',
       '',
       'The file will be saved locally on your device.',
