@@ -41,8 +41,8 @@ export class Export {
           type: 'info',
           scope: 'once',
           message:
-            'User export includes only your account and session data. ' +
-            'It does not affect other users.',
+            'User export this "Account" will be saved as " " file' +
+            '',
         },
       }
     );
@@ -73,7 +73,7 @@ export class Export {
         notice: {
           type: 'warning',
           message:
-            'Export Workspace includes all your accounts that existing on this app. ' +
+            'Workspace export saved all your "Accounts" that existing on this app as "" file. ' +
             '',
         },
       }
