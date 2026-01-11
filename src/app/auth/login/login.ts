@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { AuthService } from '../../core/auth/auth';
+import { AuthService } from '../../core/auth/auth.service';
 import { UserService } from '../../core/users/user.service';
 
 import { User, UserRole } from '../../core/interfaces/user';

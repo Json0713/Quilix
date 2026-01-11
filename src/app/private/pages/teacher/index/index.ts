@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { SpinnerService } from "../../../../services/ui/common/spinner/spinner";
-import { AuthService } from '../../../../core/auth/auth';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../../../../services/ui/common/toast/toast';
 import { Export } from '../../../../shared/components/export/export';
