@@ -71,7 +71,7 @@ export class BackupMigrator {
 
     return {
       ...backup,
-      version: 1,
+      version: BACKUP_VERSION,
       meta: {
         ...backup.meta,
         migratedFromVersion: LEGACY_V0,

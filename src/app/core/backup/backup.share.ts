@@ -51,7 +51,7 @@ export class BackupShareService {
     return new File(
       [content],
       this.ensureExtension(safeName, '.quilix-backup'),
-      { type: 'application/octet-stream' }
+      { type: 'application/vnd.quilix.backup+json' }
     );
   }
 

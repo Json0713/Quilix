@@ -173,7 +173,7 @@ export class BackupService {
     confirmReplace: (name: string) => Promise<boolean>
   ): Promise<User[]> {
 
-    const existing = this.auth.getUsers();
+    const existing = [...this.auth.getUsers()];
 
     for (const user of imported) {
       const index = existing.findIndex(
