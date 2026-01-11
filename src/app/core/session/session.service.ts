@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { StorageFacade } from '../storage/storage.facade';
+import { AuthFacade } from '../auth/auth.facade';
 import { Session } from '../interfaces/session';
 
 
@@ -9,7 +9,7 @@ import { Session } from '../interfaces/session';
 export class SessionService {
 
   
-  constructor(private storage: StorageFacade) {}
+  constructor(private storage: AuthFacade) {}
 
   start(userId: string): void {
     const now = Date.now();

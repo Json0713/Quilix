@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { StorageFacade } from '../storage/storage.facade';
+import { AuthFacade } from '../auth/auth.facade';
 import { User, UserRole } from '../interfaces/user';
 
 @Injectable({
@@ -7,7 +7,7 @@ import { User, UserRole } from '../interfaces/user';
 })
 export class UserService {
   
-  constructor(private storage: StorageFacade) {}
+  constructor(private storage: AuthFacade) {}
 
   getAll(): User[] {
     return this.storage
