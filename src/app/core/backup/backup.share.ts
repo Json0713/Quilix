@@ -23,7 +23,7 @@ export class BackupShareService {
         });
         return;
       } catch {
-        // fallback
+        // intentional fallback
       }
     }
 
@@ -37,23 +37,42 @@ export class BackupShareService {
     format: BackupFileFormat
   ): File {
 
-    const content = JSON.stringify(payload, null, 2);
+    const content = this.safeStringify(payload);
+    const safeName = this.sanitizeFilename(filename);
 
     if (format === 'json') {
-      return new File([content], this.ensureExtension(filename, '.json'), {
-        type: 'application/json',
-      });
+      return new File(
+        [content],
+        this.ensureExtension(safeName, '.json'),
+        { type: 'application/json;charset=utf-8' }
+      );
     }
 
     return new File(
       [content],
-      this.ensureExtension(filename, '.quilix-backup'),
+      this.ensureExtension(safeName, '.quilix-backup'),
       { type: 'application/octet-stream' }
     );
   }
 
+  private safeStringify(payload: unknown): string {
+    try {
+      return JSON.stringify(payload, null, 2);
+    } catch {
+      throw new Error('Backup data is not serializable.');
+    }
+  }
+
+  private sanitizeFilename(name: string): string {
+    return name
+      .trim()
+      .replace(/[<>:"/\\|?*\x00-\x1F]/g, '-')
+      .replace(/\s+/g, '-')
+      .toLowerCase();
+  }
+
   private ensureExtension(name: string, ext: string): string {
-    return name.toLowerCase().endsWith(ext)
+    return name.endsWith(ext)
       ? name
       : name.replace(/\.[^/.]+$/, '') + ext;
   }
@@ -81,5 +100,5 @@ export class BackupShareService {
 
     URL.revokeObjectURL(url);
   }
-  
+
 }

@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { Storage } from '../storage/storage';
-import { AuthService } from '../auth/auth';
-
-import { Session } from '../interfaces/session';
+import { AuthFacade } from '../auth/auth.facade';
 import { User } from '../interfaces/user';
+import { Session } from '../interfaces/session';
 
-import { 
-  BackupShareService, 
-  BackupFileFormat 
+import {
+  BackupShareService,
+  BackupFileFormat,
 } from './backup.share';
 
 import {
@@ -29,8 +27,7 @@ import {
 export class BackupService {
 
   constructor(
-    private readonly storage: Storage,
-    private readonly auth: AuthService,
+    private readonly auth: AuthFacade,
     private readonly share: BackupShareService
   ) {}
 
@@ -42,8 +39,8 @@ export class BackupService {
 
     const payload = this.buildBackupPayload(
       'workspace',
-      this.storage.getUsers(),
-      this.storage.getSession()
+      this.auth.getUsers(),
+      this.auth.getSession()
     );
 
     await this.share.shareOrDownload(
@@ -58,13 +55,20 @@ export class BackupService {
     filename?: string
   ): Promise<void> {
 
-    const user = this.auth.getCurrentUser();
-    if (!user) throw new Error('No active user.');
+    const session = this.auth.getSession();
+    if (!session?.userId) {
+      throw new Error('No active session.');
+    }
+
+    const user = this.auth.getUserById(session.userId);
+    if (!user) {
+      throw new Error('Active user not found.');
+    }
 
     const payload = this.buildBackupPayload(
       'user',
       [user],
-      this.storage.getSession()
+      session
     );
 
     const safeName = user.name
@@ -98,7 +102,11 @@ export class BackupService {
         ? BackupMigrator.migrate(normalized, BACKUP_VERSION)
         : normalized;
 
-    return this.applyBackup(migrated, expectedScope, confirmReplace);
+    return this.applyBackup(
+      migrated,
+      expectedScope,
+      confirmReplace
+    );
   }
 
   /* ───────────────────────── APPLY ───────────────────────── */
@@ -110,18 +118,18 @@ export class BackupService {
 
     let importedUsers: User[] = [];
 
-    if (backup.data?.users?.length) {
-      const users = await this.mergeUsers(
+    if (backup.data.users?.length) {
+      const mergedUsers = await this.mergeUsers(
         backup.data.users,
         confirmReplace
       );
 
-      this.storage.saveUsers(users);
+      this.auth.saveUsers(mergedUsers);
       importedUsers = backup.data.users;
     }
 
-    if (scope === 'workspace' && backup.data?.session) {
-      this.storage.saveSession(backup.data.session);
+    if (scope === 'workspace' && backup.data.session) {
+      this.auth.saveSession(backup.data.session);
     }
 
     return { importedUsers };
@@ -133,12 +141,19 @@ export class BackupService {
     users?: User[],
     session?: Session | null
   ): QuilixBackup {
+
     return {
       app: 'Quilix',
       version: BACKUP_VERSION,
       scope,
       exportedAt: Date.now(),
-      data: { users, session },
+      meta: {
+        createdAt: Date.now(),
+      },
+      data: {
+        users,
+        session,
+      },
     };
   }
 
@@ -158,7 +173,7 @@ export class BackupService {
     confirmReplace: (name: string) => Promise<boolean>
   ): Promise<User[]> {
 
-    const existing = this.storage.getUsers();
+    const existing = this.auth.getUsers();
 
     for (const user of imported) {
       const index = existing.findIndex(
@@ -181,7 +196,10 @@ export class BackupService {
     return existing;
   }
 
-  private async readBackupFile(file: File): Promise<QuilixBackup> {
+  private async readBackupFile(
+    file: File
+  ): Promise<QuilixBackup> {
+
     const text = await file.text();
     return JSON.parse(text);
   }

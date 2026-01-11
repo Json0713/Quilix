@@ -3,46 +3,71 @@ import {
   BackupScope,
   AnyBackupVersion,
   BACKUP_VERSION,
-  LegacyBackupVersion,
 } from './backup.types';
 
 
 export class BackupValidator {
 
-  static validate(payload: QuilixBackup): void {
-    this.validateRoot(payload);
-    this.validateScope(payload);
-    this.validateData(payload);
+  static validate(payload: unknown): asserts payload is QuilixBackup {
+    if (!payload || typeof payload !== 'object') {
+      throw new Error('Backup payload is not an object.');
+    }
+
+    const backup = payload as Partial<QuilixBackup>;
+
+    this.validateRoot(backup);
+    this.validateScope(backup.scope);
+    this.validateData(backup);
   }
 
-  private static validateRoot(payload: QuilixBackup): void {
-    if (payload.app !== 'Quilix') {
+  /* ───────────────────────── ROOT ───────────────────────── */
+  private static validateRoot(
+    backup: Partial<QuilixBackup>
+  ): void {
+    if (backup.app !== 'Quilix') {
       throw new Error('Invalid Quilix backup.');
     }
 
-    if (!this.isSupportedVersion(payload.version)) {
+    if (!this.isSupportedVersion(backup.version)) {
       throw new Error('Unsupported backup version.');
     }
 
-    if (!payload.exportedAt || typeof payload.exportedAt !== 'number') {
+    if (
+      typeof backup.exportedAt !== 'number' ||
+      Number.isNaN(backup.exportedAt)
+    ) {
       throw new Error('Invalid export timestamp.');
+    }
+
+    if (!backup.meta || typeof backup.meta !== 'object') {
+      throw new Error('Backup metadata is missing or invalid.');
+    }
+
+    if (!backup.data || typeof backup.data !== 'object') {
+      throw new Error('Backup data is missing or invalid.');
     }
   }
 
-  private static validateScope(payload: QuilixBackup): void {
-    if (payload.scope !== 'workspace' && payload.scope !== 'user') {
+  /* ───────────────────────── SCOPE ───────────────────────── */
+  private static validateScope(
+    scope?: BackupScope
+  ): void {
+    if (scope !== 'workspace' && scope !== 'user') {
       throw new Error('Invalid backup scope.');
     }
   }
 
-  private static validateData(payload: QuilixBackup): void {
-    const data = payload.data;
+  /* ───────────────────────── DATA ───────────────────────── */
+  private static validateData(
+    backup: Partial<QuilixBackup>
+  ): void {
+    const data = backup.data;
 
     if (!data || typeof data !== 'object') {
-      throw new Error('Backup data is missing or invalid.');
+      throw new Error('Backup data is invalid.');
     }
 
-    if (payload.scope === 'user') {
+    if (backup.scope === 'user') {
       if (!Array.isArray(data.users) || data.users.length !== 1) {
         throw new Error(
           'User backup must contain exactly one user.'
@@ -51,8 +76,9 @@ export class BackupValidator {
     }
   }
 
+  /* ───────────────────────── VERSION ───────────────────────── */
   private static isSupportedVersion(
-    version: AnyBackupVersion
+    version?: AnyBackupVersion
   ): boolean {
     return (
       version === BACKUP_VERSION ||
@@ -60,4 +86,5 @@ export class BackupValidator {
     );
   }
 
+  
 }

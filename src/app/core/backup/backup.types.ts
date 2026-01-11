@@ -1,35 +1,39 @@
 import { User } from '../interfaces/user';
 import { Session } from '../interfaces/session';
 
+/* ───────────────────────── VERSIONING ───────────────────────── */
+/** Current supported backup version */
 /* SINGLE SOURCE OF TRUTH */
 export const BACKUP_VERSION = 1 as const;
-
 export type BackupVersion = typeof BACKUP_VERSION;
 
 /** Legacy versions supported for migration */
 export type LegacyBackupVersion = '0.1.0';
-
 export type AnyBackupVersion = BackupVersion | LegacyBackupVersion;
 
+/* ───────────────────────── SCOPE ───────────────────────── */
 /**
  * Defines what kind of backup this is.
- * - workspace: full app data
- * - user: single user snapshot
+ * - workspace: full app snapshot
+ * - user: single-user snapshot
  */
 export type BackupScope = 'workspace' | 'user';
 
+/* ───────────────────────── ROOT CONTRACT ───────────────────────── */
 /**
- * Root backup structure.
- * This is the ONLY valid Quilix backup format.
+ * Root Quilix backup contract.
+ * This is the ONLY valid backup format.
  */
 export interface QuilixBackup {
   app: 'Quilix';
   version: AnyBackupVersion;
   scope: BackupScope;
   exportedAt: number;
+  meta: BackupMeta;
   data: BackupData;
 }
 
+/* ───────────────────────── DATA PAYLOAD ───────────────────────── */
 /**
  * Container for all persisted entities.
  * Optional fields allow partial backups and future expansion.
@@ -38,26 +42,22 @@ export interface BackupData {
   users?: User[];
   session?: Session | null;
 
-  // Future entities
+  // Future IndexedDB entities
   tasks?: unknown[];
   notes?: unknown[];
   boards?: unknown[];
   progress?: unknown[];
-
-  meta?: BackupMeta;
 }
 
+/* ───────────────────────── METADATA ───────────────────────── */
 /**
- * App-level metadata (non-user content).
+ * Backup metadata (non-domain, non-user data).
+ * Used for validation, migration, and tooling.
  */
 export interface BackupMeta {
   appVersion?: string;
-  createdAt?: number;
+  createdAt: number;
 
-  // numeric, not string
   migratedFromVersion?: number;
   migratedAt?: number;
-  
 }
-
-
