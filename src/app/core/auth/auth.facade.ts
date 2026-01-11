@@ -49,5 +49,5 @@ export class AuthFacade {
   clearSession(): void {
     this.storage.clearSession();
   }
-  
+
 }
