@@ -126,7 +126,7 @@ export class Login {
     return colors[Math.abs(hash) % colors.length];
   }
 
-  /* Import-modal */
+  /* Import */
   openImport(): void {
     this.modal.openImport();
   }
