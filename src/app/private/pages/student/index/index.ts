@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AuthFacade } from '../../../../core/auth/auth.facade';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
-import { SpinnerService } from "../../../../services/ui/common/spinner/spinner";
+import { LoaderService } from '../../../../services/ui/common/loader/loader';
 import { Export } from "../../../../shared/components/export/export";
 
 @Component({
@@ -14,7 +14,7 @@ export class StudentIndex {
 
   constructor(
     private auth: AuthFacade,
-    private spinner: SpinnerService,
+    private loader: LoaderService,
     private modal: ModalService,
   ) {}
 
@@ -23,10 +23,10 @@ export class StudentIndex {
   }
 
   loadData(): void {
-    this.spinner.show();
+    this.loader.show();
 
     setTimeout(() => {
-      this.spinner.hide();
+      this.loader.hide();
     }, 1800);
   }
 

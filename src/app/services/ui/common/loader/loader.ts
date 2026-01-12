@@ -3,7 +3,8 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({
   providedIn: 'root',
 })
-export class SpinnerService {
+export class LoaderService {
+
   private readonly _loading = signal<boolean>(false);
 
   readonly loading = this._loading.asReadonly();

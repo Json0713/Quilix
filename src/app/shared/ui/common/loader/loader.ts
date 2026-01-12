@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { inject } from '@angular/core';
-import { SpinnerService } from '../../../../services/ui/common/spinner/spinner';
+import { LoaderService } from '../../../../services/ui/common/loader/loader';
 
 @Component({
   selector: 'app-loader',
@@ -10,6 +10,6 @@ import { SpinnerService } from '../../../../services/ui/common/spinner/spinner';
 })
 export class Loader {
   
-    readonly spinner = inject(SpinnerService);
+  readonly loader = inject(LoaderService);
 
 }
