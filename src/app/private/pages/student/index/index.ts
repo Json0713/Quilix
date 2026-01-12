@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthFacade } from '../../../../core/auth/auth.facade';
+import { ModalService } from '../../../../services/ui/common/modal/modal';
 import { SpinnerService } from "../../../../services/ui/common/spinner/spinner";
 import { Export } from "../../../../shared/components/export/export";
 
@@ -14,6 +15,7 @@ export class StudentIndex {
   constructor(
     private auth: AuthFacade,
     private spinner: SpinnerService,
+    private modal: ModalService,
   ) {}
 
   ngOnInit(): void {
@@ -28,7 +30,18 @@ export class StudentIndex {
     }, 1800);
   }
 
-  logout(): void {
+  async logout(): Promise<void> {
+    const confirmed = await this.modal.confirm(
+      'Are you sure you want to log out?',
+      {
+        title: 'Confirm Logout',
+        confirmText: 'Logout',
+        cancelText: 'Cancel',
+      }
+    );
+
+    if (!confirmed) return;
+
     this.auth.logout();
   }
 
