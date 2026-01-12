@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
+import { AuthFacade } from '../../../../core/auth/auth.facade';
 import { SpinnerService } from "../../../../services/ui/common/spinner/spinner";
-import { AuthService } from '../../../../core/auth/auth.service';
-import { Router } from '@angular/router';
-import { ToastService } from '../../../../services/ui/common/toast/toast';
 import { Export } from "../../../../shared/components/export/export";
 
 @Component({
@@ -14,19 +12,12 @@ import { Export } from "../../../../shared/components/export/export";
 export class StudentIndex {
 
   constructor(
-    private auth: AuthService,
-    private router: Router,
+    private auth: AuthFacade,
     private spinner: SpinnerService,
-    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
     this.loadData();
-  }
-
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
   }
 
   loadData(): void {
@@ -35,6 +26,10 @@ export class StudentIndex {
     setTimeout(() => {
       this.spinner.hide();
     }, 1800);
+  }
+
+  logout(): void {
+    this.auth.logout();
   }
 
 }

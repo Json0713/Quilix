@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
-import { AuthFacade } from '../auth/auth.facade';
+import { Storage } from '../storage/storage';
 import { User, UserRole } from '../interfaces/user';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  
-  constructor(private storage: AuthFacade) {}
+
+  constructor(private storage: Storage) {}
 
   getAll(): User[] {
     return this.storage
@@ -48,5 +49,5 @@ export class UserService {
   delete(userId: string): void {
     this.storage.removeUser(userId);
   }
-  
+
 }

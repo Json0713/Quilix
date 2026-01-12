@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
+import { AuthFacade } from '../../../../core/auth/auth.facade';
 import { SpinnerService } from "../../../../services/ui/common/spinner/spinner";
-import { AuthService } from '../../../../core/auth/auth.service';
-import { Router } from '@angular/router';
-import { ToastService } from '../../../../services/ui/common/toast/toast';
 import { Export } from '../../../../shared/components/export/export';
 
 
@@ -15,19 +13,12 @@ import { Export } from '../../../../shared/components/export/export';
 export class TeacherIndex {
 
   constructor(
-    private auth: AuthService,
-    private router: Router,
+    private auth: AuthFacade,
     private spinner: SpinnerService,
-    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
     this.loadData();
-  }
-
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
   }
 
   loadData(): void {
@@ -38,21 +29,8 @@ export class TeacherIndex {
     }, 1800);
   }
 
-  //Error handling is done in interceptor
-  success(): void {
-    this.toast.success('Saved successfully');
-  }
-
-  error(): void {
-    this.toast.error('Failed to load data');
-  }
-
-  warning(): void {
-    this.toast.warning('Unsaved changes');
-  }
-
-  info(): void {
-    this.toast.info('Loading profile…');
+  logout(): void {
+    this.auth.logout();
   }
 
 }

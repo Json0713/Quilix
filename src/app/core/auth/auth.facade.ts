@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from './auth.service';
 import { Storage } from '../storage/storage';
 import { User } from '../interfaces/user';
 import { Session } from '../interfaces/session';
@@ -9,8 +11,11 @@ import { Session } from '../interfaces/session';
 })
 export class AuthFacade {
 
-
-  constructor(private storage: Storage) {}
+  constructor(
+    private storage: Storage,
+    private auth: AuthService,
+    private router: Router
+  ) {}
 
   /* USERS (LocalStorage) */
   getUsers(): User[] {
@@ -48,6 +53,11 @@ export class AuthFacade {
 
   clearSession(): void {
     this.storage.clearSession();
+  }
+
+  logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/login'], { replaceUrl: true });
   }
 
 }
