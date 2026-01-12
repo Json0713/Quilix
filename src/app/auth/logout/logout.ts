@@ -1,4 +1,4 @@
-import { Component, OnInit  } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 
@@ -8,16 +8,16 @@ import { AuthService } from '../../core/auth/auth.service';
   templateUrl: './logout.html',
   styleUrl: './logout.scss',
 })
-export class Logout implements OnInit {
+export class Logout {
 
-  constructor (
+  constructor(
     private auth: AuthService,
     private router: Router
   ) {}
 
-  ngOnInit(): void {
+  logout(): void {
     this.auth.logout();
-    this.router.navigate(['/login'], { replaceUrl: true });
+    this.router.navigate(['/login']);
   }
 
 }
