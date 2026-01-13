@@ -23,15 +23,29 @@
         [attr.aria-expanded]="scopeOpen"
       >
         {{ scope === 'workspace' ? 'Workspace' : 'Userspace' }}
-        <i class="bi bi-chevron-down"></i>
+        <i
+          class="bi bi-chevron-down"
+          [class.open]="scopeOpen"
+        ></i>
       </button>
 
       @if (scopeOpen) {
         <div class="scope-menu" role="listbox">
-          <button role="option" (click)="setScope('workspace')">
+          <button
+            role="option"
+            [class.active]="scope === 'workspace'"
+            [attr.aria-selected]="scope === 'workspace'"
+            (click)="setScope('workspace')"
+          >
             Workspace
           </button>
-          <button role="option" (click)="setScope('user')">
+
+          <button
+            role="option"
+            [class.active]="scope === 'user'"
+            [attr.aria-selected]="scope === 'user'"
+            (click)="setScope('user')"
+          >
             Userspace
           </button>
         </div>
