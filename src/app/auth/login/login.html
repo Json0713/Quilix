@@ -1,10 +1,7 @@
 <section class="login-wrapper">
 
-  <!-- <app-header></app-header> -->
-
   <!-- ONE UNIFIED CARD -->
   <article class="auth-card">
-
     <!-- LEFT : CREATE / LOGIN -->
     <section
       class="auth-section auth-primary"
@@ -12,10 +9,15 @@
       aria-labelledby="login-title"
     >
 
-    <header class="create-header">
-      <h2>Create Your Workspace</h2>
-      <p>Startup your day with a cup of coffee</p>
-    </header>
+      <div class="header-title">
+        <div class="brand-icon">
+          <i class="bi bi-feather"></i>
+            Quilix
+        </div>
+        <p class="brand-subtitle">
+          Startup your day with a cup of coffee.
+        </p>
+      </div>
 
       <form
         class="auth-form"
@@ -23,7 +25,7 @@
         novalidate
       >
 
-        <!-- NAME -->
+        <!-- Name -->
         <div class="field"> 
           <label for="name">Workspace name</label>
           <input
@@ -43,7 +45,7 @@
           }
         </div>
 
-        <!-- ROLE -->
+        <!-- Role -->
         <div class="field">
           <label>Role</label>
 
@@ -72,7 +74,7 @@
           </div>
         </div>
 
-        <!-- ACTION -->
+        <!-- Action -->
         <button
           type="submit"
           class="primary-action"
@@ -124,7 +126,7 @@
 
       @else {
 
-        <!-- EMPTY -->
+        <!-- Empty -->
         @if (users.length === 0) {
           <div class="recent-empty">
             <i class="bi bi-clock-history"></i>
@@ -133,7 +135,7 @@
           </div>
         }
 
-        <!-- LIST -->
+        <!-- List -->
         @if (users.length > 0) {
           <ul class="user-list" role="list">
 
@@ -144,7 +146,7 @@
                 [class.confirm]="deletingUserId === user.id"
               >
 
-                <!-- NORMAL -->
+                <!-- Normal -->
                 @if (deletingUserId !== user.id) {
 
                   <div
@@ -193,7 +195,7 @@
 
                 }
 
-                <!-- CONFIRM DELETE -->
+                <!-- Confirm Delete -->
                 @else {
                   <div class="confirm-delete">
                     <p>Delete this workspace?</p>
@@ -232,11 +234,6 @@
       }
 
     </aside>
-
   </article>
-
-  <!-- <div class="footer mt-3">
-    <app-footer></app-footer>
-  </div> -->
 
 </section>
