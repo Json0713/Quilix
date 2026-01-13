@@ -8,8 +8,6 @@ import { UserService } from '../../core/users/user.service';
 import { User, UserRole } from '../../core/interfaces/user';
 
 import { Spinner } from '../../shared/ui/common/spinner/spinner';
-import { Header } from '../../public/common/header/header';
-import { Footer } from '../../public/common/footer/footer';
 import { TimeAgoPipe } from '../../shared/ui/common/time-ago/time-ago-pipe';
 
 import { ToastRelayService } from '../../services/ui/common/toast/toast-relay';
@@ -18,7 +16,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, Spinner, TimeAgoPipe, Header, Footer],
+  imports: [FormsModule, Spinner, TimeAgoPipe],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
