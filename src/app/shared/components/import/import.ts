@@ -14,6 +14,7 @@ const ALLOWED_EXTENSIONS = [
   '.quilix-backup',
 ];
 
+
 @Component({
   selector: 'app-import',
   standalone: true,
