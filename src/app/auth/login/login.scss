@@ -259,11 +259,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
+  background: #eef5f6;
   transition: background 0.15s, border 0.15s;
 
   &:hover {
-    background: #f4f8f9;
+    background: #eef5f6;
   }
 
   &.confirm {
@@ -276,7 +276,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 6px;
+  padding: 0.8px;
   cursor: pointer;
   flex: 1;
   transition: outline 0.15s;
@@ -292,8 +292,8 @@
 }
 
 .avatar {
-  width: 44px;
-  height: 44px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -320,7 +320,7 @@
 }
 
 /* DELETE */
-.delete-btn {
+.delete-icon {
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -336,9 +336,10 @@
 .confirm-delete {
   width: 100%;
   text-align: center;
+  padding: 0;
 
   p {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: #7f1d1d;
     margin-bottom: 0.5rem;
   }
@@ -354,7 +355,7 @@
     color: #fff;
     border: none;
     border-radius: 50px;
-    padding: 6px 14px;
+    padding: 4px 14px;
     font-size: 0.8rem;
     cursor: pointer;
   }
@@ -363,7 +364,7 @@
     background: transparent;
     border: 1px solid #d1d5db;
     border-radius: 50px;
-    padding: 6px 14px;
+    padding: 4px 14px;
     font-size: 0.8rem;
     cursor: pointer;
   }
