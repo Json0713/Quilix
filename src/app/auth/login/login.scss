@@ -47,18 +47,6 @@
   }
 }
 
-/* Footer */
-// .footer {
-//   margin-top: 12px;
-//   .description {
-//     text-align: center;
-//     font-size: 0.72rem;
-//     line-height: 1.5;
-//     color: rgba(20, 72, 77, 0.947);
-//     margin: 0;
-//   }
-// }
-
 /* SHARED SECTION BASE */
 .auth-section {
   padding: 2.5rem 1.15rem;
@@ -274,22 +262,27 @@
 .recent-loading,
 .recent-empty {
   flex: 1;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   color: var(--text-muted);
+  gap: 0.35rem;                
 
   i {
     font-size: 2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;  
   }
 
   p {
     font-weight: 600;
+    margin: 0.15rem 0;
   }
 
   small {
     font-size: 0.8rem;
+    margin: 0;
   }
 }
 
