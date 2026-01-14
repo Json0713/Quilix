@@ -301,7 +301,7 @@
 /* USER CARD */
 .user-card {
   border: 1px solid #b6bdbcd2;
-  border-radius: 24px;
+  border-radius: 21px;
   padding: 0.75rem;
   margin: 0;
   display: flex;
@@ -315,7 +315,7 @@
   }
 
   &.confirm {
-    background: #f2f2f2;
+    background: #fef2f2;
     border-color: #fecaca;
   }
 }
@@ -348,6 +348,10 @@
   color: #fff;
   font-size: 1.2rem;
   flex-shrink: 0;
+  
+  i {
+    font-size: 1.6rem;
+  }
 }
 
 .user-meta {
