@@ -48,16 +48,16 @@
 }
 
 /* Footer */
-.footer {
-  margin-top: 12px;
-  .description {
-    text-align: center;
-    font-size: 0.72rem;
-    line-height: 1.5;
-    color: rgba(20, 72, 77, 0.947);
-    margin: 0;
-  }
-}
+// .footer {
+//   margin-top: 12px;
+//   .description {
+//     text-align: center;
+//     font-size: 0.72rem;
+//     line-height: 1.5;
+//     color: rgba(20, 72, 77, 0.947);
+//     margin: 0;
+//   }
+// }
 
 /* SHARED SECTION BASE */
 .auth-section {
@@ -78,7 +78,23 @@
 /* RIGHT (SECONDARY) */
 .auth-secondary {
   background: var(--bg);
+  display: flex;
+  flex-direction: column;
 }
+
+/* Footer */
+.footer {
+  margin-top: auto;       /* keeps footer at the bottom */
+
+  .description {
+    text-align: center;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: rgba(20, 72, 77, 0.947);
+    margin: 0;
+  }
+}
+
 
 /* FORM */
 .auth-form {
