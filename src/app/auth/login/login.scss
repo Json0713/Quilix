@@ -22,23 +22,13 @@
 
 /* BRAND */
 .header-title {
+  color: var(--primary);
   text-align: center;
   margin: auto;
-  .brand {
-    text-align: center;
-    color: white;
-  }
 
   .brand-icon {
     font-size: 3.75rem;
     margin-bottom: 0.35rem;
-  }
-
-  .brand h1 {
-    color: rgba(20, 72, 77, 0.947);
-    font-weight: 700;
-    margin: 0;
-    letter-spacing: 0.5px;
   }
 
   .brand-subtitle {
@@ -72,13 +62,13 @@
 
 /* Footer */
 .footer {
+  color: var(--primary-soft);
   margin-top: auto;
 
   .description {
     text-align: center;
     font-size: 0.72rem;
     line-height: 1.5;
-    color: rgba(20, 72, 77, 0.947);
     position: relative;
     top: 18px;
     margin: 0;
