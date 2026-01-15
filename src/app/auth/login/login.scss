@@ -72,13 +72,15 @@
 
 /* Footer */
 .footer {
-  margin-top: auto;       /* keeps footer at the bottom */
+  margin-top: auto;
 
   .description {
     text-align: center;
     font-size: 0.72rem;
     line-height: 1.5;
     color: rgba(20, 72, 77, 0.947);
+    position: relative;
+    top: 12px;
     margin: 0;
   }
 }
