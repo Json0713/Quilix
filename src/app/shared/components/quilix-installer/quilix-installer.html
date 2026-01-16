@@ -9,12 +9,14 @@
     <button
       class="qi-handle"
       type="button"
-      aria-label="Install app"
+      aria-label="Open app installer"
       [attr.aria-expanded]="expanded()"
       (click)="toggle()"
       (keydown)="onKeyToggle($event)"
     >
-      <i class="bi bi-download"></i>
+      <span class="qi-dot"></span>
+      <span class="qi-dot"></span>
+      <span class="qi-dot"></span>
     </button>
 
     @if (expanded()) {
@@ -33,7 +35,7 @@
             <button
               type="button"
               class="qi-close"
-              aria-label="Close"
+              aria-label="Close installer"
               (click)="toggle()"
             >
               <i class="bi bi-x"></i>
@@ -62,8 +64,7 @@
               (click)="install()"
               [disabled]="!state.installPromptAvailable()"
             >
-              <i class="bi bi-cloud-download"></i>
-              <span>Install</span>
+              Install
             </button>
 
             <button
