@@ -1,42 +1,82 @@
 @if (visible()) {
   <div
-    class="installer"
-    [class.expanded]="expanded()"
-    [class.left]="side() === 'left'"
-    [class.right]="side() === 'right'"
-    [style.top.px]="y()"
-    (pointerdown)="startDrag($event)"
+    class="qi-hub"
+    role="region"
+    aria-label="App installer"
+    [attr.data-side]="dockSide()"
+    [attr.data-expanded]="expanded()"
+    [style.top.px]="offsetY()"
   >
+    <!-- Floating Handle / Toolbar -->
     <button
-      class="pill"
+      class="qi-handle"
       type="button"
-      aria-label="Install Quilix"
+      aria-label="Open app installer"
+      [attr.aria-expanded]="expanded()"
       (click)="toggle()"
+      (keydown)="onKeyToggle($event)"
+      (pointerdown)="startDrag($event)"
     >
-      ⬇
+      <span class="qi-dot"></span>
+      <span class="qi-dot"></span>
+      <span class="qi-dot"></span>
     </button>
 
-    <div class="panel">
-      @switch (state.platform()) {
-        @case ('ios') {
-          <h4>Install Quilix</h4>
-          <p class="instruction">
-            Tap <strong>Share</strong><br />
-            then <strong>Add to Home Screen</strong>
-          </p>
-        }
+    @if (expanded()) {
+      <!-- Slide-out Content -->
+      <div
+        class="qi-panel"
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="qi-title"
+      >
+        <div class="qi-panel-inner">
+          <header class="qi-header">
+            <h3 id="qi-title">Install App</h3>
 
-        @default {
-          <h4>Install Quilix</h4>
-          <button
-            class="install-btn"
-            type="button"
-            (click)="install()"
-          >
-            Install App
-          </button>
-        }
-      }
-    </div>
+            <button
+              type="button"
+              class="qi-close"
+              aria-label="Close installer"
+              (click)="toggle()"
+            >
+              ✕
+            </button>
+          </header>
+
+          <div class="qi-body">
+            @if (state.platform() === 'ios') {
+              <p>
+                Install this app from Safari using
+                <strong>Add to Home Screen</strong>.
+              </p>
+            } @else {
+              <p>
+                Install this app for faster access and offline support.
+              </p>
+            }
+          </div>
+
+          <footer class="qi-actions">
+            <button
+              type="button"
+              class="qi-primary"
+              (click)="install()"
+              [disabled]="!state.installPromptAvailable()"
+            >
+              Install
+            </button>
+
+            <button
+              type="button"
+              class="qi-secondary"
+              (click)="toggle()"
+            >
+              Later
+            </button>
+          </footer>
+        </div>
+      </div>
+    }
   </div>
 }

@@ -1,91 +1,254 @@
-:host {
-  --quilix-primary: #0d6efd;
+.qi-hub {
+  --qi-bg: rgba(255, 255, 255, 0.92);
+  --qi-border: rgba(0, 0, 0, 0.08);
+  --qi-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --qi-accent: var(--accent, #3fbac2);
+  --qi-text: var(--text-main, #102426);
+  --qi-muted: var(--text-muted, #6c8a8f);
+  --qi-radius: 14px;
+  --qi-handle-size: 40px;
+  --qi-panel-width: 260px;
 }
 
-.installer {
+/* ---- Root hub ---- */
+.qi-hub {
   position: fixed;
-  z-index: 1000;
-  width: 56px;
-  touch-action: none;
-  transition: width 0.25s ease;
+  z-index: 999;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
 
-  &.right {
-    right: 12px;
+.qi-hub[data-side='right'] {
+  right: 8px;
+}
+
+.qi-hub[data-side='left'] {
+  left: 8px;
+}
+
+.qi-hub[data-expanded='true'] {
+  pointer-events: auto;
+}
+
+/* =====================================================
+   Handle (Tiny Toolbar)
+   ===================================================== */
+
+.qi-handle {
+  pointer-events: auto;
+  width: var(--qi-handle-size);
+  height: calc(var(--qi-handle-size) * 1.2);
+  border-radius: 999px;
+  background: var(--qi-bg);
+  border: 1px solid var(--qi-border);
+  box-shadow: var(--qi-shadow);
+  cursor: grab;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  opacity: 0.75;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.qi-handle:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.qi-handle:active {
+  cursor: grabbing;
+  transform: scale(0.96);
+}
+
+.qi-hub[data-expanded='true'] .qi-handle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Handle dots */
+.qi-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--qi-muted);
+}
+
+/* =====================================================
+   Slide-out Panel
+   ===================================================== */
+
+.qi-panel {
+  position: absolute;
+  top: 0;
+  width: var(--qi-panel-width);
+  background: var(--qi-bg);
+  border: 1px solid var(--qi-border);
+  border-radius: var(--qi-radius);
+  box-shadow: var(--qi-shadow);
+  overflow: hidden;
+
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+/* Docked side positioning */
+.qi-hub[data-side='right'] .qi-panel {
+  right: calc(var(--qi-handle-size) + 6px);
+  animation-name: qi-slide-in-right;
+}
+
+.qi-hub[data-side='left'] .qi-panel {
+  left: calc(var(--qi-handle-size) + 6px);
+  animation-name: qi-slide-in-left;
+}
+
+/* =====================================================
+   Panel Inner Layout
+   ===================================================== */
+
+.qi-panel-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  gap: 12px;
+}
+
+/* Header */
+.qi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--qi-text);
   }
+}
 
-  &.left {
-    left: 12px;
+.qi-close {
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--qi-muted);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.qi-close:hover {
+  color: var(--qi-text);
+}
+
+/* Body */
+.qi-body {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--qi-muted);
+
+  strong {
+    color: var(--qi-text);
+    font-weight: 600;
   }
+}
 
-  &.expanded {
-    width: 260px;
-  }
+/* Actions */
+.qi-actions {
+  display: flex;
+  gap: 8px;
+}
 
-  .pill {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    border: none;
-    background: var(--quilix-primary);
-    color: #fff;
-    font-size: 18px;
-    cursor: pointer;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+.qi-actions button {
+  flex: 1;
+  font-size: 0.8rem;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+}
 
-    &:active {
-      transform: scale(0.96);
-    }
-  }
+/* Primary */
+.qi-primary {
+  background: var(--qi-accent);
+  color: #fff;
+}
 
-  .panel {
-    margin-top: 8px;
-    padding: 14px;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+.qi-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Secondary */
+.qi-secondary {
+  background: transparent;
+  border: 1px solid var(--qi-border);
+  color: var(--qi-muted);
+}
+
+.qi-secondary:hover {
+  color: var(--qi-text);
+}
+
+/* =====================================================
+   Animations
+   ===================================================== */
+
+@keyframes qi-slide-in-right {
+  from {
+    transform: translateX(12px);
     opacity: 0;
-    transform: translateX(20px);
-    transition:
-      opacity 0.2s ease,
-      transform 0.2s ease;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
 
-    h4 {
-      margin: 0 0 8px;
-      font-size: 15px;
-      font-weight: 600;
-    }
+@keyframes qi-slide-in-left {
+  from {
+    transform: translateX(-12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
 
-    .instruction {
-      margin: 0;
-      font-size: 13px;
-      line-height: 1.4;
-      color: #444;
-    }
+/* =====================================================
+   Reduced Motion
+   ===================================================== */
 
-    .install-btn {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: none;
-      background: var(--quilix-primary);
-      color: #fff;
-      font-weight: 600;
-      cursor: pointer;
+@media (prefers-reduced-motion: reduce) {
+  .qi-panel,
+  .qi-handle {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 
-      &:hover {
-        filter: brightness(1.05);
-      }
+/* =====================================================
+   Mobile Polish
+   ===================================================== */
 
-      &:active {
-        transform: scale(0.97);
-      }
-    }
+@media (max-width: 480px) {
+  .qi-panel {
+    width: min(92vw, var(--qi-panel-width));
   }
 
-  &.expanded {
-    .panel {
-      opacity: 1;
-      transform: translateX(0);
-    }
+  .qi-hub[data-side='right'] {
+    right: 6px;
+  }
+
+  .qi-hub[data-side='left'] {
+    left: 6px;
   }
 }
