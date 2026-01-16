@@ -3,27 +3,22 @@
     class="qi-hub"
     role="region"
     aria-label="App installer"
-    [attr.data-side]="dockSide()"
     [attr.data-expanded]="expanded()"
-    [style.top.px]="offsetY()"
   >
-    <!-- Floating Handle / Toolbar -->
+    <!-- Edge Handle -->
     <button
       class="qi-handle"
       type="button"
-      aria-label="Open app installer"
+      aria-label="Install app"
       [attr.aria-expanded]="expanded()"
       (click)="toggle()"
       (keydown)="onKeyToggle($event)"
-      (pointerdown)="startDrag($event)"
     >
-      <span class="qi-dot"></span>
-      <span class="qi-dot"></span>
-      <span class="qi-dot"></span>
+      <i class="bi bi-download"></i>
     </button>
 
     @if (expanded()) {
-      <!-- Slide-out Content -->
+      <!-- Slide-out Panel -->
       <div
         class="qi-panel"
         role="dialog"
@@ -31,19 +26,21 @@
         aria-labelledby="qi-title"
       >
         <div class="qi-panel-inner">
+          <!-- Header -->
           <header class="qi-header">
             <h3 id="qi-title">Install App</h3>
 
             <button
               type="button"
               class="qi-close"
-              aria-label="Close installer"
+              aria-label="Close"
               (click)="toggle()"
             >
-              ✕
+              <i class="bi bi-x"></i>
             </button>
           </header>
 
+          <!-- Body -->
           <div class="qi-body">
             @if (state.platform() === 'ios') {
               <p>
@@ -57,6 +54,7 @@
             }
           </div>
 
+          <!-- Actions -->
           <footer class="qi-actions">
             <button
               type="button"
@@ -64,7 +62,8 @@
               (click)="install()"
               [disabled]="!state.installPromptAvailable()"
             >
-              Install
+              <i class="bi bi-cloud-download"></i>
+              <span>Install</span>
             </button>
 
             <button

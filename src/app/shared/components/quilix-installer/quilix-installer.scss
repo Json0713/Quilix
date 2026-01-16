@@ -1,124 +1,108 @@
 .qi-hub {
   --qi-bg: rgba(255, 255, 255, 0.92);
   --qi-border: rgba(0, 0, 0, 0.08);
-  --qi-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --qi-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+
   --qi-accent: var(--accent, #3fbac2);
   --qi-text: var(--text-main, #102426);
   --qi-muted: var(--text-muted, #6c8a8f);
-  --qi-radius: 14px;
-  --qi-handle-size: 40px;
-  --qi-panel-width: 260px;
-}
 
-/* ---- Root hub ---- */
-.qi-hub {
+  --qi-handle-size: 52px;
+  --qi-panel-width: 280px;
+  --qi-radius: 18px;
+
   position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
   z-index: 999;
+
   pointer-events: none;
-  transition: opacity 200ms ease;
 }
 
-.qi-hub[data-side='right'] {
-  right: 8px;
-}
-
-.qi-hub[data-side='left'] {
-  left: 8px;
-}
-
+/* Expanded state allows interaction */
 .qi-hub[data-expanded='true'] {
   pointer-events: auto;
 }
 
-/* =====================================================
-   Handle (Tiny Toolbar)
-   ===================================================== */
+/* Handle (Edge-hidden, stationary) */
 
 .qi-handle {
   pointer-events: auto;
+
   width: var(--qi-handle-size);
-  height: calc(var(--qi-handle-size) * 1.2);
-  border-radius: 999px;
-  background: var(--qi-bg);
+  height: var(--qi-handle-size);
+
+  border-radius: 50px;
   border: 1px solid var(--qi-border);
+  background: var(--qi-bg);
   box-shadow: var(--qi-shadow);
-  cursor: grab;
 
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
 
-  opacity: 0.75;
+  cursor: pointer;
+
+  /* 70% hidden off-screen */
+  transform: translateX(65%);
+  opacity: 0.55;
+
   transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
     opacity 200ms ease,
-    transform 200ms ease,
     box-shadow 200ms ease;
+
+  i {
+    font-size: 1.25rem;
+    color: var(--qi-muted);
+  }
 }
 
-.qi-handle:hover {
+/* Wake-up on hover / focus */
+.qi-handle:hover,
+.qi-handle:focus-visible {
+  transform: translateX(20%);
   opacity: 1;
-  transform: translateY(-2px);
+
+  i {
+    color: var(--qi-text);
+  }
 }
 
-.qi-handle:active {
-  cursor: grabbing;
-  transform: scale(0.96);
-}
-
+/* Hide handle when expanded */
 .qi-hub[data-expanded='true'] .qi-handle {
   opacity: 0;
   pointer-events: none;
 }
 
-/* Handle dots */
-.qi-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--qi-muted);
-}
-
-/* =====================================================
-   Slide-out Panel
-   ===================================================== */
+/* Slide-out Panel */
 
 .qi-panel {
   position: absolute;
-  top: 0;
+  top: 50%;
+  right: calc(var(--qi-handle-size) + 10px);
+  transform: translateY(-50%) translateX(12px);
+
   width: var(--qi-panel-width);
   background: var(--qi-bg);
   border: 1px solid var(--qi-border);
   border-radius: var(--qi-radius);
   box-shadow: var(--qi-shadow);
-  overflow: hidden;
 
-  animation-duration: 220ms;
-  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
-  animation-fill-mode: both;
+  opacity: 0;
+
+  animation: qi-panel-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1)
+    forwards;
 }
 
-/* Docked side positioning */
-.qi-hub[data-side='right'] .qi-panel {
-  right: calc(var(--qi-handle-size) + 6px);
-  animation-name: qi-slide-in-right;
-}
-
-.qi-hub[data-side='left'] .qi-panel {
-  left: calc(var(--qi-handle-size) + 6px);
-  animation-name: qi-slide-in-left;
-}
-
-/* =====================================================
-   Panel Inner Layout
-   ===================================================== */
+/* Panel Layout */
 
 .qi-panel-inner {
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  padding: 14px;
-  gap: 12px;
+  gap: 14px;
 }
 
 /* Header */
@@ -138,20 +122,24 @@
 .qi-close {
   border: none;
   background: transparent;
-  font-size: 1rem;
-  color: var(--qi-muted);
+  border-radius: 50px;
+  padding: 6px;
   cursor: pointer;
-  padding: 4px;
-}
 
-.qi-close:hover {
-  color: var(--qi-text);
+  i {
+    font-size: 1.1rem;
+    color: var(--qi-muted);
+  }
+
+  &:hover i {
+    color: var(--qi-text);
+  }
 }
 
 /* Body */
 .qi-body {
   font-size: 0.85rem;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--qi-muted);
 
   strong {
@@ -161,29 +149,39 @@
 }
 
 /* Actions */
+
 .qi-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .qi-actions button {
   flex: 1;
-  font-size: 0.8rem;
-  padding: 8px 10px;
-  border-radius: 10px;
-  cursor: pointer;
+  border-radius: 50px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
   border: none;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 /* Primary */
 .qi-primary {
   background: var(--qi-accent);
   color: #fff;
-}
 
-.qi-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  i {
+    font-size: 1rem;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 /* Secondary */
@@ -191,64 +189,44 @@
   background: transparent;
   border: 1px solid var(--qi-border);
   color: var(--qi-muted);
+
+  &:hover {
+    color: var(--qi-text);
+  }
 }
 
-.qi-secondary:hover {
-  color: var(--qi-text);
-}
+/* Animations */
 
-/* =====================================================
-   Animations
-   ===================================================== */
-
-@keyframes qi-slide-in-right {
+@keyframes qi-panel-in {
   from {
-    transform: translateX(12px);
     opacity: 0;
+    transform: translateY(-50%) translateX(16px);
   }
   to {
-    transform: translateX(0);
     opacity: 1;
+    transform: translateY(-50%) translateX(0);
   }
 }
 
-@keyframes qi-slide-in-left {
-  from {
-    transform: translateX(-12px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* =====================================================
-   Reduced Motion
-   ===================================================== */
+/* Reduced Motion */
 
 @media (prefers-reduced-motion: reduce) {
-  .qi-panel,
-  .qi-handle {
+  .qi-handle,
+  .qi-panel {
     animation: none !important;
     transition: none !important;
   }
 }
 
-/* =====================================================
-   Mobile Polish
-   ===================================================== */
+/* Mobile Polish */
 
 @media (max-width: 480px) {
   .qi-panel {
     width: min(92vw, var(--qi-panel-width));
+    right: calc(var(--qi-handle-size) + 8px);
   }
 
-  .qi-hub[data-side='right'] {
-    right: 6px;
-  }
-
-  .qi-hub[data-side='left'] {
-    left: 6px;
+  .qi-handle {
+    transform: translateX(60%);
   }
 }
