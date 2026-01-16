@@ -1,5 +1,5 @@
 .qi-hub {
-  --qi-bg: rgba(255, 255, 255, 0.94);
+  --qi-bg: rgb(255, 255, 255);
   --qi-border: rgba(0, 0, 0, 0.08);
   --qi-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
 
@@ -11,7 +11,7 @@
   --qi-radius: 18px;
 
   position: fixed;
-  top: 50%;
+  top: 85%;
   right: 0;
   transform: translateY(-50%);
   z-index: 999;
@@ -25,7 +25,6 @@
 }
 
 /* Handle – Visible but subtle (≈75–80%) */
-
 .qi-handle {
   pointer-events: auto;
 
@@ -41,7 +40,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
 
   cursor: pointer;
 
@@ -76,11 +75,10 @@
 }
 
 /* Panel */
-
 .qi-panel {
   position: absolute;
   top: 50%;
-  right: calc(var(--qi-handle-size) + 10px);
+  right: calc(var(--qi-handle-size) - 34px);
   transform: translateY(-50%) translateX(12px);
 
   width: var(--qi-panel-width);
@@ -95,7 +93,6 @@
 }
 
 /* Panel Layout */
-
 .qi-panel-inner {
   padding: 16px;
   display: flex;
@@ -121,11 +118,10 @@
   border: none;
   background: transparent;
   border-radius: 50px;
-  padding: 6px;
   cursor: pointer;
 
   i {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     color: var(--qi-muted);
   }
 
@@ -147,7 +143,6 @@
 }
 
 /* Actions */
-
 .qi-actions {
   display: flex;
   gap: 10px;
@@ -188,7 +183,6 @@
 }
 
 /* Animations */
-
 @keyframes qi-panel-in {
   from {
     opacity: 0;
@@ -201,7 +195,6 @@
 }
 
 /* Reduced Motion */
-
 @media (prefers-reduced-motion: reduce) {
   .qi-handle,
   .qi-panel {
@@ -211,10 +204,9 @@
 }
 
 /* Mobile Polish */
-
-@media (max-width: 480px) {
+@media (max-width: 720px) {
   .qi-panel {
-    width: min(92vw, var(--qi-panel-width));
+    width: min(100vw, var(--qi-panel-width));
   }
 
   .qi-handle {
