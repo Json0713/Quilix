@@ -1,11 +1,12 @@
 {
   "name": "Quilix",
   "short_name": "Quilix",
-  "description": "A modern cross-platform application educational framework.",
+  "description": "A modern cross-platform educational application framework.",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "theme_color": "#244f55",
   "background_color": "#244f55",
   "icons": [
@@ -22,4 +23,5 @@
       "purpose": "any maskable"
     }
   ]
+  
 }
