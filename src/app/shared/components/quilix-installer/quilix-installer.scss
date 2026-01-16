@@ -1,0 +1,91 @@
+:host {
+  --quilix-primary: #0d6efd;
+}
+
+.installer {
+  position: fixed;
+  z-index: 1000;
+  width: 56px;
+  touch-action: none;
+  transition: width 0.25s ease;
+
+  &.right {
+    right: 12px;
+  }
+
+  &.left {
+    left: 12px;
+  }
+
+  &.expanded {
+    width: 260px;
+  }
+
+  .pill {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: var(--quilix-primary);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+
+    &:active {
+      transform: scale(0.96);
+    }
+  }
+
+  .panel {
+    margin-top: 8px;
+    padding: 14px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    transform: translateX(20px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+
+    h4 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .instruction {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #444;
+    }
+
+    .install-btn {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: none;
+      background: var(--quilix-primary);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover {
+        filter: brightness(1.05);
+      }
+
+      &:active {
+        transform: scale(0.97);
+      }
+    }
+  }
+
+  &.expanded {
+    .panel {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}

@@ -1,1 +1,42 @@
-<p>quilix-installer works!</p>
+@if (visible()) {
+  <div
+    class="installer"
+    [class.expanded]="expanded()"
+    [class.left]="side() === 'left'"
+    [class.right]="side() === 'right'"
+    [style.top.px]="y()"
+    (pointerdown)="startDrag($event)"
+  >
+    <button
+      class="pill"
+      type="button"
+      aria-label="Install Quilix"
+      (click)="toggle()"
+    >
+      ⬇
+    </button>
+
+    <div class="panel">
+      @switch (state.platform()) {
+        @case ('ios') {
+          <h4>Install Quilix</h4>
+          <p class="instruction">
+            Tap <strong>Share</strong><br />
+            then <strong>Add to Home Screen</strong>
+          </p>
+        }
+
+        @default {
+          <h4>Install Quilix</h4>
+          <button
+            class="install-btn"
+            type="button"
+            (click)="install()"
+          >
+            Install App
+          </button>
+        }
+      }
+    </div>
+  </div>
+}
