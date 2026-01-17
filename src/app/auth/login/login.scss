@@ -314,6 +314,7 @@
 
 .user-info {
   display: flex;
+  width: 244px;
   align-items: center;
   gap: 0.5rem;
   padding: 0.8px;
@@ -323,6 +324,10 @@
 
   &:focus-visible {
     outline: 3px solid var(--accent);
+  }
+
+  @media (max-width: 420px) {
+    width: 200px;
   }
 }
 
@@ -355,6 +360,11 @@
     display: block;
     font-size: 0.9rem;
     color: var(--text-main);
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
   }
 
   small {
