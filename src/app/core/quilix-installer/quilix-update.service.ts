@@ -17,8 +17,8 @@ export class QuilixUpdateService {
       if (event.type === 'VERSION_READY') {
         this.toastRelay.set(
           'info',
-          'New version available.\n' +
-          'Your app is now Uptodate.',
+          'New Version Detected.\n' +
+          'Your App is now Up to Date.',
           20000
         )
 
