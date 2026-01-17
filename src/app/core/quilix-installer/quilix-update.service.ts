@@ -19,7 +19,7 @@ export class QuilixUpdateService {
           'info',
           'New Version Detected.\n' +
           'Your App is now Updated.',
-          20000
+          32000
         )
 
         setTimeout(() => {
