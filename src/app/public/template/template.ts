@@ -3,9 +3,9 @@ import { RouterOutlet } from "@angular/router";
 import { Loader } from '../../shared/ui/common/loader/loader';
 import { Toast } from '../../shared/ui/common/toast/toast';
 import { Modal } from '../../shared/ui/common/modal/modal';
-import { QuilixInstaller } from '../../shared/components/quilix-installer/quilix-installer';
-
 import { ToastRelayService } from '../../services/ui/common/toast/toast-relay';
+
+import { QuilixInstaller } from '../../shared/components/quilix-installer/quilix-installer';
 import { QuilixUpdateService } from '../../core/quilix-installer/quilix-update.service';
 import { NetworkService } from '../../core/quilix-installer/network/network.service';
 
