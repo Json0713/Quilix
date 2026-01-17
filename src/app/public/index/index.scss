@@ -209,18 +209,3 @@
     font-size: 1rem;
   }
 }
-
-/* ---------- PREVIEW IMAGE TESTING ---------- */
-.preview-image {
-  img {
-    border-radius: 50px;
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-  }
-
-  display: flex;
-  border-radius: 44px;
-  height: 100px;
-  width: 100px;
-}

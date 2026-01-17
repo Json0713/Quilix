@@ -11,9 +11,4 @@ import { Footer } from '../common/footer/footer';
 })
 export class PublicIndex {
 
-// Fallback for broken image links Testing 
-onImageError(e: Event) {
-  (e.target as HTMLImageElement).src = 'assets/img/offline-placeholder.png';
-}
-
 }
