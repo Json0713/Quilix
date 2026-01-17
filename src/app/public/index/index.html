@@ -27,9 +27,10 @@
     </div>
 
     <!-- Preview Image Testing -->
-    <div class="preview-image">
-      <img src="assets/img/jasonprofilepicture1.jpg" alt="Preview of the application interface" />
-    </div>
+    <img
+      src="assets/img/jasonprofilepicture1.jpg"
+      (error)="onImageError($event)"
+    />
 
     <!-- Animated Columns ONLY -->
     <div class="preview-viewport">
