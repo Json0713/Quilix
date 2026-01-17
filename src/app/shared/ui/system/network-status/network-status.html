@@ -3,29 +3,41 @@
   @switch (network.phase()) {
 
     @case ('offline') {
-      <div class="network-status offline">
+      <div
+        class="network-status offline"
+        role="status"
+        aria-live="polite"
+      >
         <span class="dot"></span>
-        <span>You’re offline</span>
+        <span>Offline mode enabled</span>
       </div>
     }
 
     @case ('connecting') {
-      <div class="network-status connecting">
+      <div
+        class="network-status connecting"
+        role="status"
+        aria-live="polite"
+      >
         <span class="dot"></span>
-        <span>Connecting</span>
-        <span class="dots">
+        <span>Reconnecting</span>
+        <span class="dots" aria-hidden="true">
           <i></i><i></i><i></i>
         </span>
       </div>
     }
 
     @case ('online') {
-      <div class="network-status online">
+      <div
+        class="network-status online"
+        role="status"
+        aria-live="polite"
+      >
         <span class="dot"></span>
         <span>Connected</span>
       </div>
     }
 
   }
-  
+
 }
