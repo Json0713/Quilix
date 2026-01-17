@@ -3,15 +3,9 @@
   <app-loader></app-loader>
   <app-toast></app-toast>
   <app-modal></app-modal>
-
-  @if (!network.online()) {
-    <div class="offline-banner">
-      You’re offline. Some features may be unavailable.
-    </div>
-  }
+  <app-network-status />
 
   <main class="container">
     <router-outlet></router-outlet>
   </main>
-  
 </section>

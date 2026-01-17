@@ -1,0 +1,31 @@
+@if (visible()) {
+
+  @switch (network.phase()) {
+
+    @case ('offline') {
+      <div class="network-status offline">
+        <span class="dot"></span>
+        <span>You’re offline</span>
+      </div>
+    }
+
+    @case ('connecting') {
+      <div class="network-status connecting">
+        <span class="dot"></span>
+        <span>Connecting</span>
+        <span class="dots">
+          <i></i><i></i><i></i>
+        </span>
+      </div>
+    }
+
+    @case ('online') {
+      <div class="network-status online">
+        <span class="dot"></span>
+        <span>Connected</span>
+      </div>
+    }
+
+  }
+  
+}
