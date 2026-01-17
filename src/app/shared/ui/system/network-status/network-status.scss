@@ -1,12 +1,12 @@
 .network-status {
   position: fixed;
-  bottom: 1.25rem;
+  bottom: 0.25rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: .6rem;
-  padding: .55rem 1rem;
+  padding: .42rem 1rem;
   border-radius: 999px;
   font-size: .875rem;
   font-weight: 500;
@@ -20,7 +20,7 @@
   animation:
     slideUp .25s ease-out,
     fadeSoft 1s ease forwards;
-  animation-delay: 0s, 20s;
+  animation-delay: 0s, 10s;
 
   will-change: opacity, transform;
 }
