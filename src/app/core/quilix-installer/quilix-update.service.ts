@@ -35,7 +35,7 @@ export class QuilixUpdateService implements OnDestroy {
   private handleVersionReady(): void {
     this.toastRelay.set(
       'info',
-      'New version detected.\nYour app is now updating.',
+      'New Version Detected.\n Your App is now Updated!',
       QuilixUpdateService.TOAST_DURATION_MS
     );
 
