@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { AuthService } from '../../core/auth/auth.service';
@@ -16,7 +16,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, Spinner, TimeAgoPipe],
+  imports: [FormsModule, RouterModule, Spinner, TimeAgoPipe],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
