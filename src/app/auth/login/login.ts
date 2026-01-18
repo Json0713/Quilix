@@ -90,8 +90,8 @@ export class Login {
 
       // Optional: set a flag that the user just logged in
       localStorage.setItem('justLoggedIn', 'true');
-      
       this.loadingUserId = null;
+
     }, 1900);
   }
 
