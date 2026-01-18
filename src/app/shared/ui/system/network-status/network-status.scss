@@ -21,23 +21,47 @@
   z-index: 9999;
 
   /* UX rules */
-  pointer-events: none; /* click-through */
+  pointer-events: none;
   user-select: none;
 
-  /* Motion */
-  animation: slideDown .28s ease-out;
+  /* Motion (NO animation — only transitions) */
+  transform: translateY(0);
+  opacity: 1;
   transition:
     background-color .35s ease,
     color .35s ease,
-    opacity .6s ease;
+    opacity .6s ease,
+    transform .35s ease;
 
-  /* Initial emphasis */
-  opacity: 1;
+  will-change: opacity, transform;
 }
 
-/* After some time, your TS can add `.idle` */
+/* Idle / faded state */
 .network-banner.idle {
   opacity: .25;
+}
+
+/* ================================
+   Notch / Core (the hanging shape)
+================================ */
+
+.network-banner .core {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 344px;
+  height: 12px;
+
+  background: inherit;
+  border-bottom-left-radius: 999px;
+  border-bottom-right-radius: 999px;
+
+  box-shadow:
+    0 6px 12px rgba(0,0,0,.15);
+
+  pointer-events: none;
 }
 
 /* ================================
@@ -97,19 +121,8 @@
 }
 
 /* ================================
-   Animations
+   Animations (ONLY micro animations)
 ================================ */
-
-@keyframes slideDown {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
 
 @keyframes pulse {
   0% { opacity: .4; }
@@ -131,5 +144,9 @@
   .network-banner {
     font-size: .8rem;
     height: 34px;
+  }
+
+  .network-banner .core {
+    width: 64px;
   }
 }
