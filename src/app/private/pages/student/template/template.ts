@@ -6,6 +6,7 @@ import { Modal } from "../../../../shared/ui/common/modal/modal";
 
 import { OsNotificationService } from '../../../../core/notifications/os-notification.service';
 
+
 @Component({
   selector: 'app-student-template',
   imports: [RouterOutlet, Loader, Toast, Modal],
@@ -16,35 +17,41 @@ export class StudentTemplate {
   
   private readonly osNotify = inject(OsNotificationService);
 
-  
-  ngOnInit(): void {
-    this.requestNotificationPermission();
-    this.sendTestNotification();
-  }
+  showEnableNotif =
+    'Notification' in window &&
+    Notification.permission === 'default';
 
-  private requestNotificationPermission(): void {
-    const alreadyRequested = localStorage.getItem('os-notif-permission-requested');
-    if (alreadyRequested) return;
+  async enableNotifications(): Promise<void> {
+    const permission = await Notification.requestPermission();
+    console.log('[OS NOTIF] permission:', permission);
 
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().then(permission => {
-        localStorage.setItem('os-notif-permission-requested', 'true');
-        if (permission === 'granted') console.log('OS notifications enabled');
-      });
+    this.showEnableNotif = false;
+
+    if (permission === 'granted') {
+      setTimeout(() => {
+        this.osNotify.notify({
+          title: 'Notifications Enabled',
+          body: 'You will now receive updates from Quilix.',
+          tag: 'notif-enabled',
+        });
+      }, 500);
     }
   }
 
-  private sendTestNotification(): void {
+  ngOnInit(): void {
     const justLoggedIn = localStorage.getItem('justLoggedIn') === 'true';
-    if (!justLoggedIn) return;
 
-    this.osNotify.notify({
-      title: 'Test Notification',
-      body: 'This is an OS-level notification working!',
-      tag: 'test-notif'
-    });
+    if (justLoggedIn && Notification.permission === 'granted') {
+      setTimeout(() => {
+        this.osNotify.notify({
+          title: 'Welcome to Quilix',
+          body: 'You are logged in successfully.',
+          tag: 'login-welcome',
+        });
+      }, 800);
 
-    localStorage.removeItem('justLoggedIn');
+      localStorage.removeItem('justLoggedIn');
+    }
   }
-  
+
 }

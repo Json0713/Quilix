@@ -5,19 +5,35 @@ import { Injectable } from '@angular/core';
 })
 export class OsNotificationService {
 
-  notify(payload: {
+  async notify(options: {
     title: string;
     body?: string;
-    icon?: string;
     tag?: string;
     data?: any;
-  }): void {
-    if (!('serviceWorker' in navigator)) return;
-    if (Notification.permission !== 'granted') return;
+  }) 
+  
+  {
+    if (!('serviceWorker' in navigator)) {
+      console.warn('[OS NOTIF] SW not supported');
+      return;
+    }
 
-    navigator.serviceWorker.controller?.postMessage({
-      type: 'NOTIFY',
-      payload
+    if (Notification.permission !== 'granted') {
+      console.warn('[OS NOTIF] Permission not granted');
+      return;
+    }
+
+    // WAIT until SW is fully ready
+    const registration = await navigator.serviceWorker.ready;
+
+    console.log('[OS NOTIF] Sending notification');
+
+    await registration.showNotification(options.title, {
+      body: options.body,
+      tag: options.tag,
+      data: options.data,
+      icon: '/assets/icons/web-app-manifest-192x192.png',
+      badge: '/assets/icons/web-app-manifest-192x192.png',
     });
   }
 

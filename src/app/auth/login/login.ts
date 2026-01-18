@@ -74,6 +74,10 @@ export class Login {
 
     setTimeout(() => {
       this.redirect(result.user!.role);
+
+      // User flag to notify
+      localStorage.setItem('justLoggedIn', 'true');
+
       this.isSubmitting = false;
     }, 1800);
   }
@@ -88,7 +92,7 @@ export class Login {
       this.auth.loginExisting(user);
       this.redirect(user.role);
 
-      // Optional: set a flag that the user just logged in
+      // User flag to notify
       localStorage.setItem('justLoggedIn', 'true');
 
       this.loadingUserId = null;

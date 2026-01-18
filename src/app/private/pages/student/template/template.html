@@ -5,6 +5,14 @@
 
   <main class="container">
     <router-outlet></router-outlet>
+
+  @if (showEnableNotif) {
+    <button
+      class="btn btn-primary rounded-5"
+      (click)="enableNotifications()">
+      Enable Notifications
+    </button>
+  }
   </main>
   
 </section>
