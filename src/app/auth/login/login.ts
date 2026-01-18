@@ -87,6 +87,11 @@ export class Login {
     setTimeout(() => {
       this.auth.loginExisting(user);
       this.redirect(user.role);
+
+      // Optional: set a flag that the user just logged in
+      localStorage.setItem('justLoggedIn', 'true');
+      
+      this.loadingUserId = null;
     }, 1900);
   }
 
