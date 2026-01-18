@@ -43,7 +43,7 @@ export class Login {
   ) {
     this.users = this.usersService.getAll();
     this.toastRelay.consume();
-  }
+  } 
 
   ngOnInit(): void {
     this.loading = true;
@@ -90,8 +90,8 @@ export class Login {
 
       // Optional: set a flag that the user just logged in
       localStorage.setItem('justLoggedIn', 'true');
-      this.loadingUserId = null;
 
+      this.loadingUserId = null;
     }, 1900);
   }
 
