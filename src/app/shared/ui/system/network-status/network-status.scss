@@ -4,7 +4,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 24px;
+  height: 32px;
 
   display: flex;
   align-items: center;
@@ -22,10 +22,12 @@
 
   opacity: 1;
   transform: translateY(0);
+
   transition:
     background-color .35s ease,
     color .35s ease,
-    opacity .6s ease;
+    opacity .6s ease,
+    transform .6s ease;
 
   will-change: opacity;
 }
@@ -33,45 +35,17 @@
 /* Soft idle fade */
 .network-banner.idle {
   opacity: .22;
+  transform: translateY(-2px);
 }
 
-/* ================================
-   Smooth Notch (Organic Dip)
-================================ */
-.network-banner .core {
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  width: 144px;
-  height: 8px;
-
-  background: inherit;
-
-  /* ultra-smooth curvature */
-  border-bottom-left-radius: 999px;
-  border-bottom-right-radius: 999px;
-
-
-  filter: blur(.15px);
-  pointer-events: none;
-}
-
-/* ================================
-   Shared UI Elements
-================================ */
-
+/* ========== Shared UI Elements ========== */
 .dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
 }
 
-/* ================================
-   States
-================================ */
-
+/* ============ States ============ */
 .offline {
   background: #2b2b2b;
   color: #d8d8d8;
@@ -114,10 +88,7 @@
   }
 }
 
-/* ================================
-   Micro Animations
-================================ */
-
+/* ============ Micro Animations ============ */
 @keyframes pulse {
   0% { opacity: .45; }
   50% { opacity: 1; }
@@ -130,18 +101,10 @@
   100% { opacity: 0; }
 }
 
-/* ================================
-   Mobile polish
-================================ */
-
+/* =========== Mobile polish =========== */
 @media (max-width: 480px) {
   .network-banner {
     height: 18px;
     font-size: .75rem;
-  }
-
-  .network-banner .core {
-    width: 100px;
-    height: 9px;
   }
 }
