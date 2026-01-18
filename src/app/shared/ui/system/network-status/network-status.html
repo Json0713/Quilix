@@ -4,37 +4,41 @@
 
     @case ('offline') {
       <div
-        class="network-status offline"
+        class="network-banner offline"
+        [class.idle]="idle()"
         role="status"
         aria-live="polite"
       >
-        <span class="dot"></span>
-        <span>Offline Mode</span>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="label">Offline Mode</span>
+        <span class="core" aria-hidden="true"></span>
       </div>
     }
 
     @case ('connecting') {
       <div
-        class="network-status connecting"
+        class="network-banner connecting"
         role="status"
         aria-live="polite"
       >
-        <span class="dot"></span>
-        <span>Reconnecting</span>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="label">Reconnecting</span>
         <span class="dots" aria-hidden="true">
           <i></i><i></i><i></i>
         </span>
+        <span class="core" aria-hidden="true"></span>
       </div>
     }
 
     @case ('online') {
       <div
-        class="network-status online"
+        class="network-banner online"
         role="status"
         aria-live="polite"
       >
-        <span class="dot"></span>
-        <span>Connected</span>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="label">Connected</span>
+        <span class="core" aria-hidden="true"></span>
       </div>
     }
 
