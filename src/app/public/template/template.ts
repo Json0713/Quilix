@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from "@angular/router";
 import { Loader } from '../../shared/ui/common/loader/loader';
 import { Toast } from '../../shared/ui/common/toast/toast';

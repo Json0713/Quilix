@@ -50,7 +50,7 @@ export class NetworkService implements OnDestroy {
     }
 
     this.toast.warning(
-      'You’re offline. Some features may be unavailable.',
+      'You’re using Offline Mode.',
       5000
     );
   };
@@ -67,7 +67,7 @@ export class NetworkService implements OnDestroy {
       this._phase.set('online');
       this.toast.success('You’re back online.', 3000);
       this.reconnectTimer = null;
-    }, 1200);
+    }, 3200);
   };
 
 }

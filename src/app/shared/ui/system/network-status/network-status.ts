@@ -84,10 +84,7 @@ export class NetworkStatus implements OnDestroy {
     this.clearIdleTimer();
   }
 
-  // -----------------------
-  // Idle logic
-  // -----------------------
-
+  // ----- Idle logic ----- //
   private startIdleTimer(): void {
     this.clearIdleTimer();
 
@@ -112,10 +109,8 @@ export class NetworkStatus implements OnDestroy {
     }
   }
 
-  // -----------------------
-  // sessionStorage helpers
-  // -----------------------
 
+  // ------ sessionStorage helpers ------ //
   private wasIdleAcknowledged(): boolean {
     return sessionStorage.getItem(IDLE_ACK_KEY) === 'true';
   }
