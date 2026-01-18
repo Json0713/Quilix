@@ -1,66 +1,60 @@
-/* ================================
-   Network Status Top Banner
-================================ */
-
+/* ============== Network Status Top Banner =============== */
 .network-banner {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 36px;
+  height: 24px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: .6rem;
+  gap: .45rem;
 
-  font-size: .85rem;
+  font-size: .78rem;
   font-weight: 500;
-  letter-spacing: .02em;
+  letter-spacing: .015em;
 
   z-index: 9999;
 
-  /* UX rules */
   pointer-events: none;
   user-select: none;
 
-  /* Motion (NO animation — only transitions) */
-  transform: translateY(0);
   opacity: 1;
+  transform: translateY(0);
   transition:
     background-color .35s ease,
     color .35s ease,
-    opacity .6s ease,
-    transform .35s ease;
+    opacity .6s ease;
 
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
-/* Idle / faded state */
+/* Soft idle fade */
 .network-banner.idle {
-  opacity: .25;
+  opacity: .22;
 }
 
 /* ================================
-   Notch / Core (the hanging shape)
+   Smooth Notch (Organic Dip)
 ================================ */
-
 .network-banner .core {
   position: absolute;
-  bottom: -12px;
+  bottom: -8px;
   left: 50%;
   transform: translateX(-50%);
 
-  width: 344px;
-  height: 12px;
+  width: 144px;
+  height: 8px;
 
   background: inherit;
+
+  /* ultra-smooth curvature */
   border-bottom-left-radius: 999px;
   border-bottom-right-radius: 999px;
 
-  box-shadow:
-    0 6px 12px rgba(0,0,0,.15);
 
+  filter: blur(.15px);
   pointer-events: none;
 }
 
@@ -69,8 +63,8 @@
 ================================ */
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
 }
 
@@ -98,11 +92,11 @@
 
   .dots i {
     display: inline-block;
-    width: 4px;
-    height: 4px;
+    width: 3px;
+    height: 3px;
     background: currentColor;
     border-radius: 50%;
-    margin-left: 3px;
+    margin-left: 2px;
     opacity: 0;
     animation: dots 1.4s infinite;
   }
@@ -121,13 +115,13 @@
 }
 
 /* ================================
-   Animations (ONLY micro animations)
+   Micro Animations
 ================================ */
 
 @keyframes pulse {
-  0% { opacity: .4; }
+  0% { opacity: .45; }
   50% { opacity: 1; }
-  100% { opacity: .4; }
+  100% { opacity: .45; }
 }
 
 @keyframes dots {
@@ -137,16 +131,17 @@
 }
 
 /* ================================
-   Responsive polish
+   Mobile polish
 ================================ */
 
 @media (max-width: 480px) {
   .network-banner {
-    font-size: .8rem;
-    height: 34px;
+    height: 18px;
+    font-size: .75rem;
   }
 
   .network-banner .core {
-    width: 64px;
+    width: 100px;
+    height: 9px;
   }
 }
