@@ -18,7 +18,7 @@ export class QuilixUpdateService implements OnDestroy {
 
   // UX Timing
   private static readonly RELOAD_DELAY_MS = 1500;
-  private static readonly TOAST_DURATION_MS = 32000;
+  private static readonly TOAST_DURATION_MS = 12000;
 
   init(): void {
     if (!this.swUpdate.isEnabled) return;
