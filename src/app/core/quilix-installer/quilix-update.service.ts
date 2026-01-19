@@ -3,6 +3,7 @@ import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { Subject, filter, takeUntil } from 'rxjs';
 
 import { ToastRelayService } from '../../services/ui/common/toast/toast-relay';
+import { OsNotificationService } from '../notifications/os-notification.service';
 
 @Injectable({ providedIn: 'root' 
 })
@@ -10,8 +11,8 @@ export class QuilixUpdateService implements OnDestroy {
 
   private readonly swUpdate = inject(SwUpdate);
   private readonly toastRelay = inject(ToastRelayService);
+  private readonly osNotify = inject(OsNotificationService);
 
-  // UI/UX Hygiene 
   private readonly destroy$ = new Subject<void>();
 
   // UX Timing
@@ -33,13 +34,25 @@ export class QuilixUpdateService implements OnDestroy {
   }
 
   private handleVersionReady(): void {
+    // In-app feedback
     this.toastRelay.set(
       'info',
-      'New Version Detected.\n Your App is now Updated!',
+      'New Version Detected.\nYour app will refresh shortly.',
       QuilixUpdateService.TOAST_DURATION_MS
     );
 
-    setTimeout(() => this.activateAndReload(), QuilixUpdateService.RELOAD_DELAY_MS);
+    // OS-level notification (safe, permission-guarded internally)
+    this.osNotify.notify({
+      title: 'Quilix Updated',
+      body: 'A new version is ready. The app will refresh automatically.',
+      tag: 'quilix-update',
+      requireInteraction: false,
+    });
+
+    setTimeout(
+      () => this.activateAndReload(),
+      QuilixUpdateService.RELOAD_DELAY_MS
+    );
   }
 
   private activateAndReload(): void {
