@@ -16,7 +16,7 @@ export class QuilixUpdateService implements OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
 
-  // UX Timing
+  // UX Duration Constants
   private static readonly RELOAD_DELAY_MS = 1500;
   private static readonly TOAST_DURATION_MS = 12000;
 
@@ -35,17 +35,17 @@ export class QuilixUpdateService implements OnDestroy {
   }
 
   private handleVersionReady(): void {
-    // In-app feedback
+    // In-app Feedback
     this.toastRelay.set(
       'info',
-      'New Version Detected.\nYour app is now updated.',
+      'New Version Detected.\n Your App is now Updated.',
       QuilixUpdateService.TOAST_DURATION_MS
     );
 
     // OS-level Notification
     this.osNotify.notify({
       title: 'Quilix Updated',
-      body: 'A new version detected. your app is updated!',
+      body: 'A New Version Detected. Your App is Updated!',
       tag: 'quilix-update',
       requireInteraction: false,
     });
