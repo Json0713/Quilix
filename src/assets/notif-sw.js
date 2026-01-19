@@ -8,7 +8,7 @@ self.addEventListener('message', event => {
   self.registration.showNotification(title || 'Quilix', {
     body,
     icon: icon || '/assets/icons/web-app-manifest-192x192.png',
-    badge: '/assets/icons/web-app-manifest-192x192.png',
+    badge: '/assets/icons/notification-icon.png',
     tag,
     data,
     renotify: true

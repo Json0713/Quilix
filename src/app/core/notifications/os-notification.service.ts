@@ -16,7 +16,7 @@ export interface OsNotificationOptions {
 export class OsNotificationService {
 
   private readonly defaultIcon = '/assets/icons/web-app-manifest-192x192.png';
-  private readonly defaultBadge = '/assets/icons/web-app-manifest-192x192.png';
+  private readonly defaultBadge = '/assets/icons/notification-icon.png';
 
   async notify(options: OsNotificationOptions): Promise<void> {
     if (!this.isSupported()) return;
