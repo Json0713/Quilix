@@ -10,6 +10,7 @@ export interface OsNotificationOptions {
   requireInteraction?: boolean;
 }
 
+// testing push notification
 @Injectable({
   providedIn: 'root',
 })

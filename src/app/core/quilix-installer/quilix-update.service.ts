@@ -45,7 +45,7 @@ export class QuilixUpdateService implements OnDestroy {
     // OS-level notification (safe, permission-guarded internally)
     this.osNotify.notify({
       title: 'Quilix Updated',
-      body: 'A new version is ready. The app will refresh automatically.',
+      body: 'A new version detected. your app is now updated!',
       tag: 'quilix-update',
       requireInteraction: false,
     });
