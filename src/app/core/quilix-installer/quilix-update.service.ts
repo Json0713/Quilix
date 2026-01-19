@@ -38,11 +38,11 @@ export class QuilixUpdateService implements OnDestroy {
     // In-app feedback
     this.toastRelay.set(
       'info',
-      'New Version Detected.\nYour app will refresh shortly.',
+      'New Version Detected.\nYour app is now updated.',
       QuilixUpdateService.TOAST_DURATION_MS
     );
 
-    // OS-level notification (safe, permission-guarded internally)
+    // OS-level Notification
     this.osNotify.notify({
       title: 'Quilix Updated',
       body: 'A new version detected. your app is now updated!',
