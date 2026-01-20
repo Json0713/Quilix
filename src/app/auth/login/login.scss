@@ -1,13 +1,18 @@
 .root-container {
-  height: 100vh;
   display: grid;
   place-items: center;
   padding: 1.5rem 0.15rem;
+  box-sizing: border-box;
 
-  /* Mobile fix */
+  /* Desktop */
+  @media (min-width: 769px) {
+    height: 100vh;
+  }
+
+  /* Mobile */
   @media (max-width: 768px) {
     height: auto;
-    min-height: 100%;
+    min-height: 0; 
   }
 }
 
