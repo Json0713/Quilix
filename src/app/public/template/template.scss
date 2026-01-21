@@ -56,15 +56,14 @@
   --danger: #d9534f;
 }
 
-
 .root-container {
+  min-height: 100vh;
   background: linear-gradient(160deg, var(--primary), var(--primary-soft));
   font-family: Inter, Arial, Helvetica, sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
-
 
 /* Firefox */
 * {
