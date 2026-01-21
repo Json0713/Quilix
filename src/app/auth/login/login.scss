@@ -325,6 +325,11 @@
     background: #f4f8f9;
     border-color: #c7dadd;
   }
+  
+  &.confirm {
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
 }
 
 .user-info {
@@ -348,7 +353,6 @@
 
 .user-info-spinner {
   margin: auto;
-  margin-right: 0.9rem;
 }
 
 .avatar {
