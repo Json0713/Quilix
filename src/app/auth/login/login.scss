@@ -1,5 +1,5 @@
 .root-container {
-  height: 100vh;
+  height: auto;
   display: grid;
   place-items: center;
   padding: 1.5rem 0.15rem;
@@ -31,7 +31,7 @@
 
 /* BRAND */
 .header-title {
-  color: var(--text-white);
+  color: #f9fbfb;
   text-align: center;
   margin: auto;
 
@@ -109,7 +109,7 @@
     border-radius: 50px;
     border: 1px solid #d1d5db;
     font-size: 0.95rem;
-    background: #fff;
+    background: #f9fbfb;
     transition: border 0.15s, box-shadow 0.15s;
 
     &:focus {
@@ -155,10 +155,10 @@
   height: 42px;
   border-radius: 50px;
   border: 1px solid #d1d5db;
-  background: #fff;
+  background: #f9fbfb;
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--text-main);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -177,7 +177,7 @@
   &.active {
     background-color: var(--accent);
     border-color: var(--accent);
-    color: #fff;
+    color: #f9fbfb;
   }
 
   @media (max-width: 720px) {
@@ -194,7 +194,7 @@
   border-radius: 50px;
   border: none;
   background-color: var(--accent);
-  color: #fff;
+  color: #f9fbfb;
   font-weight: 600;
   font-size: 0.95rem;
   display: flex;
@@ -310,23 +310,20 @@
 
 /* USER CARD */
 .user-card {
-  border: 1px solid #b6bdbcd2;
+  background: #f9fbfb;
+  border: 1px solid #d5e3e6;
   border-radius: 21px;
-  padding: 0.75rem;
-  margin: 0;
+  padding: 0.75rem 0.85rem;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff;
-  transition: background 0.15s, border 0.15s;
+
+  transition: background 0.15s ease, border-color 0.15s ease;
 
   &:hover {
-    background: #fcfdfd;
-  }
-
-  &.confirm {
-    background: #fef2f2;
-    border-color: #fecaca;
+    background: #f4f8f9;
+    border-color: #c7dadd;
   }
 }
 
