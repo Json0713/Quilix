@@ -121,7 +121,15 @@ export class Login {
 
   /* Avatar */
   getAvatarColor(userId: string): string {
-    const colors = ['#dd791b', '#0a8ba1ff', '#c7cc37', '#a90fba', '#e30b5b'];
+    const colors = [
+      '#4fa3a8', // teal
+      '#6b8e23', // olive
+      '#c0841a', // amber
+      '#8b5a9a', // plum
+      '#a76d5c', // clay
+      '#3f6c7a', // slate teal
+    ];
+
     let hash = 0;
 
     for (let i = 0; i < userId.length; i++) {
