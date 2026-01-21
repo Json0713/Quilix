@@ -57,6 +57,7 @@
 }
 
 .root-container {
+  min-height: 100vh;
   background: linear-gradient(160deg, var(--primary), var(--primary-soft));
   font-family: Inter, Arial, Helvetica, sans-serif;
 }
