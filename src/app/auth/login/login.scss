@@ -30,24 +30,6 @@
   }
 }
 
-/* BRAND */
-.header-title {
-  color: #f9fbfb;
-  text-align: center;
-  margin: auto;
-
-  .brand-icon {
-    font-size: 3.75rem;
-    margin-bottom: 0.35rem;
-    cursor: pointer;
-  }
-
-  .brand-subtitle {
-    font-size: 0.9rem;
-    opacity: 0.85;
-  }
-}
-
 /* SHARED SECTION BASE */
 .auth-section { 
   display: flex;
@@ -87,6 +69,24 @@
   .auth-secondary > * {
     max-width: 450px;
     width: 100%;
+  }
+}
+
+/* BRAND */
+.header-title {
+  color: #f9fbfb;
+  text-align: center;
+  margin: auto;
+
+  .brand-icon {
+    font-size: 3.75rem;
+    margin-bottom: 0.35rem;
+    cursor: pointer;
+  }
+
+  .brand-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.85;
   }
 }
 
