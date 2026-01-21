@@ -62,7 +62,7 @@
 
   @media (min-width: 900px) {
     display: flex;
-    justify-content: center; /* center content, not the item */
+    align-items: center;
     border-bottom: none;
   }
 }
@@ -74,7 +74,7 @@
   padding: 0 0.5rem;
 
   @media (min-width: 900px) {
-    justify-content: center; /* center content horizontally */
+    align-items: center;
   }
 }
 
@@ -82,13 +82,11 @@
   .auth-primary > * {
     max-width: 544px;
     width: 100%;
-    margin: 0.5rem auto;
   }
 
   .auth-secondary > * {
     max-width: 450px;
     width: 100%;
-    margin: 0.5rem auto;
   }
 }
 
