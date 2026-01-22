@@ -61,39 +61,3 @@
   background: linear-gradient(160deg, var(--primary), var(--primary-soft));
   font-family: Inter, Arial, Helvetica, sans-serif;
 }
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(79, 163, 168, 0.45) transparent;
-}
-
-/* WebKit (Chrome, Edge, Safari) */
-*::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: rgba(79, 163, 168, 0.45);
-  border-radius: 999px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(79, 163, 168, 0.65);
-}
-
-@media (max-width: 768px) {
-  *::-webkit-scrollbar {
-    width: 3px;
-    height: 3px;
-  }
-
-  *::-webkit-scrollbar-thumb {
-    background-color: rgba(79, 163, 168, 0.35);
-  }
-}

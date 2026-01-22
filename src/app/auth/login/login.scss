@@ -360,13 +360,14 @@
   cursor: pointer;
   flex: 1;
   transition: outline 0.15s;
+  
   overflow: hidden;
 
   &:focus-visible {
     outline: 3px solid var(--accent);
   }
 
-  @media (max-width: 420px) {
+  @media (max-width: 1400px) {
     width: 200px;
   }
 }
@@ -417,6 +418,7 @@
   background: transparent;
   border: none;
   color: var(--text-muted);
+  margin-left: 12px;
   padding: 6px;
   cursor: pointer;
 
