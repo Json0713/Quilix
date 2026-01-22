@@ -360,6 +360,7 @@
   cursor: pointer;
   flex: 1;
   transition: outline 0.15s;
+  overflow: hidden;
 
   &:focus-visible {
     outline: 3px solid var(--accent);
