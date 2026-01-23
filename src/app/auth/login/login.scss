@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
 
-  // padding: 0 0.15rem;
+  padding: 0 0.15rem;
   box-sizing: border-box;
 }
 
@@ -32,7 +32,7 @@
 
 /* ===== Left (Primary) ===== */
 .auth-primary {
-  // padding: 0.9rem 0.5rem;
+  padding: 0.9rem 0.5rem;
   margin-bottom: 0.9rem;
   border-bottom: 1px solid rgba(225, 225, 225, 0.15);
 
@@ -45,7 +45,7 @@
 
 /* ===== Right (Secondary) ===== */
 .auth-secondary {
-  // padding: 0 0.5rem;
+  padding: 0 0.5rem;
 
   @media (min-width: 900px) {
     align-items: center;
