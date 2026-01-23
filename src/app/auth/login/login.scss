@@ -1,5 +1,4 @@
 .root-container {
-  height: auto;
   display: grid;
   place-items: center;
   padding: 0 0.15rem;
@@ -38,7 +37,7 @@
 
 /* LEFT (PRIMARY) */
 .auth-primary {
-  border-bottom: 1px solid rgba(15, 220, 200, 0.15);
+  border-bottom: 1px solid rgba(225, 225, 225, 0.15);
   padding: 0.9rem 0.5rem;
   margin-bottom: 0.9rem;
 

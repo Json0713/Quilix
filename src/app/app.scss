@@ -1,0 +1,83 @@
+:host {
+  /* ===== Brand Base ===== */
+  --primary: #1a3a3f;
+  --primary-soft: #244f55;
+  --primary-hover: #2e646b;
+
+  /* ===== UI Accent (Teal) ===== */
+  --accent: #4fa3a8;
+  --accent-hover: #3f8f94;
+  --accent-soft: #e1f3f4;
+
+  /* ===== Action Accent (Orange / CTA) ===== */
+  --action: #f59e0b;
+  --action-hover: #d97706;
+  --action-soft: #fef3c7;
+  --action-text: #ffffff;
+
+  /* ===== Backgrounds ===== */
+  --bg: #f4f8f9;
+  --surface: #ffffff;
+  --surface-muted: #eef3f4;
+
+  /* ===== Borders ===== */
+  --border: #d5e3e6;
+  --border-strong: #b7cdd2;
+
+  /* ===== Text ===== */
+  --text-main: #0f2e32;
+  --text-alt: #3f5f65;
+  --text-muted: #6f8f95;
+  --text-disabled: #9fb3b8;
+  --text-white: #ffffff;
+
+  /* ===== Buttons ===== */
+  --btn-primary-bg: var(--action);
+  --btn-primary-hover: var(--action-hover);
+  --btn-primary-text: var(--action-text);
+
+  --btn-secondary-bg: #e7f1f2;
+  --btn-secondary-hover: #d6eaec;
+  --btn-secondary-text: var(--primary);
+
+  --btn-ghost-text: var(--action);
+  --btn-ghost-hover: var(--action-soft);
+
+  /* ===== Inputs ===== */
+  --input-bg: #ffffff;
+  --input-border: var(--border);
+  --input-focus: var(--accent);
+  --input-text: var(--text-main);
+  --input-placeholder: var(--text-muted);
+
+  /* ===== Status ===== */
+  --success: #4caf8f;
+  --warning: #e6a23c;
+  --danger: #d9534f;
+}
+
+/* Root container: full viewport, stable */
+.root-container {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+
+  background: linear-gradient(160deg, var(--primary), var(--primary-soft));
+  font-family: Inter, Arial, Helvetica, sans-serif;
+}
+
+/* App shell */
+.app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  /* Prevent layout jumps on route change */
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Router outlet children control their own layout */
+router-outlet {
+  display: none;
+}
