@@ -1,27 +1,22 @@
+/* ===== Root: viewport centering ===== */
 .root-container {
-  display: grid;
-  place-items: center;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   padding: 0 0.15rem;
   box-sizing: border-box;
-
-  /* Desktop */
-  @media (min-width: 900px) {
-    height: 100vh;
-  }
-
-  /* Mobile */
-  @media (max-width: 480px) {
-    height: auto;
-    min-height: 0;
-    padding: 0 0.15rem;
-  }
 }
 
+/* ===== Auth card wrapper ===== */
 .container {
   display: grid;
-  overflow: hidden;
   margin: 0;
-  padding: 0.5rem 0.5rem;
+  padding: 0.5rem;
+
+  /* Prevent grid overflow issues */
+  min-width: 0;
 
   @media (min-width: 900px) {
     grid-template-columns: 1.1fr 0.9fr;
@@ -29,29 +24,27 @@
   }
 }
 
-/* SHARED SECTION BASE */
-.auth-section { 
+/* ===== Shared section base ===== */
+.auth-section {
   display: flex;
   flex-direction: column;
 }
 
-/* LEFT (PRIMARY) */
+/* ===== Left (Primary) ===== */
 .auth-primary {
-  border-bottom: 1px solid rgba(225, 225, 225, 0.15);
   padding: 0.9rem 0.5rem;
   margin-bottom: 0.9rem;
+  border-bottom: 1px solid rgba(225, 225, 225, 0.15);
 
   @media (min-width: 900px) {
-    display: flex;
     align-items: center;
     border-bottom: none;
+    margin-bottom: 0;
   }
 }
 
-/* RIGHT (SECONDARY) */
+/* ===== Right (Secondary) ===== */
 .auth-secondary {
-  display: flex;
-  flex-direction: column;
   padding: 0 0.5rem;
 
   @media (min-width: 900px) {
@@ -59,6 +52,7 @@
   }
 }
 
+/* ===== Width constraints (desktop only) ===== */
 @media (min-width: 900px) {
   .auth-primary > * {
     max-width: 544px;
