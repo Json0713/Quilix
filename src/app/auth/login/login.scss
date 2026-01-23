@@ -38,7 +38,7 @@
 
 /* LEFT (PRIMARY) */
 .auth-primary {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(15, 220, 200, 0.15);
   padding: 0.9rem 0.5rem;
   margin-bottom: 0.9rem;
 
@@ -135,7 +135,7 @@
     &:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(63, 186, 194, 0.22);
+      box-shadow: 0 0 0 2px rgba(30, 180, 185, 0.925);
     }
 
     &.invalid {
