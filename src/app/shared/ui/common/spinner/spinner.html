@@ -1,15 +1,15 @@
 @if (overlay) {
-  <div class="spinner-overlay">
-    <div
+  <div class="spinner-overlay" aria-hidden="true">
+    <span
       class="spinner"
       [style.width.px]="size"
       [style.height.px]="size">
-    </div>
+    </span>
   </div>
 } @else {
-  <div
+  <span
     class="spinner"
     [style.width.px]="size"
     [style.height.px]="size">
-  </div>
+  </span>
 }
