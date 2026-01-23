@@ -6,10 +6,14 @@ import { NetworkService } from './core/quilix-installer/network/network.service'
 import { QuilixUpdateService } from './core/quilix-installer/quilix-update.service';
 import { ToastRelayService } from './services/ui/common/toast/toast-relay';
 
+import { Loader } from './shared/ui/common/loader/loader';
+import { Modal } from './shared/ui/common/modal/modal';
+import { Toast } from './shared/ui/common/toast/toast';
+
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterModule, NetworkStatus],
+  imports: [RouterOutlet, RouterModule, NetworkStatus, Loader, Toast, Modal],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
