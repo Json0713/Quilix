@@ -1,0 +1,12 @@
+<section class="team-root">
+  <main class="team">
+    @if (showEnableNotif) {
+      <button
+        class="btn btn-primary"
+        (click)="enableNotifications()">
+        Enable Notifications
+      </button>
+    }
+    <router-outlet />
+  </main>
+</section>

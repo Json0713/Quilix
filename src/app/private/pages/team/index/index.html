@@ -1,0 +1,40 @@
+<section class="page">
+  <div class="page-container">
+
+    <!-- Page header -->
+    <header class="page-header">
+      <div class="page-header-content">
+        <h1 class="page-title">Team Workspace</h1>
+
+        <!-- Temporary actions (move to settings later) -->
+        <div class="page-actions">
+          <button
+            type="button"
+            class="btn btn-danger rounded-5"
+            (click)="logout()"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page main content -->
+    <main class="page-content">
+
+      <section class="page-section">
+        <h2>Welcome, Teams!</h2>
+        <p>
+          This is your team where you can manage teams,
+          team works and track team progress.
+        </p>
+      </section>
+
+      <section class="page-section">
+        <app-export></app-export>
+      </section>
+
+    </main>
+
+  </div>
+</section>

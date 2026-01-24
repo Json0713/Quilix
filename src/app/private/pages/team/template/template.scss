@@ -1,0 +1,18 @@
+.team-root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.team {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+}
+
+router-outlet {
+  display: none;
+}
