@@ -1,15 +1,12 @@
-<section class="root-container">
-
-  <main class="container">
+<section class="student-root">
+  <main class="student">
     <router-outlet></router-outlet>
-
-  @if (showEnableNotif) {
-    <button
-      class="btn btn-primary rounded-5"
-      (click)="enableNotifications()">
-      Enable Notifications
-    </button>
-  }
-  </main>
-  
+    @if (showEnableNotif) {
+      <button
+        class="btn btn-primary rounded-5"
+        (click)="enableNotifications()">
+        Enable Notifications
+      </button>
+    }
+    </main>
 </section>
