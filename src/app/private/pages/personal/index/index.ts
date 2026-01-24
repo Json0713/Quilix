@@ -24,7 +24,6 @@ export class PersonalIndex {
     
   }
 
-  // PRESERVED STUDENT LOGIC CODE
   loadData(): void {
     this.loader.show();
 

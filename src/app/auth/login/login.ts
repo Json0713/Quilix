@@ -51,7 +51,7 @@ export class Login {
   }
 
   private redirect(role: UserRole): void {
-    this.router.navigate([role === 'student' ? '/student' : '/teacher']);
+    this.router.navigate([role === 'personal' ? '/personal' : '/team']);
   }
 
   /* Workspace Creation */

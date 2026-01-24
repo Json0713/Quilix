@@ -47,29 +47,29 @@
 
         <!-- Role -->
         <div class="field">
-          <label>I am</label>
+          <label>Role</label>
 
           <div class="role-select">
             <button
               type="button"
               class="role-btn"
-              [class.active]="role === 'student'"
-              (click)="role = 'student'"
-              aria-pressed="{{ role === 'student' }}"
+              [class.active]="role === 'personal'"
+              (click)="role = 'personal'"
+              aria-pressed="{{ role === 'personal' }}"
             >
               <i class="bi bi-mortarboard"></i>
-              <span>Student</span>
+              <span>Personal</span>
             </button>
 
             <button
               type="button"
               class="role-btn"
-              [class.active]="role === 'teacher'"
-              (click)="role = 'teacher'"
-              aria-pressed="{{ role === 'teacher' }}"
+              [class.active]="role === 'team'"
+              (click)="role = 'team'"
+              aria-pressed="{{ role === 'team' }}"
             >
               <i class="bi bi-person-workspace"></i>
-              <span>Teacher</span>
+              <span>Team</span>
             </button>
           </div>
         </div>
@@ -164,15 +164,15 @@
                     >
                       <i
                         class="bi"
-                        [class.bi-mortarboard]="user.role === 'student'"
-                        [class.bi-person-workspace]="user.role === 'teacher'"
+                        [class.bi-mortarboard]="user.role === 'personal'"
+                        [class.bi-person-workspace]="user.role === 'team'"
                       ></i>
                     </div>
 
                     <div class="user-meta">
                       <strong>{{ user.name }}</strong>
                       <small>
-                        {{ user.role === 'student' ? 'Student' : 'Teacher' }}
+                        {{ user.role === 'personal' ? 'Personal' : 'Team' }}
                         · {{ user.lastActiveAt | timeAgo }}
                       </small>
                     </div>
