@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
+import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
+import { filter } from 'rxjs/operators';
 
 export interface OsNotificationOptions {
   title: string;
@@ -17,6 +19,24 @@ export class OsNotificationService {
 
   private readonly defaultIcon = '/assets/icons/web-app-manifest-192x192.png';
   private readonly defaultBadge = '/assets/icons/notification-icon.png';
+
+  constructor(private swUpdate: SwUpdate) {
+    this.checkForUpdates();
+  }
+
+  private checkForUpdates() {
+    if (!this.swUpdate.isEnabled) return;
+
+    this.swUpdate.versionUpdates
+      .pipe(filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'))
+      .subscribe(() => {
+        this.notify({
+          title: 'New Version Available',
+          body: 'Tap to refresh and get the latest version of the app.',
+          requireInteraction: true,
+        });
+      });
+  }
 
   async notify(options: OsNotificationOptions): Promise<void> {
     if (!this.isSupported()) return;
@@ -44,12 +64,10 @@ export class OsNotificationService {
       console.warn('[OS NOTIF] Service Worker not supported');
       return false;
     }
-
     if (!('Notification' in window)) {
       console.warn('[OS NOTIF] Notification API not supported');
       return false;
     }
-
     return true;
   }
 
@@ -60,5 +78,4 @@ export class OsNotificationService {
     }
     return true;
   }
-
 }
