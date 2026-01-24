@@ -1,23 +1,19 @@
-/* Root wrapper: full viewport, stable */
 .public-root {
-  min-height: 100dvh;
+  flex: 1;
   display: flex;
   flex-direction: column;
   position: relative;
 }
 
-/* Public app shell */
 .public {
   flex: 1;
   display: flex;
   flex-direction: column;
 
-  /* Critical for routed layouts */
   min-width: 0;
   min-height: 0;
 }
 
-/* Router outlet should never affect layout */
 router-outlet {
   display: none;
 }
