@@ -7,6 +7,12 @@ export const routes: Routes = [
   ...PUBLIC_ROUTES,
   ...PRIVATE_ROUTES,
 
+  {
+    path: 'meta',
+    loadChildren: () =>
+      import('./meta/meta.routes').then(m => m.META_ROUTES),
+  },
+
   { 
     path: '**', 
     redirectTo: '' 

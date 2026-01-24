@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'public-meta-index',
+  selector: 'personal-meta-index',
   imports: [],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
-export class PublicMetaIndex {
+export class PersonalMeataIndex {
 
 }
