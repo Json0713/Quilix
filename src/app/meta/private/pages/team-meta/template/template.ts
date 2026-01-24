@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { RouterModule } from "@angular/router";
 
 @Component({
   selector: 'team-meta-template',
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './template.html',
   styleUrl: './template.scss',
 })
