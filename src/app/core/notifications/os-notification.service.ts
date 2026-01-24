@@ -32,7 +32,7 @@ export class OsNotificationService {
       .subscribe(() => {
         this.notify({
           title: 'New Version Available',
-          body: 'Tap to refresh and get the latest version of the app.',
+          body: 'you are now using the latest version of Quilix!',
           requireInteraction: true,
         });
       });
