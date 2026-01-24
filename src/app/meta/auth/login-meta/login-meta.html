@@ -1,1 +1,31 @@
-<p>login-meta works!</p>
+<section class="card">
+  <h2>Login</h2>
+
+  <form (ngSubmit)="submit()">
+    <input
+      type="email"
+      [(ngModel)]="email"
+      name="email"
+      required
+      placeholder="Email"
+    />
+
+    <input
+      type="password"
+      [(ngModel)]="password"
+      name="password"
+      required
+      placeholder="Password"
+    />
+
+    <button type="submit" [disabled]="loading">
+      {{ loading ? 'Logging in…' : 'Login' }}
+    </button>
+
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
+  </form>
+
+  <a routerLink="/register">Create account</a>
+</section>
