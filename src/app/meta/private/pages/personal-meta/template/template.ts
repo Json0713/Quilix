@@ -7,6 +7,6 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './template.html',
   styleUrl: './template.scss',
 })
-export class PersonalMeateTemplate {
+export class PersonalMeteTemplate {
 
 }

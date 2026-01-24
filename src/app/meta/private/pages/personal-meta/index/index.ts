@@ -6,6 +6,6 @@ import { Component } from '@angular/core';
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
-export class PersonalMeataIndex {
+export class PersonalMetaIndex {
 
 }
