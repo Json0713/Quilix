@@ -1,12 +1,12 @@
 <section class="student-root">
   <main class="student">
-    <router-outlet />
     @if (showEnableNotif) {
       <button
-        class="btn btn-primary rounded-5"
+        class="btn btn-prmary"
         (click)="enableNotifications()">
         Enable Notifications
       </button>
     }
+    <router-outlet />
   </main>
 </section>
