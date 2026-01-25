@@ -20,13 +20,14 @@
       placeholder="Password"
     />
 
+    @if (error) {
+      <p class="error" role="alert">{{ error }}</p>
+    }
+
     <button type="submit" [disabled]="loading">
       {{ loading ? 'Logging in…' : 'Login' }}
     </button>
 
-    @if (error) {
-      <p class="error" role="alert">{{ error }}</p>
-    }
   </form>
 
   <a routerLink="/meta/register">Create account</a>

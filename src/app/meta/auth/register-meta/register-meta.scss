@@ -1,0 +1,171 @@
+/* File: src/app/meta/register/register.component.scss */
+
+:host {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  color: var(--text-main);
+}
+
+/* ===== Card ===== */
+.card {
+  width: 100%;
+  max-width: 480px;
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid var(--border);
+
+  background: rgba(119, 172, 179, 0.611);
+  backdrop-filter: blur(8px);
+
+  box-shadow:
+    0 20px 35px -15px rgba(15, 46, 50, 0.25),
+    0 8px 16px -10px rgba(15, 46, 50, 0.15);
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* ===== Title ===== */
+.card h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--primary);
+}
+
+/* ===== Form ===== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ===== Inputs & Select ===== */
+input,
+select {
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-size: 0.95rem;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+
+  &::placeholder {
+    color: var(--input-placeholder);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+    transform: translateY(-1px);
+  }
+}
+
+/* Select specific */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='12' height='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%236f8f95' stroke-width='2' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+}
+
+/* ===== Button ===== */
+button {
+  margin-top: 0.75rem;
+  padding: 0.85rem 1.2rem;
+  border-radius: 9999px; /* pill */
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-white);
+
+  background: linear-gradient(
+    160deg,
+    var(--primary),
+    var(--primary-soft)
+  );
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 20px -10px rgba(26, 58, 63, 0.6);
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow:
+      0 14px 28px -12px rgba(26, 58, 63, 0.75);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* ===== Messages ===== */
+.error {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #dc2626;
+  text-align: center;
+}
+
+.success {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #16a34a; /* green for success */
+  text-align: center;
+}
+
+/* ===== Register Link ===== */
+a {
+  margin-top: 0.25rem;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-disabled);
+  text-decoration: none;
+
+  transition: color 0.2s ease, transform 0.15s ease;
+
+  &:hover {
+    color: var(--text-white);
+    text-decoration: underline;
+    transform: translateY(-1px);
+  }
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 480px) {
+  .card {
+    padding: 2rem 1.5rem;
+    border-radius: 1.25rem;
+  }
+
+  .card h2 {
+    font-size: 1.5rem;
+  }
+}
