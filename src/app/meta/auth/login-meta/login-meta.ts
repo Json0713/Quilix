@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { MetaAuthService } from '../../core/auth/meta-auth.service';
@@ -8,7 +8,7 @@ import { MetaUserRole } from '../../interfaces/meta-role';
 @Component({
   selector: 'app-login-meta',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterModule],
   templateUrl: './login-meta.html',
   styleUrls: ['./login-meta.scss'],
 })

@@ -1,6 +1,6 @@
 // src/app/meta/auth/register-meta/register-meta.ts
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { MetaAuthService } from '../../core/auth/meta-auth.service';
@@ -9,7 +9,7 @@ import { MetaUserRole } from '../../interfaces/meta-role';
 @Component({
   selector: 'app-register-meta',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterModule],
   templateUrl: './register-meta.html',
   styleUrls: ['./register-meta.scss'],
 })
@@ -21,7 +21,7 @@ export class RegisterMeta {
   email = '';
   phone = '';
   error: string | null = null;
-  loading = false;
+  loading = true;
 
   constructor(
     private auth: MetaAuthService,
@@ -29,6 +29,11 @@ export class RegisterMeta {
   ) {}
 
   async submit(): Promise<void> {
+    if (!this.username || !this.password) {
+      this.error = 'Username and password are required';
+      return;
+    }
+
     this.loading = true;
     this.error = null;
 
@@ -46,7 +51,6 @@ export class RegisterMeta {
       return;
     }
 
-    // Auto-login after registration
     const loginResult = await this.auth.login(this.username, this.password);
 
     if (!loginResult.success) {
@@ -55,7 +59,7 @@ export class RegisterMeta {
       return;
     }
 
-    // Redirect based on role
+    this.loading = false;
     this.router.navigate([this.role === 'team' ? '/team' : '/personal']);
   }
 

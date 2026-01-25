@@ -5,8 +5,7 @@ import { MetaUserRole } from '../../interfaces/meta-role';
 import { MetaAuthResult } from '../../interfaces/meta-auth-result';
 import { MetaUserProfile } from '../../interfaces/meta-user-profile';
 
-@Injectable({ providedIn: 'root' 
-})
+@Injectable({ providedIn: 'root' })
 export class MetaAuthService {
 
   constructor(
@@ -14,12 +13,12 @@ export class MetaAuthService {
   ) {}
 
   /**
-   * Register a new user
+   * Safe register: bypass Supabase email sending
    * @param username Required username (unique)
    * @param password Required password
    * @param role User role
-   * @param email Optional email
-   * @param phone Optional phone number
+   * @param email Optional email (for profile only)
+   * @param phone Optional phone (for profile only)
    */
   async register(
     username: string,
@@ -28,34 +27,35 @@ export class MetaAuthService {
     email?: string,
     phone?: string
   ): Promise<MetaAuthResult> {
-    // Supabase Auth requires an email
-    const internalEmail = email || `${username}@internal.local`;
-
-    const { data, error } = await this.supabase.auth.signUp({
-      email: internalEmail,
-      password,
-      options: {
-        data: {
+    try {
+      const response = await fetch('/api/meta-register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           username,
+          password,
           role,
-          email: email ?? null,
-          phone: phone ?? null
-        }
-      }
-    });
+          email,
+          phone
+        })
+      });
 
-    if (error) return { success: false, error: error.message };
-    return { success: true };
+      const result = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: result.error };
+      }
+
+      return { success: true };
+    } catch {
+      return { success: false, error: 'Registration service unavailable' };
+    }
   }
 
   /**
-   * Login using username + password
-   * Internally maps username -> internal email
+   * Login using username + password (internal email)
    */
-  async login(
-    username: string,
-    password: string
-  ): Promise<MetaAuthResult> {
+  async login(username: string, password: string): Promise<MetaAuthResult> {
     const internalEmail = `${username}@internal.local`;
 
     const { error } = await this.supabase.auth.signInWithPassword({
@@ -78,7 +78,6 @@ export class MetaAuthService {
    * Restore session if exists
    */
   async restoreSession(): Promise<boolean> {
-    // Try Supabase first
     try {
       const { data } = await this.supabase.auth.getSession();
       if (data.session) return true;
@@ -86,11 +85,10 @@ export class MetaAuthService {
       console.warn('Supabase session restore failed, falling back to localStorage');
     }
 
-    // Fallback to manual restore
     const stored = localStorage.getItem('meta-session');
     if (stored) {
       const session = JSON.parse(stored);
-      await this.supabase.auth.setSession(session); // temporary restore
+      await this.supabase.auth.setSession(session);
       return true;
     }
 
@@ -104,7 +102,6 @@ export class MetaAuthService {
     const { data } = await this.supabase.auth.getUser();
     if (!data.user) return null;
 
-    // Return MetaUserProfile mapped from Supabase user_metadata
     const meta: any = data.user.user_metadata;
     return {
       id: data.user.id,
@@ -124,7 +121,6 @@ export class MetaAuthService {
     if (!userData.user) return { success: false, error: 'No user logged in' };
 
     const { error } = await this.supabase.auth.admin.deleteUser(userData.user.id);
-
     if (error) return { success: false, error: error.message };
     return { success: true };
   }

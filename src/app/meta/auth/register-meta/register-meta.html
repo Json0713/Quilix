@@ -14,11 +14,12 @@
     </select>
 
     <button type="submit" [disabled]="loading">Register</button>
-
+    
     @if (error) {
       <p class="error">{{ error }}</p>
     }
   </form>
 
   <a routerLink="/login">Already have an account?</a>
+
 </section>
