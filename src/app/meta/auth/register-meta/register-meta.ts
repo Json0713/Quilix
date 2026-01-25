@@ -76,7 +76,7 @@ export class RegisterMeta {
     // Redirect after short delay for UX
     setTimeout(() => {
       this.router.navigate(['/meta/login']);
-    }, 1200);
+    }, 5200);
   }
 
 }

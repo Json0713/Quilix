@@ -43,7 +43,7 @@ export class LoginMeta {
       }
 
       await this.router.navigate([
-        user.role === 'team' ? '/team' : '/personal'
+        user.role === 'team' ? '/meta/team' : '/meta/personal'
       ]);
     } catch (err: any) {
       this.error = err?.message ?? 'Unexpected error';
