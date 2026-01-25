@@ -29,21 +29,15 @@ export class RegisterMeta {
   ) {}
 
   async submit(): Promise<void> {
-    if (!this.username || !this.password) {
-      this.error = 'Username and password are required';
+    if (!this.username || !this.password || !this.email) {
+      this.error = 'Username, password, and email are required';
       return;
     }
 
-    // Validate email
-    if (!this.email) {
-      this.error = 'Email is required';
-      return;
-    }
-
-    const emailPattern =
-      /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-    if (!emailPattern.test(this.email)) {
-      this.error = 'Please enter a valid email address';
+    // email validators
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      this.error = 'Invalid email format';
       return;
     }
 
@@ -64,8 +58,8 @@ export class RegisterMeta {
       return;
     }
 
+    // Auto-login
     const loginResult = await this.auth.login(this.username, this.password);
-
     if (!loginResult.success) {
       this.error = loginResult.error ?? 'Auto-login failed';
       this.loading = false;

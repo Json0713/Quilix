@@ -13,35 +13,43 @@ export class MetaAuthService {
   ) {}
 
   /**
-   * Safe register: bypass Supabase email sending
+   * Safe register: bypass Supabase
    * @param username Required username (unique)
    * @param password Required password
    * @param role User role
-   * @param email Optional email (for profile only)
-   * @param phone Optional phone (for profile only)
+   * @param email Required email (unique)
+   * @param phone Optional phone (localy)
    */
   async register(
     username: string,
     password: string,
     role: MetaUserRole,
-    email: string,  // required
+    email: string,
     phone?: string
   ): Promise<MetaAuthResult> {
+    if (!email) {
+      return { success: false, error: 'Email is required for registration' };
+    }
+
     try {
+      // Ensure email is trimmed and lowercased for consistency
+      const safeEmail = email.trim().toLowerCase();
+
       const { data, error } = await this.supabase.auth.signUp({
-        email, // required
+        email: safeEmail,
         password,
         options: {
           data: {
             username,
             role,
-            email,
+            email: safeEmail,
             phone: phone ?? null
           }
         }
       });
 
       if (error) return { success: false, error: error.message };
+
       return { success: true };
     } catch (err: any) {
       return { success: false, error: err?.message ?? 'Unknown error' };
@@ -49,7 +57,7 @@ export class MetaAuthService {
   }
 
   /**
-   * Login using username + password (internal email)
+   * Login using username + internal email fallback (legacy)
    */
   async login(username: string, password: string): Promise<MetaAuthResult> {
     const internalEmail = `${username}@internal.local`;
