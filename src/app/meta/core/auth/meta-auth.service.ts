@@ -27,29 +27,18 @@ export class MetaAuthService {
     email?: string,
     phone?: string
   ): Promise<MetaAuthResult> {
-    try {
-      const response = await fetch('/api/meta-register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username,
-          password,
-          role,
-          email,
-          phone
-        })
-      });
+    const internalEmail = `${username}@internal.local`;
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        return { success: false, error: result.error };
+    const { data, error } = await this.supabase.auth.signUp({
+      email: internalEmail,
+      password,
+      options: {
+        data: { username, role, email: email ?? null, phone: phone ?? null }
       }
+    });
 
-      return { success: true };
-    } catch {
-      return { success: false, error: 'Registration service unavailable' };
-    }
+    if (error) return { success: false, error: error.message };
+    return { success: true };
   }
 
   /**
