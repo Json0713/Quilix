@@ -34,6 +34,19 @@ export class RegisterMeta {
       return;
     }
 
+    // Validate email
+    if (!this.email) {
+      this.error = 'Email is required';
+      return;
+    }
+
+    const emailPattern =
+      /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+    if (!emailPattern.test(this.email)) {
+      this.error = 'Please enter a valid email address';
+      return;
+    }
+
     this.loading = true;
     this.error = null;
 
@@ -41,7 +54,7 @@ export class RegisterMeta {
       this.username,
       this.password,
       this.role,
-      this.email || undefined,
+      this.email,
       this.phone || undefined
     );
 

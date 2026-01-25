@@ -24,28 +24,28 @@ export class MetaAuthService {
     username: string,
     password: string,
     role: MetaUserRole,
-    email?: string,
+    email: string,  // required
     phone?: string
   ): Promise<MetaAuthResult> {
-
-    // Use a valid internal placeholder email (RFC-compliant)
-    const internalEmail = email || `${username}@gmail.com`;
-
-    const { data, error } = await this.supabase.auth.signUp({
-      email: internalEmail,
-      password,
-      options: {
-        data: {
-          username,
-          role,
-          email: email ?? null,
-          phone: phone ?? null
+    try {
+      const { data, error } = await this.supabase.auth.signUp({
+        email, // required
+        password,
+        options: {
+          data: {
+            username,
+            role,
+            email,
+            phone: phone ?? null
+          }
         }
-      }
-    });
+      });
 
-    if (error) return { success: false, error: error.message };
-    return { success: true };
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err?.message ?? 'Unknown error' };
+    }
   }
 
   /**
