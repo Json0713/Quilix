@@ -9,7 +9,7 @@ export function provideSupabaseClient(config: MetaConfigService): SupabaseClient
     config.env.supabaseAnonKey,
     {
       auth: {
-        persistSession: false,
+        persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: false
       }

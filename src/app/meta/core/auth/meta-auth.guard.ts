@@ -15,7 +15,7 @@ export class MetaAuthGuard implements CanActivate {
 
     if (!isLoggedIn) {
       // Redirect to meta login page if not authenticated
-      return this.router.createUrlTree(['/login']);
+      return this.router.createUrlTree(['/meta/login']);
     }
 
     return true;

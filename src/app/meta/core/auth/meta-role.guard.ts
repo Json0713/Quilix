@@ -18,7 +18,7 @@ export class MetaRoleGuard implements CanActivate {
     const user = await this.auth.getCurrentUser(); // returns MetaUserProfile
 
     if (!user || user.role !== requiredRole) {
-      return this.router.createUrlTree(['/']);
+      return this.router.createUrlTree(['/meta']);
     }
 
     return true;
