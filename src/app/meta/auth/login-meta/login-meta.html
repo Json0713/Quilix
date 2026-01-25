@@ -1,14 +1,31 @@
 <section class="card">
   <h2>Login</h2>
 
-  <form (ngSubmit)="submit()">
-    <input type="text" [(ngModel)]="username" name="username" required placeholder="Username" />
-    <input type="password" [(ngModel)]="password" name="password" required placeholder="Password" />
+  <form (ngSubmit)="submit()" novalidate>
+    <input
+      type="text"
+      [(ngModel)]="identifier"
+      name="identifier"
+      required
+      autocomplete="username email"
+      placeholder="Username or email"
+    />
 
-    <button type="submit" [disabled]="loading">Login</button>
+    <input
+      type="password"
+      [(ngModel)]="password"
+      name="password"
+      required
+      autocomplete="current-password"
+      placeholder="Password"
+    />
+
+    <button type="submit" [disabled]="loading">
+      {{ loading ? 'Logging in…' : 'Login' }}
+    </button>
 
     @if (error) {
-      <p class="error">{{ error }}</p>
+      <p class="error" role="alert">{{ error }}</p>
     }
   </form>
 

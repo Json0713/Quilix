@@ -24,25 +24,17 @@ export class MetaAuthService {
     username: string,
     password: string,
     role: MetaUserRole,
-    email: string,
+    email: string,   // REQUIRED
     phone?: string
   ): Promise<MetaAuthResult> {
-    if (!email) {
-      return { success: false, error: 'Email is required for registration' };
-    }
-
     try {
-      // Ensure email is trimmed and lowercased for consistency
-      const safeEmail = email.trim().toLowerCase();
-
-      const { data, error } = await this.supabase.auth.signUp({
-        email: safeEmail,
+      const { error } = await this.supabase.auth.signUp({
+        email,
         password,
         options: {
           data: {
             username,
             role,
-            email: safeEmail,
             phone: phone ?? null
           }
         }
@@ -59,16 +51,38 @@ export class MetaAuthService {
   /**
    * Login using username + internal email fallback (legacy)
    */
-  async login(username: string, password: string): Promise<MetaAuthResult> {
-    const internalEmail = `${username}@internal.local`;
+  async login(identifier: string, password: string): Promise<MetaAuthResult> {
+    try {
+      let email = identifier;
 
-    const { error } = await this.supabase.auth.signInWithPassword({
-      email: internalEmail,
-      password
-    });
+      // If NOT an email, treat as username
+      if (!identifier.includes('@')) {
+        const { data, error } = await this.supabase
+          .from('profiles')
+          .select('email')
+          .eq('username', identifier)
+          .single();
 
-    if (error) return { success: false, error: error.message };
-    return { success: true };
+        if (error || !data?.email) {
+          return { success: false, error: 'Invalid username or password' };
+        }
+
+        email = data.email;
+      }
+
+      const { error } = await this.supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        return { success: false, error: 'Invalid email/username or password' };
+      }
+
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err?.message ?? 'Login failed' };
+    }
   }
 
   /**

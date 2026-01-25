@@ -14,13 +14,15 @@ import { MetaUserRole } from '../../interfaces/meta-role';
   styleUrls: ['./register-meta.scss'],
 })
 export class RegisterMeta {
-  
+
   username = '';
   password = '';
   role: MetaUserRole = 'personal';
   email = '';
   phone = '';
+
   error: string | null = null;
+  success: string | null = null;
   loading = false;
 
   constructor(
@@ -29,20 +31,29 @@ export class RegisterMeta {
   ) {}
 
   async submit(): Promise<void> {
+    this.error = null;
+    this.success = null;
+
+    // Required fields
     if (!this.username || !this.password || !this.email) {
-      this.error = 'Username, password, and email are required';
+      this.error = 'Username, email, and password are required';
       return;
     }
 
-    // email validators
+    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.email)) {
-      this.error = 'Invalid email format';
+      this.error = 'Please enter a valid email address';
+      return;
+    }
+
+    // Password strength (basic)
+    if (this.password.length < 8) {
+      this.error = 'Password must be at least 8 characters';
       return;
     }
 
     this.loading = true;
-    this.error = null;
 
     const result = await this.auth.register(
       this.username,
@@ -52,22 +63,20 @@ export class RegisterMeta {
       this.phone || undefined
     );
 
+    this.loading = false;
+
     if (!result.success) {
       this.error = result.error ?? 'Registration failed';
-      this.loading = false;
       return;
     }
 
-    // Auto-login
-    const loginResult = await this.auth.login(this.username, this.password);
-    if (!loginResult.success) {
-      this.error = loginResult.error ?? 'Auto-login failed';
-      this.loading = false;
-      return;
-    }
+    // Registration successful
+    this.success = 'Account created successfully. Please log in.';
 
-    this.loading = false;
-    this.router.navigate([this.role === 'team' ? '/team' : '/personal']);
+    // Redirect after short delay for UX
+    setTimeout(() => {
+      this.router.navigate(['/meta/login']);
+    }, 1200);
   }
 
 }

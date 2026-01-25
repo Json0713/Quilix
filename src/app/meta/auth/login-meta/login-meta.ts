@@ -13,7 +13,8 @@ import { MetaUserRole } from '../../interfaces/meta-role';
   styleUrls: ['./login-meta.scss'],
 })
 export class LoginMeta {
-  username = '';
+
+  identifier = '';
   password = '';
   error: string | null = null;
   loading = false;
@@ -28,29 +29,24 @@ export class LoginMeta {
     this.error = null;
 
     try {
-      // Attempt login
-      const result = await this.auth.login(this.username, this.password);
+      const result = await this.auth.login(this.identifier, this.password);
 
       if (!result.success) {
         this.error = result.error ?? 'Login failed';
         return;
       }
 
-      // Retrieve current user profile to determine role
       const user = await this.auth.getCurrentUser();
-
       if (!user) {
         this.error = 'User not found';
         return;
       }
 
-      // Redirect based on role
-      const redirectUrl = user.role === 'team' ? '/team' : '/personal';
-      await this.router.navigate([redirectUrl]);
-      
+      await this.router.navigate([
+        user.role === 'team' ? '/team' : '/personal'
+      ]);
     } catch (err: any) {
-      this.error = err?.message ?? 'Unexpected error occurred';
-      console.error('LoginMeta error:', err);
+      this.error = err?.message ?? 'Unexpected error';
     } finally {
       this.loading = false;
     }
