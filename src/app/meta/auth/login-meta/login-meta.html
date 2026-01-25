@@ -2,25 +2,10 @@
   <h2>Login</h2>
 
   <form (ngSubmit)="submit()">
-    <input
-      type="email"
-      [(ngModel)]="email"
-      name="email"
-      required
-      placeholder="Email"
-    />
+    <input type="text" [(ngModel)]="username" name="username" required placeholder="Username" />
+    <input type="password" [(ngModel)]="password" name="password" required placeholder="Password" />
 
-    <input
-      type="password"
-      [(ngModel)]="password"
-      name="password"
-      required
-      placeholder="Password"
-    />
-
-    <button type="submit" [disabled]="loading">
-      {{ loading ? 'Logging in…' : 'Login' }}
-    </button>
+    <button type="submit" [disabled]="loading">Login</button>
 
     @if (error) {
       <p class="error">{{ error }}</p>

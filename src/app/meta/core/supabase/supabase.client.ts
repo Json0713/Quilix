@@ -1,24 +1,19 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { MetaConfigService } from '../config/meta-config.service';
 
-let client: SupabaseClient | null = null;
+export const SUPABASE_CLIENT = 'SUPABASE_CLIENT';
 
-export function getSupabaseClient(
-  config: MetaConfigService
-): SupabaseClient {
-  if (!client) {
-    client = createClient(
-      config.env.supabaseUrl,
-      config.env.supabaseAnonKey,
-      {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: false
-        }
+export function provideSupabaseClient(config: MetaConfigService): SupabaseClient {
+  return createClient(
+    config.env.supabaseUrl,
+    config.env.supabaseAnonKey,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: true,
+        detectSessionInUrl: false
       }
-    );
-  }
-
-  return client;
+    }
+  );
+  
 }

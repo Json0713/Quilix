@@ -1,19 +1,19 @@
-import { FormsModule } from '@angular/forms';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { MetaAuthService } from '../../core/auth/auth.service';
-import { MetaUserRole } from '../../interfaces/meta-role';
+import { FormsModule } from '@angular/forms';
 
+import { MetaAuthService } from '../../core/auth/meta-auth.service';
+import { MetaUserRole } from '../../interfaces/meta-role';
 
 @Component({
   selector: 'app-login-meta',
+  standalone: true,
   imports: [FormsModule],
   templateUrl: './login-meta.html',
-  styleUrl: './login-meta.scss',
+  styleUrls: ['./login-meta.scss'],
 })
 export class LoginMeta {
-
-  email = '';
+  username = '';
   password = '';
   error: string | null = null;
   loading = false;
@@ -27,18 +27,33 @@ export class LoginMeta {
     this.loading = true;
     this.error = null;
 
-    const result = await this.auth.login(this.email, this.password);
+    try {
+      // Attempt login
+      const result = await this.auth.login(this.username, this.password);
 
-    if (!result.success) {
-      this.error = result.error ?? 'Login failed';
+      if (!result.success) {
+        this.error = result.error ?? 'Login failed';
+        return;
+      }
+
+      // Retrieve current user profile to determine role
+      const user = await this.auth.getCurrentUser();
+
+      if (!user) {
+        this.error = 'User not found';
+        return;
+      }
+
+      // Redirect based on role
+      const redirectUrl = user.role === 'team' ? '/team' : '/personal';
+      await this.router.navigate([redirectUrl]);
+      
+    } catch (err: any) {
+      this.error = err?.message ?? 'Unexpected error occurred';
+      console.error('LoginMeta error:', err);
+    } finally {
       this.loading = false;
-      return;
     }
-
-    const { data } = await this.auth.getCurrentUser();
-    const role = data.user?.user_metadata?.['role'] as MetaUserRole;
-
-    this.router.navigate([role === 'team' ? '/team' : '/personal']);
   }
 
 }

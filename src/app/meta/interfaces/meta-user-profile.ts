@@ -2,7 +2,9 @@ import { MetaUserRole } from './meta-role';
 
 export interface MetaUserProfile {
   id: string;
-  email: string;
+  username: string;
   role: MetaUserRole;
+  email?: string;
+  phone?: string;
   createdAt: string;
 }

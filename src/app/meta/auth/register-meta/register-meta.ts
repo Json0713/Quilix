@@ -1,19 +1,25 @@
+// src/app/meta/auth/register-meta/register-meta.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { MetaAuthService } from '../../core/auth/auth.service';
-import { MetaUserRole } from '../../interfaces/meta-role';
 import { FormsModule } from '@angular/forms';
+
+import { MetaAuthService } from '../../core/auth/meta-auth.service';
+import { MetaUserRole } from '../../interfaces/meta-role';
 
 @Component({
   selector: 'app-register-meta',
+  standalone: true,
   imports: [FormsModule],
   templateUrl: './register-meta.html',
-  styleUrl: './register-meta.scss',
+  styleUrls: ['./register-meta.scss'],
 })
 export class RegisterMeta {
-  email = '';
+  
+  username = '';
   password = '';
   role: MetaUserRole = 'personal';
+  email = '';
+  phone = '';
   error: string | null = null;
   loading = false;
 
@@ -26,7 +32,13 @@ export class RegisterMeta {
     this.loading = true;
     this.error = null;
 
-    const result = await this.auth.register(this.email, this.password, this.role);
+    const result = await this.auth.register(
+      this.username,
+      this.password,
+      this.role,
+      this.email || undefined,
+      this.phone || undefined
+    );
 
     if (!result.success) {
       this.error = result.error ?? 'Registration failed';
@@ -34,7 +46,16 @@ export class RegisterMeta {
       return;
     }
 
-    // Auto-login redirect
+    // Auto-login after registration
+    const loginResult = await this.auth.login(this.username, this.password);
+
+    if (!loginResult.success) {
+      this.error = loginResult.error ?? 'Auto-login failed';
+      this.loading = false;
+      return;
+    }
+
+    // Redirect based on role
     this.router.navigate([this.role === 'team' ? '/team' : '/personal']);
   }
 
