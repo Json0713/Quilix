@@ -21,7 +21,7 @@ export class RegisterMeta {
   email = '';
   phone = '';
   error: string | null = null;
-  loading = true;
+  loading = false;
 
   constructor(
     private auth: MetaAuthService,
