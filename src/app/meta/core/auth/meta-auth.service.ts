@@ -27,13 +27,20 @@ export class MetaAuthService {
     email?: string,
     phone?: string
   ): Promise<MetaAuthResult> {
-    const internalEmail = `${username}@internal.local`;
+
+    // Use a valid internal placeholder email (RFC-compliant)
+    const internalEmail = email || `${username}@example.com`;
 
     const { data, error } = await this.supabase.auth.signUp({
       email: internalEmail,
       password,
       options: {
-        data: { username, role, email: email ?? null, phone: phone ?? null }
+        data: {
+          username,
+          role,
+          email: email ?? null,  // optional real email
+          phone: phone ?? null
+        }
       }
     });
 
