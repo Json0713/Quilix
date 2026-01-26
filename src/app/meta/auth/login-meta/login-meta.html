@@ -1,34 +1,49 @@
-<section class="card">
-  <h2>Login</h2>
+<div class="container py-2 mt-2">
 
-  <form (ngSubmit)="submit()" novalidate>
-    <input
-      type="text"
-      [(ngModel)]="identifier"
-      name="identifier"
-      required
-      autocomplete="username email"
-      placeholder="Username or email"
-    />
+  <!-- Meta -->
+  <div class="meta p-2">
+    <a
+    routerLink="/meta"
+    title="Quilix"
+    >
+    <span>Quilix</span>
+    </a>
+  </div>
 
-    <input
-      type="password"
-      [(ngModel)]="password"
-      name="password"
-      required
-      autocomplete="current-password"
-      placeholder="Password"
-    />
+  <section class="card p-2 m-2">
+    <h2>Quilix Meta</h2>
 
-    @if (error) {
-      <p class="error" role="alert">{{ error }}</p>
-    }
+    <form (ngSubmit)="submit()" novalidate>
+      <input
+        class="m-2"
+        type="text"
+        [(ngModel)]="identifier"
+        name="identifier"
+        required
+        autocomplete="username email"
+        placeholder="Username or email"
+      />
 
-    <button type="submit" [disabled]="loading">
-      {{ loading ? 'Logging in…' : 'Login' }}
-    </button>
+      <input
+        class="m-2"
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        required
+        autocomplete="current-password"
+        placeholder="Password"
+      />
 
-  </form>
+      <button class="btn" type="submit" [disabled]="loading">
+        {{ loading ? 'Logging in…' : 'Login' }}
+      </button>
+      
+      @if (error) {
+        <p class="error text-danger" role="alert">{{ error }}</p>
+      }
 
-  <a routerLink="/meta/register">Create account</a>
-</section>
+    </form>
+
+    <a class="btn text-primary" routerLink="/meta/register">Create account</a>
+  </section>
+</div>
