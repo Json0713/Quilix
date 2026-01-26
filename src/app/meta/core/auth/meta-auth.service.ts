@@ -5,7 +5,8 @@ import { MetaUserRole } from '../../interfaces/meta-role';
 import { MetaAuthResult } from '../../interfaces/meta-auth-result';
 import { MetaUserProfile } from '../../interfaces/meta-user-profile';
 
-@Injectable({ providedIn: 'root' })
+@Injectable
+({ providedIn: 'root' })
 export class MetaAuthService {
 
   constructor(
@@ -24,7 +25,7 @@ export class MetaAuthService {
     username: string,
     password: string,
     role: MetaUserRole,
-    email: string,   // REQUIRED
+    email: string,   // Required
     phone?: string
   ): Promise<MetaAuthResult> {
     try {
@@ -86,13 +87,6 @@ export class MetaAuthService {
   }
 
   /**
-   * Logout user
-   */
-  async logout(): Promise<void> {
-    await this.supabase.auth.signOut();
-  }
-
-  /**
    * Restore session if exists
    */
   async restoreSession(): Promise<boolean> {
@@ -141,6 +135,13 @@ export class MetaAuthService {
     const { error } = await this.supabase.auth.admin.deleteUser(userData.user.id);
     if (error) return { success: false, error: error.message };
     return { success: true };
+  }
+
+  /**
+   * Logout user
+  */
+  async logout(): Promise<void> {
+    await this.supabase.auth.signOut();
   }
 
 }
