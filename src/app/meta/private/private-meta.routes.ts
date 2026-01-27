@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 
 import { PERSONAL_META_ROUTES } from './pages/personal-meta/personal-meta.routes';
 import { TEAM_META_ROUTES } from './pages/team-meta/team-meta.routes';
-import { MetaRoleGuard } from '../core/auth/meta-role.guard';
-import { MetaAuthGuard } from '../core/auth/meta-auth.guard';
+import { MetaRoleGuard } from '../core/guards/meta-role.guard';
+import { MetaAuthGuard } from '../core/guards/meta-auth.guard';
 
 export const PRIVATE_META_ROUTES: Routes = [
 
