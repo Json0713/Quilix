@@ -40,14 +40,14 @@ export class RegisterMeta {
       return;
     }
 
-    // Email validation
+    // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.email)) {
       this.error = 'Please enter a valid email address';
       return;
     }
 
-    // Password strength (basic)
+    // Basic password strength
     if (this.password.length < 8) {
       this.error = 'Password must be at least 8 characters';
       return;
@@ -55,12 +55,15 @@ export class RegisterMeta {
 
     this.loading = true;
 
+    // --- CALL META AUTH SERVICE (aligned with new signature) ---
     const result = await this.auth.register(
-      this.username,
+      this.email, // Supabase expects email first
       this.password,
-      this.role,
-      this.email,
-      this.phone || undefined
+      {
+        username: this.username,
+        role: this.role,
+        phone: this.phone || undefined
+      }
     );
 
     this.loading = false;
@@ -70,13 +73,13 @@ export class RegisterMeta {
       return;
     }
 
-    // Registration successful
+    // Success feedback
     this.success = 'Account created successfully. Please log in.';
 
-    // Redirect after short delay for UX
+    // Redirect after short delay
     setTimeout(() => {
       this.router.navigate(['/meta/login']);
-    }, 5200);
+    }, 5200); // 1.2s for better UX
   }
 
 }

@@ -3,7 +3,7 @@ import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { MetaAuthService } from '../../core/auth/meta-auth.service';
-import { MetaUserRole } from '../../interfaces/meta-role';
+import { MetaProfileService } from '../../core/auth/meta-profile.service';
 
 @Component({
   selector: 'app-login-meta',
@@ -14,13 +14,14 @@ import { MetaUserRole } from '../../interfaces/meta-role';
 })
 export class LoginMeta {
 
-  identifier = '';
+  identifier = ''; // email OR phone
   password = '';
   error: string | null = null;
   loading = false;
 
   constructor(
     private auth: MetaAuthService,
+    private profiles: MetaProfileService,
     private router: Router
   ) {}
 
@@ -30,26 +31,24 @@ export class LoginMeta {
 
     try {
       const result = await this.auth.login(this.identifier, this.password);
-
       if (!result.success) {
         this.error = result.error ?? 'Login failed';
         return;
       }
 
-      const user = await this.auth.getCurrentUser();
-      if (!user) {
-        this.error = 'User not found';
+      const profile = await this.profiles.getMyProfile();
+      if (!profile) {
+        this.error = 'Profile not found';
         return;
       }
 
       await this.router.navigate([
-        user.role === 'team' ? '/meta/team' : '/meta/personal'
+        profile.role === 'team' ? '/meta/team' : '/meta/personal'
       ]);
-    } catch (err: any) {
-      this.error = err?.message ?? 'Unexpected error';
+    } catch (e: any) {
+      this.error = e.message ?? 'Unexpected error';
     } finally {
       this.loading = false;
     }
   }
-
 }
