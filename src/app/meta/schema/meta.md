@@ -4,6 +4,7 @@ src/app/meta/
 ├── core/
 │   ├── auth/
 │   │   ├── meta-auth.service.ts      <-- Supabase login/register/logout/restore
+│   │   ├── meta-profile.service.ts
 │   │   
 │   │
 │   ├── config/

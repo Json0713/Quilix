@@ -14,41 +14,48 @@ import { MetaProfileService } from '../../core/auth/meta-profile.service';
 })
 export class LoginMeta {
 
-  identifier = ''; // email OR phone
+  email = '';
   password = '';
+
   error: string | null = null;
   loading = false;
 
   constructor(
-    private auth: MetaAuthService,
-    private profiles: MetaProfileService,
-    private router: Router
+    private readonly auth: MetaAuthService,
+    private readonly profiles: MetaProfileService,
+    private readonly router: Router
   ) {}
 
   async submit(): Promise<void> {
-    this.loading = true;
+    if (this.loading) return;
+
     this.error = null;
 
-    try {
-      const result = await this.auth.login(this.identifier, this.password);
-      if (!result.success) {
-        this.error = result.error ?? 'Login failed';
-        return;
-      }
-
-      const profile = await this.profiles.getMyProfile();
-      if (!profile) {
-        this.error = 'Profile not found';
-        return;
-      }
-
-      await this.router.navigate([
-        profile.role === 'team' ? '/meta/team' : '/meta/personal'
-      ]);
-    } catch (e: any) {
-      this.error = e.message ?? 'Unexpected error';
-    } finally {
-      this.loading = false;
+    if (!this.email || !this.password) {
+      this.error = 'Email and password are required';
+      return;
     }
+
+    this.loading = true;
+
+    const result = await this.auth.login(this.email, this.password);
+
+    if (!result.success) {
+      this.loading = false;
+      this.error = result.error ?? 'Login failed';
+      return;
+    }
+
+    const profile = await this.profiles.requireProfile();
+
+    if (!profile) {
+      this.loading = false;
+      this.error = 'Profile not found';
+      return;
+    }
+
+    await this.router.navigate([
+      profile.role === 'team' ? '/meta/team' : '/meta/personal'
+    ]);
   }
 }

@@ -1,1 +1,9 @@
 <p>personal meta works!</p>
+
+<button class="btn btn-danger rounded-5" (click)="logout()" [disabled]="loading">
+  @if (loading) {
+    Logging out…
+  } @else {
+    Logout
+  }
+</button>

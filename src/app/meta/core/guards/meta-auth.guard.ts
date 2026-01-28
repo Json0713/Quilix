@@ -6,12 +6,12 @@ import { MetaAuthService } from '../auth/meta-auth.service';
 export class MetaAuthGuard implements CanActivate {
 
   constructor(
-    private auth: MetaAuthService,
-    private router: Router
+    private readonly auth: MetaAuthService,
+    private readonly router: Router
   ) {}
 
   async canActivate(): Promise<boolean | UrlTree> {
-    const user = await this.auth.getAuthUser();
+    const user = await this.auth.requireUser();
 
     if (!user) {
       return this.router.createUrlTree(['/meta/login']);
@@ -19,5 +19,4 @@ export class MetaAuthGuard implements CanActivate {
 
     return true;
   }
-
 }

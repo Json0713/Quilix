@@ -5,19 +5,17 @@ import { PUBLIC_META_ROUTES } from './public/public-meta.routes';
 import { MetaAuthGuard } from './core/guards/meta-auth.guard';
 
 export const META_ROUTES: Routes = [
-
-    {
-        path: '',
-        children: PUBLIC_META_ROUTES
-    },
-    {
-        path: '',
-        canActivate: [MetaAuthGuard],
-        children: PRIVATE_META_ROUTES
-    },
-    {
-        path: '**',
-        redirectTo: ''
-    }
-
+  {
+    path: '',
+    children: PUBLIC_META_ROUTES
+  },
+  {
+    path: '',
+    canActivate: [MetaAuthGuard],
+    children: PRIVATE_META_ROUTES
+  },
+  {
+    path: '**',
+    redirectTo: ''
+  }
 ];

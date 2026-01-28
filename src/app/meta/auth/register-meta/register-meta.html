@@ -1,87 +1,107 @@
-<div class="container py-2 mt-2">
+<form
+  class="register-meta"
+  (ngSubmit)="submit()"
+  #form="ngForm"
+  novalidate
+>
 
-  <!-- Meta -->
-  <div class="meta p-2">
-    <a
-    routerLink="/meta"
-    title="Quilix"
-    >
-    <span>Quilix</span>
-    </a>
-  </div>
+  <h1>Create account</h1>
 
-  <section class="card p-2 mt-2">
-    <h2>Create account</h2>
+  @if (error) {
+    <p class="error">
+      {{ error }}
+    </p>
+  }
 
-    <form (ngSubmit)="submit()" #form="ngForm" novalidate>
+  <!-- Username -->
+  <label>
+    <span>Username</span>
+    <input
+      type="text"
+      name="username"
+      [(ngModel)]="username"
+      required
+      autocomplete="username"
+    />
+  </label>
 
+  <!-- Email -->
+  <label>
+    <span>Email</span>
+    <input
+      type="email"
+      name="email"
+      [(ngModel)]="email"
+      required
+      autocomplete="email"
+    />
+  </label>
+
+  <!-- Password -->
+  <label>
+    <span>Password</span>
+    <input
+      type="password"
+      name="password"
+      [(ngModel)]="password"
+      required
+      minlength="8"
+      autocomplete="new-password"
+    />
+  </label>
+
+  <!-- Phone (optional, profile only) -->
+  <label>
+    <span>Phone (optional)</span>
+    <input
+      type="tel"
+      name="phone"
+      [(ngModel)]="phone"
+      autocomplete="tel"
+    />
+  </label>
+
+  <!-- Role -->
+  <fieldset>
+    <legend>Account type</legend>
+
+    <label>
       <input
-        class="m-2"
-        type="text"
-        name="username"
-        [(ngModel)]="username"
-        required
-        minlength="3"
-        placeholder="Username"
-        autocomplete="username"
+        type="radio"
+        name="role"
+        value="personal"
+        [(ngModel)]="role"
       />
+      Personal
+    </label>
 
+    <label>
       <input
-        class="m-2"
-        type="email"
-        name="email"
-        [(ngModel)]="email"
-        required
-        placeholder="Email address"
-        autocomplete="email"
+        type="radio"
+        name="role"
+        value="team"
+        [(ngModel)]="role"
       />
+      Team
+    </label>
+  </fieldset>
 
-      <input
-        class="m-2"
-        type="password"
-        name="password"
-        [(ngModel)]="password"
-        required
-        minlength="8"
-        placeholder="Password (min 8 characters)"
-        autocomplete="new-password"
-      />
+  <!-- Submit -->
+  <button
+    type="submit"
+    [disabled]="loading || form.invalid"
+  >
+    @if (loading) {
+      Creating account…
+    } @else {
+      Create account
+    }
+  </button>
 
-      <input
-        class="m-2"
-        type="tel"
-        name="phone"
-        [(ngModel)]="phone"
-        placeholder="Phone (optional)"
-        autocomplete="tel"
-      />
+  <!-- Login link -->
+  <p class="login-link">
+    Already have an account?
+    <a routerLink="/meta/login">Log in</a>
+  </p>
 
-      <select class="m-2" name="role" [(ngModel)]="role">
-        <option value="personal">Personal</option>
-        <option value="team">Team</option>
-      </select>
-
-      <button
-        class="m-2"
-        type="submit"
-        [disabled]="loading || form.invalid"
-      >
-        {{ loading ? 'Creating account…' : 'Register' }}
-      </button>
-
-      @if (error) {
-        <p class="error text-danger">{{ error }}</p>
-      }
-
-      @if (success) {
-        <p class="success text-success">{{ success }}</p>
-      }
-
-    </form>
-
-    <a class="btn text-primary" routerLink="/meta/login">
-      Already have an account? Log in
-    </a>
-  </section>
-</div>
-
+</form>

@@ -1,49 +1,58 @@
-<div class="container py-2 mt-2">
+<form
+  class="login-meta"
+  (ngSubmit)="submit()"
+  #form="ngForm"
+  novalidate
+>
 
-  <!-- Meta -->
-  <div class="meta p-2">
-    <a
-    routerLink="/meta"
-    title="Quilix"
-    >
-    <span>Quilix</span>
-    </a>
-  </div>
+  <h1>Log in</h1>
 
-  <section class="card p-2 m-2">
-    <h2>Quilix Meta</h2>
+  <!-- Error message -->
+  @if (error) {
+    <p class="error">{{ error }}</p>
+  }
 
-    <form (ngSubmit)="submit()" novalidate>
-      <input
-        class="m-2"
-        type="text"
-        [(ngModel)]="identifier"
-        name="identifier"
-        required
-        autocomplete="username email"
-        placeholder="Username or email"
-      />
+  <!-- Email -->
+  <label>
+    <span>Email</span>
+    <input
+      type="email"
+      name="email"
+      [(ngModel)]="email"
+      required
+      autocomplete="email"
+    />
+  </label>
 
-      <input
-        class="m-2"
-        type="password"
-        [(ngModel)]="password"
-        name="password"
-        required
-        autocomplete="current-password"
-        placeholder="Password"
-      />
+  <!-- Password -->
+  <label>
+    <span>Password</span>
+    <input
+      type="password"
+      name="password"
+      [(ngModel)]="password"
+      required
+      minlength="8"
+      autocomplete="current-password"
+    />
+  </label>
 
-      <button class="btn" type="submit" [disabled]="loading">
-        {{ loading ? 'Logging in…' : 'Login' }}
-      </button>
-      
-      @if (error) {
-        <p class="error text-danger" role="alert">{{ error }}</p>
-      }
+  <!-- Submit button -->
+  <button
+    type="submit"
+    [disabled]="loading || form.invalid"
+  >
+    @if (loading) {
+      Logging in…
+    } @else {
+      Log in
+    }
+  </button>
 
-    </form>
+  <!-- Register link -->
+  <p class="register-link">
+    Don't have an account?
+    <a routerLink="/meta/register">Sign up</a>
+  </p>
 
-    <a class="btn text-primary" routerLink="/meta/register">Create account</a>
-  </section>
-</div>
+</form>

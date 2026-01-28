@@ -4,6 +4,7 @@ import { TeamMetaTemplate } from './template/template';
 import { TeamMetaIndex } from './index/index';
 
 export const TEAM_META_ROUTES: Routes = [
+  
   {
     path: '',
     component: TeamMetaTemplate,
@@ -12,8 +13,7 @@ export const TEAM_META_ROUTES: Routes = [
         path: '',
         component: TeamMetaIndex
       }
-      // future:
-      // { path: 'tasks', component: Team Meta Tasks }
     ]
   }
+
 ];
