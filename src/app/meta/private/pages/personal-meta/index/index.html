@@ -1,6 +1,12 @@
-<p>personal meta works!</p>
+<h2>Welcome, {{ username() }} </h2>
 
-<button class="btn btn-danger rounded-5" (click)="logout()" [disabled]="loading">
+<p>Personal dashboard</p>
+
+<button
+  class="btn btn-danger rounded-5"
+  (click)="logout()"
+  [disabled]="loading"
+>
   @if (loading) {
     Logging out…
   } @else {

@@ -1,5 +1,12 @@
-<p>team meta works!</p>
-<button class="btn btn-danger rounded-5" (click)="logout()" [disabled]="loading">
+<h2>Welcome, {{ username() }} </h2>
+
+<p>Team dashboard</p>
+
+<button
+  class="btn btn-danger rounded-5"
+  (click)="logout()"
+  [disabled]="loading"
+>
   @if (loading) {
     Logging out…
   } @else {

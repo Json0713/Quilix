@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, computed } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+
 import { MetaAuthService } from '../../../../core/auth/meta-auth.service';
-import { Router } from '@angular/router';
 import { MetaProfileService } from '../../../../core/auth/meta-profile.service';
 
 @Component({
   selector: 'personal-meta-index',
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
@@ -13,9 +14,14 @@ export class PersonalMetaIndex {
 
   loading = false;
 
+  // Reactive State
+  readonly username = computed(
+    () => this.profiles.profile()?.username ?? ''
+  );
+
   constructor(
     private readonly auth: MetaAuthService,
-    private readonly profiles: MetaProfileService, // <-- inject
+    private readonly profiles: MetaProfileService,
     private readonly router: Router
   ) {}
 
@@ -25,11 +31,12 @@ export class PersonalMetaIndex {
     this.loading = true;
 
     try {
-      await this.auth.logout();          // Supabase signOut
-      this.profiles.clear();             // Clear cached profile
+      await this.auth.logout(); // Supabase signOut
+      this.profiles.clear();    // Clear cached profile
       await this.router.navigate(['/meta/login']);
     } finally {
       this.loading = false;
     }
   }
+
 }
