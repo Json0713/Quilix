@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { CanActivate, Router, UrlTree } from '@angular/router';
 import { MetaAuthService } from '../auth/meta-auth.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ 
+  providedIn: 'root' 
+})
 export class MetaAuthGuard implements CanActivate {
 
   constructor(

@@ -6,7 +6,9 @@ import { MetaUserProfile } from '../../interfaces/meta-user-profile';
 import { MetaAuthService } from './meta-auth.service';
 import { MetaUserRole } from '../../interfaces/meta-role';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ 
+  providedIn: 'root' 
+})
 export class MetaProfileService {
 
   private readonly profileSignal = signal<MetaUserProfile | null>(null);

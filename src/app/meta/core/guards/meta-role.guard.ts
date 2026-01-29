@@ -5,7 +5,9 @@ import { MetaProfileService } from '../auth/meta-profile.service';
 import { MetaAuthService } from '../auth/meta-auth.service';
 import { MetaUserRole } from '../../interfaces/meta-role';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root' 
+})
 export class MetaRoleGuard implements CanActivate {
 
   constructor(
