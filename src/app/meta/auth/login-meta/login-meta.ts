@@ -56,6 +56,9 @@ export class LoginMeta {
 
     await this.router.navigate([
       profile.role === 'team' ? '/meta/team' : '/meta/personal'
-    ]);
+    ], 
+      { replaceUrl: true } 
+    );
   }
+
 }
