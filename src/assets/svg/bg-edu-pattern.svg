@@ -40,23 +40,13 @@
       />
     </g>
     
-    <!-- Tab UI -->
-    <g transform="translate(110 130) rotate(-9)">
-      <path
-        d="
-          M4 14
-          Q4 8 10 8
-          H22
-          L28 2
-          H40
-          Q46 2 46 8
-          V26
-          Q46 32 40 32
-          H10
-          Q4 32 4 26
-          Z
-        "
-      />
+    <!-- Grad Cap -->
+    <g transform="translate(110 130) rotate(-10)">
+      <path d="
+        M4 16 L24 8 L44 16 L24 24 Z
+      "/>
+      <line x1="25" y1="24" x2="24" y2="32"/>
+      <circle cx="24" cy="32" r="2"/>
     </g>
 
     <!-- Note card -->
