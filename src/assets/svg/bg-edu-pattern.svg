@@ -41,7 +41,7 @@
     </g>
     
     <!-- Tab UI -->
-    <g transform="translate(101 125) rotate(-3)">
+    <g transform="translate(110 125) rotate(-3)">
       <path
         d="
           M4 14
@@ -60,25 +60,25 @@
     </g>
 
     <!-- Note card -->
-    <g transform="translate(128 96) rotate(-6)">
+    <g transform="translate(120 90) rotate(-6)">
       <rect x="0" y="0" width="30" height="22" rx="9"/>
       <line x1="7" y1="9" x2="23" y2="9"/>
       <line x1="7" y1="15" x2="19" y2="15"/>
     </g>
 
     <!-- UI pill -->
-    <g transform="translate(66 70) rotate(10)">
+    <g transform="translate(75 70) rotate(17)">
       <rect x="0" y="0" width="28" height="12" rx="7"/>
       <circle cx="6" cy="6" r="1.5"/>
     </g>
 
     <!-- Micro motion curves (softer & centered) -->
-    <path d="M120 76 q12 8 26 0"/>
-    <path d="M32 84 q28 -8 28 10"/>
+    <path d="M120 71 q12 8 26 0"/>
+    <path d="M32 79 q28 -8 28 10"/>
 
     <!-- Balanced floating dots -->
-    <circle cx="52" cy="56" r="2"/>
-    <circle cx="118" cy="120" r="2"/>
+    <circle cx="75" cy="56" r="2"/>
+    <circle cx="105" cy="110" r="2"/>
     <circle cx="40" cy="124" r="2"/>
     <circle cx="136" cy="52" r="1.5"/>
     <circle cx="28" cy="99" r="1.5"/>
