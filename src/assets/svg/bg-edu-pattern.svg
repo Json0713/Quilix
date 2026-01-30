@@ -21,7 +21,7 @@
       <polyline points="5,11 9,15 15,7"/>
     </g>
 
-    <!-- Folder (fully rounded, smooth Bezier) -->
+    <!-- Folder -->
     <g transform="translate(24 98) rotate(4)">
       <path
         d="
