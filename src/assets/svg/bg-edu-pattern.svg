@@ -15,6 +15,40 @@
       <line x1="7" y1="32" x2="18" y2="32"/>
     </g>
 
+    <!-- Paperclip -->
+    <g transform="translate(40 40) rotate(-67)">
+      <path d="
+        M8 6
+        v14
+        a6 6 0 0 0 12 0
+        v-14
+        a4 4 0 0 0 -8 0
+        v13
+        a2 2 0 0 0 4 0
+        v-12
+      "/>
+    </g>
+
+    <!-- Pencil -->
+    <g transform="translate(78 10) rotate(-18)">
+      <rect x="2" y="2" width="16" height="6" rx="3"/>
+      <path d="M18 2 L22 5 L18 8 Z"/>
+      <line x1="4" y1="5" x2="14" y2="5"/>
+    </g>
+
+    <!-- Pen nib -->
+    <g transform="translate(125 26) rotate(-42)">
+      <path d="M6 0 L12 6 L6 18 L0 6 Z"/>
+      <circle cx="6" cy="8" r="1"/>
+    </g>
+
+    <!-- Micro clock -->
+    <g transform="translate(5 95) rotate(-2)">
+      <circle cx="6" cy="6" r="5"/>
+      <path d="M6 6 v-3"/>
+      <path d="M6 6 h3"/>
+    </g>
+
     <!-- Checklist -->
     <g transform="translate(96 28) rotate(6)">
       <rect x="0" y="0" width="20" height="20" rx="9"/>
