@@ -62,7 +62,16 @@
   flex-direction: column;
 
   // background-color: #353434;
-  background: linear-gradient(160deg, var(--primary), var(--primary-soft));
+  // background: linear-gradient(160deg, var(--primary), var(--primary-soft));
+
+  background:
+    url('/assets/svg/bg-edu-pattern.svg') repeat,
+    #353434;
+
+  background-size: 160px 160px, cover;
+
+
+
   font-family: Inter, Arial, Helvetica, sans-serif;
 }
 

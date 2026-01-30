@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <g
+    fill="none"
+    stroke="rgba(255,255,255,0.04)"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <!-- Document (rounded, tilted) -->
+    <g transform="translate(18 22) rotate(-6)">
+      <rect x="0" y="0" width="30" height="38" rx="6"/>
+      <line x1="6" y1="10" x2="24" y2="10"/>
+      <line x1="6" y1="18" x2="20" y2="18"/>
+    </g>
+
+    <!-- Checklist -->
+    <g transform="translate(98 26) rotate(5)">
+      <rect x="0" y="0" width="18" height="18" rx="5"/>
+      <polyline points="4,10 8,14 14,6"/>
+    </g>
+
+    <!-- Folder (rounded & soft) -->
+    <g transform="translate(24 96) rotate(4)">
+      <path d="M0 6 h16 l4 6 h30 v22 h-50 z" rx="6"/>
+    </g>
+
+    <!-- Note card -->
+    <g transform="translate(94 92) rotate(-8)">
+      <rect x="0" y="0" width="28" height="20" rx="6"/>
+      <line x1="6" y1="8" x2="22" y2="8"/>
+      <line x1="6" y1="14" x2="18" y2="14"/>
+    </g>
+
+    <!-- Floating dots (visual balance) -->
+    <circle cx="60" cy="58" r="2"/>
+    <circle cx="132" cy="132" r="2"/>
+    <circle cx="42" cy="130" r="2"/>
+  </g>
+</svg>
