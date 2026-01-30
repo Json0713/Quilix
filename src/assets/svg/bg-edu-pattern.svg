@@ -1,39 +1,87 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
   <g
     fill="none"
-    stroke="rgba(255,255,255,0.04)"
+    stroke="rgba(255,255,255,0.05)"
     stroke-width="1"
     stroke-linecap="round"
     stroke-linejoin="round"
   >
-    <!-- Document (rounded, tilted) -->
-    <g transform="translate(18 22) rotate(-6)">
-      <rect x="0" y="0" width="30" height="38" rx="6"/>
-      <line x1="6" y1="10" x2="24" y2="10"/>
-      <line x1="6" y1="18" x2="20" y2="18"/>
+
+    <!-- Document card -->
+    <g transform="translate(20 22) rotate(-6)">
+      <rect x="0" y="0" width="32" height="42" rx="10"/>
+      <line x1="7" y1="14" x2="26" y2="14"/>
+      <line x1="7" y1="24" x2="22" y2="24"/>
+      <line x1="7" y1="32" x2="18" y2="32"/>
     </g>
 
     <!-- Checklist -->
-    <g transform="translate(98 26) rotate(5)">
-      <rect x="0" y="0" width="18" height="18" rx="5"/>
-      <polyline points="4,10 8,14 14,6"/>
+    <g transform="translate(96 28) rotate(6)">
+      <rect x="0" y="0" width="20" height="20" rx="9"/>
+      <polyline points="5,11 9,15 15,7"/>
     </g>
 
-    <!-- Folder (rounded & soft) -->
-    <g transform="translate(24 96) rotate(4)">
-      <path d="M0 6 h16 l4 6 h30 v22 h-50 z" rx="6"/>
+    <!-- Folder (fully rounded, smooth Bezier) -->
+    <g transform="translate(24 98) rotate(4)">
+      <path
+        d="
+          M4 12
+          Q4 6 10 6
+          H28
+          L36 14
+          H58
+          Q64 14 64 20
+          V44
+          Q64 50 58 50
+          H10
+          Q4 50 4 44
+          Z
+        "
+      />
+    </g>
+    
+    <!-- Tab UI -->
+    <g transform="translate(101 125) rotate(-3)">
+      <path
+        d="
+          M4 14
+          Q4 8 10 8
+          H22
+          L28 2
+          H40
+          Q46 2 46 8
+          V26
+          Q46 32 40 32
+          H10
+          Q4 32 4 26
+          Z
+        "
+      />
     </g>
 
     <!-- Note card -->
-    <g transform="translate(94 92) rotate(-8)">
-      <rect x="0" y="0" width="28" height="20" rx="6"/>
-      <line x1="6" y1="8" x2="22" y2="8"/>
-      <line x1="6" y1="14" x2="18" y2="14"/>
+    <g transform="translate(128 96) rotate(-6)">
+      <rect x="0" y="0" width="30" height="22" rx="9"/>
+      <line x1="7" y1="9" x2="23" y2="9"/>
+      <line x1="7" y1="15" x2="19" y2="15"/>
     </g>
 
-    <!-- Floating dots (visual balance) -->
-    <circle cx="60" cy="58" r="2"/>
-    <circle cx="132" cy="132" r="2"/>
-    <circle cx="42" cy="130" r="2"/>
+    <!-- UI pill -->
+    <g transform="translate(66 70) rotate(10)">
+      <rect x="0" y="0" width="28" height="12" rx="7"/>
+      <circle cx="6" cy="6" r="1.5"/>
+    </g>
+
+    <!-- Micro motion curves (softer & centered) -->
+    <path d="M120 76 q12 8 26 0"/>
+    <path d="M32 84 q28 -8 28 10"/>
+
+    <!-- Balanced floating dots -->
+    <circle cx="52" cy="56" r="2"/>
+    <circle cx="118" cy="120" r="2"/>
+    <circle cx="40" cy="124" r="2"/>
+    <circle cx="136" cy="52" r="1.5"/>
+    <circle cx="28" cy="99" r="1.5"/>
+
   </g>
 </svg>
