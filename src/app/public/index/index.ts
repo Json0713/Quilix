@@ -3,16 +3,18 @@ import { RouterModule } from '@angular/router';
 import { Header } from '../common/header/header';
 import { Footer } from '../common/footer/footer';
 import { QuilixVersionService } from '../../core/quilix-installer/version/quilix-version.service';
+import { ThemeToggle } from '../../shared/ui/system/theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-public-index',
-  imports: [RouterModule, Header, Footer],
+  imports: [RouterModule, ThemeToggle, Header, Footer],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
 export class PublicIndex {
 
-  constructor(public version: QuilixVersionService) {}
+  constructor(
+    public version: QuilixVersionService
+  ) {}
 
-  
 }

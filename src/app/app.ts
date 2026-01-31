@@ -1,5 +1,6 @@
 import { Component, signal, inject } from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
+import { AppThemeService } from './core/theme/app-theme/app-theme.service';
 
 import { NetworkStatus } from './shared/ui/system/network-status/network-status';
 import { NetworkService } from './core/quilix-installer/network/network.service';
@@ -24,10 +25,12 @@ export class App {
 
   private toastRelay = inject(ToastRelayService);
   private updates = inject(QuilixUpdateService);
+  private theme = inject(AppThemeService);
 
   constructor() {
     this.toastRelay.consume();
     this.updates.init();
+    this.theme.init();
   }
 
 }

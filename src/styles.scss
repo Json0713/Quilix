@@ -1,5 +1,57 @@
 /* You can add global styles to this file, and also import other style files */
-/* =============== CHROME-LIKE OVERLAY SCROLLBAR =============== */
+
+:root {
+  --primary: #1a3a3f;
+  --primary-soft: #244f55;
+
+  /* DEFAULT = DARK */
+  --app-bg: #2B2A2A;
+}
+
+/* Explicit Light */
+html.theme-light {
+  --app-bg: linear-gradient(
+    160deg,
+    var(--primary),
+    var(--primary-soft)
+  );
+}
+
+/* Explicit Dark */
+html.theme-dark {
+  --app-bg: #2B2A2A;
+}
+
+/* System Preference */
+@media (prefers-color-scheme: light) {
+  html:not(.theme-light):not(.theme-dark) {
+    --app-bg: linear-gradient(
+      160deg,
+      var(--primary),
+      var(--primary-soft)
+    );
+  }
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--app-bg);
+}
+
+/* Motion-safe fade variable */
+:root {
+  --theme-fade-duration: 300ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --theme-fade-duration: 0ms;
+  }
+}
+
+/* =============== OVERLAY SCROLLBAR =============== */
 /* Firefox */
 html,
 body,

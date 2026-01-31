@@ -1,0 +1,25 @@
+<div class="theme-toggle btn-group">
+  <button
+    class="btn"
+    [class.active]="theme.isLight()"
+    (click)="set('light')"
+  >
+    Light
+  </button>
+
+  <button
+    class="btn"
+    [class.active]="theme.isDark()"
+    (click)="set('dark')"
+  >
+    Dark
+  </button>
+
+  <button
+    class="btn"
+    [class.active]="theme.isSystem()"
+    (click)="set('system')"
+  >
+    System
+  </button>
+</div>

@@ -1,0 +1,13 @@
+.theme-toggle {
+  .btn {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-main);
+    transition: background 250ms ease, color 250ms ease;
+
+    &.active {
+      background: var(--primary);
+      color: var(--text-white);
+    }
+  }
+}
