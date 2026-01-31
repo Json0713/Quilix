@@ -61,12 +61,17 @@
   display: flex;
   flex-direction: column;
 
+  /* Pattern + theme color */
   background:
     url('/assets/svg/bg-edu-pattern.svg') repeat,
     var(--app-bg);
 
   background-size: 160px 160px, cover;
+
   font-family: Inter, Arial, Helvetica, sans-serif;
+
+  /* Transition applied at container level */
+  transition: background-color var(--theme-transition) ease;
 }
 
 .app {

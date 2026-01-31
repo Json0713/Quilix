@@ -1,33 +1,50 @@
 /* You can add global styles to this file, and also import other style files */
 
 :root {
+  /* App colors */
+  --app-bg-dark: #2B2A2A;
+  --app-bg-light: #1a3a3f;
+
   /* Default = system fallback = dark */
-  --app-bg: #2B2A2A;
+  --app-bg: var(--app-bg-dark);
+
+  /* Motion-safe duration */
+  --theme-transition: 300ms;
 }
 
-/* Light Theme */
+/* Explicit Light */
 html.theme-light {
-  --app-bg: #1a3a3f;
+  --app-bg: var(--app-bg-light);
 }
 
-/* Dark Theme */
+/* Explicit Dark */
 html.theme-dark {
-  --app-bg: #2B2A2A;
+  --app-bg: var(--app-bg-dark);
 }
 
 /* System Preference fallback */
 @media (prefers-color-scheme: light) {
   html:not(.theme-light):not(.theme-dark) {
-    --app-bg: var(--app-prim);
+    --app-bg: var(--app-bg-light);
   }
 }
 
-/* Base styles */
+/* Base document styling */
 html,
 body {
   min-height: 100%;
   margin: 0;
-  background: var(--app-bg);
+  background-color: var(--app-bg);
+
+  /* SAFE transition: color only */
+  transition: background-color var(--theme-transition) ease;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --theme-transition: 0ms;
+  }
 }
 
 /* =============== OVERLAY SCROLLBAR =============== */
