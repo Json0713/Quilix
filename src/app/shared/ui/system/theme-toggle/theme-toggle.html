@@ -1,14 +1,16 @@
-<div class="theme-toggle btn-group">
+<div class="theme-toggle" role="group" aria-label="Theme selector">
   <button
-    class="btn"
+    type="button"
+    class="segment"
     [class.active]="theme.isLight()"
     (click)="set('light')"
   >
-    Light
+    App
   </button>
 
   <button
-    class="btn"
+    type="button"
+    class="segment"
     [class.active]="theme.isDark()"
     (click)="set('dark')"
   >
@@ -16,7 +18,8 @@
   </button>
 
   <button
-    class="btn"
+    type="button"
+    class="segment"
     [class.active]="theme.isSystem()"
     (click)="set('system')"
   >
