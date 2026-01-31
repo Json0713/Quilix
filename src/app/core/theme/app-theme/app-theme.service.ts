@@ -8,9 +8,9 @@ export class AppThemeService {
   private readonly storageKey = 'app-theme';
   readonly theme = signal<ThemeMode>('system'); // default = system
 
+  readonly isSystem = computed(() => this.theme() === 'system');
   readonly isLight = computed(() => this.theme() === 'light');
   readonly isDark = computed(() => this.theme() === 'dark');
-  readonly isSystem = computed(() => this.theme() === 'system');
 
   private mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -55,7 +55,7 @@ export class AppThemeService {
     const metaTag = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement;
     if (!metaTag) return;
 
-    const color = mode === 'light' ? '#1a3a3f' : '#2B2A2A';
+    const color = mode === 'light' ? '#10373c' : '#232222';
     metaTag.setAttribute('content', color);
   }
 }
