@@ -72,11 +72,13 @@
       font-size: 0.75rem;
 
       &:hover {
-        background: #eef6ff7c;
+        color: var(--primary);
+        background: #3f8e940d;
       }
 
       &.active {
-        background: #eef6ff;
+        color: var(--primary);
+        background: #3f8e9447;
         font-weight: 500;
       }
     }
@@ -119,7 +121,7 @@
   strong {
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--text-main);
+    color: var(--primary);
   }
 
   .file-name {
@@ -144,35 +146,6 @@
 
   &:active {
     transform: scale(0.99);
-  }
-}
-
-/* FILE PREVIEW */
-.import-preview {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: 14px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-
-  i {
-    font-size: 1.25rem;
-    color: var(--primary);
-  }
-
-  strong {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-main);
-  }
-
-  small {
-    display: block;
-    font-size: 0.7rem;
-    color: var(--text-muted);
   }
 }
 

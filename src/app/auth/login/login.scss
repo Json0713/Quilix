@@ -401,7 +401,7 @@
   strong {
     display: block;
     font-size: 0.9rem;
-    color: var(--text-main);
+    color: var(--primary);
 
     white-space: nowrap;
     overflow: hidden;
@@ -475,7 +475,7 @@
 .import-trigger {
   display: inline-flex;
   align-items: center;
-  color: var(--action-soft);
+  color: var(--action-text);
   background-color: var(--action);
   gap: 0.45rem;
 
@@ -492,19 +492,19 @@
     box-shadow 0.12s ease;
 
   i {
-    color: var(--action-soft);
+    color: var(--action-text);
     font-size: 1.2rem;
   }
 
   &:hover {
-    color: var(--action-soft);
+    color: var(--action-text);
     transform: translateY(-1px);
     outline: 3px solid rgba(63, 186, 194, 0.35);
     background-color: var(--action-hover);
   }
 
   &:active {
-    color: var(--action-soft);
+    color: var(--action-text);
     transform: translateY(0);
     box-shadow: none;
     background-color: var(--action-hover);

@@ -45,7 +45,7 @@
 .preview-card {
   // background: var(--surface);
   border-radius: 1.25rem;
-  padding: 1rem;
+  padding: 0.2rem;
   // box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
@@ -70,7 +70,7 @@
 .preview-viewport {
   overflow: hidden;
   margin: 10px 0 2px 0;
-  padding: 10px;
+  padding: 2px;
   border-radius: 15px;
 }
 
@@ -134,7 +134,7 @@
 .primary-action {
   display: inline-flex;
   justify-content: center;
-  width: 440px;
+  max-width: 440px;
   background: var(--surface);
   color: var(--text-main);
   padding: 0.85rem 1.75rem;
@@ -151,7 +151,7 @@
 
 .primary-action:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.225);
 }
 
 .primary-action:active {
@@ -175,7 +175,7 @@
 @media (min-width: 768px) {
   .preview-card,
   .workspace-start-button {
-    max-width: 540px;
+    max-width: 450px;
     margin-left: auto;
     margin-right: auto;
   }
