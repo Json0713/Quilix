@@ -44,7 +44,7 @@
   --btn-ghost-hover: var(--action-soft);
 
   /* ===== Inputs ===== */
-  --input-bg: #ffffff;
+  --input-bg: var(--surface);
   --input-border: var(--border);
   --input-focus: var(--accent);
   --input-text: var(--text-main);
@@ -56,24 +56,23 @@
   --danger: #d9534f;
 }
 
+/* ===== App Root Container ===== */
 .app-root {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  font-family: Inter, Arial, Helvetica, sans-serif;
 
-  /* Pattern + theme color */
+  /* Pattern + theme background */
   background:
     url('/assets/svg/bg-edu-pattern.svg') repeat,
     var(--app-bg);
-
   background-size: 160px 160px, cover;
 
-  font-family: Inter, Arial, Helvetica, sans-serif;
-
-  /* Transition applied at container level */
   transition: background-color var(--theme-transition) ease;
 }
 
+/* ===== App Layout ===== */
 .app {
   flex: 1;
   display: flex;
@@ -82,6 +81,7 @@
   min-height: 0;
 }
 
+/* ===== Router Outlet ===== */
 router-outlet {
   display: none;
 }

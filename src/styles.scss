@@ -1,46 +1,41 @@
-/* You can add global styles to this file, and also import other style files */
-
 :root {
-  /* App colors */
+  /* ===== App Backgrounds ===== */
   --app-bg-dark: #2B2A2A;
   --app-bg-light: #1a3a3f;
 
-  /* Default = system fallback = dark */
+  /* Default fallback = dark */
   --app-bg: var(--app-bg-dark);
 
-  /* Motion-safe duration */
+  /* ===== Motion ===== */
   --theme-transition: 300ms;
 }
 
-/* Explicit Light */
+/* ===== Explicit Themes ===== */
 html.theme-light {
   --app-bg: var(--app-bg-light);
 }
 
-/* Explicit Dark */
 html.theme-dark {
   --app-bg: var(--app-bg-dark);
 }
 
-/* System Preference fallback */
+/* ===== System Preference Fallback ===== */
 @media (prefers-color-scheme: light) {
   html:not(.theme-light):not(.theme-dark) {
     --app-bg: var(--app-bg-light);
   }
 }
 
-/* Base document styling */
+/* ===== Base Document Styling ===== */
 html,
 body {
   min-height: 100%;
   margin: 0;
   background-color: var(--app-bg);
-
-  /* SAFE transition: color only */
   transition: background-color var(--theme-transition) ease;
 }
 
-/* Respect reduced motion */
+/* ===== Respect Reduced Motion ===== */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --theme-transition: 0ms;
