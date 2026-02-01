@@ -1,36 +1,37 @@
 <div class="container">
 
-  <!-- Meta -->
-  <div class="meta">
-    <a
-      routerLink="/meta"
-      title="Back Home"
-    >
-    <span>Meta</span>
+  <!-- Meta Navigation -->
+  <nav class="meta" aria-label="Meta Navigation">
+    <a routerLink="/meta" title="Back Home">
+      <span>Meta</span>
     </a>
-  </div>
+  </nav>
 
-  <app-theme-toggle />
+  <!-- Theme Toggle -->
+  <app-theme-toggle/>
 
-  <app-header></app-header>
+  <!-- Header -->
+  <header>
+    <app-header/>
+  </header>
 
   <!-- Preview Controls -->
-  <div class="preview-controls">
+  <section class="preview-controls" aria-label="Preview Actions">
     <!-- GitHub Button -->
     <a
       href="https://github.com/Json0713"
       target="_blank"
-      rel="noopener"
+      rel="noopener noreferrer"
       class="control-btn"
       aria-label="View Author on GitHub"
       title="View Author on GitHub"
     >
-      <i class="bi bi-github"></i>
+      <i class="bi bi-github" aria-hidden="true"></i>
     </a>
-  </div>
+  </section>
 
-  <!-- Preview Card -->
-  <section class="preview-card">
+  <!-- Preview Card Section -->
+  <main class="preview-card" aria-label="Kanban Preview">
     <div class="preview-header">
       <span class="badge">Kanban</span>
       <span class="badge">Tasks</span>
@@ -38,62 +39,62 @@
       <span class="badge">Projects</span>
     </div>
 
-    <!-- Animated Columns ONLY -->
+    <!-- Animated Columns -->
     <div class="preview-viewport">
       <div class="preview-track">
 
         <!-- SET 1 -->
-        <div class="column">
+        <article class="column" aria-label="To Do Column">
           <h4>To Do</h4>
           <div class="task"></div>
           <div class="task muted"></div>
-        </div>
+        </article>
 
-        <div class="column">
+        <article class="column" aria-label="In Progress Column">
           <h4>In Progress</h4>
           <div class="task"></div>
-        </div>
+        </article>
 
-        <div class="column">
+        <article class="column" aria-label="Done Column">
           <h4>Done</h4>
           <div class="task done"></div>
-        </div>
+        </article>
 
         <!-- SET 2 -->
-        <div class="column">
+        <article class="column" aria-label="To Do Column">
           <h4>To Do</h4>
           <div class="task"></div>
           <div class="task muted"></div>
-        </div>
+        </article>
 
-        <div class="column">
+        <article class="column" aria-label="In Progress Column">
           <h4>In Progress</h4>
           <div class="task"></div>
-        </div>
+        </article>
 
-        <div class="column">
+        <article class="column" aria-label="Done Column">
           <h4>Done</h4>
           <div class="task done"></div>
-        </div>
+        </article>
 
       </div>
     </div>
-  </section>
+  </main>
 
-  <div class="workspace-start-button">
+  <!-- Workspace Start Button -->
+  <section class="workspace-start-button" aria-label="Workspace Actions">
     <a
       routerLink="/login"
       class="primary-action"
       title="Create or continue your personal workspace"
     >
-      <span>
-        {{ version.appName }} v{{ version.version }}
-      </span>
+      <span>{{ version.appName }} v{{ version.version }}</span>
     </a>
-  </div>
+  </section>
 
-  <div class="footer">
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
     <app-footer></app-footer>
-  </div>
+  </footer>
 
 </div>

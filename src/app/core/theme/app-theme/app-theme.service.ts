@@ -38,8 +38,8 @@ export class AppThemeService {
         ? (this.mediaQuery.matches ? 'dark' : 'light')
         : mode;
 
-    html.classList.toggle('theme-light', effectiveMode === 'light');
-    html.classList.toggle('theme-dark', effectiveMode === 'dark');
+    html.classList.toggle('light-theme', effectiveMode === 'light');
+    html.classList.toggle('dark-theme', effectiveMode === 'dark');
 
     if (mode === 'system') {
       localStorage.removeItem(this.storageKey);

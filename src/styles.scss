@@ -1,32 +1,133 @@
+/* styles.scss */
 :root {
-  /* ===== App Backgrounds ===== */
+  /* Brand Base */
+  --primary: #1a3a3f;
+  --primary-soft: #244f55;
+  --primary-hover: #2e646b;
+
+  /* UI Accent */
+  --accent: #4fa3a8;
+  --accent-hover: #3f8f94;
+  --accent-soft: #e1f3f4;
+
+  /* Actions */
+  --action: #f59e0b;
+  --action-hover: #d97706;
+  --action-soft: #fef3c7;
+  --action-text: #ffffff;
+
+  /* Backgrounds */
+  --bg: #f4f8f9;
+  --surface: #ffffff;
+  --surface-muted: #eef3f4;
+
+  /* Borders */
+  --border: #d5e3e6;
+  --border-strong: #b7cdd2;
+
+  /* Text */
+  --text-main: #0f2e32;
+  --text-alt: #3f5f65;
+  --text-muted: #6f8f95;
+  --text-disabled: #9fb3b8;
+  --text-white: #ffffff;
+
+  /* Buttons */
+  --btn-primary-bg: var(--action);
+  --btn-primary-hover: var(--action-hover);
+  --btn-primary-text: var(--action-text);
+  --btn-secondary-bg: #e7f1f2;
+  --btn-secondary-hover: #d6eaec;
+  --btn-secondary-text: var(--primary);
+  --btn-ghost-text: var(--action);
+  --btn-ghost-hover: var(--action-soft);
+
+  /* Inputs */
+  --input-bg: var(--surface);
+  --input-border: var(--border);
+  --input-focus: var(--accent);
+  --input-text: var(--text-main);
+  --input-placeholder: var(--text-muted);
+
+  /* Static */
+  --static-light-bg: #f4f8f9;
+  --static-dark-bg: #0f2e32;
+
+  /* Status */
+  --success: #4caf8f;
+  --warning: #e6a23c;
+  --danger: #d9534f;
+
+  /* App Background */
   --app-bg-dark: #2B2A2A;
   --app-bg-light: #1a3a3f;
+  --app-bg: var(--app-bg-light);
 
-  /* Default fallback = dark */
-  --app-bg: var(--app-bg-dark);
-
-  /* ===== Motion ===== */
+  /* Motion */
   --theme-transition: 300ms;
 }
 
-/* ===== Explicit Themes ===== */
-html.theme-light {
+/* ===== Light Theme ===== */
+html.light-theme {
+  --primary: #1a3a3f;
+  --primary-soft: #244f55;
+  --primary-hover: #2e646b;
+
+  --accent: #4fa3a8;
+  --accent-hover: #3f8f94;
+  --accent-soft: #e1f3f4;
+
+  --action: #f59e0b;
+  --action-hover: #d97706;
+  --action-soft: #fef3c7;
+  --action-text: #ffffff;
+
+  --bg: #f4f8f9;
+  --surface: #ffffff;
+  --surface-muted: #eef3f4;
+
+  --text-main: #0f2e32;
+  --text-alt: #3f5f65;
+  --text-muted: #6f8f95;
+
   --app-bg: var(--app-bg-light);
 }
 
-html.theme-dark {
+/* ===== Dark Theme ===== */
+html.dark-theme {
+  --primary: #244f55;
+  --primary-soft: #1a3a3f;
+  --primary-hover: #3f8f94;
+
+  --accent: #3f8f94;
+  --accent-hover: #4fa3a8;
+  --accent-soft: #1a3a3f;
+
+  --action: #d97706;
+  --action-hover: #f59e0b;
+  --action-soft: #2e646b;
+  --action-text: #ffffff;
+
+  --bg: #484646;
+  --surface: #272222;
+  --surface-muted: #2b2a2a;
+
+  --text-main: #ffffff;
+  --text-alt: #d5e3e6;
+  --text-muted: #9fb3b8;
+
+  --dark-card-bg: #322d2d;
+
   --app-bg: var(--app-bg-dark);
 }
 
 /* ===== System Preference Fallback ===== */
 @media (prefers-color-scheme: light) {
-  html:not(.theme-light):not(.theme-dark) {
+  html:not(.light-theme):not(.dark-theme) {
     --app-bg: var(--app-bg-light);
   }
 }
 
-/* ===== Base Document Styling ===== */
 html,
 body {
   min-height: 100%;
@@ -35,7 +136,6 @@ body {
   transition: background-color var(--theme-transition) ease;
 }
 
-/* ===== Respect Reduced Motion ===== */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --theme-transition: 0ms;
