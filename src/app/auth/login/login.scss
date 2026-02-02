@@ -195,11 +195,11 @@
   }
 
   &:hover {
-    background: var(--bg);
+    background: var(--bg-hover);
   }
 
   &.active {
-    background-color: var(--bg-active);
+    background-color: var(--bg-accent);
     color: var(--text-white);
     border: 1px solid var(--text-main);
   }

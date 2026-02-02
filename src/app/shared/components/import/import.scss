@@ -31,8 +31,9 @@
 
     padding: 0.35rem 0.75rem;
     border-radius: 999px;
-    border: 1px solid #d1d5db;
-    background: #f8fafc;
+    border: 1px solid var(--text-main);
+    background: var(--bg);
+    color: var(--text-main);
 
     font-size: 0.75rem;
     cursor: pointer;
@@ -72,13 +73,13 @@
       font-size: 0.75rem;
 
       &:hover {
-        color: var(--primary);
-        background: #3f8e940d;
+        color: var(--text-main);
+        background: var(--bg-hover);
       }
 
       &.active {
-        color: var(--primary);
-        background: #3f8e9447;
+        color: var(--text-white);
+        background: var(--bg-accent);
         font-weight: 500;
       }
     }
@@ -95,12 +96,12 @@
 
 /* DROPZONE */
 .import-dropzone {
-  border: 2px dashed #cbd5f5;
+  border: 2px dashed var(--bg-accent);
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
   cursor: pointer;
-  background: #f8fafc;
+  background: var(--bg);
 
   display: flex;
   flex-direction: column;
@@ -115,13 +116,13 @@
 
   i {
     font-size: 1.75rem;
-    color: var(--primary);
+    color: var(--text-main);
   }
 
   strong {
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--primary);
+    color: var(--text-main);
   }
 
   .file-name {
@@ -139,8 +140,8 @@
   }
 
   &:hover {
-    background: #eef6ff;
-    border-color: var(--primary);
+    background: var(--bg);
+    border-color: var(--text-main);
     transform: scale(1.01);
   }
 

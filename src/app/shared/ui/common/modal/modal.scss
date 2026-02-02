@@ -24,7 +24,7 @@
   position: relative;
   width: 100%;
   max-width: 420px;
-  background: #ffffff;
+  background: var(--bg-active);
   border-radius: 18px;
   padding: 24px 22px 22px;
   box-shadow:
@@ -42,8 +42,8 @@
   height: 34px;
   border-radius: 999px;
   border: none;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--bg);
+  color: var(--text-main);
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -58,8 +58,8 @@
   }
 
   &:hover {
-    background: #e2e8f0;
-    color: #0f172a;
+    background: var(--bg-hover);
+    color: var(--text-main);
   }
 
   &:active {
@@ -75,7 +75,7 @@
 .modal-title {
   font-size: 1.05rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text-main);
   margin-bottom: 0.75rem;
   padding-right: 2rem; /* space for X button */
 }
@@ -86,13 +86,11 @@
   word-spacing: 0.05em;
 
   line-height: 1.6;
-  color: #334155;
+  color: var(--text-main);
   margin-bottom: 1.5rem;
 
   white-space: pre-line;
   line-height: 1.6;
-
-  color: var(--primary);
 }
 
 .modal-message::first-line {
@@ -134,11 +132,11 @@
     var(--primary),
     var(--primary-soft)
   );
-  color: #ffffff;
+  color: var(--text-white);
 }
 
 .btn.primary:hover {
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 6px 18px rgba(37, 212, 235, 0.216);
 }
 
 /* SECONDARY */

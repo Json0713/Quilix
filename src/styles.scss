@@ -83,8 +83,9 @@ html.light-theme {
   --action-text: #ffffff;
 
   --bg: #f4f8f9;
-  --bg-hover: #ffffff;
-  --bg-active: #3f8f94;
+  --bg-hover: #e6ecec;
+  --bg-active: #f4f8f9;
+  --bg-accent: #0e686f;
 
   --surface: #ffffff;
   --surface-muted: #eef3f4;
@@ -114,6 +115,7 @@ html.dark-theme {
   --bg: #484646;
   --bg-hover: #575454f3;
   --bg-active: #2b2a2a;
+  --bg-accent: #2b2a2a;
 
   --surface: #272222;
   --surface-muted: #2b2a2a;
