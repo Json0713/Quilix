@@ -3,8 +3,8 @@
   box-sizing: border-box;
   border-radius: 50%;
   border: 0.15em solid transparent;
-  border-top-color: currentColor;
-  border-right-color: currentColor;
+  border-top-color: var(--action);
+  border-right-color: var(--action);
   animation: spin 0.7s linear infinite;
 }
 
