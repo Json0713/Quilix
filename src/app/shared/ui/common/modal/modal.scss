@@ -136,17 +136,17 @@
 }
 
 .btn.primary:hover {
-  box-shadow: 0 6px 18px rgba(37, 212, 235, 0.216);
+  box-shadow: 0 2px 4px rgba(37, 212, 235, 0.216);
 }
 
 /* SECONDARY */
 .btn.secondary {
-  background: #e8edf3d4;
-  color: #0f172a;
+  // background: #e8edf3d4;
+  color: var(--text-main);
 }
 
 .btn.secondary:hover {
-  background: #e8edf3;
+  background: var(--bg-hover);
 }
 
 /* ANIMATIONS */
