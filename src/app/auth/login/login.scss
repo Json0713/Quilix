@@ -130,6 +130,7 @@
     padding: 0 0.85rem;
     border-radius: 50px;
     border: 1px solid #d1d5db;
+    color: var(--text-main);
     font-size: 0.95rem;
     background: var(--bg);
     transition: border 0.15s, box-shadow 0.15s;
@@ -233,6 +234,7 @@
   }
 
   &:disabled {
+    color: var(--text-disabled);
     opacity: 0.8;
     cursor: not-allowed;
   } 
