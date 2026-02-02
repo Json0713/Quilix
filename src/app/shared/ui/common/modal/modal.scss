@@ -184,22 +184,22 @@
 
   &[data-type='info'] {
     background: rgba(63, 186, 194, 0.12);
-    color: var(--primary);
+    color: #1695a8;
   }
 
   &[data-type='success'] {
-    background: rgba(46, 204, 113, 0.15);
-    color: #1f7a4d;
+    background: rgba(46, 204, 113, 0.18);
+    color: #0cab5b;
   }
 
   &[data-type='warning'] {
     background: rgba(241, 196, 15, 0.18);
-    color: #7a5b00;
+    color: #d4a20b;
   }
 
   &[data-type='error'] {
-    background: rgba(231, 76, 60, 0.15);
-    color: #8b2a1f;
+    background: rgba(231, 76, 60, 0.18);
+    color: #e6240f;
   }
 }
 
