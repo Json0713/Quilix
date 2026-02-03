@@ -67,36 +67,6 @@
   --theme-transition: 300ms;
 }
 
-/* ===== Light Theme ===== */
-html.light-theme {
-  --primary: #1a3a3f;
-  --primary-soft: #244f55;
-  --primary-hover: #2e646b;
-
-  --accent: #4fa3a8;
-  --accent-hover: #3f8f94;
-  --accent-soft: #e1f3f4;
-
-  --action: #f59e0b;
-  --action-hover: #d97706;
-  --action-soft: #fef3c7;
-  --action-text: #ffffff;
-
-  --bg: #f4f8f9;
-  --bg-hover: #e6ecec;
-  --bg-active: #f4f8f9;
-  --bg-accent: #0e686f;
-
-  --surface: #ffffff;
-  --surface-muted: #eef3f4;
-
-  --text-main: #0f2e32;
-  --text-alt: #3f5f65;
-  --text-muted: #6f8f95;
-
-  --app-bg: var(--app-bg-light);
-}
-
 /* ===== Dark Theme ===== */
 html.dark-theme {
   --primary: #244f55;
@@ -127,6 +97,36 @@ html.dark-theme {
   --dark-card-bg: #322d2d;
 
   --app-bg: var(--app-bg-dark);
+}
+
+/* ===== Light Theme ===== */
+html.light-theme {
+  --primary: #1a3a3f;
+  --primary-soft: #244f55;
+  --primary-hover: #2e646b;
+
+  --accent: #4fa3a8;
+  --accent-hover: #3f8f94;
+  --accent-soft: #e1f3f4;
+
+  --action: #f59e0b;
+  --action-hover: #d97706;
+  --action-soft: #fef3c7;
+  --action-text: #ffffff;
+
+  --bg: #f4f8f9;
+  --bg-hover: #e6ecec;
+  --bg-active: #f4f8f9;
+  --bg-accent: #0e686f;
+
+  --surface: #ffffff;
+  --surface-muted: #eef3f4;
+
+  --text-main: #0f2e32;
+  --text-alt: #3f5f65;
+  --text-muted: #6f8f95;
+
+  --app-bg: var(--app-bg-light);
 }
 
 /* ===== System Preference Fallback ===== */
