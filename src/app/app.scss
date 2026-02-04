@@ -5,20 +5,13 @@
   flex-direction: column;
   font-family: Inter, Arial, Helvetica, sans-serif;
 
-  background-color: var(--app-bg);
+  /* Pattern + theme background */
+  background:
+    url('/assets/svg/bg-edu-pattern.svg') repeat,
+    var(--app-bg);
+  background-size: 160px 160px, cover;
+
   transition: background-color var(--theme-transition) ease;
-
-  position: relative;
-}
-
-.app-root::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url('/assets/svg/bg-edu-pattern.svg') repeat;
-  background-size: 160px 160px;
-  opacity: 1;
-  pointer-events: none;
 }
 
 /* ===== App Layout ===== */
