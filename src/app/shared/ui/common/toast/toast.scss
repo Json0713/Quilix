@@ -13,14 +13,23 @@
   position: relative;
   width: min(280px, calc(100vw - 24px));
   margin-right: 12px;
-  background: #ffffff;
   border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
   box-shadow:
     0 12px 30px rgba(0, 0, 0, 0.1),
     0 4px 10px rgba(0, 0, 0, 0.06);
-  animation: slideFromRight 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+
+  background: var(--bg);
+  color: var(--text-main);
+
+  animation: slideIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  &.fade-out {
+    opacity: 0;
+    transform: translateX(120%);
+  }
 }
 
 /* Body */
@@ -52,7 +61,7 @@
   font-size: 14.5px;
   font-weight: 500;
   line-height: 1.55;
-  color: #1f2937;
+  color: var(--text-main);
   word-break: break-word;
 
   white-space: pre-line;
@@ -66,9 +75,8 @@
   bottom: 0;
   height: 3px;
   width: 100%;
-  animation-name: shrink;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
+  background-color: currentColor;
+  animation: shrink linear forwards;
 }
 
 /* Status colors */
@@ -104,25 +112,16 @@
   background: #3b82f6;
 }
 
-/* Animations */
-@keyframes slideFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(120%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* Slide in keyframes */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(120%); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
+/* Shrink keyframes (progress bar) */
 @keyframes shrink {
-  from {
-    width: 100%;
-  }
-  to {
-    width: 0%;
-  }
+  from { width: 100%; }
+  to   { width: 0%; }
 }
 
 /* Mobile optimization */

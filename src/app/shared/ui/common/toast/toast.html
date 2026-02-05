@@ -4,27 +4,20 @@
       class="toast-card"
       [class]="t.type"
       (click)="toast.remove(t.id)"
+      role="status"
+      aria-live="polite"
+      data-id="{{ t.id }}"
     >
       <div class="toast-body">
         <div class="icon-wrapper">
-          @if (t.type === 'success') {
-            <i class="bi bi-check-lg"></i>
-          }
-          @if (t.type === 'error') {
-            <i class="bi bi-x-lg"></i>
-          }
-          @if (t.type === 'warning') {
-            <i class="bi bi-exclamation-lg"></i>
-          }
-          @if (t.type === 'info') {
-            <i class="bi bi-info-lg"></i>
-          }
+          @if (t.type === 'warning') { <i class="bi bi-exclamation-lg"></i> }
+          @if (t.type === 'success') { <i class="bi bi-check-lg"></i> }
+          @if (t.type === 'info')    { <i class="bi bi-info-lg"></i> }
+          @if (t.type === 'error')   { <i class="bi bi-x-lg"></i> }
         </div>
 
         <div class="toast-content">
-          <div class="toast-message">
-            {{ t.message }}
-          </div>
+          <div class="toast-message">{{ t.message }}</div>
         </div>
       </div>
 
