@@ -1,10 +1,13 @@
+/* ============================================================
+   Global Theme Tokens (Neutral / System Default)
+   ============================================================ */
 :root {
-  /* Brand Base */
+  /* Brand */
   --primary: #1a3a3f;
   --primary-soft: #244f55;
   --primary-hover: #2e646b;
 
-  /* UI Accent */
+  /* Accent */
   --accent: #4fa3a8;
   --accent-hover: #3f8f94;
   --accent-soft: #e1f3f4;
@@ -15,8 +18,12 @@
   --action-soft: #fef3c7;
   --action-text: #ffffff;
 
-  /* Backgrounds */
+  /* Surfaces */
   --bg: #f4f8f9;
+  --bg-hover: #e6ecec;
+  --bg-active: #f4f8f9;
+  --bg-accent: #0e686f;
+  
   --surface: #ffffff;
   --surface-muted: #eef3f4;
 
@@ -48,25 +55,26 @@
   --input-text: var(--text-main);
   --input-placeholder: var(--text-muted);
 
-  /* Static */
-  --static-light-bg: #f4f8f9;
-  --static-dark-bg: #0f2e32;
-
   /* Status */
   --success: #4caf8f;
   --warning: #e6a23c;
   --danger: #d9534f;
 
   /* App Background */
-  --app-bg-dark: #2B2A2A;
+  --bg-light: #ffff;
+  --bg-dark: #2b2a2a;
+
+  /* App Background Tokens */
   --app-bg-light: #1a3a3f;
-  --app-bg: var(--app-bg-light);
+  --app-bg-dark: #2b2a2a;
 
   /* Motion */
   --theme-transition: 300ms;
 }
 
-/* ===== Dark Theme ===== */
+/* ============================================================
+   Dark Theme Overrides
+   ============================================================ */
 html.dark-theme {
   --primary: #244f55;
   --primary-soft: #1a3a3f;
@@ -79,7 +87,6 @@ html.dark-theme {
   --action: #d97706;
   --action-hover: #f59e0b;
   --action-soft: #2e646b;
-  --action-text: #ffffff;
 
   --bg: #484646;
   --bg-hover: #575454f3;
@@ -93,48 +100,34 @@ html.dark-theme {
   --text-alt: #d5e3e6;
   --text-muted: #9fb3b8;
 
-  --dark-card-bg: #322d2d;
-
   --app-bg: var(--app-bg-dark);
 }
 
-/* ===== Light Theme ===== */
+/* ============================================================
+   Light Theme Overrides (Explicit User Choice)
+   ============================================================ */
 html.light-theme {
-  --primary: #1a3a3f;
-  --primary-soft: #244f55;
-  --primary-hover: #2e646b;
-
-  --accent: #4fa3a8;
-  --accent-hover: #3f8f94;
-  --accent-soft: #e1f3f4;
-
-  --action: #f59e0b;
-  --action-hover: #d97706;
-  --action-soft: #fef3c7;
-  --action-text: #ffffff;
-
-  --bg: #f4f8f9;
-  --bg-hover: #e6ecec;
-  --bg-active: #f4f8f9;
-  --bg-accent: #0e686f;
-
-  --surface: #ffffff;
-  --surface-muted: #eef3f4;
-
-  --text-main: #0f2e32;
-  --text-alt: #3f5f65;
-  --text-muted: #6f8f95;
-
   --app-bg: var(--app-bg-light);
 }
 
-/* ===== System Preference Fallback ===== */
+/* ============================================================
+   System Preference (No Class Applied)
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  html:not(.light-theme):not(.dark-theme) {
+    --app-bg: var(--app-bg-dark);
+  }
+}
+
 @media (prefers-color-scheme: light) {
   html:not(.light-theme):not(.dark-theme) {
     --app-bg: var(--app-bg-light);
   }
 }
 
+/* ============================================================
+   Base Layout
+   ============================================================ */
 html,
 body {
   min-height: 100%;
@@ -143,6 +136,9 @@ body {
   transition: background-color var(--theme-transition) ease;
 }
 
+/* ============================================================
+   Reduced Motion
+   ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --theme-transition: 0ms;
