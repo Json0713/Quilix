@@ -5,7 +5,7 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 @Injectable({ providedIn: 'root' })
 export class AppThemeService {
 
-  private readonly storageKey = 'app-theme';
+  private readonly storageKey = 'theme';
   private readonly mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
   readonly theme = signal<ThemeMode>('system');
@@ -16,30 +16,32 @@ export class AppThemeService {
 
   private initialized = false;
 
+  private onSystemChange = () => {
+    if (this.theme() === 'system') {
+      this.apply('system');
+    }
+  };
+
   init(): void {
-    if (this.initialized) return;
+    if (this.initialized || typeof window === 'undefined') return;
     this.initialized = true;
 
     const saved = localStorage.getItem(this.storageKey) as ThemeMode | null;
     this.apply(saved ?? 'system');
 
-    this.mediaQuery.addEventListener('change', () => {
-      if (this.theme() === 'system') {
-        this.apply('system');
-      }
-    });
+    this.mediaQuery.addEventListener('change', this.onSystemChange);
   }
 
   apply(mode: ThemeMode): void {
     const html = document.documentElement;
 
-    const effectiveMode: 'light' | 'dark' =
+    const effective: 'light' | 'dark' =
       mode === 'system'
         ? (this.mediaQuery.matches ? 'dark' : 'light')
         : mode;
 
-    html.classList.toggle('light-theme', effectiveMode === 'light');
-    html.classList.toggle('dark-theme', effectiveMode === 'dark');
+    html.classList.toggle('light-theme', effective === 'light');
+    html.classList.toggle('dark-theme', effective === 'dark');
 
     if (mode === 'system') {
       localStorage.removeItem(this.storageKey);
@@ -48,7 +50,7 @@ export class AppThemeService {
     }
 
     this.theme.set(mode);
-    this.updateMetaThemeColor(effectiveMode);
+    this.updateMetaThemeColor(effective);
   }
 
   private updateMetaThemeColor(mode: 'light' | 'dark'): void {

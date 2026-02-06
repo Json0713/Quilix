@@ -106,6 +106,10 @@ html.dark-theme {
 /* ============================================================
    Light Theme Overrides (Explicit User Choice)
    ============================================================ */
+html.dark-theme {
+  --app-bg: var(--app-bg-dark);
+}
+
 html.light-theme {
   --app-bg: var(--app-bg-light);
 }
@@ -128,15 +132,6 @@ html.light-theme {
 /* ============================================================
    Base Layout
    ============================================================ */
-
-// html,
-// body {
-//   min-height: 100%;
-//   margin: 0;
-//   background-color: var(--app-bg);
-//   transition: background-color var(--theme-transition) ease;
-// }
-
 html {
   min-height: 100%;
   margin: 0;
@@ -149,6 +144,11 @@ body {
   margin: 0;
   background-color: var(--app-bg);
   transition: background-color var(--theme-transition) ease;
+}
+
+html,
+body {
+  background-color: var(--app-bg, #2b2a2a);
 }
 
 /* ============================================================
