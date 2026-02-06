@@ -23,7 +23,8 @@
   position: absolute;
   inset: 0;
 
-  background: url('/assets/svg/bg-edu-pattern.svg') repeat;
+  background: url('/assets/svg/bg-edu-pattern.svg') repeat
+  var(--app-bg);
   background-size: 160px 160px;
 
   opacity: 1;

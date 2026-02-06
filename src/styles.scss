@@ -128,7 +128,22 @@ html.light-theme {
 /* ============================================================
    Base Layout
    ============================================================ */
-html,
+
+// html,
+// body {
+//   min-height: 100%;
+//   margin: 0;
+//   background-color: var(--app-bg);
+//   transition: background-color var(--theme-transition) ease;
+// }
+
+html {
+  min-height: 100%;
+  margin: 0;
+  background-color: var(--app-bg);
+  color-scheme: light dark;
+}
+
 body {
   min-height: 100%;
   margin: 0;
