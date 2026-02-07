@@ -1,0 +1,32 @@
+<section class="stack-marquee" aria-labelledby="stack-title">
+  <header class="stack-header">
+    <h2 id="stack-title">Built with</h2>
+    <p>
+      Quilix is crafted using a modern, reliable stack focused on performance,
+      scalability, and long-term maintainability.
+    </p>
+  </header>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      @for (tech of technologies; track tech.alt) {
+        <img
+          [src]="tech.src"
+          [alt]="tech.alt"
+          loading="lazy"
+          class="tech-icon"
+        />
+      }
+
+      <!-- duplicate for seamless loop -->
+      @for (tech of technologies; track tech.alt + '-dup') {
+        <img
+          [src]="tech.src"
+          [alt]="tech.alt"
+          loading="lazy"
+          class="tech-icon"
+        />
+      }
+    </div>
+  </div>
+</section>

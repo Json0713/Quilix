@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 interface StackGroup {
   title: string;
@@ -13,6 +13,7 @@ interface StackGroup {
   imports: [],
   templateUrl: './cta-stack.html',
   styleUrl: './cta-stack.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CtaStack {
   readonly groups: StackGroup[] = [
