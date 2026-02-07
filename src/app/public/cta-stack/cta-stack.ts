@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, AfterViewInit } from '@angular/core';
 
 interface StackGroup {
   title: string;
@@ -15,7 +15,7 @@ interface StackGroup {
   styleUrl: './cta-stack.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CtaStack {
+export class CtaStack implements AfterViewInit {
   readonly groups: StackGroup[] = [
     {
       title: 'Core Tech',
@@ -42,4 +42,36 @@ export class CtaStack {
       ],
     },
   ];
+
+  ngAfterViewInit() {
+    this.sequentialBadgeGlow();
+  }
+
+  private sequentialBadgeGlow() {
+    const badges = Array.from(document.querySelectorAll('.tech-badge img')) as HTMLElement[];
+    if (!badges.length) return;
+
+    let queue = [...badges]; // clone array
+    const glowNext = () => {
+      if (queue.length === 0) {
+        queue = [...badges]; // reset queue after full cycle
+      }
+
+      // pick a random badge from queue
+      const idx = Math.floor(Math.random() * queue.length);
+      const badge = queue[idx];
+      queue.splice(idx, 1); // remove from queue
+
+      // glow badge
+      badge.classList.add('hover-active');
+
+      // remove glow after duration
+      setTimeout(() => {
+        badge.classList.remove('hover-active');
+        setTimeout(glowNext, 500 + Math.random() * 1000); // next glow after 0.5–1.5s
+      }, 1200 + Math.random() * 800); // glow duration 1.2–2s
+    };
+
+    glowNext(); // start first glow
+  }
 }
