@@ -1,0 +1,107 @@
+/* Stack Section */
+.stack {
+  margin-block: clamp(0.5rem, 2vh, 2rem);
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+/* Header */
+.stack-header {
+  max-width: 640px;
+  margin-inline: auto;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  max-width: 18rem;
+
+  h2 {
+    color: var(--text-white);
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--text-alt);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+}
+
+/* Groups */
+.stack-groups {
+  max-width: 960px;
+  margin-inline: auto;
+  display: grid;
+  gap: 2.25rem;
+}
+
+.stack-group {
+  text-align: center;
+
+  h3 {
+    color: var(--text-white);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Badge layout */
+.badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+/* Badge wrapper */
+.tech-badge {
+  display: inline-flex;
+}
+
+/* Badge */
+.tech-badge img {
+  height: 26px;
+  border-radius: 999px;
+
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  background: transparent;
+
+  animation: badge-float 6s ease-in-out infinite;
+  animation-delay: calc(var(--idle-delay) * 0.6s);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Hover = takes control */
+.tech-badge:hover img {
+  animation-play-state: paused;
+  transform: translateY(-2px) scale(1.06);
+  box-shadow:
+    0 0 0 1px var(--bg-hover),
+    0 8px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* Subtle morphing motion */
+@keyframes badge-float {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .tech-badge img {
+    height: 24px;
+    animation: none;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .tech-badge img {
+    animation: none;
+    transition: none;
+  }
+}

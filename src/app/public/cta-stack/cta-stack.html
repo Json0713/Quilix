@@ -1,0 +1,32 @@
+<section class="stack" aria-labelledby="stack-title">
+  <header class="stack-header">
+    <h2 id="stack-title">Stack</h2>
+    <p>
+      Quilix is built with modern, reliable tools chosen for performance,
+      maintainability, and long-term scalability.
+    </p>
+  </header>
+
+  <div class="stack-groups">
+    @for (group of groups; track group.title) {
+      <div class="stack-group">
+        <h3>{{ group.title }}</h3>
+
+        <div class="badge-group">
+          @for (badge of group.badges; track badge.label; let i = $index) {
+            <span
+              class="tech-badge"
+              [style.--idle-delay]="i"
+            >
+              <img
+                [src]="badge.src"
+                [alt]="badge.label"
+                loading="lazy"
+              />
+            </span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>

@@ -5,10 +5,11 @@ import { Footer } from '../common/footer/footer';
 import { QuilixVersionService } from '../../core/quilix-installer/version/quilix-version.service';
 import { ThemeToggle } from '../../shared/ui/system/theme-toggle/theme-toggle';
 import { Feature } from "../feature/feature";
+import { CtaStack } from "../cta-stack/cta-stack";
 
 @Component({
   selector: 'app-public-index',
-  imports: [RouterModule, ThemeToggle, Header, Footer, Feature],
+  imports: [RouterModule, ThemeToggle, Header, Footer, Feature, CtaStack],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
