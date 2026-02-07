@@ -1,0 +1,28 @@
+<!-- src/app/landing/feature/feature.component.html -->
+<section class="features" aria-labelledby="features-title">
+  <header class="features-header">
+    <h2 id="features-title">Work, Organized Naturally</h2>
+    <p>
+      Quilix helps you structure work without forcing rigid systems.
+      Simple when you need it, powerful when you grow.
+    </p>
+  </header>
+
+  <div class="features-list">
+    @for (feature of features; track feature.title; let i = $index) {
+      <article
+        class="feature"
+        [style.--delay]="i"
+      >
+        <div class="feature-icon">
+          <i class="bi {{ feature.icon }}"></i>
+        </div>
+
+        <div class="feature-content">
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+        </div>
+      </article>
+    }
+  </div>
+</section>
