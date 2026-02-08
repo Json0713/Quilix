@@ -72,6 +72,9 @@
   margin: 10px 0 2px 0;
   padding: 2px;
   border-radius: 15px;
+
+  /* fade edges */
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 }
 
 .preview-track {
