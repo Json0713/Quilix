@@ -81,6 +81,8 @@
   display: flex;
   gap: 0.75rem;
   width: max-content;
+  margin-top: 0.5rem;
+
   animation: columns-marquee 18s linear infinite;
 }
 
@@ -109,6 +111,13 @@
 .column:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+
+
+  box-shadow:
+    0 0 6px var(--success),
+    0 0 12px rgba(0, 255, 0, 0.2),
+    0 4px 16px rgba(0, 255, 0, 0.15),
+    0 8px 24px rgba(0, 255, 0, 0.1);
 }
 
 .column h4 {
