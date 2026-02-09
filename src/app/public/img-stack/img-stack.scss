@@ -4,12 +4,15 @@
 }
 
 .stack-header {
+  display: flex;
   text-align: center;
   max-width: 640px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 0.5rem;
 
-  p {
-    color: var(--text-muted);
+  i {
+    position: relative;
+    left: 0.4rem;
+    top: 0.2rem;
   }
 }
 
@@ -37,6 +40,7 @@
   min-width: 100%;
   padding: 1rem;
   background-color: var(--bg-app);
+  border: none;
 }
 
 .card-content {
