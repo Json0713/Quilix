@@ -1,5 +1,5 @@
 .stack {
-  padding: 3rem 1rem;
+  padding: 3rem 0;
   color: var(--text-white);
 }
 
@@ -73,6 +73,7 @@ img {
   color: var(--text-white);
   font-size: 0.9rem;
   line-height: 1.5;
+  margin-bottom: 0;
 }
 
 .label {
@@ -91,7 +92,7 @@ img {
   cursor: pointer;
 
   &:hover {
-    color: var(--text-main);
+    color: var(--text-white);
   }
 
   &.prev {
