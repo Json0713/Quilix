@@ -16,6 +16,16 @@
   }
 }
 
+.stack-header i {
+  opacity: 0.6;
+  animation: nudge 2.5s infinite;
+}
+
+@keyframes nudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+
 .carousel {
   position: relative;
   max-width: 520px;
@@ -69,16 +79,18 @@ img {
   // justify-content: space-between;
 }
 
+.label {
+  color: var(--text-white);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
 .desc {
   color: var(--text-white);
   font-size: 0.9rem;
   line-height: 1.5;
   margin-bottom: 0;
-}
-
-.label {
-  color: var(--text-white);
-  font-weight: 600;
+  margin-top: 0.05rem;
 }
 
 .nav {
