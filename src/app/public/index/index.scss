@@ -114,12 +114,12 @@
 
 
   box-shadow:
-    0 0 6px var(--success),
-    0 0 12px rgba(0, 255, 0, 0.2),
+    0 0 6px var(--accent),
+    0 0 12px rgba(62, 73, 62, 0.2),
     0 4px 16px rgba(0, 255, 0, 0.15),
     0 8px 24px rgba(0, 255, 0, 0.1);
 }
-
+  
 .column h4 {
   font-size: 0.7rem;
   color: var(--text-alt);
