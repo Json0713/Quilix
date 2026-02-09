@@ -1,32 +1,45 @@
-<section class="stack-marquee" aria-labelledby="stack-title">
+<section class="stack" aria-labelledby="stack-title">
   <header class="stack-header">
     <h2 id="stack-title">Built with</h2>
     <p>
-      Quilix is crafted using a modern, reliable stack focused on performance,
-      scalability, and long-term maintainability.
+      <!-- Quilix is crafted using a modern, reliable stack focused on performance,
+      scalability, and long-term maintainability. -->
     </p>
   </header>
 
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee-track">
-      @for (tech of technologies; track tech.alt) {
-        <img
-          [src]="tech.src"
-          [alt]="tech.alt"
-          loading="lazy"
-          class="tech-icon"
-        />
-      }
+  <div
+    class="carousel"
+    (touchstart)="onTouchStart($event)"
+    (touchmove)="onTouchMove($event)"
+    (touchend)="onTouchEnd()"
+  >
+    <button class="nav prev" (click)="prev()" aria-label="Previous">
+      <i class="bi bi-chevron-left"></i>
+    </button>
 
-      <!-- duplicate for seamless loop -->
-      @for (tech of technologies; track tech.alt + '-dup') {
-        <img
-          [src]="tech.src"
-          [alt]="tech.alt"
-          loading="lazy"
-          class="tech-icon"
-        />
-      }
+    <div class="viewport">
+      <div
+        class="track"
+        [class.no-animate]="!isAnimating()"
+        [style.transform]="'translateX(-' + index() * 100 + '%)'"
+        (transitionend)="onTransitionEnd()"
+      >
+        @for (tech of slides; track tech.alt + $index) {
+          <article class="card">
+            <div class="card-content">
+              <img [src]="tech.src" [alt]="tech.alt" />
+              <div class="text">
+                <p class="desc">{{ tech.description }}</p>
+                <span class="label">{{ tech.label }}</span>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
     </div>
+
+    <button class="nav next" (click)="next()" aria-label="Next">
+      <i class="bi bi-chevron-right"></i>
+    </button>
   </div>
 </section>
