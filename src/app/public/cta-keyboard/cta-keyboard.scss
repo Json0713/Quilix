@@ -92,3 +92,36 @@
   opacity: 0;
   pointer-events: none;
 }
+
+/* Floating text originates from display */
+.cta-keyboard {
+  position: relative;
+}
+
+.floating-layer {
+  position: absolute;
+  top: 2.4rem; /* aligns with display */
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.float-text {
+  display: inline-block;
+  animation: floatUp 2.6s ease forwards;
+  color: var(--text-main);
+  opacity: 0.9;
+}
+
+@keyframes floatUp {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+  to {
+    transform: translateY(-160px);
+    opacity: 0;
+    filter: blur(12px);
+  }
+}

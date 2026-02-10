@@ -1,24 +1,15 @@
-<!-- src/app/public/cta-keyboard/cta-keyboard.html -->
-
-<section
-  class="cta-keyboard"
-  aria-label="Interactive keyboard call to action"
->
-  <!-- Hidden input for mobile keyboards -->
-  <input
-    #input
-    class="sr-only"
-    type="text"
-    autocomplete="off"
-    autocorrect="off"
-    autocapitalize="off"
-    spellcheck="false"
-    (input)="onInput($event)"
-  />
+<section class="cta-keyboard" aria-label="Interactive keyboard CTA">
+  <input #input class="sr-only" type="text" (input)="onInput($event)" />
 
   <div class="display">
     {{ display() }}
     <span class="cursor">|</span>
+  </div>
+
+  <div class="floating-layer">
+    @for (item of floating(); track item.id) {
+      <span class="float-text">{{ item.value }}</span>
+    }
   </div>
 
   <div class="keyboard-shell">
@@ -26,16 +17,23 @@
       <div class="key-row">
         @for (key of row; track key) {
           <button
-            type="button"
             class="key"
             [class.active]="activeKey() === key"
-            (click)="press(key)"
-            aria-hidden="true"
-          >
+            (click)="press(key)">
             {{ key }}
           </button>
         }
       </div>
     }
+
+    <div class="key-row actions">
+      <button class="key space" (click)="press('SPACE')">Space</button>
+      <button class="key action" (click)="press('BACK')">
+        <i class="bi bi-backspace"></i>
+      </button>
+      <button class="key action enter" (click)="press('ENTER')">
+        <i class="bi bi-arrow-return-left"></i>
+      </button>
+    </div>
   </div>
 </section>
