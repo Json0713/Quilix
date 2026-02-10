@@ -74,7 +74,7 @@
   border-radius: 15px;
 
   /* fade edges */
-  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
 }
 
 .preview-track {
@@ -183,7 +183,7 @@
 @media (min-width: 768px) {
   .preview-card,
   .workspace-start-button {
-    max-width: 450px;
+    max-width: 610px;
     margin-left: auto;
     margin-right: auto;
   }

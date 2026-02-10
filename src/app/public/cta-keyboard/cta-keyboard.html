@@ -1,0 +1,41 @@
+<!-- src/app/public/cta-keyboard/cta-keyboard.html -->
+
+<section
+  class="cta-keyboard"
+  aria-label="Interactive keyboard call to action"
+>
+  <!-- Hidden input for mobile keyboards -->
+  <input
+    #input
+    class="sr-only"
+    type="text"
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="off"
+    spellcheck="false"
+    (input)="onInput($event)"
+  />
+
+  <div class="display">
+    {{ display() }}
+    <span class="cursor">|</span>
+  </div>
+
+  <div class="keyboard-shell">
+    @for (row of rows; track row) {
+      <div class="key-row">
+        @for (key of row; track key) {
+          <button
+            type="button"
+            class="key"
+            [class.active]="activeKey() === key"
+            (click)="press(key)"
+            aria-hidden="true"
+          >
+            {{ key }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+</section>

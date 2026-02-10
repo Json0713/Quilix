@@ -7,10 +7,11 @@ import { ThemeToggle } from '../../shared/ui/system/theme-toggle/theme-toggle';
 import { Feature } from "../feature/feature";
 import { CtaStack } from "../cta-stack/cta-stack";
 import { ImgStack } from "../img-stack/img-stack";
+import { CtaKeyboard } from "../cta-keyboard/cta-keyboard";
 
 @Component({
   selector: 'app-public-index',
-  imports: [RouterModule, ThemeToggle, Header, Footer, Feature, CtaStack, ImgStack],
+  imports: [RouterModule, ThemeToggle, Header, Footer, Feature, CtaStack, ImgStack, CtaKeyboard],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
