@@ -72,17 +72,17 @@
 }
 
 .key:hover {
-    background: var(--bg-hover);
-    color: var(--text-main);
+    color: var(--text-white);
     opacity: 2;
 }
 
 .key.active {
-  background: var(--bg-hover);
+  background: rgba(245, 245, 245, 0.300);
   transform: translateY(2px) scale(0.96);
 }
 
 .key:active {
+  background: rgba(245, 245, 245, 0.300);
   transform: translateY(3px);
 }
 
@@ -90,9 +90,8 @@
   font-size: 0.9rem;
 }
 
-.key.action:hover {
-  background: var(--bg-hover);
-}
+// .key.action:hover {
+// }
 
 .key.enter {
     font-weight: 300;
