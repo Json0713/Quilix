@@ -20,7 +20,9 @@ type FloatingText = {
   styleUrl: './cta-keyboard.scss',
 })
 export class CtaKeyboard {
+
   @ViewChild('input', { static: true })
+
   private readonly input!: ElementRef<HTMLInputElement>;
 
   readonly text = signal('');
@@ -61,6 +63,10 @@ export class CtaKeyboard {
 
   @HostListener('window:keydown', ['$event'])
   onKeydown(e: KeyboardEvent): void {
+    if (e.key === ' ') {
+      e.preventDefault();
+    }
+
     this.markInteraction();
 
     if (e.key === 'Backspace') return this.backspace();
