@@ -86,9 +86,19 @@
   <app-feature />
 
   <!-- Meta Navigation -->
-  <nav class="meta" aria-label="Meta Navigation">
-    <a routerLink="/meta" title="Back Home">
-      <span>Meta</span>
+  <nav class="meta-nav" aria-label="Meta Navigation">
+    <a
+      routerLink="/meta"
+      class="meta-button"
+      title="Quilix Meta"
+    >
+      <span class="meta-label">Quilix-Meta</span>
+
+      <span class="meta-version">v{{ version.version }}</span>
+
+      <span class="meta-badge" aria-label="Beta version">
+        Beta
+      </span>
     </a>
   </nav>
 
