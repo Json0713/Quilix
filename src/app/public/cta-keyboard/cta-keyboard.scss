@@ -1,13 +1,9 @@
-/* src/app/public/cta-keyboard/cta-keyboard.scss */
-
 :host {
   display: block;
 }
 
 .cta-keyboard {
-  --shell-bg: color-mix(in srgb, var(--bg) 85%, black 15%);
-  --key-bg: rgba(255, 255, 255, 0.06);
-  --glow: rgba(255, 230, 0, 0.45);
+  --key-bg: rgba(255, 255, 255, 0.115);
 
   width: fit-content;
   max-width: 100%;
@@ -18,7 +14,7 @@
 .display {
   margin-bottom: 1rem;
   font-size: clamp(1rem, 2vw, 1.25rem);
-  color: var(--text-main);
+  color: var(--text-white);
   opacity: 0.85;
 }
 
@@ -40,7 +36,7 @@
   background: linear-gradient(
     to bottom,
     rgba(255, 255, 255, 0.06),
-    var(--shell-bg)
+    var(--app-bg)
   );
 
   box-shadow:
@@ -63,7 +59,7 @@
   border-radius: 0.6rem;
 
   background: var(--key-bg);
-  color: var(--text-main);
+  color: var(--text-white);
   border: none;
 
   font-size: 0.75rem;
@@ -75,9 +71,14 @@
     background-color 120ms ease;
 }
 
+.key:hover {
+    background: var(--bg-hover);
+    color: var(--text-main);
+    opacity: 2;
+}
+
 .key.active {
-  background: rgba(255, 230, 0, 0.25);
-  box-shadow: 0 0 12px var(--glow);
+  background: var(--bg-hover);
   transform: translateY(2px) scale(0.96);
 }
 
@@ -85,8 +86,21 @@
   transform: translateY(3px);
 }
 
+.key.action {
+  font-size: 0.9rem;
+}
+
+.key.action:hover {
+  background: var(--bg-hover);
+}
+
+.key.enter {
+    font-weight: 300;
+}
+
 .key.space {
   width: 12.5rem;
+  letter-spacing: 0.05em;
 }
 
 @media (max-width: 480px) {
@@ -120,7 +134,7 @@
 .float-text {
   display: inline-block;
   animation: floatUp 2.6s ease forwards;
-  color: var(--text-main);
+  color: var(--text-white);
   opacity: 0.9;
 }
 
