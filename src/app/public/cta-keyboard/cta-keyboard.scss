@@ -9,9 +9,10 @@
   --key-bg: rgba(255, 255, 255, 0.06);
   --glow: rgba(255, 230, 0, 0.45);
 
-  max-width: 720px;
+  width: fit-content;
+  max-width: 100%;
   margin: 0 auto;
-  text-align: center;
+  padding-inline: 0.5rem;
 }
 
 .display {
@@ -82,6 +83,16 @@
 
 .key:active {
   transform: translateY(3px);
+}
+
+.key.space {
+  width: 12.5rem;
+}
+
+@media (max-width: 480px) {
+  .key.space {
+    width: 12.5rem;
+  }
 }
 
 /* Accessibility helper */

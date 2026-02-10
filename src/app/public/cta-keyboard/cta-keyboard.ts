@@ -26,9 +26,9 @@ export class CtaKeyboard {
   readonly text = signal('');
   readonly activeKey = signal<string | null>(null);
   readonly floating = signal<FloatingText[]>([]);
+  readonly isAutoTyping = signal(false);
 
   private floatId = 0;
-
   private lastInteractionAt = Date.now();
   private idleInterval?: number;
 
@@ -116,18 +116,16 @@ export class CtaKeyboard {
   }
 
   // ----------------------------
-  // Idle typing (FIXED)
+  // Idle typing
   // ----------------------------
 
   private startIdleLoop(): void {
     this.idleInterval = window.setInterval(() => {
-      const now = Date.now();
-      const quietFor = now - this.lastInteractionAt;
-
-      // only auto-type after user is truly idle
+      const quietFor = Date.now() - this.lastInteractionAt;
       if (quietFor < 3500) return;
 
       const msg = this.messages[this.messageIndex];
+      this.isAutoTyping.set(true);
 
       if (this.charIndex < msg.length) {
         this.text.update(t => t + msg[this.charIndex++]);
@@ -137,11 +135,16 @@ export class CtaKeyboard {
         this.messageIndex =
           (this.messageIndex + 1) % this.messages.length;
       }
-    }, 300);
+    }, 320);
   }
 
   private markInteraction(): void {
     this.lastInteractionAt = Date.now();
-    this.charIndex = 0;
+
+    if (this.isAutoTyping()) {
+      this.isAutoTyping.set(false);
+      this.text.set('');
+      this.charIndex = 0;
+    }
   }
 }
