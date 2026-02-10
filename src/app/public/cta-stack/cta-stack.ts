@@ -28,7 +28,7 @@ export class CtaStack implements AfterViewInit {
     {
       title: 'Backend & Platform',
       badges: [
-        { label: 'Supabase', src: 'https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white' },
+        { label: 'Supabase', src: 'https://img.shields.io/badge/Supabase-000000?logo=supabase&logoColor=3ECF8E' },
         { label: 'Node.js', src: 'https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white' },
         { label: 'Vercel', src: 'https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white' },
       ],
