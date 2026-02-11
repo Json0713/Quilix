@@ -5,7 +5,7 @@ import {
   ElementRef,
   signal,
   computed,
-  effect,
+  OnDestroy,
 } from '@angular/core';
 
 type FloatingText = {
@@ -19,10 +19,9 @@ type FloatingText = {
   templateUrl: './cta-keyboard.html',
   styleUrl: './cta-keyboard.scss',
 })
-export class CtaKeyboard {
+export class CtaKeyboard implements OnDestroy {
 
   @ViewChild('input', { static: true })
-
   private readonly input!: ElementRef<HTMLInputElement>;
 
   readonly text = signal('');
@@ -31,8 +30,12 @@ export class CtaKeyboard {
   readonly isAutoTyping = signal(false);
 
   private floatId = 0;
-  private lastInteractionAt = Date.now();
-  private idleInterval?: number;
+
+  private idleTimer?: number;
+  private typingTimer?: number;
+
+  private messageIndex = 0;
+  private charIndex = 0;
 
   readonly messages = [
     'Welcome to Quilix',
@@ -40,9 +43,6 @@ export class CtaKeyboard {
     'Take a coffee break',
     'Build something meaningful',
   ];
-
-  private messageIndex = 0;
-  private charIndex = 0;
 
   readonly rows = [
     ['Q','W','E','R','T','Y','U','I','O','P'],
@@ -53,21 +53,21 @@ export class CtaKeyboard {
   readonly display = computed(() => this.text() || ' ');
 
   constructor() {
-    effect(() => this.input.nativeElement.focus());
-    this.startIdleLoop();
+    this.scheduleIdle();
   }
 
-  // ----------------------------
-  // Keyboard input
-  // ----------------------------
+  // ------------------------------------------------
+  // INPUT / INTERACTION
+  // ------------------------------------------------
 
   @HostListener('window:keydown', ['$event'])
   onKeydown(e: KeyboardEvent): void {
+
     if (e.key === ' ') {
       e.preventDefault();
     }
 
-    this.markInteraction();
+    this.handleUserInteraction(true);
 
     if (e.key === 'Backspace') return this.backspace();
     if (e.key === 'Enter') return this.enter();
@@ -76,12 +76,13 @@ export class CtaKeyboard {
   }
 
   onInput(e: Event): void {
-    this.markInteraction();
+    this.handleUserInteraction(true);
     this.text.set((e.target as HTMLInputElement).value.slice(-48));
   }
 
   press(key: string): void {
-    this.markInteraction();
+    this.handleUserInteraction(true);
+    this.input.nativeElement.focus();
 
     if (key === 'SPACE') return this.commit(' ');
     if (key === 'BACK') return this.backspace();
@@ -114,6 +115,8 @@ export class CtaKeyboard {
     setTimeout(() => {
       this.floating.update(f => f.filter(x => x.id !== id));
     }, 2600);
+
+    this.resetAutoTyping();
   }
 
   private flash(key: string): void {
@@ -121,36 +124,97 @@ export class CtaKeyboard {
     setTimeout(() => this.activeKey.set(null), 150);
   }
 
-  // ----------------------------
-  // Idle typing
-  // ----------------------------
+  // ------------------------------------------------
+  // IDLE / AUTO TYPING
+  // ------------------------------------------------
 
-  private startIdleLoop(): void {
-    this.idleInterval = window.setInterval(() => {
-      const quietFor = Date.now() - this.lastInteractionAt;
-      if (quietFor < 3500) return;
+  private scheduleIdle(): void {
+    this.clearTimers();
 
-      const msg = this.messages[this.messageIndex];
-      this.isAutoTyping.set(true);
-
-      if (this.charIndex < msg.length) {
-        this.text.update(t => t + msg[this.charIndex++]);
-      } else {
-        this.enter();
-        this.charIndex = 0;
-        this.messageIndex =
-          (this.messageIndex + 1) % this.messages.length;
-      }
-    }, 320);
+    this.idleTimer = window.setTimeout(() => {
+      this.startAutoTyping();
+    }, 3500);
   }
 
-  private markInteraction(): void {
-    this.lastInteractionAt = Date.now();
+  private startAutoTyping(): void {
+    this.isAutoTyping.set(true);
+    this.charIndex = 0;
+    this.text.set('');
+    this.typeNextChar();
+  }
+
+  private typeNextChar(): void {
+    if (!this.isAutoTyping()) return;
+
+    const msg = this.messages[this.messageIndex];
+
+    if (this.charIndex < msg.length) {
+      this.text.update(t => t + msg[this.charIndex++]);
+
+      this.typingTimer = window.setTimeout(() => {
+        this.typeNextChar();
+      }, 320);
+
+    } else {
+      // Pause before vanishing
+      this.typingTimer = window.setTimeout(() => {
+
+        this.enter();
+
+        this.messageIndex =
+          (this.messageIndex + 1) % this.messages.length;
+
+        this.isAutoTyping.set(false);
+        this.scheduleIdle();
+
+      }, 2000); // <-- CHANGE THIS VALUE (milliseconds)
+    }
+  }
+
+  // ------------------------------------------------
+  // CRITICAL FIX: Immediate erase on interrupt
+  // ------------------------------------------------
+
+  private handleUserInteraction(fromKeyboard: boolean): void {
 
     if (this.isAutoTyping()) {
+      // STOP auto typing immediately
       this.isAutoTyping.set(false);
-      this.text.set('');
+      this.clearTimers();
       this.charIndex = 0;
+
+      // IMMEDIATELY erase unfinished auto text
+      this.text.set('');
     }
+
+    // restart idle countdown
+    this.scheduleIdle();
+  }
+
+  private resetAutoTyping(): void {
+    this.isAutoTyping.set(false);
+    this.charIndex = 0;
+    this.clearTimers();
+    this.scheduleIdle();
+  }
+
+  private clearTimers(): void {
+    if (this.idleTimer) {
+      clearTimeout(this.idleTimer);
+      this.idleTimer = undefined;
+    }
+
+    if (this.typingTimer) {
+      clearTimeout(this.typingTimer);
+      this.typingTimer = undefined;
+    }
+  }
+
+  // ------------------------------------------------
+  // CLEANUP
+  // ------------------------------------------------
+
+  ngOnDestroy(): void {
+    this.clearTimers();
   }
 }
