@@ -5,10 +5,15 @@
 .cta-keyboard {
   --key-bg: rgba(255, 255, 255, 0.115);
 
-  width: fit-content;
+  overflow-x: visible;
+  contain: layout;
+
+  display: block;
+  width: max-content;
   max-width: 100%;
-  margin: 0 auto;
+  margin-inline: auto;
   padding-inline: 0.5rem;
+  position: relative;
 }
 
 .display {
@@ -205,5 +210,14 @@
     transform: translateY(-160px);
     opacity: 0;
     filter: blur(12px);
+  }
+}
+
+@media (max-width: 480px) {
+  .keyboard-shell {
+    transform:
+      perspective(112px)
+      rotateX(12deg)
+      translateY(-32px);
   }
 }
