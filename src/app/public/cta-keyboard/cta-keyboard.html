@@ -1,7 +1,5 @@
 <section class="cta-keyboard" aria-label="Interactive keyboard CTA">
-  <input #input class="sr-only" type="text" (input)="onInput($event)" />
-
-  <div class="display">
+  <div class="display" aria-live="polite">
     {{ display() }}
     <span class="cursor">|</span>
   </div>
@@ -17,6 +15,7 @@
       <div class="key-row">
         @for (key of row; track key) {
           <button
+            type="button"
             class="key"
             [class.active]="activeKey() === key"
             (click)="press(key)">
@@ -27,13 +26,24 @@
     }
 
     <div class="key-row actions">
-      <button class="key space" (click)="press('SPACE')">
+      <button
+        type="button"
+        class="key space"
+        (click)="press('SPACE')">
         Space
       </button>
-      <button class="key action" (click)="press('BACK')">
+
+      <button
+        type="button"
+        class="key action"
+        (click)="press('BACK')">
         <i class="bi bi-backspace"></i>
       </button>
-      <button class="key action enter" (click)="press('ENTER')">
+
+      <button
+        type="button"
+        class="key action enter"
+        (click)="press('ENTER')">
         <i class="bi bi-arrow-return-left"></i>
       </button>
     </div>

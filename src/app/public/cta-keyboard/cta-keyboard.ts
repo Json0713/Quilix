@@ -21,9 +21,6 @@ type FloatingText = {
 })
 export class CtaKeyboard implements OnDestroy {
 
-  @ViewChild('input', { static: true })
-  private readonly input!: ElementRef<HTMLInputElement>;
-
   readonly text = signal('');
   readonly activeKey = signal<string | null>(null);
   readonly floating = signal<FloatingText[]>([]);
@@ -75,14 +72,8 @@ export class CtaKeyboard implements OnDestroy {
     if (e.key.length === 1) this.commit(e.key);
   }
 
-  onInput(e: Event): void {
-    this.handleUserInteraction(true);
-    this.text.set((e.target as HTMLInputElement).value.slice(-48));
-  }
-
   press(key: string): void {
     this.handleUserInteraction(true);
-    this.input.nativeElement.focus();
 
     if (key === 'SPACE') return this.commit(' ');
     if (key === 'BACK') return this.backspace();
