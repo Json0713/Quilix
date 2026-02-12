@@ -1,107 +1,118 @@
-<form
-  class="register-meta"
-  (ngSubmit)="submit()"
-  #form="ngForm"
-  novalidate
->
+<div class="register-container">
+  <div class="glass register-card">
 
-  <h1>Create account</h1>
+    <h1>Create account</h1>
 
-  @if (error) {
-    <p class="error">
+    @if (error) {
+    <div class="error-banner">
       {{ error }}
-    </p>
-  }
-
-  <!-- Username -->
-  <label>
-    <span>Username</span>
-    <input
-      type="text"
-      name="username"
-      [(ngModel)]="username"
-      required
-      autocomplete="username"
-    />
-  </label>
-
-  <!-- Email -->
-  <label>
-    <span>Email</span>
-    <input
-      type="email"
-      name="email"
-      [(ngModel)]="email"
-      required
-      autocomplete="email"
-    />
-  </label>
-
-  <!-- Password -->
-  <label>
-    <span>Password</span>
-    <input
-      type="password"
-      name="password"
-      [(ngModel)]="password"
-      required
-      minlength="8"
-      autocomplete="new-password"
-    />
-  </label>
-
-  <!-- Phone (optional, profile only) -->
-  <label>
-    <span>Phone (optional)</span>
-    <input
-      type="tel"
-      name="phone"
-      [(ngModel)]="phone"
-      autocomplete="tel"
-    />
-  </label>
-
-  <!-- Role -->
-  <fieldset>
-    <legend>Account type</legend>
-
-    <label>
-      <input
-        type="radio"
-        name="role"
-        value="personal"
-        [(ngModel)]="role"
-      />
-      Personal
-    </label>
-
-    <label>
-      <input
-        type="radio"
-        name="role"
-        value="team"
-        [(ngModel)]="role"
-      />
-      Team
-    </label>
-  </fieldset>
-
-  <!-- Submit -->
-  <button
-    type="submit"
-    [disabled]="loading || form.invalid"
-  >
-    @if (loading) {
-      Creating account…
-    } @else {
-      Create account
+    </div>
     }
-  </button>
 
-  <!-- Login link -->
-  <p class="login-link">
-    Already have an account?
-    <a routerLink="/meta/login">Log in</a>
-  </p>
+    <form [formGroup]="registerForm" (ngSubmit)="submit()">
 
-</form>
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" type="text" formControlName="username" placeholder="johndoe" autocomplete="username"
+          [class.invalid]="f['username'].invalid && f['username'].touched" />
+        @if (f['username'].invalid && f['username'].touched) {
+        <small class="error-text">Username is required (min 3 chars)</small>
+        }
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="name@example.com" autocomplete="email"
+          [class.invalid]="f['email'].invalid && f['email'].touched" />
+        @if (f['email'].invalid && f['email'].touched) {
+        <small class="error-text">Valid email is required</small>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password" placeholder="••••••••"
+          autocomplete="new-password" [class.invalid]="f['password'].invalid && f['password'].touched" />
+        @if (f['password'].invalid && f['password'].touched) {
+        <small class="error-text">Password must be at least 8 characters</small>
+        }
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input id="confirmPassword" type="password" formControlName="confirmPassword" placeholder="••••••••"
+          autocomplete="new-password"
+          [class.invalid]="(f['confirmPassword'].invalid || registerForm.hasError('mismatch')) && f['confirmPassword'].touched" />
+        @if (registerForm.hasError('mismatch') && f['confirmPassword'].touched) {
+        <small class="error-text">Passwords do not match</small>
+        }
+      </div>
+
+      <!-- Phone -->
+      <div class="form-group">
+        <label for="phone">Phone <span class="optional">(Optional)</span></label>
+
+        <div class="phone-input-group">
+          <!-- Country Select -->
+          <div class="select-wrapper">
+            <select formControlName="countryCode">
+              @for (country of countryCodes; track country.code) {
+              <option [value]="country.code">{{ country.label }} {{ country.code }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Phone Number -->
+          <input id="phone" type="tel" formControlName="phone" (input)="onPhoneInput($event)"
+            [placeholder]="f['countryCode'].value === '+63' ? '912 345 6789' : 'Phone Number'" autocomplete="tel"
+            [class.invalid]="f['phone'].invalid && f['phone'].touched" />
+        </div>
+
+        @if (f['phone'].hasError('invalidPhPhone') && f['phone'].touched) {
+        <small class="error-text">Invalid PH number. Format: 9123456789 or 09123456789</small>
+        }
+      </div>
+
+      <!-- Progress Indicator -->
+      <div class="progress-section">
+        <label>Password Strength</label>
+        <div class="progress-track">
+          <div class="progress-bar" [style.width.%]="progress" [style.background-color]="progressColor"></div>
+        </div>
+      </div>
+
+      <!-- Role Selection -->
+      <div class="form-group role-group">
+        <label>Account Type</label>
+        <div class="role-options">
+          <label class="radio-card" [class.selected]="f['role'].value === 'personal'">
+            <input type="radio" formControlName="role" value="personal">
+            <span class="radio-label">Personal</span>
+          </label>
+          <label class="radio-card" [class.selected]="f['role'].value === 'team'">
+            <input type="radio" formControlName="role" value="team">
+            <span class="radio-label">Team</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="submit-btn" [disabled]="registerForm.invalid || loading">
+        @if (loading) {
+        Creating...
+        } @else {
+        Create Account
+        }
+      </button>
+
+      <p class="login-link">
+        Already have an account? <a routerLink="/meta/login">Log in</a>
+      </p>
+
+    </form>
+  </div>
+</div>
