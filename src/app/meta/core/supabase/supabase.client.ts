@@ -17,11 +17,10 @@ export function provideSupabaseClient(
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        // Using 'undefined' usually defaults to navigator locks.
-        // If specific issues persist, safe to ignore in dev, 
-        // or one can try `lock: { ... }` if supported by the version.
-        // For now, let's enable detectSessionInUrl to true as it's standard 
-        // to handle OAuth redirects properly which might be confusing the state.
+
+        flowType: 'pkce',
+        debug: false
+        
       }
     }
   );
