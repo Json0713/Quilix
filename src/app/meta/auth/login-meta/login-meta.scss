@@ -21,9 +21,6 @@
     flex-direction: column;
     gap: 1.5rem;
 
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
-        0 2px 4px -1px rgba(0, 0, 0, 0.03);
-
     .brand-header {
         text-align: center;
         margin-bottom: 0.5rem;
@@ -32,7 +29,7 @@
             text-decoration: none;
             font-size: 1.5rem;
             font-weight: 800;
-            color: var(--primary);
+            color: var(--text-white);
             letter-spacing: -0.03em;
         }
     }
@@ -40,9 +37,9 @@
     h1 {
         margin: 0;
         font-size: 1.5rem;
-        /* slightly smaller than register header */
+
         font-weight: 700;
-        color: var(--text-main);
+        color: var(--text-white);
         text-align: center;
     }
 
@@ -69,7 +66,7 @@ form {
     label {
         font-size: 0.875rem;
         font-weight: 600;
-        color: var(--text-main);
+        color: var(--text-white);
     }
 
     input {
@@ -163,7 +160,7 @@ form {
     margin-top: 1rem;
 
     a {
-        color: var(--primary);
+        color: var(--action);
         text-decoration: none;
         font-weight: 600;
 
