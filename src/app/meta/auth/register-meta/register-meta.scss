@@ -28,7 +28,7 @@
         margin: 0;
         font-size: 1.75rem;
         font-weight: 700;
-        color: var(--text-main);
+        color: var(--text-white);
         text-align: center;
         letter-spacing: -0.02em;
     }
@@ -47,7 +47,7 @@
     width: 100%;
     height: 14px;
     /* Thin */
-    background-color: var(--surface-muted);
+    background-color: var(--text-muted);
     border-radius: 99px;
     overflow: hidden;
 }
@@ -76,7 +76,7 @@ form {
         font-size: 0.875rem;
         font-weight: 600;
         /* slightly bolder */
-        color: var(--text-main);
+        color: var(--text-white);
 
         .optional {
             font-weight: 400;
@@ -214,7 +214,7 @@ form {
     padding: 0.875rem;
     border-radius: 10px;
     border: none;
-    background-color: var(--primary);
+    background-color: var(--primary-hover);
     /* Use Primary for strong CTA */
     color: #fff;
     font-size: 1rem;
@@ -243,11 +243,11 @@ form {
 .login-link {
     text-align: center;
     font-size: 0.875rem;
-    color: var(--text-muted);
+    color: var(--text-alt);
     margin-top: 1rem;
 
     a {
-        color: var(--primary);
+        color: var(--action);
         text-decoration: none;
         font-weight: 600;
 
@@ -270,10 +270,15 @@ form {
     }
 
     .phone-input-group {
-        flex-direction: column;
+        flex-direction: row;
+
 
         .select-wrapper {
-            width: 100%;
+            width: 35%;
+        }
+        
+        input {
+            flex: 1;
         }
     }
 }
