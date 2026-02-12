@@ -20,11 +20,10 @@ export function provideSupabaseClient(
 
         flowType: 'pkce',
         debug: false,
-        lock: {
-          // @ts-ignore
-          acquire: () => Promise.resolve(() => { }),
-          // @ts-ignore
-          release: () => { }
+        // Override lock to prevent NavigatorLockAcquireTimeoutError
+        // This bypasses the browser lock manager entirely
+        lock: (name, acquireTimeout, fn) => {
+          return fn();
         }
       }
     }
