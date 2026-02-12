@@ -1,70 +1,59 @@
-<div class="container py-2 mt-2">
-  <!-- Meta -->
-  <div class="meta py-2">
-    <a
-    routerLink="/"
-    title="Quilix"
-    > 
-      <span>Quilix</span>
-    </a>
+<div class="login-container">
+
+  <div class="login-card">
+
+    <!-- Meta Logo/Name -->
+    <div class="brand-header">
+      <a routerLink="/" title="Quilix">
+        <span>Quilix</span>
+      </a>
+    </div>
+
+    <h1>Welcome back</h1>
+    <p class="subtitle">Please enter your details to sign in.</p>
+
+    @if (error) {
+    <div class="error-banner">
+      {{ error }}
+    </div>
+    }
+
+    <form [formGroup]="loginForm" (ngSubmit)="submit()">
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="name@example.com" autocomplete="email"
+          [class.invalid]="f['email'].invalid && f['email'].touched" />
+        @if (f['email'].invalid && f['email'].touched) {
+        <small class="error-text">Valid email is required</small>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password" placeholder="••••••••"
+          autocomplete="current-password" [class.invalid]="f['password'].invalid && f['password'].touched" />
+        @if (f['password'].invalid && f['password'].touched) {
+        <small class="error-text">Password is required</small>
+        }
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="submit-btn" [disabled]="loginForm.invalid || loading">
+        @if (loading) {
+        Signing in...
+        } @else {
+        Sign in
+        }
+      </button>
+
+      <!-- Register link -->
+      <p class="register-link">
+        Don't have an account? <a routerLink="/meta/register">Sign up</a>
+      </p>
+
+    </form>
   </div>
 </div>
-
-<form
-  class="login-meta"
-  (ngSubmit)="submit()"
-  #form="ngForm"
-  novalidate
->
-
-  <h1>Log in</h1>
-
-  <!-- Error message -->
-  @if (error) {
-    <p class="error">{{ error }}</p>
-  }
-
-  <!-- Email -->
-  <label>
-    <span>Email</span>
-    <input
-      type="email"
-      name="email"
-      [(ngModel)]="email"
-      required
-      autocomplete="email"
-    />
-  </label>
-
-  <!-- Password -->
-  <label>
-    <span>Password</span>
-    <input
-      type="password"
-      name="password"
-      [(ngModel)]="password"
-      required
-      minlength="8"
-      autocomplete="current-password"
-    />
-  </label>
-
-  <!-- Submit button -->
-  <button
-    type="submit"
-    [disabled]="loading || form.invalid"
-  >
-    @if (loading) {
-      Logging in…
-    } @else {
-      Log in
-    }
-  </button>
-
-  <!-- Register link -->
-  <p class="register-link">
-    Don't have an account?
-    <a routerLink="/meta/register">Sign up</a>
-  </p>
-
-</form>
