@@ -19,8 +19,13 @@ export function provideSupabaseClient(
         detectSessionInUrl: true,
 
         flowType: 'pkce',
-        debug: false
-        
+        debug: false,
+        lock: {
+          // @ts-ignore
+          acquire: () => Promise.resolve(() => { }),
+          // @ts-ignore
+          release: () => { }
+        }
       }
     }
   );
