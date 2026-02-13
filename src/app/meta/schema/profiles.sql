@@ -1,11 +1,9 @@
-
 --------------- Create profiles table ---------------
 
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   username text not null unique,
   role text not null check (role in ('personal', 'team')),
-  email text,
   phone text,
   created_at timestamptz default now()
 );
@@ -42,7 +40,7 @@ using (auth.uid() = id);
 
 ----------- Trigger to auto-create profile on signup -----------
 
-create function public.handle_new_user()
+create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer
@@ -52,15 +50,15 @@ begin
     id,
     username,
     role,
-    email,
-    phone
+    phone,
+    created_at
   )
   values (
     new.id,
     new.raw_user_meta_data->>'username',
     coalesce(new.raw_user_meta_data->>'role', 'personal'),
-    new.raw_user_meta_data->>'email',
-    new.raw_user_meta_data->>'phone'
+    new.raw_user_meta_data->>'phone',
+    now()
   );
   return new;
 end;
@@ -70,4 +68,3 @@ create trigger on_auth_user_created
 after insert on auth.users
 for each row
 execute function public.handle_new_user();
-
