@@ -23,7 +23,7 @@
       <!-- Email -->
       <div class="form-group">
         <label for="email">Email</label>
-        <input id="email" type="email" formControlName="email" placeholder="name@example.com" autocomplete="email"
+        <input id="email" type="email" formControlName="email" placeholder="your.name@example.com" autocomplete="email"
           [class.invalid]="f['email'].invalid && f['email'].touched" />
         @if (f['email'].invalid && f['email'].touched) {
         <small class="error-text">Valid email is required</small>
@@ -33,7 +33,7 @@
       <!-- Password -->
       <div class="form-group">
         <label for="password">Password</label>
-        <input id="password" type="password" formControlName="password" placeholder="••••••••"
+        <input id="password" type="password" formControlName="password" placeholder="Password"
           autocomplete="current-password" [class.invalid]="f['password'].invalid && f['password'].touched" />
         @if (f['password'].invalid && f['password'].touched) {
         <small class="error-text">Password is required</small>

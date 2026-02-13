@@ -22,7 +22,7 @@ export class RegisterMeta implements OnDestroy {
 
   countryCodes = [
     { code: '+63', label: 'PH' },
-    { code: 'Other', label: 'Other' }
+    { code: 'Other', label: '*' }
   ];
 
   private readonly destroy$ = new Subject<void>();

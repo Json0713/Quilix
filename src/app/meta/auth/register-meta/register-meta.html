@@ -14,7 +14,7 @@
       <!-- Username -->
       <div class="form-group">
         <label for="username">Username</label>
-        <input id="username" type="text" formControlName="username" placeholder="johndoe" autocomplete="username"
+        <input id="username" type="text" formControlName="username" placeholder="Enter Username" autocomplete="username"
           [class.invalid]="f['username'].invalid && f['username'].touched" />
         @if (f['username'].invalid && f['username'].touched) {
         <small class="error-text">Username is required (min 3 chars)</small>
@@ -24,7 +24,7 @@
       <!-- Email -->
       <div class="form-group">
         <label for="email">Email</label>
-        <input id="email" type="email" formControlName="email" placeholder="name@example.com" autocomplete="email"
+        <input id="email" type="email" formControlName="email" placeholder="your.name@example.com" autocomplete="email"
           [class.invalid]="f['email'].invalid && f['email'].touched" />
         @if (f['email'].invalid && f['email'].touched) {
         <small class="error-text">Valid email is required</small>
@@ -34,7 +34,7 @@
       <!-- Password -->
       <div class="form-group">
         <label for="password">Password</label>
-        <input id="password" type="password" formControlName="password" placeholder="••••••••"
+        <input id="password" type="password" formControlName="password" placeholder="Enter Password"
           autocomplete="new-password" [class.invalid]="f['password'].invalid && f['password'].touched" />
         @if (f['password'].invalid && f['password'].touched) {
         <small class="error-text">Password must be at least 8 characters</small>
@@ -44,7 +44,7 @@
       <!-- Confirm Password -->
       <div class="form-group">
         <label for="confirmPassword">Confirm Password</label>
-        <input id="confirmPassword" type="password" formControlName="confirmPassword" placeholder="••••••••"
+        <input id="confirmPassword" type="password" formControlName="confirmPassword" placeholder="Enter Confirm Password"
           autocomplete="new-password"
           [class.invalid]="(f['confirmPassword'].invalid || registerForm.hasError('mismatch')) && f['confirmPassword'].touched" />
         @if (registerForm.hasError('mismatch') && f['confirmPassword'].touched) {
@@ -61,26 +61,36 @@
 
       <!-- Phone -->
       <div class="form-group">
-        <label for="phone">Phone <span class="optional">(Optional)</span></label>
+        <label for="phone">
+          Phone <span class="optional">(Optional)</span>
+        </label>
 
-        <div class="phone-input-group">
-          <!-- Country Select -->
+        <div class="phone-input-group phone-input-group--combined">
           <div class="select-wrapper">
             <select formControlName="countryCode">
               @for (country of countryCodes; track country.code) {
-              <option [value]="country.code">{{ country.label }} {{ country.code }}</option>
+              <option [value]="country.code">
+                {{ country.label }} {{ country.code }}
+              </option>
               }
             </select>
           </div>
 
-          <!-- Phone Number -->
-          <input id="phone" type="tel" formControlName="phone" (input)="onPhoneInput($event)"
-            [placeholder]="f['countryCode'].value === '+63' ? '912 345 6789' : 'Phone Number'" autocomplete="tel"
-            [class.invalid]="f['phone'].invalid && f['phone'].touched" />
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            (input)="onPhoneInput($event)"
+            [placeholder]="f['countryCode'].value === '+63' ? 'Phone Number' : 'Phone Number'"
+            autocomplete="tel"
+            [class.invalid]="f['phone'].invalid && f['phone'].touched"
+          />
         </div>
 
         @if (f['phone'].hasError('invalidPhPhone') && f['phone'].touched) {
-        <small class="error-text">Invalid PH number. Format: 9123456789 or 09123456789</small>
+        <small class="error-text">
+          Invalid PH number. Format: 9123456789 or 09123456789
+        </small>
         }
       </div>
 

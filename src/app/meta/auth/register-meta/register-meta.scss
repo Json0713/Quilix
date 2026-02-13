@@ -45,7 +45,7 @@
 
 .progress-track {
     width: 100%;
-    height: 14px;
+    height: 8px;
     /* Thin */
     background-color: var(--text-muted);
     border-radius: 99px;
@@ -124,23 +124,38 @@ form {
 
 /* Phone Input Group */
 .phone-input-group {
-    display: flex;
-    gap: 0.5rem;
+  display: flex;
+  width: 100%;
 
-    .select-wrapper {
-        width: 100px;
-        flex-shrink: 0;
+  .select-wrapper {
+    flex: 0 0 110px;
 
-        select {
-            height: 100%;
-            cursor: pointer;
-            font-weight: 600;
-        }
+    select {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px 0 0 8px;
+      border-right: 0;
+      font-weight: 600;
+      cursor: pointer;
     }
+  }
 
-    input {
-        flex: 1;
-    }
+  input {
+    flex: 1;
+    min-width: 0;
+    border-radius: 0 8px 8px 0;
+  }
+
+  select,
+  input {
+    border: 1px solid #ccc;
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  input.invalid {
+    border-color: #dc3545;
+  }
 }
 
 .error-text {
@@ -263,22 +278,18 @@ form {
         border: none;
         background: transparent;
         box-shadow: none;
-
-        /* On mobile, maybe float labels or just stack cleaner? 
-       For now, keep simple stack 
-    */
     }
-
+    
     .phone-input-group {
         flex-direction: row;
 
-
         .select-wrapper {
-            width: 35%;
+            flex: 0 0 100px;
         }
-        
+
         input {
             flex: 1;
+            min-width: 0;
         }
     }
 }
