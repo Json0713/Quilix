@@ -105,10 +105,17 @@ export class BackupService {
         ? BackupMigrator.migrate(normalized, BACKUP_VERSION)
         : normalized;
 
+    // Phase 3 Fix: Resolve conflicts BEFORE starting the transaction
+    // This prevents TransactionInactiveError by handling UI interaction first.
+    const finalWorkspaces = await this.resolveWorkspaces(
+      migrated.data.workspaces ?? [],
+      confirmReplace
+    );
+
     return this.applyBackup(
       migrated,
       expectedScope,
-      confirmReplace
+      finalWorkspaces
     );
   }
 
@@ -116,21 +123,14 @@ export class BackupService {
   private async applyBackup(
     backup: NormalizedBackup,
     scope: BackupScope,
-    confirmReplace: (name: string) => Promise<boolean>
+    workspacesToSave: Workspace[]
   ): Promise<{ importedWorkspaces: Workspace[] }> {
 
     return await db.transaction('rw', db.workspaces, db.sessions, async () => {
-      let importedWorkspaces: Workspace[] = [];
 
-      if (backup.data.workspaces?.length) {
-        const merged = await this.mergeWorkspaces(
-          backup.data.workspaces,
-          confirmReplace
-        );
-
-        // Bulk put (add or replace)
-        await db.workspaces.bulkPut(merged);
-        importedWorkspaces = backup.data.workspaces;
+      if (workspacesToSave.length) {
+        // Bulk put (add or replace) - This is now safe as we resolved conflicts already
+        await db.workspaces.bulkPut(workspacesToSave);
       }
 
       if (scope === 'appspace' && backup.data.session) {
@@ -138,7 +138,8 @@ export class BackupService {
         await db.sessions.add(backup.data.session);
       }
 
-      return { importedWorkspaces };
+      // Return the list of workspaces that were part of the backup
+      return { importedWorkspaces: backup.data.workspaces ?? [] };
     });
   }
 
@@ -175,32 +176,35 @@ export class BackupService {
     }
   }
 
-  private async mergeWorkspaces(
+  private async resolveWorkspaces(
     imported: Workspace[],
     confirmReplace: (name: string) => Promise<boolean>
   ): Promise<Workspace[]> {
 
+    // 1. Get current list outside transaction
     const existing = await db.workspaces.toArray();
+    const finalSet = [...existing];
 
     for (const workspace of imported) {
-      const index = existing.findIndex(
+      const index = finalSet.findIndex(
         w => w.name.toLowerCase() === workspace.name.toLowerCase()
       );
 
       if (index === -1) {
-        existing.push(workspace);
+        finalSet.push(workspace);
         continue;
       }
 
+      // 2. Ask user outside transaction
       const shouldReplace = await confirmReplace(workspace.name);
       if (!shouldReplace) {
         throw new Error('IMPORT_CANCELLED');
       }
 
-      existing[index] = workspace;
+      finalSet[index] = workspace;
     }
 
-    return existing;
+    return finalSet;
   }
 
   private async readBackupFile(
