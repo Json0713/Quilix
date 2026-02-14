@@ -8,10 +8,11 @@ import { Feature } from "../feature/feature";
 import { CtaStack } from "../cta-stack/cta-stack";
 import { ImgStack } from "../img-stack/img-stack";
 import { CtaKeyboard } from "../cta-keyboard/cta-keyboard";
+import { Valentines } from "../valentines/valentines";
 
 @Component({
   selector: 'app-public-index',
-  imports: [RouterModule, ThemeToggle, Header, Footer, Feature, CtaStack, ImgStack, CtaKeyboard],
+  imports: [RouterModule, ThemeToggle, Header, Footer, Feature, CtaStack, ImgStack, CtaKeyboard, Valentines],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })

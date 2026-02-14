@@ -1,0 +1,236 @@
+.valentines-container {
+    position: relative;
+    width: 100%;
+    padding: 4rem 2rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+/* ============================================================
+   Floating Hearts Background
+   ============================================================ */
+.hearts-background {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.floating-heart {
+    position: absolute;
+    bottom: -10%;
+    width: 30px;
+    height: 30px;
+    opacity: 0;
+    animation: floatUp 10s infinite ease-in;
+
+    svg {
+        width: 100%;
+        height: 100%;
+        fill: #ff6b9d;
+        filter: drop-shadow(0 2px 8px rgba(255, 107, 157, 0.3));
+    }
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 0;
+        transform: translateY(0) rotate(0deg);
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-120vh) rotate(360deg);
+    }
+}
+
+/* ============================================================
+   Main Content
+   ============================================================ */
+.valentines-content {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+    max-width: 600px;
+}
+
+.main-heart {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 2rem;
+    animation: heartbeat 1.5s infinite ease-in-out;
+
+    svg {
+        width: 100%;
+        height: 100%;
+        fill: url(#heartGradient);
+        filter: drop-shadow(0 4px 20px rgba(255, 107, 157, 0.5));
+    }
+}
+
+@keyframes heartbeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    10%,
+    30% {
+        transform: scale(1.1);
+    }
+
+    20%,
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* Add gradient definition */
+.main-heart svg {
+    fill: #ff6b9d;
+    background: linear-gradient(135deg, #ff6b9d 0%, #ff1744 100%);
+}
+
+.valentines-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, #ff6b9d 0%, #ff1744 50%, #ff6b9d 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 1rem;
+    animation: shimmer 3s infinite linear;
+    letter-spacing: -0.02em;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 0% center;
+    }
+
+    100% {
+        background-position: 200% center;
+    }
+}
+
+.valentines-message {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    color: var(--text-secondary, #888);
+    margin: 0 0 2rem;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+/* ============================================================
+   Sparkles
+   ============================================================ */
+.sparkles {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+}
+
+.sparkle {
+    display: inline-block;
+    animation: sparkle 2s infinite ease-in-out;
+
+    &:nth-child(1) {
+        animation-delay: 0s;
+    }
+
+    &:nth-child(2) {
+        animation-delay: 0.3s;
+        font-size: 2.5rem;
+    }
+
+    &:nth-child(3) {
+        animation-delay: 0.6s;
+    }
+}
+
+@keyframes sparkle {
+
+    0%,
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.3) rotate(180deg);
+        opacity: 0.7;
+    }
+}
+
+/* ============================================================
+   Responsive Design
+   ============================================================ */
+@media (max-width: 768px) {
+    .valentines-container {
+        padding: 3rem 1.5rem;
+        min-height: 350px;
+    }
+
+    .main-heart {
+        width: 90px;
+        height: 90px;
+    }
+
+    .floating-heart {
+        width: 20px;
+        height: 20px;
+    }
+
+    .sparkles {
+        gap: 1rem;
+        font-size: 1.5rem;
+
+        .sparkle:nth-child(2) {
+            font-size: 2rem;
+        }
+    }
+}
+
+/* ============================================================
+   Accessibility - Reduced Motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+
+    .floating-heart,
+    .main-heart,
+    .sparkle {
+        animation: none;
+    }
+
+    .valentines-title {
+        animation: none;
+        background: #ff6b9d;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+}
+
+/* ============================================================
+   Dark Theme Support
+   ============================================================ */
+[data-theme="dark"] {
+    .valentines-message {
+        color: rgba(255, 255, 255, 0.7);
+    }
+}
