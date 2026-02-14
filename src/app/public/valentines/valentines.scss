@@ -1,12 +1,12 @@
 .valentines-container {
     position: relative;
     width: 100%;
-    padding: 4rem 2rem;
+    padding: 6rem 2rem;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 400px;
+    min-height: 500px;
 }
 
 /* ============================================================
@@ -25,13 +25,13 @@
     width: 30px;
     height: 30px;
     opacity: 0;
-    animation: floatUp 10s infinite ease-in;
+    animation: floatUp 12s infinite linear;
 
     svg {
         width: 100%;
         height: 100%;
         fill: #ff6b9d;
-        filter: drop-shadow(0 2px 8px rgba(255, 107, 157, 0.3));
+        filter: drop-shadow(0 2px 8px rgba(255, 107, 157, 0.4));
     }
 }
 
@@ -42,11 +42,11 @@
     }
 
     10% {
-        opacity: 1;
+        opacity: 0.6;
     }
 
     90% {
-        opacity: 1;
+        opacity: 0.6;
     }
 
     100% {
@@ -56,64 +56,171 @@
 }
 
 /* ============================================================
+   Cupid & Arrow
+   ============================================================ */
+.cupid-zone {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.cupid {
+    position: absolute;
+    top: 20%;
+    left: 5%;
+    font-size: 3.5rem;
+    animation: floatCupid 4s infinite ease-in-out;
+    transform-origin: center;
+}
+
+@keyframes floatCupid {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(-5deg);
+    }
+
+    50% {
+        transform: translate(10px, -20px) rotate(5deg);
+    }
+}
+
+.flying-arrow {
+    position: absolute;
+    top: 30%;
+    left: 10%;
+    font-size: 2rem;
+    animation: shootArrow 4s infinite ease-in;
+    opacity: 0;
+}
+
+@keyframes shootArrow {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 0;
+    }
+
+    20% {
+        transform: translate(50px, 10px) scale(1);
+        opacity: 1;
+    }
+
+    80% {
+        transform: translate(45vw, 15vh) scale(1.2) rotate(10deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(50vw, 18vh) scale(0);
+        opacity: 0;
+    }
+}
+
+/* ============================================================
+   Walking Cat
+   ============================================================ */
+.cat-walker {
+    position: absolute;
+    bottom: 0;
+    left: -50px;
+    width: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.cat {
+    font-size: 2.5rem;
+    animation: walkCat 15s infinite linear;
+}
+
+@keyframes walkCat {
+    0% {
+        transform: translateX(0) scaleX(-1);
+    }
+
+    45% {
+        transform: translateX(110vw) scaleX(-1);
+    }
+
+    50% {
+        transform: translateX(110vw) scaleX(1);
+    }
+
+    95% {
+        transform: translateX(0) scaleX(1);
+    }
+
+    100% {
+        transform: translateX(0) scaleX(-1);
+    }
+}
+
+/* ============================================================
    Main Content
    ============================================================ */
 .valentines-content {
     position: relative;
     text-align: center;
-    z-index: 1;
+    z-index: 5;
     max-width: 600px;
 }
 
+.main-heart-wrapper {
+    perspective: 1000px;
+    margin-bottom: 2.5rem;
+}
+
 .main-heart {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 2rem;
-    animation: heartbeat 1.5s infinite ease-in-out;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto;
+    animation: intenseHeartbeat 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform-origin: center;
 
     svg {
         width: 100%;
         height: 100%;
-        fill: url(#heartGradient);
-        filter: drop-shadow(0 4px 20px rgba(255, 107, 157, 0.5));
+        /* No background on SVG itself to avoid square look */
+        filter: drop-shadow(0 8px 30px rgba(255, 23, 68, 0.6));
     }
 }
 
-@keyframes heartbeat {
+@keyframes intenseHeartbeat {
 
     0%,
     100% {
-        transform: scale(1);
+        transform: scale(1) rotate(0deg);
     }
 
-    10%,
+    15% {
+        transform: scale(1.15) rotate(-2deg);
+    }
+
     30% {
-        transform: scale(1.1);
+        transform: scale(1) rotate(0deg);
     }
 
-    20%,
-    40% {
-        transform: scale(1);
+    45% {
+        transform: scale(1.2) rotate(2deg);
     }
-}
-
-/* Add gradient definition */
-.main-heart svg {
-    fill: #ff6b9d;
-    background: linear-gradient(135deg, #ff6b9d 0%, #ff1744 100%);
 }
 
 .valentines-title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 700;
-    background: linear-gradient(135deg, #ff6b9d 0%, #ff1744 50%, #ff6b9d 100%);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #ff6b9d 10%, #ff1744 50%, #ff6b9d 90%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin: 0 0 1rem;
     animation: shimmer 3s infinite linear;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.04em;
+    text-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
 @keyframes shimmer {
@@ -127,11 +234,12 @@
 }
 
 .valentines-message {
-    font-size: clamp(1rem, 2.5vw, 1.25rem);
-    color: var(--text-secondary, #888);
-    margin: 0 0 2rem;
-    font-weight: 400;
+    font-size: clamp(1.1rem, 2.8vw, 1.5rem);
+    color: var(--text-secondary, #666);
+    margin: 0 0 2.5rem;
+    font-weight: 500;
     opacity: 0.9;
+    letter-spacing: 0.01em;
 }
 
 /* ============================================================
@@ -139,70 +247,41 @@
    ============================================================ */
 .sparkles {
     display: flex;
-    gap: 1.5rem;
+    gap: 2rem;
     justify-content: center;
     align-items: center;
-    font-size: 2rem;
+    font-size: 2.5rem;
 }
 
 .sparkle {
     display: inline-block;
-    animation: sparkle 2s infinite ease-in-out;
+    animation: sparkleRotate 2.5s infinite ease-in-out;
 
     &:nth-child(1) {
         animation-delay: 0s;
     }
 
     &:nth-child(2) {
-        animation-delay: 0.3s;
-        font-size: 2.5rem;
+        animation-delay: 0.4s;
+        font-size: 3rem;
     }
 
     &:nth-child(3) {
-        animation-delay: 0.6s;
+        animation-delay: 0.8s;
     }
 }
 
-@keyframes sparkle {
+@keyframes sparkleRotate {
 
     0%,
     100% {
-        transform: scale(1) rotate(0deg);
+        transform: scale(1) rotate(0deg) translateY(0);
         opacity: 1;
     }
 
     50% {
-        transform: scale(1.3) rotate(180deg);
-        opacity: 0.7;
-    }
-}
-
-/* ============================================================
-   Responsive Design
-   ============================================================ */
-@media (max-width: 768px) {
-    .valentines-container {
-        padding: 3rem 1.5rem;
-        min-height: 350px;
-    }
-
-    .main-heart {
-        width: 90px;
-        height: 90px;
-    }
-
-    .floating-heart {
-        width: 20px;
-        height: 20px;
-    }
-
-    .sparkles {
-        gap: 1rem;
-        font-size: 1.5rem;
-
-        .sparkle:nth-child(2) {
-            font-size: 2rem;
-        }
+        transform: scale(1.4) rotate(180deg) translateY(-10px);
+        opacity: 0.8;
     }
 }
 
@@ -213,16 +292,18 @@
 
     .floating-heart,
     .main-heart,
-    .sparkle {
-        animation: none;
+    .sparkle,
+    .cat,
+    .cupid,
+    .flying-arrow {
+        animation: none !important;
     }
 
     .valentines-title {
         animation: none;
-        background: #ff6b9d;
+        background: #ff1744;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
     }
 }
 
@@ -231,6 +312,10 @@
    ============================================================ */
 [data-theme="dark"] {
     .valentines-message {
-        color: rgba(255, 255, 255, 0.7);
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .valentines-title {
+        text-shadow: 0 4px 15px rgba(255, 23, 68, 0.3);
     }
 }

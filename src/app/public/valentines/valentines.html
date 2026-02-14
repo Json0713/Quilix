@@ -12,13 +12,32 @@
         }
     </div>
 
+    <!-- Animated Cat Section -->
+    <div class="cat-walker">
+        <div class="cat">🐈</div>
+    </div>
+
+    <!-- Cupid & Arrow Section -->
+    <div class="cupid-zone">
+        <div class="cupid">👼🏹</div>
+        <div class="flying-arrow">💘</div>
+    </div>
+
     <!-- Main Content -->
     <div class="valentines-content">
-        <div class="main-heart">
-            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M16 28c-0.256 0-0.512-0.098-0.707-0.293-5.854-5.854-10.293-10.707-10.293-15.707 0-4.411 3.589-8 8-8 2.114 0 4.109 0.84 5.586 2.343l0.414 0.414 0.414-0.414c1.477-1.503 3.472-2.343 5.586-2.343 4.411 0 8 3.589 8 8 0 5-4.439 9.853-10.293 15.707-0.195 0.195-0.451 0.293-0.707 0.293z" />
-            </svg>
+        <div class="main-heart-wrapper">
+            <div class="main-heart">
+                <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ff6b9d;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#ff1744;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#heartGrad)"
+                        d="M16 29c-0.256 0-0.512-0.098-0.707-0.293-5.854-5.854-10.293-10.707-10.293-15.707 0-4.411 3.589-8 8-8 2.114 0 4.109 0.84 5.586 2.343l0.414 0.414 0.414-0.414c1.477-1.503 3.472-2.343 5.586-2.343 4.411 0 8 3.589 8 8 0 5-4.439 9.853-10.293 15.707-0.195 0.195-0.451 0.293-0.707 0.293z" />
+                </svg>
+            </div>
         </div>
 
         <h2 class="valentines-title">Happy Valentine's Day!</h2>
