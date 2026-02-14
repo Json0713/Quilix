@@ -3,10 +3,11 @@ import { Router, RouterModule } from '@angular/router';
 
 import { MetaAuthService } from '../../../../core/auth/meta-auth.service';
 import { MetaProfileService } from '../../../../core/auth/meta-profile.service';
+import { Valentines } from "../../../../../public/valentines/valentines";
 
 @Component({
   selector: 'personal-meta-index',
-  imports: [RouterModule],
+  imports: [RouterModule, Valentines],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
