@@ -1,0 +1,124 @@
+/* ---------- PREVIEW CARD ---------- */
+.preview-card {
+    border-radius: 1.25rem;
+    padding: 0.2rem;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Header */
+.preview-header {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.badge {
+    background: var(--primary-soft);
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-alt);
+}
+
+/* ---------- ANIMATED COLUMNS ---------- */
+.preview-viewport {
+    overflow: hidden;
+    margin: 10px 0 2px 0;
+    padding: 2px;
+    border-radius: 15px;
+
+    /* fade edges */
+    mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
+}
+
+.preview-track {
+    display: flex;
+    gap: 0.75rem;
+    width: max-content;
+    margin-top: 0.5rem;
+
+    animation: columns-marquee 18s linear infinite;
+}
+
+.preview-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes columns-marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+/* Column */
+.column {
+    background: var(--bg);
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+    min-width: 120px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.column:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+
+
+    box-shadow:
+        0 0 6px var(--accent),
+        0 0 12px rgba(62, 73, 62, 0.2),
+        0 4px 16px rgba(0, 255, 0, 0.15),
+        0 8px 24px rgba(0, 255, 0, 0.1);
+}
+
+.column h4 {
+    font-size: 0.7rem;
+    color: var(--text-alt);
+    margin-bottom: 0.45rem;
+}
+
+/* Tasks */
+.task {
+    height: 0.6rem;
+    background: var(--accent);
+    border-radius: 0.4rem;
+    margin-bottom: 0.4rem;
+}
+
+.task.muted {
+    opacity: 0.4;
+}
+
+.task.done {
+    background: var(--success);
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+    .preview-card {
+        max-width: 610px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+    .column {
+        min-width: 160px;
+        padding: 0.75rem;
+    }
+
+    .task {
+        height: 0.7rem;
+    }
+
+    .preview-track {
+        animation-duration: 24s;
+    }
+}

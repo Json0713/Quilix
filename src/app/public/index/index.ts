@@ -9,9 +9,11 @@ import { CtaStack } from "../cta-stack/cta-stack";
 import { ImgStack } from "../img-stack/img-stack";
 import { CtaKeyboard } from "../cta-keyboard/cta-keyboard";
 
+import { Cta } from "../cta/cta";
+
 @Component({
   selector: 'app-public-index',
-  imports: [RouterModule, ThemeToggle, Header, Footer, Feature, CtaStack, ImgStack, CtaKeyboard],
+  imports: [RouterModule, ThemeToggle, Header, Footer, Feature, CtaStack, ImgStack, CtaKeyboard, Cta],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
@@ -19,6 +21,6 @@ export class PublicIndex {
 
   constructor(
     public version: QuilixVersionService
-  ) {}
+  ) { }
 
 }
