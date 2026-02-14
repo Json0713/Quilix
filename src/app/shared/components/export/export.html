@@ -1,15 +1,10 @@
-<section
-  class="export-card"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="export-title"
->
+<section class="export-card" role="dialog" aria-modal="true" aria-labelledby="export-title">
   <!-- HEADER -->
   <header class="export-header">
     <div class="header-text">
       <p id="export-title" class="export-title">Export your data</p>
       <span class="export-subtitle">
-        Save a backup of your workspace or user data
+        Save a backup of your individual Workspace or entire Appspace
       </span>
     </div>
   </header>
@@ -19,16 +14,8 @@
     <p class="label">Export format</p>
 
     <div class="format-grid">
-      <label
-        class="format-option is-primary"
-        [class.active]="format === 'backup'"
-      >
-        <input
-          type="radio"
-          name="format"
-          value="backup"
-          [(ngModel)]="format"
-        />
+      <label class="format-option is-primary" [class.active]="format === 'backup'">
+        <input type="radio" name="format" value="backup" [(ngModel)]="format" />
 
         <div class="format-icon">
           <i class="bi bi-archive"></i>
@@ -36,20 +23,12 @@
 
         <div class="format-text">
           <strong>Quilix Backup</strong>
-          <span>Recommended for most users</span>
+          <span>Recommended format</span>
         </div>
       </label>
 
-      <label
-        class="format-option is-secondary"
-        [class.active]="format === 'json'"
-      >
-        <input
-          type="radio"
-          name="format"
-          value="json"
-          [(ngModel)]="format"
-        />
+      <label class="format-option is-secondary" [class.active]="format === 'json'">
+        <input type="radio" name="format" value="json" [(ngModel)]="format" />
 
         <div class="format-icon">
           <i class="bi bi-braces"></i>
@@ -57,7 +36,7 @@
 
         <div class="format-text">
           <strong>JSON</strong>
-          <span>Advanced · Developer use</span>
+          <span>Raw data · Advanced use</span>
         </div>
       </label>
     </div>
@@ -65,25 +44,14 @@
 
   <!-- ACTIONS -->
   <div class="actions">
-    <button
-      type="button"
-      class="btn icon"
-      (click)="exportWorkspace()"
-      [disabled]="isExporting"
-      aria-label="Export Workspace"
-      title="Export Workspace"
-    >
+    <button type="button" class="btn icon secondary" (click)="exportAppspace()" [disabled]="isExporting"
+      aria-label="Export Appspace" title="Export Entire Appspace">
       <i class="bi bi-menu-button-wide"></i>
     </button>
 
-    <button
-      type="button"
-      class="btn primary"
-      (click)="exportCurrentUser()"
-      [disabled]="isExporting"
-    >
-      Export User
+    <button type="button" class="btn primary" (click)="exportWorkspace()" [disabled]="isExporting">
+      Export
     </button>
   </div>
-  
+
 </section>

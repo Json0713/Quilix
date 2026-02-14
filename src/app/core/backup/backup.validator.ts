@@ -52,7 +52,7 @@ export class BackupValidator {
   private static validateScope(
     scope?: BackupScope
   ): void {
-    if (scope !== 'workspace' && scope !== 'user') {
+    if (scope !== 'appspace' && scope !== 'workspace') {
       throw new Error('Invalid backup scope.');
     }
   }
@@ -67,10 +67,10 @@ export class BackupValidator {
       throw new Error('Backup data is invalid.');
     }
 
-    if (backup.scope === 'user') {
-      if (!Array.isArray(data.users) || data.users.length !== 1) {
+    if (backup.scope === 'workspace') {
+      if (!Array.isArray(data.workspaces) || data.workspaces.length !== 1) {
         throw new Error(
-          'User backup must contain exactly one user.'
+          'Workspace backup must contain exactly one workspace.'
         );
       }
     }
@@ -86,5 +86,4 @@ export class BackupValidator {
     );
   }
 
-  
 }

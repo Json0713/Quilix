@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { STORAGE_KEYS } from '../storage/storage.key';
-import { User } from '../interfaces/user';
+import { Workspace } from '../interfaces/workspace';
 import { Session } from '../interfaces/session';
 
 @Injectable({
@@ -21,38 +21,38 @@ export class Storage {
     localStorage.removeItem(key);
   }
 
-  /* USERS */
-  getUsers(): User[] {
-    return this.getItem<User[]>(STORAGE_KEYS.USERS) ?? [];
+  /* WORKSPACES */
+  getWorkspaces(): Workspace[] {
+    return this.getItem<Workspace[]>(STORAGE_KEYS.WORKSPACES) ?? [];
   }
 
-  saveUsers(users: User[]): void {
-    this.setItem(STORAGE_KEYS.USERS, users);
+  saveWorkspaces(workspaces: Workspace[]): void {
+    this.setItem(STORAGE_KEYS.WORKSPACES, workspaces);
   }
 
-  addUser(user: User): void {
-    const users = this.getUsers();
-    this.saveUsers([...users, user]);
+  addWorkspace(workspace: Workspace): void {
+    const workspaces = this.getWorkspaces();
+    this.saveWorkspaces([...workspaces, workspace]);
   }
 
-  removeUser(userId: string): void {
-    const users = this.getUsers().filter(u => u.id !== userId);
-    this.saveUsers(users);
+  removeWorkspace(workspaceId: string): void {
+    const workspaces = this.getWorkspaces().filter(w => w.id !== workspaceId);
+    this.saveWorkspaces(workspaces);
   }
 
-  getUserById(id: string): User | null {``
-    return this.getUsers().find(u => u.id === id) ?? null;
+  getWorkspaceById(id: string): Workspace | null {
+    return this.getWorkspaces().find(w => w.id === id) ?? null;
   }
-  
+
   /* Last Active */
-  updateUserLastActive(userId: string): void {
-    const users = this.getUsers().map(user =>
-      user.id === userId
-        ? { ...user, lastActiveAt: Date.now() }
-        : user
+  updateWorkspaceLastActive(workspaceId: string): void {
+    const workspaces = this.getWorkspaces().map(workspace =>
+      workspace.id === workspaceId
+        ? { ...workspace, lastActiveAt: Date.now() }
+        : workspace
     );
 
-    this.saveUsers(users);
+    this.saveWorkspaces(workspaces);
   }
 
   /* SESSION */

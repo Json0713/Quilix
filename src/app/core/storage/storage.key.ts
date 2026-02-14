@@ -1,5 +1,5 @@
 export const STORAGE_KEYS = {
-  USERS: 'quilix_users',
+  WORKSPACES: 'quilix_workspaces',
   SESSION: 'quilix_session',
   META: 'quilix_meta'
 } as const;

@@ -1,22 +1,20 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
-import { UserRole } from '../interfaces/user';
+import { WorkspaceRole } from '../interfaces/workspace';
 
-export const roleGuard = (requiredRole: UserRole): CanActivateFn => {
-
+export const roleGuard = (requiredRole: WorkspaceRole): CanActivateFn => {
   return async () => {
     const auth = inject(AuthService);
     const router = inject(Router);
 
-    const user = await auth.getCurrentUser();
+    const workspace = await auth.getCurrentWorkspace();
 
-    if (user?.role !== requiredRole) {
-      router.navigate(['/']);
+    if (workspace?.role !== requiredRole) {
+      router.navigate(['/login']);
       return false;
     }
 
     return true;
   };
-
 };

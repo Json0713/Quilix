@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { db } from '../db/app-db';
-import { User } from '../interfaces/user';
+import { Workspace } from '../interfaces/workspace';
 import { Session } from '../interfaces/session';
 
 import {
@@ -17,7 +17,7 @@ import {
 
 import { BackupValidator } from './backup.validator';
 import {
-  BackupMigrator, 
+  BackupMigrator,
   NormalizedBackup,
 } from './backup.migrator';
 
@@ -31,57 +31,57 @@ export class BackupService {
   ) { }
 
   /* ───────────────────────── EXPORT ───────────────────────── */
-  async exportWorkspace(
+  async exportAppspace(
     format: BackupFileFormat,
     filename?: string
   ): Promise<void> {
 
     // Fetch directly from DB
-    const users = await db.users.toArray();
+    const allWorkspaces = await db.workspaces.toArray();
     const session = await db.sessions.toCollection().first();
 
     const payload = this.buildBackupPayload(
-      'workspace',
-      users,
+      'appspace',
+      allWorkspaces,
       session
     );
 
     await this.share.shareOrDownload(
       payload,
-      filename ?? `quilix - workspace - ${Date.now()} `,
+      filename ?? `quilix - appspace - ${Date.now()} `,
       format
     );
   }
 
-  async exportCurrentUser(
+  async exportCurrentWorkspace(
     format: BackupFileFormat,
     filename?: string
   ): Promise<void> {
 
     const session = await db.sessions.toCollection().first();
-    if (!session?.userId) {
+    if (!session?.workspaceId) {
       throw new Error('No active session.');
     }
 
-    const user = await db.users.get(session.userId);
-    if (!user) {
-      throw new Error('Active user not found.');
+    const workspace = await db.workspaces.get(session.workspaceId);
+    if (!workspace) {
+      throw new Error('Active workspace not found.');
     }
 
     const payload = this.buildBackupPayload(
-      'user',
-      [user],
+      'workspace',
+      [workspace],
       session
     );
 
-    const safeName = user.name
+    const safeName = workspace.name
       .trim()
       .replace(/\s+/g, '-')
       .toLowerCase();
 
     await this.share.shareOrDownload(
       payload,
-      filename ?? `quilix - user - ${safeName} -${Date.now()} `,
+      filename ?? `quilix - workspace - ${safeName} -${Date.now()} `,
       format
     );
   }
@@ -91,7 +91,7 @@ export class BackupService {
     file: File,
     expectedScope: BackupScope,
     confirmReplace: (name: string) => Promise<boolean>
-  ): Promise<{ importedUsers: User[] }> {
+  ): Promise<{ importedWorkspaces: Workspace[] }> {
 
     const raw = await this.readBackupFile(file);
 
@@ -117,35 +117,35 @@ export class BackupService {
     backup: NormalizedBackup,
     scope: BackupScope,
     confirmReplace: (name: string) => Promise<boolean>
-  ): Promise<{ importedUsers: User[] }> {
+  ): Promise<{ importedWorkspaces: Workspace[] }> {
 
-    return await db.transaction('rw', db.users, db.sessions, async () => {
-      let importedUsers: User[] = [];
+    return await db.transaction('rw', db.workspaces, db.sessions, async () => {
+      let importedWorkspaces: Workspace[] = [];
 
-      if (backup.data.users?.length) {
-        const mergedUsers = await this.mergeUsers(
-          backup.data.users,
+      if (backup.data.workspaces?.length) {
+        const merged = await this.mergeWorkspaces(
+          backup.data.workspaces,
           confirmReplace
         );
 
         // Bulk put (add or replace)
-        await db.users.bulkPut(mergedUsers);
-        importedUsers = backup.data.users;
+        await db.workspaces.bulkPut(merged);
+        importedWorkspaces = backup.data.workspaces;
       }
 
-      if (scope === 'workspace' && backup.data.session) {
+      if (scope === 'appspace' && backup.data.session) {
         await db.sessions.clear();
         await db.sessions.add(backup.data.session);
       }
 
-      return { importedUsers };
+      return { importedWorkspaces };
     });
   }
 
   /* ───────────────────────── HELPERS ───────────────────────── */
   private buildBackupPayload(
     scope: BackupScope,
-    users?: User[],
+    workspaces?: Workspace[],
     session?: Session | undefined
   ): QuilixBackup {
 
@@ -158,7 +158,7 @@ export class BackupService {
         createdAt: Date.now(),
       },
       data: {
-        users,
+        workspaces,
         session: session ?? undefined,
       },
     };
@@ -175,29 +175,29 @@ export class BackupService {
     }
   }
 
-  private async mergeUsers(
-    imported: User[],
+  private async mergeWorkspaces(
+    imported: Workspace[],
     confirmReplace: (name: string) => Promise<boolean>
-  ): Promise<User[]> {
+  ): Promise<Workspace[]> {
 
-    const existing = await db.users.toArray();
+    const existing = await db.workspaces.toArray();
 
-    for (const user of imported) {
+    for (const workspace of imported) {
       const index = existing.findIndex(
-        u => u.name.toLowerCase() === user.name.toLowerCase()
+        w => w.name.toLowerCase() === workspace.name.toLowerCase()
       );
 
       if (index === -1) {
-        existing.push(user);
+        existing.push(workspace);
         continue;
       }
 
-      const shouldReplace = await confirmReplace(user.name);
+      const shouldReplace = await confirmReplace(workspace.name);
       if (!shouldReplace) {
         throw new Error('IMPORT_CANCELLED');
       }
 
-      existing[index] = user;
+      existing[index] = workspace;
     }
 
     return existing;

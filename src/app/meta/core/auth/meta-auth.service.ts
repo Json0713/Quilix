@@ -11,8 +11,8 @@ export interface MetaAuthMetadata {
   phone?: string | null;
 }
 
-@Injectable({ 
-  providedIn: 'root' 
+@Injectable({
+  providedIn: 'root'
 })
 export class MetaAuthService implements OnDestroy {
 

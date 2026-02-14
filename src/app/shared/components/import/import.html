@@ -1,10 +1,5 @@
-<section
-  class="import-card"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="import-title"
-  aria-describedby="import-description"
->
+<section class="import-card" role="dialog" aria-modal="true" aria-labelledby="import-title"
+  aria-describedby="import-description">
   <!-- HEADER -->
   <header class="import-header">
     <div>
@@ -15,102 +10,59 @@
 
     <!-- Dropdown wrapper -->
     <div class="scope-select">
-      <button
-        class="scope-trigger"
-        type="button"
-        (click)="scopeOpen = !scopeOpen"
-        aria-haspopup="listbox"
-        [attr.aria-expanded]="scopeOpen"
-      >
-        {{ scope === 'workspace' ? 'Workspace' : 'Userspace' }}
-        <i
-          class="bi bi-chevron-down"
-          [class.open]="scopeOpen"
-        ></i>
+      <button class="scope-trigger" type="button" (click)="scopeOpen = !scopeOpen" aria-haspopup="listbox"
+        [attr.aria-expanded]="scopeOpen">
+        {{ scope === 'workspace' ? 'Workspace' : 'Appspace' }}
+        <i class="bi bi-chevron-down" [class.open]="scopeOpen"></i>
       </button>
 
       @if (scopeOpen) {
-        <div class="scope-menu" role="listbox">
-          <button
-            role="option"
-            [class.active]="scope === 'workspace'"
-            [attr.aria-selected]="scope === 'workspace'"
-            (click)="setScope('workspace')"
-          >
-            Workspace
-          </button>
+      <div class="scope-menu" role="listbox">
+        <button role="option" [class.active]="scope === 'workspace'" [attr.aria-selected]="scope === 'workspace'"
+          (click)="setScope('workspace')">
+          Workspace
+        </button>
 
-          <button
-            role="option"
-            [class.active]="scope === 'user'"
-            [attr.aria-selected]="scope === 'user'"
-            (click)="setScope('user')"
-          >
-            Userspace
-          </button>
-        </div>
+        <button role="option" [class.active]="scope === 'appspace'" [attr.aria-selected]="scope === 'appspace'"
+          (click)="setScope('appspace')">
+          Appspace
+        </button>
+      </div>
       }
     </div>
   </header>
 
   <!-- DROPZONE -->
-  <label
-    class="import-dropzone"
-    role="button"
-    tabindex="0"
-    aria-label="Upload backup file"
-
-    (dragover)="onDragOver($event)"
-    (dragleave)="onDragLeave($event)"
-    (drop)="onDrop($event)"
-  >
+  <label class="import-dropzone" role="button" tabindex="0" aria-label="Upload backup file"
+    (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
     <i class="bi bi-cloud-arrow-down" aria-hidden="true"></i>
 
     @if (!file) {
-      <strong>Drop file here</strong>
-      <span>or click to browse (.json, .quilix-backup)</span>
+    <strong>Drop file here</strong>
+    <span>or click to browse (.json, .quilix-backup)</span>
     }
 
     @if (file) {
-      <strong
-        class="file-name"
-        [title]="file.name"
-      >
-        {{ file.name }}
-      </strong>
-      <span>{{ (file.size / 1024).toFixed(1) }} KB</span>
+    <strong class="file-name" [title]="file.name">
+      {{ file.name }}
+    </strong>
+    <span>{{ (file.size / 1024).toFixed(1) }} KB</span>
     }
 
-    <input
-      #fileInput
-      type="file"
-      accept=".json,.quilix-backup"
-      hidden
-      (change)="onFileSelected($event)"
-    />
+    <input #fileInput type="file" accept=".json,.quilix-backup" hidden (change)="onFileSelected($event)" />
   </label>
 
   <!-- ACTIONS -->
   <div class="actions">
-    <button
-      type="button"
-      class="btn secondary"
-      (click)="clearFile()"
-      [disabled]="!file || loading"
-    >
+    <button type="button" class="btn secondary" (click)="clearFile()" [disabled]="!file || loading">
       Remove
     </button>
 
-    <button
-      type="button"
-      class="btn primary"
-      (click)="submitImport()"
-      [disabled]="!file || loading"
-    >
+    <button type="button" class="btn primary" (click)="submitImport()" [disabled]="!file || loading">
       @if (loading) {
-        Importing…
+      Importing…
       } @else {
-        Import
+      Import
       }
     </button>
   </div>

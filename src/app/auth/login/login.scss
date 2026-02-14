@@ -54,12 +54,12 @@
 
 /* ===== Width constraints (desktop only) ===== */
 @media (min-width: 900px) {
-  .auth-primary > * {
+  .auth-primary>* {
     max-width: 544px;
     width: 100%;
   }
 
-  .auth-secondary > * {
+  .auth-secondary>* {
     max-width: 450px;
     width: 100%;
   }
@@ -100,6 +100,7 @@
   // Responsive
   @media (max-width: 900px) {
     margin-top: 32px;
+
     .description {
       font-size: 0.72rem;
       margin: auto;
@@ -237,10 +238,10 @@
     color: var(--text-disabled);
     opacity: 0.8;
     cursor: not-allowed;
-  } 
+  }
 
   @media (max-width: 720px) {
-    border-radius: 50px;  
+    border-radius: 50px;
     width: 100%;
   }
 }
@@ -300,7 +301,7 @@
 
   i {
     font-size: 2rem;
-    margin-bottom: 0.25rem;  
+    margin-bottom: 0.25rem;
   }
 
   p {
@@ -314,8 +315,8 @@
   }
 }
 
-/* USER LIST */
-.user-list {
+/* WORKSPACE LIST */
+.workspace-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -333,8 +334,8 @@
 
 }
 
-/* USER CARD */
-.user-card {
+/* WORKSPACE CARD */
+.workspace-card {
   background: var(--bg);
   border-radius: 21px;
   padding: 0.75rem 0.85rem;
@@ -349,14 +350,14 @@
     background: var(--bg-hover);
     border-color: #c7dadd;
   }
-  
+
   &.confirm {
     background: #af1a1a52;
     border-color: #fecaca;
   }
 }
 
-.user-info {
+.workspace-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -364,7 +365,7 @@
   cursor: pointer;
   flex: 1;
   transition: outline 0.15s;
-  
+
   overflow: hidden;
 
   &:focus-visible {
@@ -376,7 +377,7 @@
   }
 }
 
-.user-info-spinner {
+.workspace-info-spinner {
   margin: auto;
 }
 
@@ -393,13 +394,13 @@
   color: #fff;
   font-size: 1.2rem;
   flex-shrink: 0;
-  
+
   i {
     font-size: 1.6rem;
   }
 }
 
-.user-meta {
+.workspace-meta {
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -418,7 +419,7 @@
   small {
     font-size: 0.75rem;
     color: var(--text-muted);
-    
+
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

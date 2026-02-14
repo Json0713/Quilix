@@ -1,12 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth.service';
-import { UserService } from '../../core/users/user.service';
+import { WorkspaceService } from '../../core/workspaces/workspace.service';
 
-import { User, UserRole } from '../../core/interfaces/user';
+import { Workspace, WorkspaceRole } from '../../core/interfaces/workspace';
 
 import { Spinner } from '../../shared/ui/common/spinner/spinner';
 import { TimeAgoPipe } from '../../shared/ui/common/time-ago/time-ago-pipe';
@@ -24,13 +23,20 @@ import { ModalService } from '../../services/ui/common/modal/modal';
 export class Login implements OnInit, OnDestroy {
 
   name = '';
-  role: UserRole | null = null;
+  role: WorkspaceRole | null = null;
 
-  users: User[] = [];
-  usersSub: any;
+  workspaces: Workspace[] = [];
+  /** Subscription to Dexie live query. Using 'any' to avoid complex type mismatch with Dexie's Observable. */
+  private workspacesSub: any;
 
-  deletingUserId: string | null = null;
-  loadingUserId: string | null = null;
+  deletingWorkspaceId: string | null = null;
+  loadingWorkspaceId: string | null = null;
+
+  /** 
+   * Tracks IDs present BEFORE a creation starts to prevent flickering
+   * of the newly created workspace in the "Recent" list.
+   */
+  private snapshotWorkspaceIds: Set<string> = new Set();
 
   isSubmitting = false;
   errorMessage: string | null = null;
@@ -38,7 +44,7 @@ export class Login implements OnInit, OnDestroy {
 
   constructor(
     private auth: AuthService,
-    private usersService: UserService,
+    private workspaceService: WorkspaceService,
     private router: Router,
     private toastRelay: ToastRelayService,
     private modal: ModalService
@@ -50,33 +56,44 @@ export class Login implements OnInit, OnDestroy {
     this.loading = true;
 
     // Subscribe to live query from Dexie
-    this.usersSub = this.usersService.users$.subscribe(
-      (users) => {
-        this.users = users;
-        this.loading = false; // Data loaded
+    this.workspacesSub = this.workspaceService.workspaces$.subscribe(
+      (list: Workspace[]) => {
+        // While submitting, we "freeze" the view to the workspaces we knew about.
+        // This prevents the new workspace from flickering on/off during the delay.
+        if (this.isSubmitting) {
+          this.workspaces = list.filter(w => this.snapshotWorkspaceIds.has(w.id));
+        } else {
+          this.workspaces = list;
+        }
+        this.loading = false;
       }
     );
   }
 
   ngOnDestroy(): void {
-    this.usersSub?.unsubscribe();
+    this.workspacesSub?.unsubscribe();
   }
 
-  private redirect(role: UserRole): void {
+  private redirect(role: WorkspaceRole): void {
     this.router.navigate([role === 'personal' ? '/personal' : '/team']);
   }
 
-  /* Workspace Creation */
+  /**
+   * Creates a new local workspace (technical user profile)
+   */
   async createWorkspace(): Promise<void> {
     if (this.name.trim().length < 2 || !this.role || this.isSubmitting) return;
 
+    // CAPTURE SNAPSHOT: Set current IDs to prevent flickering before DB write
+    this.snapshotWorkspaceIds = new Set(this.workspaces.map(w => w.id));
     this.isSubmitting = true;
     this.errorMessage = null;
 
-    const result = await this.auth.createUser(this.name, this.role);
+    const result = await this.auth.createWorkspace(this.name, this.role);
 
     if (!result.success) {
       this.isSubmitting = false;
+      this.snapshotWorkspaceIds.clear();
 
       if (result.error === 'DUPLICATE_NAME') {
         this.errorMessage = 'A workspace with this name already exists.';
@@ -84,58 +101,59 @@ export class Login implements OnInit, OnDestroy {
       return;
     }
 
-    // Give a small delay for UI feedback if desired, or redirect immediately
+    // UX Delay for "Preparing Workspace" feel
     setTimeout(() => {
-      this.redirect(result.user!.role);
-
       // User flag to notify
       localStorage.setItem('justLoggedIn', 'true');
 
+      this.redirect(result.workspace!.role);
+
       this.isSubmitting = false;
+      this.snapshotWorkspaceIds.clear();
     }, 1800);
   }
 
-  /* Workspace Login */
-  async continueWorkspace(user: User): Promise<void> {
-    if (this.loadingUserId) return;
+  /**
+   * Resumes an existing local workspace
+   */
+  async continueWorkspace(workspace: Workspace): Promise<void> {
+    if (this.loadingWorkspaceId) return;
 
-    this.loadingUserId = user.id;
+    this.loadingWorkspaceId = workspace.id;
 
-    // Simulate load delay for UX if desired
+    // Simulate load delay for UX
     setTimeout(async () => {
-      await this.auth.loginExisting(user);
-      this.redirect(user.role);
+      await this.auth.loginExisting(workspace);
 
-      // User flag to notify
       localStorage.setItem('justLoggedIn', 'true');
 
-      this.loadingUserId = null;
-    }, 1900);
+      this.redirect(workspace.role);
+      this.loadingWorkspaceId = null;
+    }, 1500); // Slightly faster for existing ones
   }
 
   /* Workspace Deletion */
-  requestDelete(user: User): void {
-    this.deletingUserId = user.id;
+  requestDelete(workspace: Workspace): void {
+    this.deletingWorkspaceId = workspace.id;
   }
 
   cancelDelete(): void {
-    this.deletingUserId = null;
+    this.deletingWorkspaceId = null;
   }
 
-  confirmDelete(user: User): void {
-    this.loadingUserId = user.id;
+  confirmDelete(workspace: Workspace): void {
+    this.loadingWorkspaceId = workspace.id;
 
     setTimeout(async () => {
-      await this.auth.deleteUser(user.id);
-      // Logic for refreshing list is handled automatically by users$ subscription
+      await this.auth.deleteWorkspace(workspace.id);
 
-      this.deletingUserId = null;
-      this.loadingUserId = null;
+      this.deletingWorkspaceId = null;
+      this.loadingWorkspaceId = null;
     }, 1200);
   }
 
-  /* Avatar */
-  getAvatarColor(userId: string): string {
+  /* UI Helpers */
+  getAvatarColor(workspaceId: string): string {
     const colors = [
       '#4fa3a8', // teal
       '#6b8e23', // olive
@@ -146,15 +164,13 @@ export class Login implements OnInit, OnDestroy {
     ];
 
     let hash = 0;
-
-    for (let i = 0; i < userId.length; i++) {
-      hash = userId.charCodeAt(i) + ((hash << 5) - hash);
+    for (let i = 0; i < workspaceId.length; i++) {
+      hash = workspaceId.charCodeAt(i) + ((hash << 5) - hash);
     }
 
     return colors[Math.abs(hash) % colors.length];
   }
 
-  /* Import */
   openImport(): void {
     this.modal.openImport();
   }

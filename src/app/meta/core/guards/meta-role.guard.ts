@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, Router, UrlTree } from '@angular/router';
 
 import { MetaProfileService } from '../auth/meta-profile.service';
-import { MetaAuthService } from '../auth/meta-auth.service';
+import { MetaAuthService } from '../../core/auth/meta-auth.service';
 import { MetaUserRole } from '../../interfaces/meta-role';
 
 @Injectable({
-  providedIn: 'root' 
+  providedIn: 'root'
 })
 export class MetaRoleGuard implements CanActivate {
 
@@ -14,7 +14,7 @@ export class MetaRoleGuard implements CanActivate {
     private readonly auth: MetaAuthService,
     private readonly profiles: MetaProfileService,
     private readonly router: Router
-  ) {}
+  ) { }
 
   async canActivate(route: ActivatedRouteSnapshot): Promise<boolean | UrlTree> {
     const requiredRole = route.data['role'] as MetaUserRole;

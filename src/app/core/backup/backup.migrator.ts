@@ -69,8 +69,19 @@ export class BackupMigrator {
     backup: NormalizedBackup
   ): NormalizedBackup {
 
+    // Scope mapping for legacy files
+    let newScope = backup.scope;
+    if ((backup.scope as string) === 'user') {
+      newScope = 'workspace';
+    } else if ((backup.scope as string) === 'workspace') {
+      newScope = 'appspace';
+    } else if ((backup.scope as string) === 'full') {
+      newScope = 'appspace';
+    }
+
     return {
       ...backup,
+      scope: newScope,
       version: BACKUP_VERSION,
       meta: {
         ...backup.meta,

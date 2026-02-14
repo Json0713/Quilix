@@ -1,4 +1,4 @@
-import { User } from '../interfaces/user';
+import { Workspace } from '../interfaces/workspace';
 import { Session } from '../interfaces/session';
 
 /* ───────────────────────── VERSIONING ───────────────────────── */
@@ -14,10 +14,10 @@ export type AnyBackupVersion = BackupVersion | LegacyBackupVersion;
 /* ───────────────────────── SCOPE ───────────────────────── */
 /**
  * Defines what kind of backup this is.
- * - workspace: full app snapshot
- * - user: single-user snapshot
+ * - appspace: full app snapshot (all workspaces)
+ * - workspace: single-workspace snapshot
  */
-export type BackupScope = 'workspace' | 'user';
+export type BackupScope = 'appspace' | 'workspace';
 
 /* ───────────────────────── ROOT CONTRACT ───────────────────────── */
 /**
@@ -39,7 +39,7 @@ export interface QuilixBackup {
  * Optional fields allow partial backups and future expansion.
  */
 export interface BackupData {
-  users?: User[];
+  workspaces?: Workspace[];
   session?: Session | null;
 
   // Future IndexedDB entities

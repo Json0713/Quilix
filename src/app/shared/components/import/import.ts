@@ -7,7 +7,7 @@ import { ModalService } from '../../../services/ui/common/modal/modal';
 import { ToastService } from '../../../services/ui/common/toast/toast';
 import { ToastRelayService } from '../../../services/ui/common/toast/toast-relay';
 
-type ImportScope = 'workspace' | 'user';
+type ImportScope = 'workspace' | 'appspace';
 
 const ALLOWED_EXTENSIONS = [
   '.json',
@@ -34,7 +34,7 @@ export class Import {
     private readonly modal: ModalService,
     private readonly toast: ToastService,
     private readonly toastRelay: ToastRelayService
-  ) {}
+  ) { }
 
   /* ───────────── FILE HANDLING ───────────── */
   onFileSelected(event: Event): void {
@@ -76,10 +76,10 @@ export class Import {
         name => this.confirmReplace(name)
       );
 
-      if (this.scope === 'workspace') {
+      if (this.scope === 'appspace') {
         this.toastRelay.set(
           'success',
-          'Workspace imported successfully.'
+          'Appspace imported successfully.'
         );
 
         this.modal.cancelResult();
@@ -87,13 +87,13 @@ export class Import {
         return;
       }
 
-      if (!result.importedUsers.length) {
-        throw new Error('No users were imported.');
+      if (!result.importedWorkspaces.length) {
+        throw new Error('No workspaces were imported.');
       }
 
       this.toastRelay.set(
         'success',
-        `User "${result.importedUsers[0].name}" imported successfully.`
+        `Workspace "${result.importedWorkspaces[0].name}" imported successfully.`
       );
 
       this.modal.cancelResult();

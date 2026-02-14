@@ -7,9 +7,9 @@ export const authGuard: CanActivateFn = async () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  const currentUser = await auth.getCurrentUser();
+  const currentWorkspace = await auth.getCurrentWorkspace();
 
-  if (!currentUser) {
+  if (!currentWorkspace) {
     router.navigate(['/login']); // Redirect to login page specifically
     return false;
   }

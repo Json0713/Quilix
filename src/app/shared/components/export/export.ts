@@ -7,7 +7,7 @@ import { BackupFileFormat } from '../../../core/backup/backup.share';
 import { ToastService } from '../../../services/ui/common/toast/toast';
 import { ModalService } from '../../../services/ui/common/modal/modal';
 
-type ExportScope = 'workspace' | 'user';
+type ExportScope = 'workspace' | 'appspace';
 
 
 @Component({
@@ -25,60 +25,25 @@ export class Export {
     private readonly backup: BackupService,
     private readonly toast: ToastService,
     private readonly modal: ModalService
-  ) {}
+  ) { }
 
   /* ───────────────────────── EXPORT ACTIONS ───────────────────────── */
-  async exportCurrentUser(): Promise<void> {
-    if (this.isExporting) return;
-
-    const { label, extension } = this.getFormatInfo();
-
-    const confirmed = await this.modal.confirm(
-      this.buildUserExportMessage(),
-      {
-        title: 'Export Your Data',
-        confirmText: 'Export',
-        cancelText: 'Cancel',
-        notice: {
-          type: 'info',
-          scope: 'once',
-          message:
-          `Your account will be saved as a ${label} file. ` +
-          ``,
-        },
-      }
-    );
-
-    if (!confirmed) return;
-
-    await this.run(async () => {
-      await this.backup.exportCurrentUser(
-        this.format,
-        this.buildFilename('user')
-      );
-
-      this.toast.success(
-        'Your backup file will saved on your device.'
-      );
-    });
-  }
-
   async exportWorkspace(): Promise<void> {
     if (this.isExporting) return;
 
     const { label, extension } = this.getFormatInfo();
 
     const confirmed = await this.modal.confirm(
-      this.buildWorkspaceExportMessage(),
+      this.buildWorkspaceMessage(),
       {
         title: 'Export Workspace',
-        confirmText: 'Export Workspace',
+        confirmText: 'Export',
         cancelText: 'Cancel',
         notice: {
-          type: 'warning',
+          type: 'info',
+          scope: 'once',
           message:
-          `All accounts in this app will be exported as a ${label} file. ` +
-          ``,
+            `Your active workspace will be saved as a ${label} file.`,
         },
       }
     );
@@ -86,42 +51,73 @@ export class Export {
     if (!confirmed) return;
 
     await this.run(async () => {
-      await this.backup.exportWorkspace(
+      await this.backup.exportCurrentWorkspace(
         this.format,
         this.buildFilename('workspace')
       );
 
       this.toast.success(
-        'The workspace backup will saved on your device.'
+        'Workspace backup saved.'
+      );
+    });
+  }
+
+  async exportAppspace(): Promise<void> {
+    if (this.isExporting) return;
+
+    const { label, extension } = this.getFormatInfo();
+
+    const confirmed = await this.modal.confirm(
+      this.buildAppspaceMessage(),
+      {
+        title: 'Export Appspace',
+        confirmText: 'Export Everything',
+        cancelText: 'Cancel',
+        notice: {
+          type: 'warning',
+          message:
+            `All workspaces and app settings will be exported as a ${label} file.`,
+        },
+      }
+    );
+
+    if (!confirmed) return;
+
+    await this.run(async () => {
+      await this.backup.exportAppspace(
+        this.format,
+        this.buildFilename('appspace')
+      );
+
+      this.toast.success(
+        'Appspace backup saved.'
       );
     });
   }
 
   /* ───────────────────────── MESSAGE BUILDERS ───────────────────────── */
-  private buildUserExportMessage(): string {
+  private buildWorkspaceMessage(): string {
     return [
-      'You are about to export your user backup.',
+      'You are about to export an individual workspace backup.',
       '',
       'This includes:',
-      '• Your Profile',
-      '• Your Account data',
+      '• Workspace Profile',
+      '• All accounts within this workspace',
       '',
-      'The file will be saved locally on your device as file.',
-      'You can keep it as a backup or restore it later (Import).',
+      'The file can be restored later using the Import feature.',
     ].join('\n');
   }
 
-  private buildWorkspaceExportMessage(): string {
+  private buildAppspaceMessage(): string {
     return [
-      'You are about to export the entire workspace.',
+      'You are about to export your entire "Appspace".',
       '',
       'This includes:',
-      '• All Workspaces',
-      '• Workspace data',
-      '• App data and settings',
+      '• EVERY Workspace in this application',
+      '• Global app settings and configurations',
+      '• All locally stored metadata',
       '',
-      'The file will be saved locally on your device.',
-      'This file can be imported later to restore the entire workspace.',
+      'Use this for full application migrations or safety backups.',
     ].join('\n');
   }
 

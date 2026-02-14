@@ -8,14 +8,14 @@ import { Session } from '../interfaces/session';
 })
 export class SessionService {
 
-  constructor(private storage: Storage) {}
+  constructor(private storage: Storage) { }
 
-  start(userId: string): void {
+  start(workspaceId: string): void {
     const now = Date.now();
 
     const session: Session = {
       isLoggedIn: true,
-      userId,
+      workspaceId,
       startedAt: now,
       lastActiveAt: now,
     };

@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { User, UserRole } from '../interfaces/user';
-import { UserService } from '../users/user.service';
+import { Workspace, WorkspaceRole } from '../interfaces/workspace';
+import { WorkspaceService } from '../workspaces/workspace.service';
 import { db } from '../db/app-db';
 
 
@@ -18,43 +18,43 @@ export class AuthService {
   authEvents$ = this._authEvents.asObservable();
 
   constructor(
-    private users: UserService
+    private workspaces: WorkspaceService
   ) { }
 
-  async createUser(name: string, role: UserRole): Promise<CreateUserResult> {
-    if (await this.users.existsByName(name)) {
+  async createWorkspace(name: string, role: WorkspaceRole): Promise<CreateWorkspaceResult> {
+    if (await this.workspaces.existsByName(name)) {
       return { success: false, error: 'DUPLICATE_NAME' };
     }
 
-    const user = await this.users.create(name, role);
-    await this.startSession(user.id);
-    await this.users.updateLastActive(user.id);
+    const workspace = await this.workspaces.create(name, role);
+    await this.startSession(workspace.id);
+    await this.workspaces.updateLastActive(workspace.id);
 
-    return { success: true, user };
+    return { success: true, workspace };
   }
 
-  async loginExisting(user: User): Promise<void> {
-    await this.startSession(user.id);
-    await this.users.updateLastActive(user.id);
+  async loginExisting(workspace: Workspace): Promise<void> {
+    await this.startSession(workspace.id);
+    await this.workspaces.updateLastActive(workspace.id);
   }
 
-  async getCurrentUser(): Promise<User | undefined> {
+  async getCurrentWorkspace(): Promise<Workspace | undefined> {
     const session = await this.getSession();
-    if (!session?.isLoggedIn || !session.userId) return undefined;
-    return this.users.getById(session.userId);
+    if (!session?.isLoggedIn || !session.workspaceId) return undefined;
+    return this.workspaces.getById(session.workspaceId);
   }
 
   async restoreSession(): Promise<boolean> {
-    const user = await this.getCurrentUser();
-    if (!user) return false;
+    const workspace = await this.getCurrentWorkspace();
+    if (!workspace) return false;
 
-    await this.users.updateLastActive(user.id);
+    await this.workspaces.updateLastActive(workspace.id);
     return true;
   }
 
-  async hasRole(role: UserRole): Promise<boolean> {
-    const user = await this.getCurrentUser();
-    return user?.role === role;
+  async hasRole(role: WorkspaceRole): Promise<boolean> {
+    const workspace = await this.getCurrentWorkspace();
+    return workspace?.role === role;
   }
 
   async logout(isExternalSync = false): Promise<void> {
@@ -67,21 +67,21 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  async deleteUser(userId: string): Promise<void> {
-    await this.users.delete(userId);
+  async deleteWorkspace(workspaceId: string): Promise<void> {
+    await this.workspaces.delete(workspaceId);
 
     const session = await this.getSession();
-    if (session?.userId === userId) {
+    if (session?.workspaceId === workspaceId) {
       await this.logout();
     }
   }
 
   // Session Helpers
-  private async startSession(userId: string): Promise<void> {
+  private async startSession(workspaceId: string): Promise<void> {
     const now = Date.now();
     await db.sessions.clear();
     await db.sessions.put({
-      userId,
+      workspaceId,
       isLoggedIn: true,
       startedAt: now,
       lastActiveAt: now
@@ -95,8 +95,8 @@ export class AuthService {
   }
 }
 
-export interface CreateUserResult {
+export interface CreateWorkspaceResult {
   success: boolean;
   error?: 'DUPLICATE_NAME';
-  user?: User;
+  workspace?: Workspace;
 }
