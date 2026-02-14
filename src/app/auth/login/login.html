@@ -1,10 +1,9 @@
 <div class="root-container">
-
   <!-- ONE UNIFIED CARD -->
   <div class="container">
-    <!-- LEFT : CREATE / LOGIN -->
+    <!-- LEFT : CREATE / WORKSPACE -->
     <section class="auth-section auth-primary" role="form" aria-labelledby="login-title">
-
+      <!-- LEFT : HEADER / TITLE -->
       <div class="header-title" id="login-title" title="Quilix">
         <div class="brand-icon" routerLink="/" aria-label="Go to homepage">
           <i class="bi bi-feather"></i>
@@ -14,9 +13,9 @@
           Startup your day with a cup of coffee.
         </p>
       </div>
-
+      
+      <!-- FORM / WORKSPACE -->
       <form class="auth-form" (ngSubmit)="createWorkspace()" novalidate>
-
         <!-- Name -->
         <div class="field">
           <label for="name">Workspace</label>
@@ -55,7 +54,6 @@
             <span>Start Workspace</span>
           }
         </button>
-
       </form>
 
       <footer class="auth-footer">
@@ -162,14 +160,14 @@
         }
       }
 
+      <!-- RIGHT : FOOTER -->
       <footer class="footer">
         <p class="description">
-          • Plan tasks • Organize projects • Academic workflows <br />
+          • Plan tasks • Organize projects • Academic workflows <br/>
           • A focused, workspace built for modern learning.
         </p>
       </footer>
 
     </aside>
   </div>
-
 </div>
