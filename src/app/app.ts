@@ -28,7 +28,7 @@ export class App implements AfterViewInit {
   private toastRelay = inject(ToastRelayService);
   private updates = inject(QuilixUpdateService);
   private theme = inject(AppThemeService);
-  private sync: GlobalSyncService = inject(GlobalSyncService); // Wake up synchronization
+  private sync: GlobalSyncService = inject(GlobalSyncService);
 
   constructor() {
     this.toastRelay.consume();
@@ -38,8 +38,7 @@ export class App implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Mark app as ready after initial render to prevent FOUC
-    document.body.classList.add('app-ready');
+    // No FOUC prevention needed - animations are smooth enough
   }
 
 }
