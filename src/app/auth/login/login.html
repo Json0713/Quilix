@@ -23,7 +23,7 @@
           <input id="name" type="text" name="name" placeholder="Enter Workspace Name" [(ngModel)]="name" required
             minlength="2" maxlength="80" autocomplete="off" [class.invalid]="errorMessage" />
           @if (errorMessage) {
-          <p class="error-text">{{ errorMessage }}</p>
+            <p class="error-text">{{ errorMessage }}</p>
           }
         </div>
 
@@ -50,9 +50,9 @@
         <button type="submit" class="primary-action" [disabled]="name.trim().length < 2 || !role || isSubmitting"
           aria-busy="{{ isSubmitting }}">
           @if (isSubmitting) {
-          <app-spinner [size]="18"></app-spinner>
+            <app-spinner [size]="18"></app-spinner>
           } @else {
-          <span>Start Workspace</span>
+            <span>Start Workspace</span>
           }
         </button>
 
@@ -81,92 +81,85 @@
 
       <!-- INITIAL LOADING -->
       @if (loading) {
-      <div class="recent-loading" aria-busy="true">
-        <app-spinner [size]="28" class="mb-4" />
-        <p>Preparing your workspaces…</p>
-      </div>
-      }
-
+        <div class="recent-loading" aria-busy="true">
+          <app-spinner [size]="28" class="mb-4" />
+          <p>Preparing your workspaces…</p>
+        </div>
+      } 
+      
       @else {
-
-      <!-- Empty -->
-      @if (workspaces.length === 0) {
-      <div class="recent-empty">
-        <i class="bi bi-clock-history"></i>
-        <p>No recent workspaces</p>
-        <small>Create one to get started</small>
-      </div>
-      }
-
-      <!-- List -->
-      @if (workspaces.length > 0) {
-      <ul class="workspace-list" role="list">
-
-        @for (workspace of workspaces; track workspace.id) {
-
-        <li class="workspace-card" [class.confirm]="deletingWorkspaceId === workspace.id">
-
-          <!-- Normal -->
-          @if (deletingWorkspaceId !== workspace.id) {
-
-          <div class="workspace-info" role="button" tabindex="0" (click)="continueWorkspace(workspace)"
-            [attr.aria-busy]="loadingWorkspaceId === workspace.id">
-
-            <div class="avatar" [style.background]="getAvatarColor(workspace.id)" aria-hidden="true">
-              <i class="bi" [class.bi-mortarboard]="workspace.role === 'personal'"
-                [class.bi-person-workspace]="workspace.role === 'team'"></i>
-            </div>
-
-            <div class="workspace-meta">
-              <strong>{{ workspace.name }}</strong>
-              <small>
-                {{ workspace.role === 'personal' ? 'Personal' : 'Team' }}
-                · {{ workspace.lastActiveAt | timeAgo }}
-              </small>
-            </div>
-
-            @if (loadingWorkspaceId === workspace.id) {
-            <div class="workspace-info-spinner" aria-hidden="true">
-              <app-spinner [size]="24"></app-spinner>
-            </div>
-            }
+        <!-- Empty -->
+        @if (workspaces.length === 0) {
+          <div class="recent-empty">
+            <i class="bi bi-clock-history"></i>
+            <p>No recent workspaces</p>
+            <small>Create one to get started</small>
           </div>
-
-          <button type="button" class="delete-icon" aria-label="Delete workspace"
-            (click)="requestDelete(workspace); $event.stopPropagation()">
-            <i class="bi bi-x-diamond"></i>
-          </button>
-
-          }
-
-          <!-- Confirm Delete -->
-          @else {
-          <div class="confirm-delete">
-            <p>Delete this workspace?</p>
-
-            <div class="confirm-actions">
-              <button type="button" class="danger" (click)="confirmDelete(workspace)">
-                @if (loadingWorkspaceId === workspace.id) {
-                •••••••
-                } @else {
-                Delete
-                }
-              </button>
-
-              <button type="button" class="ghost" (click)="cancelDelete()">
-                Cancel
-              </button>
-            </div>
-          </div>
-          }
-
-        </li>
-
         }
 
-      </ul>
-      }
+        <!-- List -->
+        @if (workspaces.length > 0) {
+          <ul class="workspace-list" role="list">
 
+            @for (workspace of workspaces; track workspace.id) {
+              
+              <li class="workspace-card" [class.confirm]="deletingWorkspaceId === workspace.id">
+
+                <!-- Normal -->
+                @if (deletingWorkspaceId !== workspace.id) {
+                  <div class="workspace-info" role="button" tabindex="0" (click)="continueWorkspace(workspace)"
+                    [attr.aria-busy]="loadingWorkspaceId === workspace.id">
+
+                    <div class="avatar" [style.background]="getAvatarColor(workspace.id)" aria-hidden="true">
+                      <i class="bi" [class.bi-mortarboard]="workspace.role === 'personal'"
+                        [class.bi-person-workspace]="workspace.role === 'team'"></i>
+                    </div>
+
+                    <div class="workspace-meta">
+                      <strong>{{ workspace.name }}</strong>
+                      <small>
+                        {{ workspace.role === 'personal' ? 'Personal' : 'Team' }}
+                        · {{ workspace.lastActiveAt | timeAgo }}
+                      </small>
+                    </div>
+
+                    @if (loadingWorkspaceId === workspace.id) {
+                      <div class="workspace-info-spinner" aria-hidden="true">
+                        <app-spinner [size]="24"></app-spinner>
+                      </div>
+                    }
+                  </div>
+
+                  <button type="button" class="delete-icon" aria-label="Delete workspace"
+                    (click)="requestDelete(workspace); $event.stopPropagation()">
+                    <i class="bi bi-x-diamond"></i>
+                  </button>
+                }
+
+                <!-- Confirm Delete -->
+                @else {
+                  <div class="confirm-delete">
+                    <p>Delete this workspace?</p>
+
+                    <div class="confirm-actions">
+                      <button type="button" class="danger" (click)="confirmDelete(workspace)">
+                        @if (loadingWorkspaceId === workspace.id) {
+                          <app-spinner [size]="20"></app-spinner>
+                        } @else {
+                          Delete
+                        }
+                      </button>
+
+                      <button type="button" class="ghost" (click)="cancelDelete()">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                }
+              </li>
+            }
+          </ul>
+        }
       }
 
       <footer class="footer">
