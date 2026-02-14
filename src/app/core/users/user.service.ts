@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Storage } from '../storage/storage';
+import { liveQuery, Observable } from 'dexie';
+import { db } from '../db/app-db';
 import { User, UserRole } from '../interfaces/user';
 
 
@@ -8,26 +9,30 @@ import { User, UserRole } from '../interfaces/user';
 })
 export class UserService {
 
-  constructor(private storage: Storage) {}
+  // Real-time observable of users, sorted by lastActiveAt
+  readonly users$ = liveQuery(() =>
+    db.users.orderBy('lastActiveAt').reverse().toArray()
+  );
 
-  getAll(): User[] {
-    return this.storage
-      .getUsers()
-      .sort((a, b) => (b.lastActiveAt ?? 0) - (a.lastActiveAt ?? 0));
+  async getAll(): Promise<User[]> {
+    return db.users.orderBy('lastActiveAt').reverse().toArray();
   }
 
-  getById(id: string): User | null {
-    return this.storage.getUserById(id);
+  async getById(id: string): Promise<User | undefined> {
+    return db.users.get(id);
   }
 
-  existsByName(name: string): boolean {
+  async existsByName(name: string): Promise<boolean> {
     const normalized = name.trim().toLowerCase();
-    return this.storage
-      .getUsers()
-      .some(u => u.name.toLowerCase() === normalized);
+
+    // Dexie doesn't verify case-insensitivity by default with simple indexes,
+    // so we fetch all to check. For small datasets this is fine.
+    // For larger, we'd store a normalizedName field.
+    const all = await db.users.toArray();
+    return all.some(u => u.name.toLowerCase() === normalized);
   }
 
-  create(name: string, role: UserRole): User {
+  async create(name: string, role: UserRole): Promise<User> {
     const now = Date.now();
 
     const user: User = {
@@ -38,16 +43,16 @@ export class UserService {
       lastActiveAt: now,
     };
 
-    this.storage.addUser(user);
+    await db.users.add(user);
     return user;
   }
 
-  updateLastActive(userId: string): void {
-    this.storage.updateUserLastActive(userId);
+  async updateLastActive(userId: string): Promise<void> {
+    await db.users.update(userId, { lastActiveAt: Date.now() });
   }
 
-  delete(userId: string): void {
-    this.storage.removeUser(userId);
+  async delete(userId: string): Promise<void> {
+    await db.users.delete(userId);
   }
 
 }

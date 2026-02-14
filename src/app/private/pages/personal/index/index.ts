@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { AuthFacade } from '../../../../core/auth/auth.facade';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
 import { LoaderService } from '../../../../services/ui/common/loader/loader';
 import { Export } from "../../../../shared/components/export/export";
@@ -11,17 +11,17 @@ import { Export } from "../../../../shared/components/export/export";
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
-export class PersonalIndex {
+export class PersonalIndex implements OnInit {
 
   constructor(
-    private auth: AuthFacade,
+    private auth: AuthService,
     private loader: LoaderService,
     private modal: ModalService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadData();
-    
+
   }
 
   loadData(): void {
@@ -44,6 +44,6 @@ export class PersonalIndex {
 
     if (!confirmed) return;
 
-    this.auth.logout();
+    await this.auth.logout();
   }
 }

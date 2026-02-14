@@ -11,6 +11,8 @@ import { Loader } from './shared/ui/common/loader/loader';
 import { Modal } from './shared/ui/common/modal/modal';
 import { Toast } from './shared/ui/common/toast/toast';
 
+import { GlobalSyncService } from './core/sync/global-sync.service';
+
 
 @Component({
   selector: 'app-root',
@@ -26,11 +28,13 @@ export class App {
   private toastRelay = inject(ToastRelayService);
   private updates = inject(QuilixUpdateService);
   private theme = inject(AppThemeService);
+  private sync: GlobalSyncService = inject(GlobalSyncService); // Wake up synchronization
 
   constructor() {
     this.toastRelay.consume();
     this.updates.init();
     this.theme.init();
+    this.sync.init();
   }
 
 }

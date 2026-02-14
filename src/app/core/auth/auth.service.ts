@@ -1,64 +1,97 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
 import { User, UserRole } from '../interfaces/user';
 import { UserService } from '../users/user.service';
-import { SessionService } from '../session/session.service';
+import { db } from '../db/app-db';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(
-    private users: UserService,
-    private sessions: SessionService
-  ) {}
 
-  createUser(name: string, role: UserRole): CreateUserResult {
-    if (this.users.existsByName(name)) {
+  private router = inject(Router);
+
+  private readonly _authEvents = new Subject<'LOGIN' | 'LOGOUT'>();
+  /** Observable of internal auth events (for sync service) */
+  authEvents$ = this._authEvents.asObservable();
+
+  constructor(
+    private users: UserService
+  ) { }
+
+  async createUser(name: string, role: UserRole): Promise<CreateUserResult> {
+    if (await this.users.existsByName(name)) {
       return { success: false, error: 'DUPLICATE_NAME' };
     }
 
-    const user = this.users.create(name, role);
-    this.sessions.start(user.id);
-    this.users.updateLastActive(user.id);
+    const user = await this.users.create(name, role);
+    await this.startSession(user.id);
+    await this.users.updateLastActive(user.id);
 
     return { success: true, user };
   }
 
-  loginExisting(user: User): void {
-    this.sessions.start(user.id);
-    this.users.updateLastActive(user.id);
+  async loginExisting(user: User): Promise<void> {
+    await this.startSession(user.id);
+    await this.users.updateLastActive(user.id);
   }
 
-  getCurrentUser(): User | null {
-    const session = this.sessions.get();
-    if (!session?.isLoggedIn || !session.userId) return null;
+  async getCurrentUser(): Promise<User | undefined> {
+    const session = await this.getSession();
+    if (!session?.isLoggedIn || !session.userId) return undefined;
     return this.users.getById(session.userId);
   }
 
-  restoreSession(): boolean {
-    const user = this.getCurrentUser();
+  async restoreSession(): Promise<boolean> {
+    const user = await this.getCurrentUser();
     if (!user) return false;
 
-    this.users.updateLastActive(user.id);
+    await this.users.updateLastActive(user.id);
     return true;
   }
 
-  hasRole(role: UserRole): boolean {
-    return this.getCurrentUser()?.role === role;
+  async hasRole(role: UserRole): Promise<boolean> {
+    const user = await this.getCurrentUser();
+    return user?.role === role;
   }
 
-  logout(): void {
-    this.sessions.clear();
-  }
+  async logout(isExternalSync = false): Promise<void> {
+    await db.sessions.clear();
 
-  deleteUser(userId: string): void {
-    this.users.delete(userId);
-
-    const session = this.sessions.get();
-    if (session?.userId === userId) {
-      this.logout();
+    if (!isExternalSync) {
+      this._authEvents.next('LOGOUT');
     }
+
+    this.router.navigate(['/login']);
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    await this.users.delete(userId);
+
+    const session = await this.getSession();
+    if (session?.userId === userId) {
+      await this.logout();
+    }
+  }
+
+  // Session Helpers
+  private async startSession(userId: string): Promise<void> {
+    const now = Date.now();
+    await db.sessions.clear();
+    await db.sessions.put({
+      userId,
+      isLoggedIn: true,
+      startedAt: now,
+      lastActiveAt: now
+    });
+
+    this._authEvents.next('LOGIN');
+  }
+
+  private async getSession() {
+    return db.sessions.toCollection().first();
   }
 }
 

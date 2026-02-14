@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { AuthFacade } from '../auth/auth.facade';
+import { db } from '../db/app-db';
 import { User } from '../interfaces/user';
 import { Session } from '../interfaces/session';
 
@@ -17,7 +17,7 @@ import {
 
 import { BackupValidator } from './backup.validator';
 import {
-  BackupMigrator,
+  BackupMigrator, 
   NormalizedBackup,
 } from './backup.migrator';
 
@@ -27,9 +27,8 @@ import {
 export class BackupService {
 
   constructor(
-    private readonly auth: AuthFacade,
     private readonly share: BackupShareService
-  ) {}
+  ) { }
 
   /* ───────────────────────── EXPORT ───────────────────────── */
   async exportWorkspace(
@@ -37,15 +36,19 @@ export class BackupService {
     filename?: string
   ): Promise<void> {
 
+    // Fetch directly from DB
+    const users = await db.users.toArray();
+    const session = await db.sessions.toCollection().first();
+
     const payload = this.buildBackupPayload(
       'workspace',
-      this.auth.getUsers(),
-      this.auth.getSession()
+      users,
+      session
     );
 
     await this.share.shareOrDownload(
       payload,
-      filename ?? `quilix-workspace-${Date.now()}`,
+      filename ?? `quilix - workspace - ${Date.now()} `,
       format
     );
   }
@@ -55,12 +58,12 @@ export class BackupService {
     filename?: string
   ): Promise<void> {
 
-    const session = this.auth.getSession();
+    const session = await db.sessions.toCollection().first();
     if (!session?.userId) {
       throw new Error('No active session.');
     }
 
-    const user = this.auth.getUserById(session.userId);
+    const user = await db.users.get(session.userId);
     if (!user) {
       throw new Error('Active user not found.');
     }
@@ -78,7 +81,7 @@ export class BackupService {
 
     await this.share.shareOrDownload(
       payload,
-      filename ?? `quilix-user-${safeName}-${Date.now()}`,
+      filename ?? `quilix - user - ${safeName} -${Date.now()} `,
       format
     );
   }
@@ -116,30 +119,34 @@ export class BackupService {
     confirmReplace: (name: string) => Promise<boolean>
   ): Promise<{ importedUsers: User[] }> {
 
-    let importedUsers: User[] = [];
+    return await db.transaction('rw', db.users, db.sessions, async () => {
+      let importedUsers: User[] = [];
 
-    if (backup.data.users?.length) {
-      const mergedUsers = await this.mergeUsers(
-        backup.data.users,
-        confirmReplace
-      );
+      if (backup.data.users?.length) {
+        const mergedUsers = await this.mergeUsers(
+          backup.data.users,
+          confirmReplace
+        );
 
-      this.auth.saveUsers(mergedUsers);
-      importedUsers = backup.data.users;
-    }
+        // Bulk put (add or replace)
+        await db.users.bulkPut(mergedUsers);
+        importedUsers = backup.data.users;
+      }
 
-    if (scope === 'workspace' && backup.data.session) {
-      this.auth.saveSession(backup.data.session);
-    }
+      if (scope === 'workspace' && backup.data.session) {
+        await db.sessions.clear();
+        await db.sessions.add(backup.data.session);
+      }
 
-    return { importedUsers };
+      return { importedUsers };
+    });
   }
 
   /* ───────────────────────── HELPERS ───────────────────────── */
   private buildBackupPayload(
     scope: BackupScope,
     users?: User[],
-    session?: Session | null
+    session?: Session | undefined
   ): QuilixBackup {
 
     return {
@@ -152,7 +159,7 @@ export class BackupService {
       },
       data: {
         users,
-        session,
+        session: session ?? undefined,
       },
     };
   }
@@ -173,7 +180,7 @@ export class BackupService {
     confirmReplace: (name: string) => Promise<boolean>
   ): Promise<User[]> {
 
-    const existing = [...this.auth.getUsers()];
+    const existing = await db.users.toArray();
 
     for (const user of imported) {
       const index = existing.findIndex(

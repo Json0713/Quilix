@@ -1,19 +1,14 @@
 import { Routes } from '@angular/router';
 
-import { PersonalTemplate } from './template/template';
-import { PersonalIndex } from './index/index';
-
 export const PERSONAL_ROUTES: Routes = [
   {
     path: '',
-    component: PersonalTemplate,
+    loadComponent: () => import('./template/template').then(m => m.PersonalTemplate),
     children: [
       {
         path: '',
-        component: PersonalIndex
+        loadComponent: () => import('./index/index').then(m => m.PersonalIndex)
       }
-      // future:
-      // { path: 'tasks', component: PersonalTasks }
     ]
   }
 ];

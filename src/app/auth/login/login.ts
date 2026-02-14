@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { UserService } from '../../core/users/user.service';
@@ -20,12 +21,13 @@ import { ModalService } from '../../services/ui/common/modal/modal';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements OnInit, OnDestroy {
 
   name = '';
   role: UserRole | null = null;
 
   users: User[] = [];
+  usersSub: any;
 
   deletingUserId: string | null = null;
   loadingUserId: string | null = null;
@@ -41,13 +43,23 @@ export class Login {
     private toastRelay: ToastRelayService,
     private modal: ModalService
   ) {
-    this.users = this.usersService.getAll();
     this.toastRelay.consume();
-  } 
+  }
 
   ngOnInit(): void {
     this.loading = true;
-    setTimeout(() => (this.loading = false), 1200);
+
+    // Subscribe to live query from Dexie
+    this.usersSub = this.usersService.users$.subscribe(
+      (users) => {
+        this.users = users;
+        this.loading = false; // Data loaded
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.usersSub?.unsubscribe();
   }
 
   private redirect(role: UserRole): void {
@@ -55,13 +67,13 @@ export class Login {
   }
 
   /* Workspace Creation */
-  createWorkspace(): void {
+  async createWorkspace(): Promise<void> {
     if (this.name.trim().length < 2 || !this.role || this.isSubmitting) return;
 
     this.isSubmitting = true;
     this.errorMessage = null;
 
-    const result = this.auth.createUser(this.name, this.role);
+    const result = await this.auth.createUser(this.name, this.role);
 
     if (!result.success) {
       this.isSubmitting = false;
@@ -72,6 +84,7 @@ export class Login {
       return;
     }
 
+    // Give a small delay for UI feedback if desired, or redirect immediately
     setTimeout(() => {
       this.redirect(result.user!.role);
 
@@ -83,13 +96,14 @@ export class Login {
   }
 
   /* Workspace Login */
-  continueWorkspace(user: User): void {
+  async continueWorkspace(user: User): Promise<void> {
     if (this.loadingUserId) return;
 
     this.loadingUserId = user.id;
 
-    setTimeout(() => {
-      this.auth.loginExisting(user);
+    // Simulate load delay for UX if desired
+    setTimeout(async () => {
+      await this.auth.loginExisting(user);
       this.redirect(user.role);
 
       // User flag to notify
@@ -111,9 +125,10 @@ export class Login {
   confirmDelete(user: User): void {
     this.loadingUserId = user.id;
 
-    setTimeout(() => {
-      this.auth.deleteUser(user.id);
-      this.users = this.usersService.getAll();
+    setTimeout(async () => {
+      await this.auth.deleteUser(user.id);
+      // Logic for refreshing list is handled automatically by users$ subscription
+
       this.deletingUserId = null;
       this.loadingUserId = null;
     }, 1200);

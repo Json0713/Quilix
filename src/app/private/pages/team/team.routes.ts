@@ -1,19 +1,14 @@
 import { Routes } from '@angular/router';
 
-import { TeamTemplate } from './template/template';
-import { TeamIndex } from './index/index';
-
 export const TEAM_ROUTES: Routes = [
   {
     path: '',
-    component: TeamTemplate,
+    loadComponent: () => import('./template/template').then(m => m.TeamTemplate),
     children: [
       {
         path: '',
-        component: TeamIndex
+        loadComponent: () => import('./index/index').then(m => m.TeamIndex)
       }
-      // future:
-      // { path: 'tasks', component: TeamTasks }
     ]
   }
 ];

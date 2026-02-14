@@ -4,12 +4,12 @@ import { AuthService } from '../auth/auth.service';
 import { UserRole } from '../interfaces/user';
 
 export const roleGuard = (requiredRole: UserRole): CanActivateFn => {
-  
-  return () => {
+
+  return async () => {
     const auth = inject(AuthService);
     const router = inject(Router);
 
-    const user = auth.getCurrentUser();
+    const user = await auth.getCurrentUser();
 
     if (user?.role !== requiredRole) {
       router.navigate(['/']);
