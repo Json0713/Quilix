@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, AfterViewInit } from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { AppThemeService } from './core/theme/app-theme/app-theme.service';
 
@@ -20,7 +20,7 @@ import { GlobalSyncService } from './core/sync/global-sync.service';
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App {
+export class App implements AfterViewInit {
 
   protected readonly title = signal('Quilix');
   readonly network = inject(NetworkService);
@@ -35,6 +35,11 @@ export class App {
     this.updates.init();
     this.theme.init();
     this.sync.init();
+  }
+
+  ngAfterViewInit(): void {
+    // Mark app as ready after initial render to prevent FOUC
+    document.body.classList.add('app-ready');
   }
 
 }

@@ -1,0 +1,82 @@
+.skeleton-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.skeleton {
+    background-color: var(--surface-muted);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Variants */
+.skeleton-text {
+    height: 1rem;
+    border-radius: 4px;
+}
+
+.skeleton-circular {
+    border-radius: 50%;
+    aspect-ratio: 1;
+}
+
+.skeleton-rectangular {
+    border-radius: 8px;
+}
+
+.skeleton-card {
+    border-radius: 12px;
+    min-height: 120px;
+}
+
+.skeleton-button {
+    height: 40px;
+    border-radius: 8px;
+}
+
+/* Shimmer animation */
+.skeleton-animate::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.15) 50%,
+            transparent 100%);
+    animation: shimmer 1.5s infinite;
+    z-index: 1;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Dark theme adjustments */
+html.dark-theme {
+    .skeleton {
+        background-color: var(--surface);
+    }
+
+    .skeleton-animate::before {
+        background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.08) 50%,
+                transparent 100%);
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-animate::before {
+        animation: none;
+    }
+}

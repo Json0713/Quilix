@@ -20,16 +20,8 @@ export class PersonalIndex implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loadData();
-
-  }
-
-  loadData(): void {
-    this.loader.show();
-
-    setTimeout(() => {
-      this.loader.hide();
-    }, 1800);
+    // Data loading happens naturally through component lifecycle
+    // No artificial delays needed
   }
 
   async logout(): Promise<void> {

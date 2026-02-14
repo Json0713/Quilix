@@ -23,7 +23,7 @@
   --bg-hover: #e6ecec;
   --bg-active: #f4f8f9;
   --bg-accent: #0e686f;
-  
+
   --surface: #ffffff;
   --surface-muted: #eef3f4;
 
@@ -143,6 +143,7 @@ html {
 body {
   min-height: 100%;
   margin: 0;
+  
   background-color: var(--app-bg);
   transition: background-color var(--theme-transition) ease;
 }
@@ -152,6 +153,46 @@ body {
   background-color: var(--app-bg, #2b2a2a);
 }
 
+/* ============================================================
+   FOUC Prevention & Smooth Initial Load
+   ============================================================ */
+body:not(.app-ready) {
+  visibility: hidden;
+}
+
+body.app-ready {
+  animation: fadeInBody 300ms ease-in;
+}
+
+@keyframes fadeInBody {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   Route Transition Animations
+   ============================================================ */
+router-outlet+* {
+  animation: routeFadeIn 250ms ease-out;
+}
+
+@keyframes routeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 // Global Styling Bootstraping
 
 
@@ -159,7 +200,7 @@ body {
   position: relative;
   overflow: hidden;
 
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.06);
 
   backdrop-filter: blur(18px) saturate(140%);
@@ -190,10 +231,12 @@ body {
 html,
 body,
 * {
+
   /* Custom Scrollbar */
   .main::-webkit-scrollbar {
     width: 6px;
   }
+
   .main::-webkit-scrollbar-thumb {
     background-color: rgba(22, 81, 93, 0.834);
     border-radius: 3px;
@@ -203,7 +246,7 @@ body,
 /* WebKit (Chrome, Edge, Safari) */
 html::-webkit-scrollbar,
 body::-webkit-scrollbar,
-*::-webkit-scrollbar {  
+*::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
@@ -232,6 +275,7 @@ body::-webkit-scrollbar-thumb:hover,
 .main::-webkit-scrollbar {
   width: 6px;
 }
+
 .main::-webkit-scrollbar-thumb {
   background-color: (9, 91, 108, 0.834);
   border-radius: 3px;
@@ -239,6 +283,7 @@ body::-webkit-scrollbar-thumb:hover,
 
 /* Mobile / small screens */
 @media (max-width: 768px) {
+
   html::-webkit-scrollbar,
   body::-webkit-scrollbar,
   *::-webkit-scrollbar {

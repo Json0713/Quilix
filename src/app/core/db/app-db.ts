@@ -13,6 +13,11 @@ export class AppDatabase extends Dexie {
             workspaces: 'id, name, role, lastActiveAt',
             sessions: 'workspaceId' // workspaceId as PK for session
         });
+
+        // Open database connection early to optimize initial load
+        this.open().catch(err => {
+            console.error('[DB] Failed to open database:', err);
+        });
     }
 }
 
