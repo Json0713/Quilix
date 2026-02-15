@@ -1,0 +1,43 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed()" [class.mobile-open]="isMobileOpen()">
+    <div class="sidebar-header">
+        @if (!isCollapsed()) {
+        <div class="logo-container">
+            <i class="bi bi-rocket-takeoff-fill logo-icon"></i>
+            <span class="logo-text">Quilix</span>
+        </div>
+        }
+        <button class="toggle-btn" (click)="toggleSidebar()" [class.centered]="isCollapsed()"
+            [title]="isCollapsed() ? 'Expand' : 'Collapse'">
+            <i class="bi" [class.bi-chevron-left]="!isCollapsed()" [class.bi-chevron-right]="isCollapsed()"></i>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul class="nav-list">
+            @for (item of navItems; track item.label) {
+            <li class="nav-item">
+                <a [routerLink]="item.route" routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: item.route === './' }" class="nav-link" [title]="item.label"
+                    (click)="onItemClick()">
+                    <i [class]="item.icon" class="nav-icon"></i>
+                    @if (!isCollapsed()) {
+                    <span class="nav-label">{{ item.label }}</span>
+                    }
+                </a>
+            </li>
+            }
+        </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="profile-section">
+            <i class="bi bi-person-circle profile-icon"></i>
+            @if (!isCollapsed()) {
+            <div class="profile-info">
+                <span class="profile-name">Personal User</span>
+                <span class="profile-role">Individual</span>
+            </div>
+            }
+        </div>
+    </div>
+</aside>

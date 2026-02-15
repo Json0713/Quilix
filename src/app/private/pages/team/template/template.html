@@ -1,12 +1,28 @@
-<section class="team-root">
-  <main class="team">
-    @if (showEnableNotif) {
-      <button
-        class="btn btn-primary"
-        (click)="enableNotifications()">
-        Enable Notifications
-      </button>
-    }
-    <router-outlet />
-  </main>
-</section>
+<div class="layout-wrapper">
+  <!-- Mobile Toggle Button -->
+  <button class="mobile-toggle" (click)="toggleMobileSidebar()" aria-label="Toggle Menu">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <!-- Sidebar Backdrop (Mobile Only) -->
+  @if (isMobileOpen()) {
+  <div class="sidebar-backdrop" (click)="closeMobileSidebar()"></div>
+  }
+
+  <app-team-sidebar />
+
+  <section class="team-root">
+    <main class="team">
+      @if (showEnableNotif) {
+      <div class="notification-banner p-3">
+        <button class="btn btn-primary" (click)="enableNotifications()">
+          Enable Notifications
+        </button>
+      </div>
+      }
+      <div class="content-area">
+        <router-outlet />
+      </div>
+    </main>
+  </section>
+</div>

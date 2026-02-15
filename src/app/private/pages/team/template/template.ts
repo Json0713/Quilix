@@ -3,13 +3,26 @@ import { RouterOutlet } from '@angular/router';
 
 import { OsNotificationService } from '../../../../core/notifications/os-notification.service';
 
+import { TeamSidebarComponent } from '../common/sidebar/sidebar';
+import { SidebarService } from '../../../../core/sidebar/sidebar.service';
+
 @Component({
   selector: 'app-team-template',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, TeamSidebarComponent],
   templateUrl: './template.html',
   styleUrl: './template.scss',
 })
 export class TeamTemplate {
+  private sidebarService = inject(SidebarService);
+  isMobileOpen = this.sidebarService.isMobileOpen;
+
+  toggleMobileSidebar() {
+    this.sidebarService.toggleMobile();
+  }
+
+  closeMobileSidebar() {
+    this.sidebarService.closeMobile();
+  }
 
   private readonly osNotify = inject(OsNotificationService);
 

@@ -8,6 +8,10 @@ export const TEAM_ROUTES: Routes = [
       {
         path: '',
         loadComponent: () => import('./index/index').then(m => m.TeamIndex)
+      },
+      {
+        path: 'tasks',
+        loadComponent: () => import('./tasks/tasks').then(m => m.TeamTasks)
       }
     ]
   }

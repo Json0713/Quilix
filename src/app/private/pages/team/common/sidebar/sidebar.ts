@@ -1,0 +1,34 @@
+import { Component, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { SidebarService } from '../../../../../core/sidebar/sidebar.service';
+
+@Component({
+    selector: 'app-team-sidebar',
+    standalone: true,
+    imports: [RouterLink, RouterLinkActive],
+    templateUrl: './sidebar.html',
+    styleUrl: './sidebar.scss',
+})
+export class TeamSidebarComponent {
+    private sidebarService = inject(SidebarService);
+
+    isCollapsed = this.sidebarService.isCollapsed;
+    isMobileOpen = this.sidebarService.isMobileOpen;
+
+    navItems = [
+        { label: 'Team Dashboard', icon: 'bi bi-people-fill', route: './' },
+        { label: 'Team Tasks', icon: 'bi bi-list-check', route: './tasks' },
+    ];
+
+    toggleSidebar() {
+        if (this.isMobileOpen()) {
+            this.sidebarService.closeMobile();
+        } else {
+            this.sidebarService.toggleCollapsed();
+        }
+    }
+
+    onItemClick() {
+        this.sidebarService.closeMobile();
+    }
+}

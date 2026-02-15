@@ -2,14 +2,26 @@ import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { OsNotificationService } from '../../../../core/notifications/os-notification.service';
+import { PersonalSidebarComponent } from '../common/sidebar/sidebar';
+import { SidebarService } from '../../../../core/sidebar/sidebar.service';
 
 @Component({
   selector: 'app-personal-template',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, PersonalSidebarComponent],
   templateUrl: './template.html',
   styleUrl: './template.scss',
 })
 export class PersonalTemplate {
+  private sidebarService = inject(SidebarService);
+  isMobileOpen = this.sidebarService.isMobileOpen;
+
+  toggleMobileSidebar() {
+    this.sidebarService.toggleMobile();
+  }
+
+  closeMobileSidebar() {
+    this.sidebarService.closeMobile();
+  }
 
   private readonly osNotify = inject(OsNotificationService);
 
