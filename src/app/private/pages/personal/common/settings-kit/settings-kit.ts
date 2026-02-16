@@ -18,7 +18,7 @@ export class SettingsKitComponent {
 
   isCollapsed = this.sidebarService.isCollapsed;
   currentTheme = this.themeService.theme;
-  
+
   showTools = signal(false);
 
   notificationPermission = signal<NotificationPermission>(
@@ -26,15 +26,14 @@ export class SettingsKitComponent {
   );
 
   handleSettingsClick(event: Event) {
-    if (this.isCollapsed()) {
-      event.preventDefault();
-      this.sidebarService.setCollapsed(false);
-    }
+    // Navigate directly, but close mobile sidebar if open
+    this.sidebarService.closeMobile();
   }
 
   toggleTools(event: Event) {
     event.stopPropagation();
     if (this.isCollapsed()) {
+      // Expand sidebar to show tools when collapsed on desktop
       this.sidebarService.setCollapsed(false);
       this.showTools.set(true);
     } else {
@@ -48,7 +47,7 @@ export class SettingsKitComponent {
 
   async enableNotifications() {
     if (!('Notification' in window)) return;
-    
+
     const permission = await Notification.requestPermission();
     this.notificationPermission.set(permission);
 
