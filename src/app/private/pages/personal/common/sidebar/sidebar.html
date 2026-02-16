@@ -1,13 +1,13 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed()" [class.mobile-open]="isMobileOpen()">
     <div class="sidebar-header">
         @if (!isCollapsed()) {
-        <div class="logo-container">
+        <a class="logo-container" routerLink="/personal">
             <i class="bi bi-feather logo-icon"></i>
             <span class="logo-text">Quilix</span>
-        </div>
+        </a>
         }
-        <button class="toggle-btn" 
-            (click)="toggleSidebar()" 
+        <button class="toggle-btn"
+            (click)="toggleSidebar()"
             [class.centered]="isCollapsed()"
             [title]="isCollapsed() ? 'Expand' : 'Close'"
         >

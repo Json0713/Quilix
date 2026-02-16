@@ -1,17 +1,17 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed()" [class.mobile-open]="isMobileOpen()">
     <div class="sidebar-header">
         @if (!isCollapsed()) {
-        <div class="logo-container">
+        <a class="logo-container" routerLink="/team">
             <i class="bi bi-feather logo-icon"></i>
-            <span class="logo-text">Quilix Team</span>
-        </div>
+            <span class="logo-text">Quilix</span>
+        </a>
         }
-        <button class="toggle-btn" 
-            (click)="toggleSidebar()" 
+        <button class="toggle-btn"
+            (click)="toggleSidebar()"
             [class.centered]="isCollapsed()"
             [title]="isCollapsed() ? 'Expand' : 'Close'"
         >
-            <i class="bi" 
+            <i class="bi"
                 [class.bi-layout-sidebar-inset]="!isCollapsed()" 
                 [class.bi-layout-sidebar]="isCollapsed()"
             ></i>
