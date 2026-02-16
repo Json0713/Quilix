@@ -1,0 +1,203 @@
+.settings-kit {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    margin-top: 6px;
+
+    .nav-item {
+        list-style: none;
+    }
+
+    .nav-link,
+    .tools-toggle {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0.18rem 1rem;
+        border-radius: 12px;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        background: transparent;
+        border: none;
+        width: 100%;
+        cursor: pointer;
+        font-size: 0.9rem;
+        white-space: nowrap;
+
+        &:hover {
+            background: var(--bg-hover);
+            color: var(--text-main);
+        }
+
+        &.active {
+            background: var(--bg-active);
+            color: var(--text-main);
+            font-weight: 600;
+
+            .nav-icon {
+                color: var(--text-main);
+            }
+        }
+    }
+
+    .nav-icon {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .nav-label {
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .quick-tools-container {
+        position: relative;
+    }
+
+    .arrow-icon {
+        font-size: 0.8rem;
+        transition: transform 0.3s ease;
+
+        &.rotated {
+            transform: rotate(90deg);
+        }
+    }
+
+    .tools-menu {
+        margin-top: 6px;
+        padding: 0.75rem;
+        background: var(--bg-alt);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        animation: slideDown 0.3s ease;
+
+        .tool-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            .section-title {
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-muted);
+                font-weight: 600;
+                opacity: 0.7;
+            }
+        }
+
+        .theme-options {
+            display: flex;
+            gap: 6px;
+
+            button {
+                flex: 1;
+                aspect-ratio: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--bg-muted);
+                border: 1px solid transparent;
+                border-radius: 8px;
+                color: var(--text-muted);
+                transition: all 0.2s ease;
+                cursor: pointer;
+
+                &:hover {
+                    background: var(--bg-hover);
+                    color: var(--text-main);
+                }
+
+                &.active {
+                    background: var(--bg-active);
+                    color: var(--text-main);
+                    border-color: rgba(255, 255, 255, 0.1);
+                }
+
+                i {
+                    font-size: 1rem;
+                }
+            }
+        }
+
+        .notif-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-muted);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: var(--text-main);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+
+            &:hover:not(:disabled) {
+                background: var(--bg-hover);
+            }
+
+            &:disabled {
+                opacity: 0.8;
+                cursor: default;
+                color: var(--accent);
+                background: var(--bg-active);
+            }
+        }
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Collapsed State adjustments
+:host-context(.collapsed) {
+    .settings-kit {
+        padding: 0.5rem 0;
+        align-items: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+        .nav-item {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-link,
+        .tools-toggle {
+            justify-content: center;
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            margin: 0 auto;
+
+            .nav-icon {
+                margin: 0;
+                font-size: 1.25rem;
+            }
+        }
+
+        .tools-menu {
+            display: none;
+        }
+    }
+}

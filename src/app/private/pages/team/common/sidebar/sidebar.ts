@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SidebarService } from '../../../../../core/sidebar/sidebar.service';
+import { SettingsKitComponent } from '../settings-kit/settings-kit';
 
 @Component({
     selector: 'app-team-sidebar',
     standalone: true,
-    imports: [RouterLink, RouterLinkActive],
+    imports: [RouterLink, RouterLinkActive, SettingsKitComponent],
     templateUrl: './sidebar.html',
     styleUrl: './sidebar.scss',
 })

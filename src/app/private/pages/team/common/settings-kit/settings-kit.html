@@ -1,0 +1,51 @@
+<div class="settings-kit" [class.expanded-tools]="showTools()">
+    <div class="nav-item">
+        <a [routerLink]="['./settings']" routerLinkActive="active" class="nav-link" title="Settings"
+            (click)="handleSettingsClick($event)">
+            <i class="bi bi-gear nav-icon"></i>
+            @if (!isCollapsed()) {
+            <span class="nav-label">Settings</span>
+            }
+        </a>
+    </div>
+
+    <div class="quick-tools-container">
+        <button class="tools-toggle" (click)="toggleTools($event)" [title]="showTools() ? 'Hide Tools' : 'Quick Tools'">
+            <i class="bi" [class.bi-tools]="!showTools()" [class.bi-chevron-down]="showTools()"></i>
+            @if (!isCollapsed()) {
+            <span class="nav-label">Quick Tools</span>
+            <i class="bi bi-chevron-right ms-auto arrow-icon" [class.rotated]="showTools()"></i>
+            }
+        </button>
+
+        @if (showTools() && !isCollapsed()) {
+        <div class="tools-menu">
+            <div class="tool-section">
+                <span class="section-title">Theme</span>
+                <div class="theme-options">
+                    <button (click)="setTheme('light')" [class.active]="currentTheme() === 'light'" title="Light Mode">
+                        <i class="bi bi-sun"></i>
+                    </button>
+                    <button (click)="setTheme('dark')" [class.active]="currentTheme() === 'dark'" title="Dark Mode">
+                        <i class="bi bi-moon-stars"></i>
+                    </button>
+                    <button (click)="setTheme('system')" [class.active]="currentTheme() === 'system'"
+                        title="System Default">
+                        <i class="bi bi-display"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tool-section">
+                <span class="section-title">Notifications</span>
+                <button class="notif-btn" [disabled]="notificationPermission() === 'granted'"
+                    (click)="enableNotifications()">
+                    <i class="bi" [class.bi-bell]="notificationPermission() !== 'granted'"
+                        [class.bi-bell-fill]="notificationPermission() === 'granted'"></i>
+                    <span>{{ notificationPermission() === 'granted' ? 'Enabled' : 'Enable Now' }}</span>
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+</div>
