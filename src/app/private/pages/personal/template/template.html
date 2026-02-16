@@ -1,5 +1,5 @@
-<div class="layout-wrapper">
-  
+<div class="layout-wrapper" [class.collapsed]="isCollapsed()">
+
   <!-- Mobile Toggle Button -->
   <button class="mobile-toggle" (click)="toggleMobileSidebar()" aria-label="Toggle Menu">
     <i class="bi bi-list"></i>
@@ -21,7 +21,7 @@
         </button>
       </div>
       } -->
-      <div class="content-area">
+      <div class="container">
         <router-outlet />
       </div>
     </main>

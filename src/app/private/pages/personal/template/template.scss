@@ -3,7 +3,7 @@
   flex: 1;
 
   min-height: 100vh;
-  min-width: 100vw;
+  min-width: 0;
 
   overflow: hidden;
   position: relative;
@@ -75,6 +75,9 @@
   display: flex;
   flex-direction: column;
 
+  margin-left: 260px;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
   .personal {
     flex: 1;
     display: flex;
@@ -85,6 +88,12 @@
   }
 }
 
-router-outlet {
-  display: none;
+.layout-wrapper.collapsed .personal-root {
+  margin-left: 72px;
+}
+
+@media (max-width: 770px) {
+  .personal-root {
+    margin-left: 0;
+  }
 }
