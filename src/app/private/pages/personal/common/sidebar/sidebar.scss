@@ -1,5 +1,6 @@
 .sidebar {
     display: flex;
+    flex: 1;
     flex-direction: column;
     height: 100%;
 
@@ -7,7 +8,9 @@
     background-color: var(--surface);
     color: var(--text-main);
     border-right: 1px solid var(--border);
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
     position: relative;
     z-index: 1100; // Higher than backdrop
     will-change: width, transform;
