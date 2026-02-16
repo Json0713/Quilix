@@ -24,7 +24,7 @@
   position: relative;
   width: 100%;
   max-width: 420px;
-  background: var(--bg-active);
+  background: var(--surface-main);
   border-radius: 18px;
   padding: 24px 22px 22px;
   box-shadow:
@@ -42,7 +42,7 @@
   height: 34px;
   border-radius: 999px;
   border: none;
-  background: var(--bg);
+  background: var(--bg-alt);
   color: var(--text-main);
   display: grid;
   place-items: center;
