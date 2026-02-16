@@ -13,9 +13,18 @@ export class SidebarService {
     isMobileOpen = signal(false);
 
     constructor() {
-        // Persist state changes
+        // Persist collapsed state
         effect(() => {
             localStorage.setItem(this.STORAGE_KEY, String(this.isCollapsed()));
+        });
+
+        // Lock body scroll when mobile sidebar is open
+        effect(() => {
+            if (this.isMobileOpen()) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
         });
     }
 
