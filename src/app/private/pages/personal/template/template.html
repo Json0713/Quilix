@@ -1,4 +1,5 @@
 <div class="layout-wrapper">
+  
   <!-- Mobile Toggle Button -->
   <button class="mobile-toggle" (click)="toggleMobileSidebar()" aria-label="Toggle Menu">
     <i class="bi bi-list"></i>
@@ -13,13 +14,13 @@
 
   <section class="personal-root">
     <main class="personal">
-      @if (showEnableNotif) {
+      <!-- @if (showEnableNotif) {
       <div class="notification-banner p-3">
         <button class="btn btn-primary" (click)="enableNotifications()">
           Enable Notifications
         </button>
       </div>
-      }
+      } -->
       <div class="content-area">
         <router-outlet />
       </div>
