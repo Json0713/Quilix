@@ -1,7 +1,7 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed()" [class.mobile-open]="isMobileOpen()">
     <div class="sidebar-header">
         @if (!isCollapsed()) {
-        <a class="logo-container" [routerLink]="['./']" (click)="toggleSidebar()">
+        <a class="logo-container" [routerLink]="['./']" (click)="toggleSidebar()" title="Quilix">
             <i class="bi bi-feather logo-icon"></i>
             <span class="logo-text">Quilix</span>
         </a>
