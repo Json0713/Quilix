@@ -1,8 +1,9 @@
 .layout-wrapper {
   display: flex;
+  flex: 1;
 
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  min-width: 0;
   
   overflow: hidden;
   position: relative;
@@ -74,6 +75,9 @@
   display: flex;
   flex-direction: column;
 
+  margin-left: 260px;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
   .team {
     flex: 1;
     display: flex;
@@ -81,14 +85,15 @@
 
     min-width: 0;
     min-height: 0;
+  }
+}
 
-    .notification-banner {
-      border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-    }
+.layout-wrapper.collapsed .team-root {
+  margin-left: 72px;
+}
 
-    .content-area {
-      flex: 1;
-      padding: 0;
-    }
+@media (max-width: 770px) {
+  .team-root {
+    margin-left: 0;
   }
 }

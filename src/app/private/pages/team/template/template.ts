@@ -15,6 +15,7 @@ import { SidebarService } from '../../../../core/sidebar/sidebar.service';
 export class TeamTemplate {
   private sidebarService = inject(SidebarService);
   isMobileOpen = this.sidebarService.isMobileOpen;
+  isCollapsed = this.sidebarService.isCollapsed;
 
   toggleMobileSidebar() {
     this.sidebarService.toggleMobile();
