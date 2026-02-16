@@ -58,46 +58,65 @@ export class SidebarService {
         let startX = 0;
         let startY = 0;
         let isTracking = false;
+        let gestureLocked = false;
 
-        const thresholdX = 60; // Minimum horizontal swipe distance trigger
-        const edgeThreshold = 80; // Only start swipe if near left edge
-        const verticalLock = 20; // Max vertical movement allowed
+        const thresholdX = 90;      // Require longer swipe distance
+        const edgeThreshold = 70;   // Safe zone from left edge (avoid system back)
+        const verticalLock = 25;    // Cancel if vertical movement too large
 
         const touchStart = (e: TouchEvent) => {
             if (e.touches.length !== 1) return;
+
             const touch = e.touches[0];
             startX = touch.clientX;
             startY = touch.clientY;
-            if (startX <= edgeThreshold) {
+
+            gestureLocked = false;
+
+            // Opening gesture (only from left edge when closed)
+            if (!this.isMobileOpen() && startX <= edgeThreshold) {
                 isTracking = true;
+            }
+            // Closing gesture (only if sidebar already open)
+            else if (this.isMobileOpen()) {
+                isTracking = true;
+            }
+            else {
+                isTracking = false;
             }
         };
 
         const touchMove = (e: TouchEvent) => {
-            if (!isTracking) return;
+            if (!isTracking || gestureLocked) return;
+
             const touch = e.touches[0];
             const deltaX = touch.clientX - startX;
             const deltaY = touch.clientY - startY;
 
-            // Ignore mostly vertical swipes
-            if (Math.abs(deltaY) > verticalLock) {
+            // Cancel gesture if vertical scroll dominates
+            if (Math.abs(deltaY) > verticalLock && Math.abs(deltaY) > Math.abs(deltaX)) {
                 isTracking = false;
                 return;
             }
 
-            if (deltaX > thresholdX && !this.isMobileOpen()) {
+            // OPEN SIDEBAR
+            if (!this.isMobileOpen() && deltaX > thresholdX) {
                 this.openMobile();
+                gestureLocked = true;
                 isTracking = false;
             }
 
-            if (deltaX < -thresholdX && this.isMobileOpen()) {
+            // CLOSE SIDEBAR
+            if (this.isMobileOpen() && deltaX < -thresholdX) {
                 this.closeMobile();
+                gestureLocked = true;
                 isTracking = false;
             }
         };
 
         const touchEnd = () => {
             isTracking = false;
+            gestureLocked = false;
         };
 
         document.addEventListener('touchstart', touchStart, { passive: true });
