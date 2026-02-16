@@ -6,15 +6,10 @@
             <span class="logo-text">Quilix</span>
         </a>
         }
-        <button class="toggle-btn"
-            (click)="toggleSidebar()"
-            [class.centered]="isCollapsed()"
-            [title]="isCollapsed() ? 'Expand' : 'Close'"
-        >
-            <i class="bi" 
-                [class.bi-layout-sidebar-inset]="!isCollapsed()" 
-                [class.bi-layout-sidebar]="isCollapsed()"
-            ></i>
+        <button class="toggle-btn" (click)="toggleSidebar()" [class.centered]="isCollapsed()"
+            [title]="isCollapsed() ? 'Expand' : 'Close'">
+            <i class="bi" [class.bi-layout-sidebar-inset]="!isCollapsed()"
+                [class.bi-layout-sidebar]="isCollapsed()"></i>
         </button>
     </div>
 
@@ -22,15 +17,12 @@
         <ul class="nav-list">
             @for (item of navItems; track item.label) {
             <li class="nav-item">
-                <a 
-                    [routerLink]="item.route" routerLinkActive="active"
-                    [routerLinkActiveOptions]="{ exact: item.route === './' }" 
-                    class="nav-link" [title]="item.label"
-                    (click)="onItemClick()"
-                >
+                <a [routerLink]="item.route" routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: item.route === './' }" class="nav-link" [title]="item.label"
+                    (click)="onItemClick()">
                     <i [class]="item.icon" class="nav-icon"></i>
                     @if (!isCollapsed()) {
-                        <span class="nav-label">{{ item.label }}</span>
+                    <span class="nav-label">{{ item.label }}</span>
                     }
                 </a>
             </li>
@@ -48,5 +40,7 @@
             </div>
             }
         </div>
+
+        <app-settings-kit />
     </div>
 </aside>

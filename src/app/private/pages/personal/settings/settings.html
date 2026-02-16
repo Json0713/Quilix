@@ -1,1 +1,92 @@
-<p>settings works!</p>
+<div class="settings-page">
+    <header class="settings-header">
+        <h1>Settings</h1>
+        <p>Manage your account settings and preferences.</p>
+    </header>
+
+    <div class="settings-grid">
+        <!-- Profile Section -->
+        <section class="settings-card profile-card">
+            <div class="card-header">
+                <i class="bi bi-person-badge"></i>
+                <h2>Profile Information</h2>
+            </div>
+            <div class="card-content">
+                <div class="profile-preview">
+                    <div class="avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="info">
+                        <h3>Jason O. Bayaga</h3>
+                        <p>IQA Officer</p>
+                    </div>
+                </div>
+                <button class="btn-secondary" disabled>Edit Profile (Coming Soon)</button>
+            </div>
+        </section>
+
+        <!-- Appearance Section -->
+        <section class="settings-card">
+            <div class="card-header">
+                <i class="bi bi-palette"></i>
+                <h2>Appearance</h2>
+            </div>
+            <div class="card-content">
+                <p>Customize how Quilix looks on your device.</p>
+                <div class="theme-selector">
+                    <button [class.active]="currentTheme() === 'light'" (click)="setTheme('light')">
+                        <i class="bi bi-sun"></i>
+                        <span>Light</span>
+                    </button>
+                    <button [class.active]="currentTheme() === 'dark'" (click)="setTheme('dark')">
+                        <i class="bi bi-moon-stars"></i>
+                        <span>Dark</span>
+                    </button>
+                    <button [class.active]="currentTheme() === 'system'" (click)="setTheme('system')">
+                        <i class="bi bi-display"></i>
+                        <span>System</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Notifications Section -->
+        <section class="settings-card">
+            <div class="card-header">
+                <i class="bi bi-bell"></i>
+                <h2>Notifications</h2>
+            </div>
+            <div class="card-content">
+                <p>Stay updated with the latest activity.</p>
+                <div class="notification-status">
+                    <div class="status-info">
+                        <span class="label">System Notifications</span>
+                        <span class="value" [class.granted]="notificationPermission() === 'granted'">
+                            {{ notificationPermission() === 'granted' ? 'Enabled' : 'Disabled' }}
+                        </span>
+                    </div>
+                    @if (notificationPermission() !== 'granted') {
+                    <button class="btn-primary" (click)="enableNotifications()">
+                        Enable Notifications
+                    </button>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Section (Coming Soon) -->
+        <section class="settings-card disabled">
+            <div class="card-header">
+                <i class="bi bi-shield-lock"></i>
+                <h2>Security</h2>
+            </div>
+            <div class="card-content">
+                <p>Manage your password and security settings.</p>
+                <div class="coming-soon">
+                    <i class="bi bi-lock"></i>
+                    <span>Secure implementation in progress</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
