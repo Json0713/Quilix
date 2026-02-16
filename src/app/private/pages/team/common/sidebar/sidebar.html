@@ -1,7 +1,7 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed()" [class.mobile-open]="isMobileOpen()">
     <div class="sidebar-header">
         @if (!isCollapsed()) {
-        <a class="logo-container" routerLink="/team">
+        <a class="logo-container" [routerLink]="['./']" (click)="toggleSidebar()">
             <i class="bi bi-feather logo-icon"></i>
             <span class="logo-text">Quilix</span>
         </a>
@@ -22,12 +22,15 @@
         <ul class="nav-list">
             @for (item of navItems; track item.label) {
             <li class="nav-item">
-                <a [routerLink]="item.route" routerLinkActive="active"
-                    [routerLinkActiveOptions]="{ exact: item.route === './' }" class="nav-link" [title]="item.label"
-                    (click)="onItemClick()">
+                <a 
+                    [routerLink]="item.route" routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: item.route === './' }" 
+                    class="nav-link" [title]="item.label"
+                    (click)="onItemClick()"
+                >
                     <i [class]="item.icon" class="nav-icon"></i>
                     @if (!isCollapsed()) {
-                    <span class="nav-label">{{ item.label }}</span>
+                        <span class="nav-label">{{ item.label }}</span>
                     }
                 </a>
             </li>
@@ -40,8 +43,8 @@
             <i class="bi bi-person-circle profile-icon"></i>
             @if (!isCollapsed()) {
             <div class="profile-info">
-                <span class="profile-name">Team Member</span>
-                <span class="profile-role">Collaborator</span>
+                <span class="profile-name">Team</span>
+                <span class="profile-role">Management</span>
             </div>
             }
         </div>
