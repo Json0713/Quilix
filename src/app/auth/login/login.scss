@@ -1,7 +1,8 @@
 /* ===== Root: viewport centering ===== */
 .root-container {
-  min-height: 100dvh;
   display: flex;
+
+  min-height: 100vh;
   align-items: center;
   justify-content: center;
 
@@ -336,7 +337,7 @@
 
 /* WORKSPACE CARD */
 .workspace-card {
-  background: var(--bg);
+  background: var(--surface);
   border-radius: 21px;
   padding: 0.75rem 0.85rem;
 
@@ -347,7 +348,7 @@
   transition: background 0.15s ease, border-color 0.15s ease;
 
   &:hover {
-    background: var(--bg-hover);
+    background: var(--bg);
     border-color: #c7dadd;
   }
 
