@@ -1,8 +1,8 @@
 .app-root {
-  // min-height: 100vh;
-  // min-width: 100vw;
-  // display: flex;
-  // flex-direction: column;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
 
   font-family: Inter, Arial, Helvetica, sans-serif;
 
@@ -40,6 +40,6 @@
   z-index: 0;
 }
 
-// router-outlet {
-//   display: none;
-// }
+router-outlet {
+  display: none;
+}

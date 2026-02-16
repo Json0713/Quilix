@@ -135,22 +135,15 @@ html.light-theme {
 /* ============================================================
    Base Layout
    ============================================================ */
-html {
+html,
+body {
   margin: 0;
-  background-color: var(--app-bg);
+  background-color: var(--app-bg, #2b2a2a);
   color-scheme: light dark;
 }
 
 body {
-  margin: 0;
-
-  background-color: var(--app-bg);
   transition: background-color var(--theme-transition) ease;
-}
-
-html,
-body {
-  background-color: var(--app-bg, #2b2a2a);
 }
 
 // // Global Styling Bootstraping
