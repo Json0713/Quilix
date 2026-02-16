@@ -16,7 +16,7 @@ export class TeamSidebarComponent {
     isMobileOpen = this.sidebarService.isMobileOpen;
 
     navItems = [
-        { label: 'Team Dashboard', icon: 'bi bi-people-fill', route: './' },
+        { label: 'Home', icon: 'bi bi-house', route: './' },
         { label: 'Team Tasks', icon: 'bi bi-list-check', route: './tasks' },
     ];
 

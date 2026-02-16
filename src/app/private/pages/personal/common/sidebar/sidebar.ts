@@ -16,8 +16,8 @@ export class PersonalSidebarComponent {
     isMobileOpen = this.sidebarService.isMobileOpen;
 
     navItems = [
-        { label: 'Dashboard', icon: 'bi bi-grid-fill', route: './' },
-        { label: 'Tasks', icon: 'bi bi-check-circle-fill', route: './tasks' },
+        { label: 'Home', icon: 'bi bi-house', route: './' },
+        { label: 'Tasks', icon: 'bi bi-list-check', route: './tasks' },
     ];
 
     toggleSidebar() {
