@@ -59,8 +59,8 @@ export class SidebarService {
         let startY = 0;
         let isTracking = false;
 
-        const thresholdX = 50; // Minimum horizontal swipe distance
-        const edgeThreshold = 20; // Only start swipe if near left edge
+        const thresholdX = 20; // Minimum horizontal swipe distance
+        const edgeThreshold = 75; // Only start swipe if near left edge
         const verticalLock = 30; // Max vertical movement allowed
 
         const touchStart = (e: TouchEvent) => {
