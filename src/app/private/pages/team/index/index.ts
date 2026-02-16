@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
-import { LoaderService } from '../../../../services/ui/common/loader/loader';
 import { Export } from "../../../../shared/components/export/export";
 
 @Component({
@@ -15,21 +14,12 @@ export class TeamIndex implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private loader: LoaderService,
     private modal: ModalService,
   ) { }
 
   ngOnInit(): void {
-    this.loadData();
-
-  }
-
-  loadData(): void {
-    this.loader.show();
-
-    setTimeout(() => {
-      this.loader.hide();
-    }, 1800);
+    // Oninitialization logic can be added here if needed.
+    // ...
   }
 
   async logout(): Promise<void> {

@@ -2,13 +2,19 @@
     <div class="sidebar-header">
         @if (!isCollapsed()) {
         <div class="logo-container">
-            <i class="bi bi-rocket-takeoff-fill logo-icon"></i>
+            <i class="bi bi-feather logo-icon"></i>
             <span class="logo-text">Quilix Team</span>
         </div>
         }
-        <button class="toggle-btn" (click)="toggleSidebar()" [class.centered]="isCollapsed()"
-            [title]="isCollapsed() ? 'Expand' : 'Collapse'">
-            <i class="bi" [class.bi-chevron-left]="!isCollapsed()" [class.bi-chevron-right]="isCollapsed()"></i>
+        <button class="toggle-btn" 
+            (click)="toggleSidebar()" 
+            [class.centered]="isCollapsed()"
+            [title]="isCollapsed() ? 'Expand' : 'Close'"
+        >
+            <i class="bi" 
+                [class.bi-layout-sidebar-inset]="!isCollapsed()" 
+                [class.bi-layout-sidebar]="isCollapsed()"
+            ></i>
         </button>
     </div>
 

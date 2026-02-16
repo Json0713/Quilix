@@ -7,7 +7,7 @@
     width: 260px;
     background-color: var(--surface);
     color: var(--text-main);
-    border-right: 1px solid var(--border);
+    border-right: none;
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
                 transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -57,12 +57,12 @@
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 6px;
             overflow: hidden;
 
             .logo-icon {
                 font-size: 1.5rem;
-                color: var(--accent);
+                color: var(--text-main);
             }
 
             .logo-text {
@@ -75,12 +75,13 @@
         }
 
         .toggle-btn {
-            background: var(--bg-hover);
-            border: 1px solid var(--border);
+            background: var(--bg-active);
+            border: none;
             color: var(--text-muted);
             cursor: pointer;
             width: 32px;
             height: 32px;
+
             display: flex;
             align-items: center;
             justify-content: center;
@@ -88,7 +89,7 @@
             transition: all 0.2s;
 
             &:hover {
-                background: var(--bg-active);
+                background: var(--bg-hover);
                 color: var(--text-main);
                 border-color: var(--accent);
             }

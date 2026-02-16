@@ -15,11 +15,13 @@
   top: 1.25rem;
   left: 1.25rem;
   z-index: 1050;
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
+  
   border-radius: 10px;
   background: var(--surface);
   border: 1px solid var(--border);
+
   color: var(--text-main);
   align-items: center;
   justify-content: center;
@@ -33,7 +35,7 @@
   }
 
   i {
-    font-size: 1.5rem;
+    font-size: 1.0rem;
   }
 }
 

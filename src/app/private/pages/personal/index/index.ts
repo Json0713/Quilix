@@ -20,8 +20,8 @@ export class PersonalIndex implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Data loading happens naturally through component lifecycle
-    // No artificial delays needed
+    // Oninitialization logic can be added here if needed.
+    // ...
   }
 
   async logout(): Promise<void> {
