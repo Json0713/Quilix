@@ -58,7 +58,7 @@ export class AppThemeService {
     if (!meta) return;
 
     meta.content = mode === 'light'
-      ? '#10373c'
+      ? '#a2c2c2'
       : '#232222';
   }
 }
