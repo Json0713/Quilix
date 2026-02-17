@@ -16,7 +16,7 @@
         <button class="tools-toggle" 
                 (click)="toggleTools($event)" 
                 [title]="showTools() ? 'Hide Tools' : 'Quick Tools'">
-            <i class="bi" [class.bi-tools]="!showTools()" [class.bi-chevron-down]="showTools()"></i>
+            <i class="bi" [class.bi-hdd-stack]="!showTools()" [class.bi-hdd-stack-fill]="showTools()"></i>
             @if (!isCollapsed()) {
                 <span class="nav-label">Quick Tools</span>
                 <i class="bi bi-chevron-right ms-auto arrow-icon" [class.rotated]="showTools()"></i>
