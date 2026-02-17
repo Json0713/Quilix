@@ -78,7 +78,8 @@
         display: flex;
         flex-direction: column;
         gap: 12px;
-        animation: slideDown 0.3s ease;
+        transform-origin: top center;
+        animation: smoothSlideDown 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 
         .tool-section {
             display: flex;
@@ -156,15 +157,15 @@
     }
 }
 
-@keyframes slideDown {
+@keyframes smoothSlideDown {
     from {
         opacity: 0;
-        transform: translateY(-8px);
+        transform: translateY(-10px) scaleY(0.95);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scaleY(1);
     }
 }
 

@@ -19,7 +19,8 @@ export class SettingsKitComponent {
     isCollapsed = this.sidebarService.isCollapsed;
     currentTheme = this.themeService.theme;
 
-    showTools = signal(false);
+    private readonly TOOLS_KEY = 'quilix_show_quick_tools';
+    showTools = signal(localStorage.getItem(this.TOOLS_KEY) === 'true');
 
     notificationPermission = signal<NotificationPermission>(
         'Notification' in window ? Notification.permission : 'denied'
@@ -36,8 +37,13 @@ export class SettingsKitComponent {
             // Expand sidebar to show tools when collapsed on desktop
             this.sidebarService.setCollapsed(false);
             this.showTools.set(true);
+            localStorage.setItem(this.TOOLS_KEY, 'true');
         } else {
-            this.showTools.update(v => !v);
+            this.showTools.update(v => {
+                const newVal = !v;
+                localStorage.setItem(this.TOOLS_KEY, String(newVal));
+                return newVal;
+            });
         }
     }
 
