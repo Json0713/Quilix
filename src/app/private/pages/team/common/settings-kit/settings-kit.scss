@@ -108,7 +108,7 @@
                 font-size: 0.7rem;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
-                color: var(--text-muted);
+                color: var(--text-main);
                 font-weight: 600;
                 opacity: 0.7;
             }
@@ -137,13 +137,14 @@
                 }
 
                 &.active {
-                    background: var(--bg-active);
+                    background: var(--bg-active-main);
                     color: var(--text-main);
                     border-color: rgba(255, 255, 255, 0.1);
                 }
 
                 i {
-                    font-size: 1rem;
+                    font-size: 1.2rem;
+                    font-weight: 500;
                 }
             }
         }
@@ -168,7 +169,7 @@
             &:disabled {
                 opacity: 0.8;
                 cursor: default;
-                color: var(--accent);
+                color: var(--text-main);
                 background: var(--bg-active);
             }
         }
