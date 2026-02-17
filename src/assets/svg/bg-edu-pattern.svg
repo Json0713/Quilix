@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
   <g
     fill="none"
-    stroke="currentColor"
+    stroke="rgba(255, 255, 255, 0.35)"
     stroke-opacity="0.35"
     stroke-width="1"
     stroke-linecap="round"
