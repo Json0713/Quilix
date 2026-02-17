@@ -100,7 +100,20 @@
 }
 
 @media (max-width: 770px) {
+  .mobile-toggle {
+    display: flex;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+  }
+
   .team-root {
     margin-left: 0;
   }
+
+  .layout-wrapper.collapsed .team-root {
+    margin-left: 0;
+  }
 }
+

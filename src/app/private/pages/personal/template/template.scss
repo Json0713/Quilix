@@ -100,7 +100,19 @@
 }
 
 @media (max-width: 770px) {
+  .mobile-toggle {
+    display: flex;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+  }
+
   .personal-root {
+    margin-left: 0;
+  }
+
+  .layout-wrapper.collapsed .personal-root {
     margin-left: 0;
   }
 }

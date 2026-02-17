@@ -12,13 +12,14 @@ export class SidebarService {
     // Mobile Open State
     isMobileOpen = signal(false);
 
+    // Preserve desktop collapsed state when switching to mobile
+    private previousCollapsed: boolean | null = null;
+
     constructor() {
-        // Persist collapsed state
         effect(() => {
             localStorage.setItem(this.STORAGE_KEY, String(this.isCollapsed()));
         });
 
-        // Lock body scroll when mobile sidebar is open
         effect(() => {
             if (this.isMobileOpen()) {
                 document.body.style.overflow = 'hidden';
@@ -27,44 +28,55 @@ export class SidebarService {
             }
         });
 
-        // Left-edge swipe to open sidebar on mobile
         this.initSwipeListener();
     }
 
-    toggleCollapsed() {
+    toggleCollapsed(): void {
         this.isCollapsed.update(v => !v);
     }
 
-    setCollapsed(value: boolean) {
+    setCollapsed(value: boolean): void {
         this.isCollapsed.set(value);
     }
 
-    toggleMobile() {
-        this.isMobileOpen.update(v => !v);
+    toggleMobile(): void {
+        this.isMobileOpen() ? this.closeMobile() : this.openMobile();
     }
 
-    closeMobile() {
-        this.isMobileOpen.set(false);
+    openMobile(): void {
+        if (!this.isMobileOpen()) {
+            this.previousCollapsed = this.isCollapsed();
+            this.isCollapsed.set(false); // Force expanded in mobile
+            this.isMobileOpen.set(true);
+        }
     }
 
-    openMobile() {
-        this.isMobileOpen.set(true);
+    closeMobile(): void {
+        if (this.isMobileOpen()) {
+            this.isMobileOpen.set(false);
+
+            // Restore previous desktop state
+            if (this.previousCollapsed !== null) {
+                this.isCollapsed.set(this.previousCollapsed);
+                this.previousCollapsed = null;
+            }
+        }
     }
 
     // ----------------------------
     // Swipe Gesture Handling
     // ----------------------------
-    private initSwipeListener() {
+    private initSwipeListener(): void {
         let startX = 0;
         let startY = 0;
         let isTracking = false;
         let gestureLocked = false;
 
-        const thresholdX = 90;      // Require longer swipe distance
-        const edgeThreshold = 70;   // Safe zone from left edge (avoid system back)
-        const verticalLock = 25;    // Cancel if vertical movement too large
+        const thresholdX = 90;
+        const edgeThreshold = 70;
+        const verticalLock = 25;
 
-        const touchStart = (e: TouchEvent) => {
+        const touchStart = (e: TouchEvent): void => {
             if (e.touches.length !== 1) return;
 
             const touch = e.touches[0];
@@ -73,40 +85,33 @@ export class SidebarService {
 
             gestureLocked = false;
 
-            // Opening gesture (only from left edge when closed)
             if (!this.isMobileOpen() && startX <= edgeThreshold) {
                 isTracking = true;
-            }
-            // Closing gesture (only if sidebar already open)
-            else if (this.isMobileOpen()) {
+            } else if (this.isMobileOpen()) {
                 isTracking = true;
-            }
-            else {
+            } else {
                 isTracking = false;
             }
         };
 
-        const touchMove = (e: TouchEvent) => {
+        const touchMove = (e: TouchEvent): void => {
             if (!isTracking || gestureLocked) return;
 
             const touch = e.touches[0];
             const deltaX = touch.clientX - startX;
             const deltaY = touch.clientY - startY;
 
-            // Cancel gesture if vertical scroll dominates
             if (Math.abs(deltaY) > verticalLock && Math.abs(deltaY) > Math.abs(deltaX)) {
                 isTracking = false;
                 return;
             }
 
-            // OPEN SIDEBAR
             if (!this.isMobileOpen() && deltaX > thresholdX) {
                 this.openMobile();
                 gestureLocked = true;
                 isTracking = false;
             }
 
-            // CLOSE SIDEBAR
             if (this.isMobileOpen() && deltaX < -thresholdX) {
                 this.closeMobile();
                 gestureLocked = true;
@@ -114,7 +119,7 @@ export class SidebarService {
             }
         };
 
-        const touchEnd = () => {
+        const touchEnd = (): void => {
             isTracking = false;
             gestureLocked = false;
         };
