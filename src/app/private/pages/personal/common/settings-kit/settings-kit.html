@@ -23,34 +23,32 @@
             }
         </button>
 
-        @if (showTools() && !isCollapsed()) {
-            <div class="tools-menu">
-                <div class="tool-section">
-                    <span class="section-title">Theme</span>
-                    <div class="theme-options">
-                        <button (click)="setTheme('light')" [class.active]="currentTheme() === 'light'" title="Light Mode">
-                            <i class="bi bi-sun"></i>
-                        </button>
-                        <button (click)="setTheme('dark')" [class.active]="currentTheme() === 'dark'" title="Dark Mode">
-                            <i class="bi bi-moon-stars"></i>
-                        </button>
-                        <button (click)="setTheme('system')" [class.active]="currentTheme() === 'system'" title="System Default">
-                            <i class="bi bi-display"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="tool-section">
-                    <span class="section-title">Notifications</span>
-                    <button class="notif-btn" 
-                            [disabled]="notificationPermission() === 'granted'"
-                            (click)="enableNotifications()">
-                        <i class="bi" [class.bi-bell]="notificationPermission() !== 'granted'" 
-                                   [class.bi-bell-fill]="notificationPermission() === 'granted'"></i>
-                        <span>{{ notificationPermission() === 'granted' ? 'Enabled' : 'Enable Now' }}</span>
+        <div class="tools-menu" [class.open]="showTools() && !isCollapsed()">
+            <div class="tool-section">
+                <span class="section-title">Theme</span>
+                <div class="theme-options">
+                    <button (click)="setTheme('light')" [class.active]="currentTheme() === 'light'" title="Light Mode">
+                        <i class="bi bi-sun"></i>
+                    </button>
+                    <button (click)="setTheme('dark')" [class.active]="currentTheme() === 'dark'" title="Dark Mode">
+                        <i class="bi bi-moon-stars"></i>
+                    </button>
+                    <button (click)="setTheme('system')" [class.active]="currentTheme() === 'system'" title="System Default">
+                        <i class="bi bi-display"></i>
                     </button>
                 </div>
             </div>
-        }
+
+            <div class="tool-section">
+                <span class="section-title">Notifications</span>
+                <button class="notif-btn" 
+                        [disabled]="notificationPermission() === 'granted'"
+                        (click)="enableNotifications()">
+                    <i class="bi" [class.bi-bell]="notificationPermission() !== 'granted'" 
+                            [class.bi-bell-fill]="notificationPermission() === 'granted'"></i>
+                    <span>{{ notificationPermission() === 'granted' ? 'Enabled' : 'Enable Now' }}</span>
+                </button>
+            </div>
+        </div>
     </div>
 </div>
