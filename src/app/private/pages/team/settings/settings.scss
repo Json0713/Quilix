@@ -1,5 +1,5 @@
 .settings-page {
-    padding: 2rem;
+    padding: 1.15rem;
     margin: 0 auto;
 
     .settings-header {
@@ -26,7 +26,7 @@
 
     .settings-card {
         background: var(--surface-main, rgba(255, 255, 255, 0.03));
-        border: 1px solid var(--border, rgba(255, 255, 255, 0.05));
+        border: none;
         border-radius: 24px;
         padding: 1.75rem;
         backdrop-filter: blur(18px) saturate(140%);
@@ -45,7 +45,7 @@
 
             i {
                 font-size: 1.5rem;
-                color: var(--accent, #20c997);
+                color: var(--accent, #044230);
             }
 
             h2 {
@@ -109,7 +109,7 @@
             gap: 0.5rem;
             padding: 1rem;
             background: var(--bg-alt, rgba(255, 255, 255, 0.03));
-            border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+            border: none;
             border-radius: 12px;
             color: var(--text-muted, rgba(255, 255, 255, 0.6));
             cursor: pointer;
@@ -130,8 +130,8 @@
 
             &.active {
                 background: var(--bg-active, #413b3be9);
-                border-color: var(--accent, #20c997);
-                color: var(--accent, #20c997);
+                color: var(--text-main);
+                font-weight: 600;
             }
         }
     }
