@@ -1,54 +1,55 @@
 <div class="container">
+  <div class="content">
+    <!-- Header -->
+    <header>
+      <app-header />
+    </header>
 
-  <!-- Header -->
-  <header>
-    <app-header />
-  </header>
+    <!-- Preview Controls --> <!-- GitHub Button -->
+    <!-- <section class="preview-controls" aria-label="Preview Actions">
+      <a href="https://github.com/Json0713" target="_blank" rel="noopener noreferrer" class="control-btn"
+        aria-label="View Author on GitHub" title="View Author on GitHub">
+        <i class="bi bi-github" aria-hidden="true"></i>
+      </a>
+    </section> -->
 
-  <!-- Preview Controls --> <!-- GitHub Button -->
-  <!-- <section class="preview-controls" aria-label="Preview Actions">
-    <a href="https://github.com/Json0713" target="_blank" rel="noopener noreferrer" class="control-btn"
-      aria-label="View Author on GitHub" title="View Author on GitHub">
-      <i class="bi bi-github" aria-hidden="true"></i>
-    </a>
-  </section> -->
+    <app-cta />
 
-  <app-cta />
+    <!-- Workspace Start Button -->
+    <section class="workspace-start-button" aria-label="Workspace Actions">
+      <a routerLink="/login" class="primary-action" title="Create or continue your personal workspace">
+        <span>Get Started</span>
+      </a>
+    </section>
 
-  <!-- Workspace Start Button -->
-  <section class="workspace-start-button" aria-label="Workspace Actions">
-    <a routerLink="/login" class="primary-action" title="Create or continue your personal workspace">
-      <span>Get Started</span>
-    </a>
-  </section>
+    <app-cta-keyboard />
 
-  <app-cta-keyboard />
+    <app-img-stack />
 
-  <app-img-stack />
+    <app-feature />
 
-  <app-feature />
+    <!-- Meta Navigation -->
+    <nav class="meta-nav" aria-label="Meta Navigation">
+      <a routerLink="/meta" class="meta-button" title="Quilix Meta">
+        <span class="meta-label">{{ version.appName }}-Meta</span>
 
-  <!-- Meta Navigation -->
-  <nav class="meta-nav" aria-label="Meta Navigation">
-    <a routerLink="/meta" class="meta-button" title="Quilix Meta">
-      <span class="meta-label">{{ version.appName }}-Meta</span>
+        <span class="meta-version">v{{ version.version }}</span>
 
-      <span class="meta-version">v{{ version.version }}</span>
+        <span class="meta-badge" aria-label="Beta version">
+          Beta
+        </span>
+      </a>
+    </nav>
 
-      <span class="meta-badge" aria-label="Beta version">
-        Beta
-      </span>
-    </a>
-  </nav>
+    <!-- Theme Toggle -->
+    <app-theme-toggle />
 
-  <!-- Theme Toggle -->
-  <app-theme-toggle />
+    <app-cta-stack />
 
-  <app-cta-stack />
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+      <app-footer></app-footer>
+    </footer>
 
-  <!-- Footer -->
-  <footer class="footer" role="contentinfo">
-    <app-footer></app-footer>
-  </footer>
-
+  </div>
 </div>

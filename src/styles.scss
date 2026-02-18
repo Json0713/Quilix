@@ -145,14 +145,14 @@ html.light-theme {
    ============================================================ */
 html,
 body {
-  margin: 0;
   height: 100%;
+  margin: 0;
   background-color: var(--app-bg, #2b2a2a);
   color-scheme: light dark;
 }
 
 body {
-  transition: background-color var(--theme-transition) ease;
+  overflow: hidden;
 }
 
 // // Global Styling Bootstraping
