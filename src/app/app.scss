@@ -1,9 +1,5 @@
 .app-root {
-  display: flex;
-  flex-direction: column;
-
   font-family: Inter, Arial, Helvetica, sans-serif;
-
   background-color: var(--app-bg);
   transition: background-color var(--theme-transition) ease;
 
@@ -17,10 +13,14 @@
   position: absolute;
   inset: 0;
 
-  background: url('/assets/svg/bg-edu-pattern.svg') repeat;
-  background-size: 160px 160px;
+  background-color: var(--text-main);
+  mask: url('/assets/svg/bg-edu-pattern.svg') repeat;
+  -webkit-mask: url('/assets/svg/bg-edu-pattern.svg') repeat;
 
-  pointer-events: none;
+  mask-size: 160px 160px;
+  -webkit-mask-size: 160px 160px;
+
+  opacity: 0.35;
   z-index: -1;
 }
 
