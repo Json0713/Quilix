@@ -5,7 +5,7 @@ import { AppThemeService } from '../../../../../core/theme/app-theme/app-theme.s
 import { OsNotificationService } from '../../../../../core/notifications/os-notification.service';
 
 @Component({
-  selector: 'app-settings-kit',
+  selector: 'app-personal-settings-kit',
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './settings-kit.html',
