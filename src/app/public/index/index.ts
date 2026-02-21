@@ -13,7 +13,7 @@ import { CtaMeta } from "../cta-meta/cta-meta";
 
 @Component({
   selector: 'app-public-index',
-  imports: [RouterModule, Header, Footer, Feature, CtaStack, ImgStack, CtaKeyboard, Cta, CtaMeta],
+  imports: [RouterModule, Header, CtaKeyboard, Cta],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
