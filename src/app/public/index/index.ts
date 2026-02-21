@@ -3,17 +3,17 @@ import { RouterModule } from '@angular/router';
 import { Header } from '../common/header/header';
 import { Footer } from '../common/footer/footer';
 import { QuilixVersionService } from '../../core/quilix-installer/version/quilix-version.service';
-import { ThemeToggle } from '../../shared/ui/system/theme-toggle/theme-toggle';
 import { Feature } from "../feature/feature";
 import { CtaStack } from "../cta-stack/cta-stack";
 import { ImgStack } from "../img-stack/img-stack";
 import { CtaKeyboard } from "../cta-keyboard/cta-keyboard";
 
 import { Cta } from "../cta/cta";
+import { CtaMeta } from "../cta-meta/cta-meta";
 
 @Component({
   selector: 'app-public-index',
-  imports: [RouterModule, ThemeToggle, Header, Footer, Feature, CtaStack, ImgStack, CtaKeyboard, Cta],
+  imports: [RouterModule, Header, Footer, Feature, CtaStack, ImgStack, CtaKeyboard, Cta, CtaMeta],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
