@@ -1,24 +1,107 @@
-<div class="container py-2 mt-2">
-    
-    <!-- Meta -->
-    <div class="login-meta py-2">
-        <a
-        routerLink="/meta/login"
-        title="Meta Login"
-        >
-        <span>Meta Login</span>
-        </a>
-    </div>
+<div class="meta-landing-container">
 
+    <header class="meta-landing-header">
+        <div class="brand-logo">
+            <i class="bi bi-feather"></i>
+            <span>{{ version.appName }} <strong>Meta</strong></span>
+        </div>
+    </header>
 
-    <!-- Meta -->
-    <div class="meta py-2">
-        <a
-        routerLink="/"
-        title="Quilix"
-        >
-        <span>Quilix</span>
-        </a>
-    </div>
+    <main class="meta-hero">
 
+        <!-- Left: Content Story -->
+        <div class="hero-content">
+            <div class="badge-wrapper staggered-1">
+                <span class="beta-badge">Public Beta</span>
+                <span class="version-badge">v{{ version.version }}</span>
+            </div>
+
+            <h1 class="hero-title staggered-2">
+                The Open Social Workspace for <br><span>Teams.</span>
+            </h1>
+
+            <p class="hero-description staggered-3">
+                Step into the future of unified workspaces. Connect with colleagues, participate in deep real-time
+                channels, and bring social workflows out of isolation and into a synchronized environment.
+            </p>
+
+            <div class="hero-actions staggered-4">
+                <a routerLink="/meta/login" class="btn primary-cta" title="Go to Meta Login">
+                    Launch Meta
+                    <i class="bi bi-rocket-takeoff-fill"></i>
+                </a>
+                <a routerLink="/" class="btn secondary-cta" title="Return to Quilix Core">
+                    <i class="bi bi-arrow-left-short"></i>
+                    Back to Quilix
+                </a>
+            </div>
+        </div>
+
+        <!-- Right: Visual Experience -->
+        <div class="hero-visual staggered-5" aria-hidden="true">
+            <div class="glass-terminal">
+
+                <!-- App Header Structure -->
+                <div class="terminal-header">
+                    <div class="dots">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                    </div>
+                    <div class="header-title">general-chat</div>
+                    <div class="header-actions">
+                        <i class="bi bi-camera-video-fill"></i>
+                        <i class="bi bi-telephone-fill"></i>
+                    </div>
+                </div>
+
+                <!-- App Layout Structure -->
+                <div class="terminal-body">
+                    <!-- Sidebar Mock -->
+                    <div class="sidebar-mock">
+                        <div class="nav-item active"><i class="bi bi-hash"></i>general</div>
+                        <div class="nav-item"><i class="bi bi-hash"></i>development</div>
+                        <div class="nav-item"><i class="bi bi-hash"></i>design-system</div>
+                        <div class="nav-space"></div>
+                        <div class="nav-title">Direct Messages</div>
+                        <div class="nav-item user"><span class="status online"></span>Alice</div>
+                        <div class="nav-item user"><span class="status busy"></span>Bob</div>
+                    </div>
+
+                    <!-- Main Chat Mock -->
+                    <div class="chat-mock">
+                        <div class="message incoming">
+                            <div class="avatar"><i class="bi bi-person-fill"></i></div>
+                            <div class="bubble">We launching this week right? 🚀</div>
+                        </div>
+
+                        <div class="message outgoing">
+                            <div class="bubble">Absolutely. The landing page is done!</div>
+                        </div>
+
+                        <div class="message incoming typing">
+                            <div class="avatar"><i class="bi bi-person-fill"></i></div>
+                            <div class="bubble indicator">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
+
+                        <!-- Input Skeleton -->
+                        <div class="input-skeleton">
+                            <i class="bi bi-plus-circle-fill"></i>
+                            <div class="line"></div>
+                            <i class="bi bi-emoji-smile"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Ornaments -->
+            <div class="ornament orb left"></div>
+            <div class="ornament orb right"></div>
+            <div class="ornament float badge"><i class="bi bi-bell-fill"></i> <span class="ping">9+</span></div>
+        </div>
+
+    </main>
 </div>
