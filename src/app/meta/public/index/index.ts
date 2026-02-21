@@ -4,10 +4,11 @@ import { QuilixVersionService } from '../../../core/quilix-installer/version/qui
 import { CtaQuilix } from '../cta-quilix/cta-quilix';
 import { CtaTech } from '../cta-tech/cta-tech';
 import { CtaContact } from '../cta-contact/cta-contact';
+import { CtaFooter } from '../cta-footer/cta-footer';
 
 @Component({
   selector: 'public-meta-index',
-  imports: [RouterModule, CtaQuilix, CtaTech, CtaContact],
+  imports: [RouterModule, CtaQuilix, CtaTech, CtaContact, CtaFooter],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })

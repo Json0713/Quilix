@@ -4,12 +4,10 @@
 
 .cta-contact-section {
     padding: 6rem 1.5rem;
-    background: rgba(0, 0, 0, 0.015);
     position: relative;
     overflow: hidden;
     max-width: 100%;
     margin: 0 auto;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
 
     html.light-theme & {
         border-top: 1px solid rgba(0, 0, 0, 0.05);
@@ -304,8 +302,8 @@
         z-index: -1;
 
         &.bottom-right {
-            bottom: -10%;
-            right: -10%;
+            bottom: -20%;
+            right: 30%;
             background: radial-gradient(circle, #10b981, #0ea5e9);
         }
     }
