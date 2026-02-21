@@ -291,7 +291,7 @@
 .terminal-body {
     flex: 1;
     display: grid;
-    grid-template-columns: 140px 1fr;
+    grid-template-columns: 160px 1fr;
 
     @media (max-width: 600px) {
         grid-template-columns: 1fr;

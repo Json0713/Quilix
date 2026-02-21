@@ -1,0 +1,45 @@
+<section class="cta-tech-section" aria-label="Quilix Technology Stack">
+    <div class="tech-container" data-scroll="fade-up">
+
+        <!-- Header Content -->
+        <header class="tech-header">
+            <div class="tech-tag">
+                <span class="tech-badge"><i class="bi bi-cpu-fill"></i> Engine Room</span>
+            </div>
+
+            <h2 class="tech-title">Powered by <span>Modern Tech.</span></h2>
+            <p class="tech-description">
+                Quilix is built upon a robust, highly-optimized stack designed for absolute scale, performance, and
+                long-term maintainability.
+            </p>
+        </header>
+
+        <!-- Infinite Marquee -->
+        <div class="marquee-container">
+            <div class="marquee-track">
+                <!-- Original Set -->
+                <div class="tech-pill" *ngFor="let item of techStack">
+                    <i class="bi {{ item.icon }}" [style.color]="item.color"></i>
+                    <span>{{ item.label }}</span>
+                </div>
+
+                <!-- Duplicated Set for Loop Seamlessness -->
+                <div class="tech-pill" *ngFor="let item of techStack" aria-hidden="true">
+                    <i class="bi {{ item.icon }}" [style.color]="item.color"></i>
+                    <span>{{ item.label }}</span>
+                </div>
+
+                <!-- Third Set for Ultra-Wide Screens -->
+                <div class="tech-pill" *ngFor="let item of techStack" aria-hidden="true">
+                    <i class="bi {{ item.icon }}" [style.color]="item.color"></i>
+                    <span>{{ item.label }}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Background Blurs -->
+    <div class="tech-blur-left"></div>
+    <div class="tech-blur-right"></div>
+</section>

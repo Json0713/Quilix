@@ -1,0 +1,74 @@
+<section class="cta-contact-section" aria-label="Get in Touch with the Developer">
+    <div class="cta-contact-grid">
+
+        <!-- Left: Contact Story -->
+        <div class="contact-content" data-scroll="fade-up">
+            <div class="cc-tag">
+                <span class="cc-badge"><i class="bi bi-envelope-paper-fill"></i> Direct Line</span>
+            </div>
+
+            <h2 class="cc-title">Have a project in mind? <br><span>Let's build together.</span></h2>
+            <p class="cc-description">
+                Reach out directly to the creator. Whether you have feature requests, partnership ideas, or want to
+                discuss enterprise solutions—my inbox is open.
+            </p>
+
+            <ul class="cc-info">
+                <li><i class="bi bi-envelope-at-fill"></i> Secure Local Submissions</li>
+                <li><i class="bi bi-database-fill-gear"></i> Supabase-Ready Architecture</li>
+                <li><i class="bi bi-lightning-charge-fill"></i> Fast Response Times</li>
+            </ul>
+        </div>
+
+        <!-- Right: Glassmorphism Contact Form -->
+        <div class="contact-visual" data-scroll="fade-up">
+            <div class="glass-form-container">
+
+                <!-- Form View -->
+                <form class="glass-form" (ngSubmit)="onSubmit()" *ngIf="!isSuccess">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-name">Name</label>
+                            <input type="text" id="contact-name" name="name" [(ngModel)]="form.name" required
+                                placeholder="John Doe" autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact-email">Email</label>
+                            <input type="email" id="contact-email" name="email" [(ngModel)]="form.email" required
+                                placeholder="john@example.com" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contact-message">Message</label>
+                        <textarea id="contact-message" name="message" [(ngModel)]="form.message" required rows="4"
+                            placeholder="How can we collaborate?"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="primary-btn submit-btn"
+                            [disabled]="isSubmitting || !form.name || !form.email || !form.message">
+                            <span *ngIf="!isSubmitting">Send Message <i class="bi bi-send-fill"></i></span>
+                            <span *ngIf="isSubmitting" class="spinner-inline">Sending...</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Success View -->
+                <div class="success-state" *ngIf="isSuccess">
+                    <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
+                    <h3 class="success-title">Message Delivered</h3>
+                    <p class="success-message">Thanks for reaching out! I've securely stored your message locally via
+                        Dexie and I'll be in touch soon.</p>
+                </div>
+
+            </div>
+
+            <!-- Background Ornaments -->
+            <div class="cc-ornament orb bottom-right"></div>
+        </div>
+
+    </div>
+</section>

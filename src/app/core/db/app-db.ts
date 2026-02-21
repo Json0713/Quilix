@@ -2,9 +2,18 @@ import Dexie, { Table } from 'dexie';
 import { Workspace } from '../interfaces/workspace';
 import { Session } from '../interfaces/session';
 
+export interface ContactMessage {
+    id: string;
+    name: string;
+    email: string;
+    message: string;
+    createdAt: number;
+}
+
 export class AppDatabase extends Dexie {
     workspaces!: Table<Workspace, string>;
     sessions!: Table<Session, string>;
+    contacts!: Table<ContactMessage, string>;
 
     constructor() {
         super('QuilixGlobalDB');
@@ -12,6 +21,10 @@ export class AppDatabase extends Dexie {
         this.version(1).stores({
             workspaces: 'id, name, role, lastActiveAt',
             sessions: 'workspaceId' // workspaceId as PK for session
+        });
+
+        this.version(2).stores({
+            contacts: 'id, createdAt'
         });
 
         // Open database connection early to optimize initial load
