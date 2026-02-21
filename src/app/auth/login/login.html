@@ -30,7 +30,9 @@
         <div class="field">
           <label>Role</label>
 
-          <div class="role-select">
+          <div class="role-select" [class.is-team]="role === 'team'">
+            <div class="role-slider"></div>
+
             <button type="button" class="role-btn" [class.active]="role === 'personal'" (click)="role = 'personal'"
               aria-pressed="{{ role === 'personal' }}">
               <i class="bi bi-mortarboard"></i>

@@ -23,7 +23,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
 export class Login implements OnInit, OnDestroy {
 
   name = '';
-  role: WorkspaceRole | null = null;
+  role: WorkspaceRole = 'personal';
 
   workspaces: Workspace[] = [];
   /** Subscription to Dexie live query. Using 'any' to avoid complex type mismatch with Dexie's Observable. */
