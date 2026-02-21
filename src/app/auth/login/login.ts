@@ -171,6 +171,30 @@ export class Login implements OnInit, OnDestroy {
     return colors[Math.abs(hash) % colors.length];
   }
 
+  getAvatarIcon(workspaceId: string): string {
+    const icons = [
+      'bi-rocket-takeoff',
+      'bi-controller',
+      'bi-palette',
+      'bi-layers',
+      'bi-grid',
+      'bi-briefcase',
+      'bi-lightbulb',
+      'bi-lightning-charge',
+      'bi-cup-hot',
+      'bi-star',
+      'bi-book',
+      'bi-diagram-3'
+    ];
+
+    let hash = 0;
+    for (let i = 0; i < workspaceId.length; i++) {
+      hash = workspaceId.charCodeAt(i) + ((hash << 5) - hash); // Basic DJB2 hash
+    }
+
+    return icons[Math.abs(hash) % icons.length];
+  }
+
   openImport(): void {
     this.modal.openImport();
   }
