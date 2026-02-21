@@ -130,7 +130,7 @@
   input {
     height: 46px;
     padding: 0 0.85rem;
-    border-radius: 50px;
+    border-radius: 18px;
     border: 1px solid #d1d5db;
     color: var(--text-main);
     font-size: 0.95rem;
@@ -284,7 +284,7 @@
 
 .recent-header p {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--text-alt);
   margin: 0;
 }
 
@@ -484,7 +484,7 @@
 .import-trigger {
   display: inline-flex;
   align-items: center;
-  color: var(--action-text);
+  color: var(--text-white);
   background-color: var(--action);
   gap: 0.45rem;
 
@@ -506,7 +506,7 @@
   }
 
   &:hover {
-    color: var(--action-text);
+    color: var(--text-white);
     transform: translateY(-1px);
     outline: 3px solid rgba(63, 186, 194, 0.35);
     background-color: var(--action-hover);
