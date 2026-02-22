@@ -46,8 +46,15 @@
         <!-- Password -->
         <div class="form-group">
           <label for="password">Password</label>
-          <input id="password" type="password" formControlName="password" placeholder="Enter Password"
-            autocomplete="new-password" [class.invalid]="f['password'].invalid && f['password'].touched" />
+          <div class="password-input-wrapper">
+            <input [id]="'password'" [type]="showPassword ? 'text' : 'password'" formControlName="password"
+              placeholder="Enter Password" autocomplete="new-password"
+              [class.invalid]="f['password'].invalid && f['password'].touched" />
+            <button type="button" class="password-toggle" (click)="showPassword = !showPassword"
+              [title]="showPassword ? 'Hide password' : 'Show password'">
+              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+            </button>
+          </div>
           @if (f['password'].invalid && f['password'].touched) {
           <small class="error-text">Password must be at least 8 characters</small>
           }
@@ -56,9 +63,15 @@
         <!-- Confirm Password -->
         <div class="form-group">
           <label for="confirmPassword">Confirm Password</label>
-          <input id="confirmPassword" type="password" formControlName="confirmPassword"
-            placeholder="Enter Confirm Password" autocomplete="new-password"
-            [class.invalid]="(f['confirmPassword'].invalid || registerForm.hasError('mismatch')) && f['confirmPassword'].touched" />
+          <div class="password-input-wrapper">
+            <input [id]="'confirmPassword'" [type]="showConfirmPassword ? 'text' : 'password'"
+              formControlName="confirmPassword" placeholder="Enter Confirm Password" autocomplete="new-password"
+              [class.invalid]="(f['confirmPassword'].invalid || registerForm.hasError('mismatch')) && f['confirmPassword'].touched" />
+            <button type="button" class="password-toggle" (click)="showConfirmPassword = !showConfirmPassword"
+              [title]="showConfirmPassword ? 'Hide password' : 'Show password'">
+              <i class="bi" [class.bi-eye]="!showConfirmPassword" [class.bi-eye-slash]="showConfirmPassword"></i>
+            </button>
+          </div>
           @if (registerForm.hasError('mismatch') && f['confirmPassword'].touched) {
           <small class="error-text">Passwords do not match</small>
           }

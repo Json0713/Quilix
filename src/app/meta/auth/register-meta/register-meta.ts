@@ -20,6 +20,8 @@ export class RegisterMeta implements OnDestroy {
   registerForm: FormGroup;
   error: string | null = null;
   loading = false;
+  showPassword = false;
+  showConfirmPassword = false;
 
   countryCodes = [
     { code: '+63', label: 'PH' },

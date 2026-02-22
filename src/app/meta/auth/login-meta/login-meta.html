@@ -36,8 +36,15 @@
         <!-- Password -->
         <div class="form-group">
           <label for="password">Password</label>
-          <input id="password" type="password" formControlName="password" placeholder="Password"
-            autocomplete="current-password" [class.invalid]="f['password'].invalid && f['password'].touched" />
+          <div class="password-input-wrapper">
+            <input [id]="'password'" [type]="showPassword ? 'text' : 'password'" formControlName="password"
+              placeholder="Password" autocomplete="current-password"
+              [class.invalid]="f['password'].invalid && f['password'].touched" />
+            <button type="button" class="password-toggle" (click)="showPassword = !showPassword"
+              [title]="showPassword ? 'Hide password' : 'Show password'">
+              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+            </button>
+          </div>
           @if (f['password'].invalid && f['password'].touched) {
           <small class="error-text">Password is required</small>
           }

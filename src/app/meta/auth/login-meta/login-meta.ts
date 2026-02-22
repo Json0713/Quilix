@@ -19,6 +19,7 @@ export class LoginMeta {
   loginForm: FormGroup;
   error: string | null = null;
   loading = false;
+  showPassword = false;
 
   constructor(
     private readonly auth: MetaAuthService,

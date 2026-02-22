@@ -127,6 +127,42 @@ form {
     }
 }
 
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+
+    input {
+        padding-right: 3rem !important;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: all 0.2s ease;
+        z-index: 5;
+
+        &:hover {
+            color: var(--accent);
+        }
+
+        &:focus {
+            outline: none;
+            color: var(--action);
+        }
+    }
+}
+
 .error-text {
     font-size: 0.75rem;
     font-weight: 600;
