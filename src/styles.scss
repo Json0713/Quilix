@@ -49,7 +49,7 @@
   --danger: #d9534f;
 
   /* ================= App Background ================= */
-  --app-bg-light:#d8e3e4;
+  --app-bg-light: #d8e3e4;
   --app-bg-dark: #2b2a2a;
   --app-bg: var(--app-bg-light);
 
@@ -217,5 +217,45 @@ body::-webkit-scrollbar-thumb:hover,
   body::-webkit-scrollbar-thumb,
   *::-webkit-scrollbar-thumb {
     background-color: (9, 91, 108, 0.834);
+  }
+}
+
+/* ============================================================
+   Global Custom Tooltip
+   ============================================================ */
+.tooltip-container {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  background-color: var(--surface-main);
+  color: var(--text-main);
+  padding: 8px 16px;
+  border-radius: 50px;
+  /* Cute rounded shape */
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transform: translate(-50%, -100%) translateY(-10px);
+  opacity: 0;
+  transition: opacity 250ms ease, transform 250ms ease;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  &.visible {
+    opacity: 1;
+    transform: translate(-50%, -100%) translateY(-8px);
+  }
+
+  .tooltip-tail {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--surface-main);
   }
 }

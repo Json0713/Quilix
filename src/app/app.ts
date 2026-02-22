@@ -12,11 +12,13 @@ import { Modal } from './shared/ui/common/modal/modal';
 import { Toast } from './shared/ui/common/toast/toast';
 
 import { GlobalSyncService } from './core/sync/global-sync.service';
+import { Tooltip } from './shared/ui/common/tooltip/tooltip';
+import { TooltipManagerService } from './core/services/tooltip-manager.service';
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterModule, NetworkStatus, Loader, Toast, Modal],
+  imports: [RouterOutlet, RouterModule, NetworkStatus, Loader, Toast, Modal, Tooltip],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -29,12 +31,14 @@ export class App {
   private updates = inject(QuilixUpdateService);
   private theme = inject(AppThemeService);
   private sync: GlobalSyncService = inject(GlobalSyncService);
+  private tooltipManager = inject(TooltipManagerService);
 
   constructor() {
     this.toastRelay.consume();
     this.updates.init();
     this.theme.init();
     this.sync.init();
+    this.tooltipManager.init();
   }
 
 }
