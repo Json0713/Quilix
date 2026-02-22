@@ -6,11 +6,12 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { MetaAuthService } from '../../core/auth/meta-auth.service';
 import { MetaUserRole } from '../../interfaces/meta-role';
+import { LoginMockupComponent } from '../login-mockup/login-mockup';
 
 @Component({
   selector: 'app-register-meta',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, LoginMockupComponent],
   templateUrl: './register-meta.html',
   styleUrls: ['./register-meta.scss'],
 })

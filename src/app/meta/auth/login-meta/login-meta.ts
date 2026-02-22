@@ -5,11 +5,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 
 import { MetaAuthService } from '../../core/auth/meta-auth.service';
 import { MetaProfileService } from '../../core/auth/meta-profile.service';
+import { LoginMockupComponent } from '../login-mockup/login-mockup';
 
 @Component({
   selector: 'app-login-meta',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, LoginMockupComponent],
   templateUrl: './login-meta.html',
   styleUrls: ['./login-meta.scss'],
 })

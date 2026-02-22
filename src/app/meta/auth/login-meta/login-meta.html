@@ -1,59 +1,69 @@
-<div class="login-container">
+<div class="login-split-container">
 
-  <div class="login-card">
+  <!-- Left Side: Authentication Form -->
+  <div class="login-form-side">
+    <div class="login-card">
 
-    <!-- Meta Logo/Name -->
-    <div class="brand-header">
-      <a routerLink="/meta" title="Quilix">
-        <span>Quilix</span>
-      </a>
-    </div>
-
-    <h1>Welcome back</h1>
-    <p class="subtitle">Please enter your details to sign in.</p>
-
-    @if (error) {
-    <div class="error-banner">
-      {{ error }}
-    </div>
-    }
-
-    <form [formGroup]="loginForm" (ngSubmit)="submit()">
-
-      <!-- Email -->
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input id="email" type="email" formControlName="email" placeholder="your.name@example.com" autocomplete="email"
-          [class.invalid]="f['email'].invalid && f['email'].touched" />
-        @if (f['email'].invalid && f['email'].touched) {
-        <small class="error-text">Valid email is required</small>
-        }
+      <!-- Meta Logo/Name -->
+      <div class="brand-header">
+        <a routerLink="/meta" title="Quilix">
+          <i class="bi bi-layers-half"></i>
+          <span>Quilix</span>
+        </a>
       </div>
 
-      <!-- Password -->
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input id="password" type="password" formControlName="password" placeholder="Password"
-          autocomplete="current-password" [class.invalid]="f['password'].invalid && f['password'].touched" />
-        @if (f['password'].invalid && f['password'].touched) {
-        <small class="error-text">Password is required</small>
-        }
+      <h1>Welcome back</h1>
+      <p class="subtitle">Please enter your details to sign in.</p>
+
+      @if (error) {
+      <div class="error-banner">
+        {{ error }}
       </div>
+      }
 
-      <!-- Submit button -->
-      <button type="submit" class="submit-btn" [disabled]="loginForm.invalid || loading">
-        @if (loading) {
-        Signing in...
-        } @else {
-        Sign in
-        }
-      </button>
+      <form [formGroup]="loginForm" (ngSubmit)="submit()">
 
-      <!-- Register link -->
-      <p class="register-link">
-        Don't have an account? <a routerLink="/meta/register">Sign up</a>
-      </p>
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" type="email" formControlName="email" placeholder="your.name@example.com"
+            autocomplete="email" [class.invalid]="f['email'].invalid && f['email'].touched" />
+          @if (f['email'].invalid && f['email'].touched) {
+          <small class="error-text">Valid email is required</small>
+          }
+        </div>
 
-    </form>
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" formControlName="password" placeholder="Password"
+            autocomplete="current-password" [class.invalid]="f['password'].invalid && f['password'].touched" />
+          @if (f['password'].invalid && f['password'].touched) {
+          <small class="error-text">Password is required</small>
+          }
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" class="submit-btn" [disabled]="loginForm.invalid || loading">
+          @if (loading) {
+          Signing in...
+          } @else {
+          Sign in
+          }
+        </button>
+
+        <!-- Register link -->
+        <p class="register-link">
+          Don't have an account? <a routerLink="/meta/register">Sign up</a>
+        </p>
+
+      </form>
+    </div>
   </div>
+
+  <!-- Right Side: Cleanly Extracted Abstract Visual -->
+  <div class="login-visual-side">
+    <app-login-mockup></app-login-mockup>
+  </div>
+
 </div>
