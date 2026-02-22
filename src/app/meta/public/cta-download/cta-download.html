@@ -36,11 +36,10 @@
 
                 <!-- Massive Commercial Airliner (Centered) -->
                 <div class="airplane-zone">
-                    <!-- Wind speed streaks -->
+                    <!-- Minimal Wind streaks -->
                     <div class="wind-streaks">
                         <span class="streak s1"></span>
                         <span class="streak s2"></span>
-                        <span class="streak s3"></span>
                     </div>
 
                     <svg class="airplane-svg" viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
@@ -59,66 +58,58 @@
                             </linearGradient>
                         </defs>
 
-                        <!-- Fuselage (Modern Sleek Tapered Shape) -->
-                        <path
-                            d="M40,65 C120,55 300,55 380,65 L395,72 C400,75 400,80 395,83 L380,90 C300,100 120,100 40,90 L30,85 Q25,80 30,75 L40,65 Z"
-                            fill="url(#airlinerBody)" />
-
-                        <!-- Smoothed Cockpit & Modern Nose -->
-                        <path d="M360,67 Q382,68 388,75 L378,79 Q368,76 360,76 Z" fill="#0f172a" opacity="0.95" />
-
-                        <!-- Far Wing (Top, Centered Alignment, Swept Back) -->
-                        <path d="M210,65 L145,20 Q135,10 160,15 L260,65 Z" fill="#94a3b8" />
-
-                        <!-- Vertical Stabilizer (Tail) -->
-                        <path d="M45,75 L15,18 Q12,5 40,15 L100,72 Z" fill="#0ea5e9" />
-                        <path d="M40,30 Q30,20 50,40 L65,65 L45,65 Z" fill="#7dd3fc" opacity="0.5" />
-
-                        <!-- Near Wing (Bottom, Centered Alignment, Massive Swept Back) -->
-                        <path d="M210,92 L140,142 Q130,150 165,145 L300,88 Z" fill="url(#airlinerWings)" />
-
-                        <!-- Engine Pods (Massive) -->
-                        <path d="M195,115 Q195,108 230,110 L232,125 Q195,128 195,115 Z" fill="#475569" />
+                        <!-- [Z-LAYER 1] Far Elements (Drawn behind fuselage) -->
+                        <path d="M185,62 L120,25 Q110,15 130,20 L240,62 Z" fill="#94a3b8" />
                         <path d="M198,42 Q198,35 228,37 L230,48 Q198,51 198,42 Z" fill="#334155" />
 
-                        <!-- Emphasized Windows Row -->
+                        <!-- [Z-LAYER 2] Vertical Stabilizer (Tail) -->
+                        <path d="M55,75 L25,18 Q20,5 50,15 L105,72 Z" fill="#0ea5e9" />
+                        <path d="M50,30 Q40,20 60,40 L75,65 L55,65 Z" fill="#7dd3fc" opacity="0.5" />
+
+                        <!-- [Z-LAYER 3] Fuselage (Modern Sleek Shape) -->
+                        <path
+                            d="M40,68 C120,58 300,58 380,68 L395,75 C400,78 400,82 395,85 L380,92 C300,102 120,102 40,92 L30,87 Q25,82 30,77 L40,68 Z"
+                            fill="url(#airlinerBody)" />
+
+                        <!-- [Z-LAYER 4] Cockpit & Windows -->
+                        <path d="M358,69 Q380,70 388,77 L378,81 Q368,78 358,78 Z" fill="#0f172a" opacity="0.95" />
                         <g fill="url(#windowGlow)">
-                            <rect x="70" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="85" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="100" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="115" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="130" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="145" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="160" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="175" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="190" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="205" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="220" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="235" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="250" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="265" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="280" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="295" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="310" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="325" y="75" width="2.5" height="3.5" rx="1.2" />
-                            <rect x="340" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="80" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="95" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="110" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="125" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="140" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="155" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="170" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="185" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="200" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="215" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="230" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="245" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="260" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="275" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="290" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="305" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="320" y="78" width="3" height="4" rx="1.5" />
+                            <rect x="335" y="78" width="3" height="4" rx="1.5" />
                         </g>
 
-                        <!-- Local Wind Streaks (Nose & Wings) -->
+                        <!-- [Z-LAYER 5] Near Elements (Drawn in front of fuselage) -->
+                        <path d="M185,92 L115,142 Q105,152 140,148 L275,88 Z" fill="url(#airlinerWings)" />
+                        <path d="M195,115 Q195,108 230,110 L232,125 Q195,128 195,115 Z" fill="#475569" />
+
+                        <!-- [Z-LAYER 6] Wind & Details -->
                         <g class="local-wind">
-                            <line x1="390" y1="75" x2="420" y2="75" stroke="#ffffff" stroke-width="1"
+                            <line x1="390" y1="78" x2="415" y2="78" stroke="#ffffff" stroke-width="0.8" opacity="0.4"
                                 class="nose-wind" />
-                            <line x1="150" y1="20" x2="180" y2="15" stroke="#ffffff" stroke-width="0.8"
+                            <line x1="120" y1="25" x2="145" y2="21" stroke="#ffffff" stroke-width="0.6" opacity="0.3"
                                 class="wing-wind-top" />
-                            <line x1="140" y1="145" x2="170" y2="150" stroke="#ffffff" stroke-width="0.8"
-                                class="wing-wind-bottom" />
                         </g>
 
-                        <!-- Engine Trails -->
                         <g class="trails">
-                            <line x1="15" y1="78" x2="-30" y2="78" stroke="#38bdf8" stroke-width="2.5"
+                            <line x1="15" y1="80" x2="-35" y2="80" stroke="#38bdf8" stroke-width="2.5"
                                 class="trail t1" />
-                            <line x1="15" y1="84" x2="-20" y2="84" stroke="#0ea5e9" stroke-width="1.8"
+                            <line x1="15" y1="88" x2="-25" y2="88" stroke="#0ea5e9" stroke-width="1.8"
                                 class="trail t2" />
                         </g>
                     </svg>
@@ -145,7 +136,7 @@
                     }
                 </div>
 
-                <!-- Dense Trough Clouds (Infinite Loop, Moved Higher) -->
+                <!-- Dense Trough Clouds (Maintain Current) -->
                 <div class="clouds-layer">
                     <div class="clouds-marquee">
                         <!-- Set 1 -->
@@ -202,5 +193,5 @@
 
     <!-- Background Blurs -->
     <div class="dl-blur-left"></div>
-    <div class="dl-blur-right"></div>
+    <div class="dl-blur-right (USER_REVERTED_TO_ORIGINAL)"></div>
 </section>
