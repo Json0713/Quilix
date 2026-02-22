@@ -289,25 +289,26 @@
 }
 
 /* ---------- ORNAMENTS ---------- */
-// .cc-ornament {
-//     position: absolute;
-//     pointer-events: none;
+.cc-ornament {
+    position: absolute;
+    pointer-events: none;
+    z-index: -1;
 
-//     &.orb {
-//         width: 300px;
-//         height: 300px;
-//         border-radius: 50%;
-//         filter: blur(95px);
-//         opacity: 0.18;
-//         z-index: -1;
+    &.orb {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        filter: blur(95px);
+        opacity: 0.18;
+        z-index: -10;
 
-//         &.bottom-right {
-//             bottom: 20%;
-//             right: 130%;
-//             background: radial-gradient(circle, #10b981, #0ea5e9);
-//         }
-//     }
-// }
+        &.bottom-right {
+            bottom: -10%;
+            right: -10%;
+            background: radial-gradient(circle, #10b9814b, #0ea4e94b);
+        }
+    }
+}
 
 /* ---------- ANIMATIONS ---------- */
 @keyframes slideFadeIn {
