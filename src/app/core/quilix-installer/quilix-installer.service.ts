@@ -61,7 +61,10 @@ export class QuilixInstallerService {
 
   /* ---------- TRIGGER INSTALL ---------- */
   async requestInstall(): Promise<void> {
-    if (!this.deferredPrompt) return;
+    if (!this.deferredPrompt) {
+      console.warn('Install prompt not ready yet.');
+      return;
+    }
 
     await this.deferredPrompt.prompt();
     const choice = await this.deferredPrompt.userChoice;
