@@ -46,7 +46,7 @@
 
     // Mobile fallback: shrink to a sleek banner
     @media (max-width: 899px) {
-        min-height: 280px;
+        min-height: 180px;
         padding: 2rem 1.5rem;
         justify-content: flex-end;
         align-items: flex-start;
@@ -58,7 +58,7 @@
 
             &.glow-1 {
                 width: 150%;
-                height: 300px;
+                height: 200px;
                 top: -50%;
                 right: -25%;
                 animation: none;
