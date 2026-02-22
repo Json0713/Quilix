@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { TooltipManagerService, TooltipState } from '../../../../core/services/tooltip-manager.service';
 
 @Component({
-    selector: 'app-tooltip',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
+  selector: 'app-tooltip',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
     <div 
       class="tooltip-container" 
       [class.visible]="state().visible"
+      [class.pos-top]="state().position === 'top'"
+      [class.pos-bottom]="state().position === 'bottom'"
       [style.left.px]="state().x"
       [style.top.px]="state().y"
     >
@@ -21,6 +23,6 @@ import { TooltipManagerService, TooltipState } from '../../../../core/services/t
   `
 })
 export class Tooltip {
-    private tooltipManager = inject(TooltipManagerService);
-    state: Signal<TooltipState> = this.tooltipManager.tooltipState;
+  private tooltipManager = inject(TooltipManagerService);
+  state: Signal<TooltipState> = this.tooltipManager.tooltipState;
 }

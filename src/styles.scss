@@ -231,31 +231,53 @@ body::-webkit-scrollbar-thumb:hover,
   color: var(--text-main);
   padding: 8px 16px;
   border-radius: 50px;
-  /* Cute rounded shape */
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  transform: translate(-50%, -100%) translateY(-10px);
   opacity: 0;
   transition: opacity 250ms ease, transform 250ms ease;
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.05);
 
+  /* Shared transform logic */
+  &.pos-top {
+    transform: translate(-50%, -100%) translateY(-10px);
+
+    &.visible {
+      transform: translate(-50%, -100%) translateY(-8px);
+    }
+
+    .tooltip-tail {
+      bottom: -6px;
+      border-top: 6px solid var(--surface-main);
+    }
+  }
+
+  &.pos-bottom {
+    transform: translate(-50%, 0%) translateY(10px);
+
+    &.visible {
+      transform: translate(-50%, 0%) translateY(8px);
+    }
+
+    .tooltip-tail {
+      top: -6px;
+      border-bottom: 6px solid var(--surface-main);
+    }
+  }
+
   &.visible {
     opacity: 1;
-    transform: translate(-50%, -100%) translateY(-8px);
   }
 
   .tooltip-tail {
     position: absolute;
-    bottom: -6px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid var(--surface-main);
   }
 }

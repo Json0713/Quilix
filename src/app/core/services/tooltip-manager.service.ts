@@ -5,6 +5,7 @@ export interface TooltipState {
     x: number;
     y: number;
     visible: boolean;
+    position: 'top' | 'bottom';
 }
 
 @Injectable({
@@ -15,7 +16,8 @@ export class TooltipManagerService {
         text: '',
         x: 0,
         y: 0,
-        visible: false
+        visible: false,
+        position: 'top'
     });
 
     readonly tooltipState = this.state.asReadonly();
@@ -26,7 +28,6 @@ export class TooltipManagerService {
      * Initializes global event listeners to hijack native title attributes.
      */
     init() {
-        // We use capture phase for scroll to catch it everywhere
         window.addEventListener('mouseover', (e: MouseEvent) => this.handleMouseOver(e));
         window.addEventListener('mouseout', (e: MouseEvent) => this.handleMouseOut(e));
         window.addEventListener('scroll', () => this.hide(), true);
@@ -55,14 +56,22 @@ export class TooltipManagerService {
 
             // Calculate horizontal center
             const x = rect.left + rect.width / 2;
-            // Position above the element
-            const y = rect.top;
+
+            // Smart Positioning Check: 
+            // If there's less than 50px space above the element, flip to bottom
+            const enoughSpaceAbove = rect.top > 60;
+            const position = enoughSpaceAbove ? 'top' : 'bottom';
+
+            // If position is 'top', center is at rect.top
+            // If position is 'bottom', center is at rect.bottom
+            const y = enoughSpaceAbove ? rect.top : rect.bottom;
 
             this.state.set({
                 text,
                 x,
                 y,
-                visible: true
+                visible: true,
+                position
             });
         }, 500);
     }
