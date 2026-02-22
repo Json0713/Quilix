@@ -1,33 +1,46 @@
 <section class="cta-download-section" aria-label="Install Quilix App">
     <div class="download-container" data-scroll="fade-up">
 
-        <!-- Header Content -->
         <header class="download-header">
-            <div class="dl-tag">
-                @if (state.installed()) {
-                <span class="dl-badge success"><i class="bi bi-patch-check-fill"></i> System Ready</span>
-                } @else {
-                <span class="dl-badge"><i class="bi bi-cloud-arrow-down-fill"></i> Install as App</span>
-                }
-            </div>
 
-            <h2 class="dl-title">
-                @if (state.installed()) {
-                Welcome to your <span>Workspace.</span>
-                } @else {
-                Take Quilix <span>Everywhere.</span>
-                }
-            </h2>
-            <p class="dl-description">
-                @if (state.installed()) {
-                You're all set! Quilix is installed and ready to empower your productivity. Launch it anytime from your
-                applications folder or home screen for the full, immersive experience.
-                } @else {
-                Install Quilix directly onto your device as a native-feeling PWA. Launch instantly from your home
-                screen, work seamlessly offline, and experience the full power of your workspace — no browser tab
-                needed.
-                }
-            </p>
+            @if (!state.installed()) {
+
+                <div class="dl-tag">
+                    <span class="dl-badge">
+                        <i class="bi bi-cloud-arrow-down-fill"></i>
+                        Install as App
+                    </span>
+                </div>
+
+                <h2 class="dl-title">
+                    Take Quilix <span>Everywhere.</span>
+                </h2>
+
+                <p class="dl-description">
+                    Install Quilix directly onto your device as a native-feeling PWA.
+                    Launch instantly from your home screen, work offline,
+                    and experience the full workspace — no browser tab needed.
+                </p>
+
+            } @else {
+
+                <div class="dl-tag">
+                    <span class="dl-badge success">
+                        <i class="bi bi-patch-check-fill"></i>
+                        System Ready
+                    </span>
+                </div>
+
+                <h2 class="dl-title">
+                    Welcome to your <span>Workspace.</span>
+                </h2>
+
+                <p class="dl-description">
+                    Quilix is installed and ready. Launch anytime from your home screen
+                    for the full immersive experience.
+                </p>
+
+            }
         </header>
 
         <!-- Sky Visual Container -->
@@ -117,22 +130,29 @@
 
                 <!-- Interactive Button Area -->
                 <div class="sky-btn-zone">
-                    @if (state.installed()) {
-                    <div class="installed-badge">
-                        <i class="bi bi-check-circle-fill"></i>
-                        <span>Already Installed</span>
-                    </div>
-                    } @else {
-                    <button class="sky-install-btn" (click)="install()" [disabled]="!state.installPromptAvailable()">
-                        <i class="bi bi-download"></i>
-                        Install Quilix
-                    </button>
-                    @if (!state.installPromptAvailable() && state.platform() !== 'ios') {
-                    <span class="sky-hint">Open in a supported browser to install</span>
-                    }
-                    @if (state.platform() === 'ios') {
-                    <span class="sky-hint">Tap share and <strong>Add to Home Screen</strong></span>
-                    }
+
+                    @if (!state.installed()) {
+
+                        <button
+                            class="sky-install-btn"
+                            (click)="install()"
+                            [disabled]="!state.installPromptAvailable()">
+                            <i class="bi bi-download"></i>
+                            Install Quilix
+                        </button>
+
+                        @if (!state.installPromptAvailable() && state.platform() !== 'ios') {
+                            <span class="sky-hint">
+                                Open in a supported browser to install
+                            </span>
+                        }
+
+                        @if (state.platform() === 'ios') {
+                            <span class="sky-hint">
+                                Tap share and <strong>Add to Home Screen</strong>
+                            </span>
+                        }
+
                     }
                 </div>
 
