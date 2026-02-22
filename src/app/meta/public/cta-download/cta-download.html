@@ -131,25 +131,22 @@
                 <!-- Interactive Button Area -->
                 <div class="sky-btn-zone">
 
-                    @if (!state.installed()) {
+                    @if (state.canInstall()) {
 
                         <button
                             class="sky-install-btn"
-                            (click)="install()"
-                            [disabled]="!state.installPromptAvailable()">
+                            (click)="install()">
                             <i class="bi bi-download"></i>
                             Install Quilix
                         </button>
 
-                        @if (!state.installPromptAvailable() && state.platform() !== 'ios') {
-                            <span class="sky-hint">
-                                Open in a supported browser to install
-                            </span>
-                        }
-
                         @if (state.platform() === 'ios') {
                             <span class="sky-hint">
                                 Tap share and <strong>Add to Home Screen</strong>
+                            </span>
+                        } @else {
+                            <span class="sky-hint">
+                                Open in a supported browser to install
                             </span>
                         }
 
