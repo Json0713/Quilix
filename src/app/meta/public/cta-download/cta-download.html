@@ -59,47 +59,66 @@
                             </linearGradient>
                         </defs>
 
-                        <!-- Fuselage (Centered Wings Reference) -->
+                        <!-- Fuselage (Modern Sleek Tapered Shape) -->
                         <path
                             d="M40,65 C120,55 300,55 380,65 L395,72 C400,75 400,80 395,83 L380,90 C300,100 120,100 40,90 L30,85 Q25,80 30,75 L40,65 Z"
                             fill="url(#airlinerBody)" />
 
-                        <!-- Cockpit -->
-                        <path d="M355,66 Q375,66 385,73 L375,76 Q365,74 355,74 Z" fill="#1e293b" />
+                        <!-- Smoothed Cockpit & Modern Nose -->
+                        <path d="M360,67 Q382,68 388,75 L378,79 Q368,76 360,76 Z" fill="#0f172a" opacity="0.95" />
 
-                        <!-- Far Wing (Top, Adjusted Centering, Swept Back) -->
-                        <path d="M140,70 L90,30 Q80,20 100,22 L180,68 Z" fill="#94a3b8" />
+                        <!-- Far Wing (Top, Centered Alignment, Swept Back) -->
+                        <path d="M210,65 L145,20 Q135,10 160,15 L260,65 Z" fill="#94a3b8" />
 
                         <!-- Vertical Stabilizer (Tail) -->
-                        <path d="M60,65 L35,15 Q30,5 55,15 L100,65 Z" fill="#0ea5e9" />
-                        <path d="M55,25 Q45,15 65,35 L80,55 L65,55 Z" fill="#38bdf8" opacity="0.6" />
+                        <path d="M45,75 L15,18 Q12,5 40,15 L100,72 Z" fill="#0ea5e9" />
+                        <path d="M40,30 Q30,20 50,40 L65,65 L45,65 Z" fill="#7dd3fc" opacity="0.5" />
 
-                        <!-- Near Wing (Bottom, Centered on Fuselage, Swept Back) -->
-                        <path d="M140,82 L80,130 Q70,140 100,135 L220,90 Z" fill="url(#airlinerWings)" />
+                        <!-- Near Wing (Bottom, Centered Alignment, Massive Swept Back) -->
+                        <path d="M210,92 L140,142 Q130,150 165,145 L300,88 Z" fill="url(#airlinerWings)" />
 
-                        <!-- Engines -->
-                        <path d="M130,110 Q130,100 165,102 L165,118 Q130,120 130,110 Z" fill="#475569" />
-                        <path d="M135,40 Q135,33 160,35 L160,47 Q135,49 135,40 Z" fill="#334155" />
+                        <!-- Engine Pods (Massive) -->
+                        <path d="M195,115 Q195,108 230,110 L232,125 Q195,128 195,115 Z" fill="#475569" />
+                        <path d="M198,42 Q198,35 228,37 L230,48 Q198,51 198,42 Z" fill="#334155" />
 
-                        <!-- Windows -->
-                        <g fill="url(#windowGlow)" opacity="0.5">
-                            <rect x="80" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="92" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="104" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="116" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="128" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="140" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="152" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="164" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="176" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="188" y="74" width="3" height="4" rx="1.5" />
+                        <!-- Emphasized Windows Row -->
+                        <g fill="url(#windowGlow)">
+                            <rect x="70" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="85" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="100" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="115" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="130" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="145" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="160" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="175" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="190" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="205" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="220" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="235" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="250" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="265" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="280" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="295" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="310" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="325" y="75" width="2.5" height="3.5" rx="1.2" />
+                            <rect x="340" y="75" width="2.5" height="3.5" rx="1.2" />
+                        </g>
+
+                        <!-- Local Wind Streaks (Nose & Wings) -->
+                        <g class="local-wind">
+                            <line x1="390" y1="75" x2="420" y2="75" stroke="#ffffff" stroke-width="1"
+                                class="nose-wind" />
+                            <line x1="150" y1="20" x2="180" y2="15" stroke="#ffffff" stroke-width="0.8"
+                                class="wing-wind-top" />
+                            <line x1="140" y1="145" x2="170" y2="150" stroke="#ffffff" stroke-width="0.8"
+                                class="wing-wind-bottom" />
                         </g>
 
                         <!-- Engine Trails -->
                         <g class="trails">
-                            <line x1="30" y1="75" x2="-20" y2="75" stroke="#38bdf8" stroke-width="2.5"
+                            <line x1="15" y1="78" x2="-30" y2="78" stroke="#38bdf8" stroke-width="2.5"
                                 class="trail t1" />
-                            <line x1="30" y1="83" x2="-10" y2="83" stroke="#0ea5e9" stroke-width="1.8"
+                            <line x1="15" y1="84" x2="-20" y2="84" stroke="#0ea5e9" stroke-width="1.8"
                                 class="trail t2" />
                         </g>
                     </svg>
