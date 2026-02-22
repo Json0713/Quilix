@@ -36,6 +36,13 @@
 
                 <!-- Massive Commercial Airliner (Centered) -->
                 <div class="airplane-zone">
+                    <!-- Wind speed streaks -->
+                    <div class="wind-streaks">
+                        <span class="streak s1"></span>
+                        <span class="streak s2"></span>
+                        <span class="streak s3"></span>
+                    </div>
+
                     <svg class="airplane-svg" viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="airlinerBody" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -52,30 +59,29 @@
                             </linearGradient>
                         </defs>
 
-                        <!-- Fuselage (Massive Passenger Jet) -->
+                        <!-- Fuselage (Centered Wings Reference) -->
                         <path
                             d="M40,65 C120,55 300,55 380,65 L395,72 C400,75 400,80 395,83 L380,90 C300,100 120,100 40,90 L30,85 Q25,80 30,75 L40,65 Z"
                             fill="url(#airlinerBody)" />
 
-                        <!-- Cockpit Windows -->
+                        <!-- Cockpit -->
                         <path d="M355,66 Q375,66 385,73 L375,76 Q365,74 355,74 Z" fill="#1e293b" />
 
-                        <!-- Far Wing (Top, Swept Back) -->
-                        <path d="M120,62 L70,25 Q60,15 80,20 L160,60 Z" fill="#94a3b8" />
+                        <!-- Far Wing (Top, Adjusted Centering, Swept Back) -->
+                        <path d="M140,70 L90,30 Q80,20 100,22 L180,68 Z" fill="#94a3b8" />
 
                         <!-- Vertical Stabilizer (Tail) -->
                         <path d="M60,65 L35,15 Q30,5 55,15 L100,65 Z" fill="#0ea5e9" />
-                        <!-- Tail Logo/Accent -->
                         <path d="M55,25 Q45,15 65,35 L80,55 L65,55 Z" fill="#38bdf8" opacity="0.6" />
 
-                        <!-- Near Wing (Bottom, Massive Swept Back) -->
-                        <path d="M120,93 L60,135 Q50,145 80,140 L210,95 Z" fill="url(#airlinerWings)" />
+                        <!-- Near Wing (Bottom, Centered on Fuselage, Swept Back) -->
+                        <path d="M140,82 L80,130 Q70,140 100,135 L220,90 Z" fill="url(#airlinerWings)" />
 
-                        <!-- Engine Pods (Massive) -->
-                        <path d="M110,118 Q110,108 145,110 L145,126 Q110,128 110,118 Z" fill="#475569" />
-                        <path d="M115,35 Q115,28 140,30 L140,42 Q115,44 115,35 Z" fill="#334155" />
+                        <!-- Engines -->
+                        <path d="M130,110 Q130,100 165,102 L165,118 Q130,120 130,110 Z" fill="#475569" />
+                        <path d="M135,40 Q135,33 160,35 L160,47 Q135,49 135,40 Z" fill="#334155" />
 
-                        <!-- Windows Row (Massive Fleet Feel) -->
+                        <!-- Windows -->
                         <g fill="url(#windowGlow)" opacity="0.5">
                             <rect x="80" y="74" width="3" height="4" rx="1.5" />
                             <rect x="92" y="74" width="3" height="4" rx="1.5" />
@@ -87,18 +93,6 @@
                             <rect x="164" y="74" width="3" height="4" rx="1.5" />
                             <rect x="176" y="74" width="3" height="4" rx="1.5" />
                             <rect x="188" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="200" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="212" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="224" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="236" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="248" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="260" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="272" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="284" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="296" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="308" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="320" y="74" width="3" height="4" rx="1.5" />
-                            <rect x="332" y="74" width="3" height="4" rx="1.5" />
                         </g>
 
                         <!-- Engine Trails -->
@@ -132,49 +126,49 @@
                     }
                 </div>
 
-                <!-- Dense Trough Clouds (Infinite Loop) -->
+                <!-- Dense Trough Clouds (Infinite Loop, Moved Higher) -->
                 <div class="clouds-layer">
                     <div class="clouds-marquee">
                         <!-- Set 1 -->
                         <div class="cloud-chunk">
-                            <svg class="cloud big" viewBox="0 0 170 60">
+                            <svg class="cloud big" viewBox="0 0 200 60">
                                 <path d="M0,60 L200,60 L200,45 Q180,20 150,30 Q120,5 90,25 Q60,10 30,35 Q10,40 0,60 Z"
                                     fill="currentColor" />
                             </svg>
-                            <svg class="cloud massive" viewBox="0 0 300 80" style="margin-left: -60px;">
+                            <svg class="cloud massive" viewBox="0 0 300 80" style="margin-left: -80px;">
                                 <path d="M0,80 L300,80 L300,55 Q260,20 210,40 Q160,5 110,45 Q60,15 30,55 Q10,65 0,80 Z"
                                     fill="currentColor" />
                             </svg>
-                            <svg class="cloud medium" viewBox="0 0 160 50" style="margin-left: -50px;">
+                            <svg class="cloud medium" viewBox="0 0 160 50" style="margin-left: -70px;">
                                 <path d="M0,50 L160,50 L160,35 Q130,15 100,25 Q70,5 40,30 Q10,35 0,50 Z"
                                     fill="currentColor" />
                             </svg>
-                            <svg class="cloud small" viewBox="0 0 100 40" style="margin-left: -30px;">
+                            <svg class="cloud small" viewBox="0 0 100 40" style="margin-left: -50px;">
                                 <path d="M0,40 L100,40 L100,25 Q80,10 50,20 Q20,10 0,40 Z" fill="currentColor" />
                             </svg>
-                            <svg class="cloud big" viewBox="0 0 200 60" style="margin-left: -40px;">
+                            <svg class="cloud big" viewBox="0 0 200 60" style="margin-left: -60px;">
                                 <path d="M0,60 L200,60 L200,45 Q180,20 150,30 Q120,5 90,25 Q60,10 30,35 Q10,40 0,60 Z"
                                     fill="currentColor" />
                             </svg>
                         </div>
-                        <!-- Set 2 (Duplicate for seamless tiling) -->
+                        <!-- Set 2 -->
                         <div class="cloud-chunk" aria-hidden="true">
                             <svg class="cloud big" viewBox="0 0 200 60">
                                 <path d="M0,60 L200,60 L200,45 Q180,20 150,30 Q120,5 90,25 Q60,10 30,35 Q10,40 0,60 Z"
                                     fill="currentColor" />
                             </svg>
-                            <svg class="cloud massive" viewBox="0 0 300 80" style="margin-left: -60px;">
+                            <svg class="cloud massive" viewBox="0 0 300 80" style="margin-left: -80px;">
                                 <path d="M0,80 L300,80 L300,55 Q260,20 210,40 Q160,5 110,45 Q60,15 30,55 Q10,65 0,80 Z"
                                     fill="currentColor" />
                             </svg>
-                            <svg class="cloud medium" viewBox="0 0 160 50" style="margin-left: -50px;">
+                            <svg class="cloud medium" viewBox="0 0 160 50" style="margin-left: -70px;">
                                 <path d="M0,50 L160,50 L160,35 Q130,15 100,25 Q70,5 40,30 Q10,35 0,50 Z"
                                     fill="currentColor" />
                             </svg>
-                            <svg class="cloud small" viewBox="0 0 100 40" style="margin-left: -30px;">
+                            <svg class="cloud small" viewBox="0 0 100 40" style="margin-left: -50px;">
                                 <path d="M0,40 L100,40 L100,25 Q80,10 50,20 Q20,10 0,40 Z" fill="currentColor" />
                             </svg>
-                            <svg class="cloud big" viewBox="0 0 200 60" style="margin-left: -40px;">
+                            <svg class="cloud big" viewBox="0 0 200 60" style="margin-left: -60px;">
                                 <path d="M0,60 L200,60 L200,45 Q180,20 150,30 Q120,5 90,25 Q60,10 30,35 Q10,40 0,60 Z"
                                     fill="currentColor" />
                             </svg>

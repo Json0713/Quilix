@@ -13,7 +13,8 @@
 .download-container {
     display: flex;
     flex-direction: column;
-    gap: 4rem;
+    gap: 3rem;
+    /* Tighter gap to bring clouds closer */
     z-index: 2;
     position: relative;
 }
@@ -89,7 +90,7 @@
     /* Fade out edges seamlessly */
     -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
     mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-    padding: 2rem 0 0 0;
+    padding: 1rem 0 0 0;
 }
 
 .sky-track {
@@ -97,18 +98,20 @@
     flex-direction: column;
     align-items: center;
     position: relative;
-    min-height: 380px;
+    min-height: 360px;
 
     @media (min-width: 900px) {
-        min-height: 480px;
+        min-height: 440px;
     }
 }
 
-/* ---------- MASSIVE AIRPLANE ---------- */
+/* ---------- MASSIVE AIRPLANE & WIND ---------- */
 .airplane-zone {
     position: relative;
     z-index: 10;
-    animation: floatPlane 6s ease-in-out infinite;
+    animation:
+        floatPlane 6s ease-in-out infinite,
+        windJitter 0.5s ease-in-out infinite alternate;
     filter: drop-shadow(0 15px 45px rgba(0, 0, 0, 0.25));
 
     html.light-theme & {
@@ -120,6 +123,47 @@
     width: clamp(280px, 55vw, 550px);
     height: auto;
     display: block;
+}
+
+/* Wind speed lines overlay */
+.wind-streaks {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: -1;
+
+    .streak {
+        position: absolute;
+        height: 1px;
+        background: linear-gradient(to right, transparent, var(--text-muted), transparent);
+        opacity: 0.15;
+        border-radius: 10px;
+        animation: streakPass 1.5s linear infinite;
+
+        &.s1 {
+            top: 20%;
+            width: 15%;
+            animation-duration: 1.2s;
+        }
+
+        &.s2 {
+            top: 50%;
+            width: 25%;
+            animation-duration: 0.8s;
+            left: -10%;
+        }
+
+        &.s3 {
+            top: 80%;
+            width: 10%;
+            animation-duration: 1.5s;
+            left: 20%;
+        }
+    }
 }
 
 /* Engine trail pulse */
@@ -141,9 +185,9 @@
     flex-direction: column;
     align-items: center;
     gap: 0.8rem;
-    margin: 2rem 0 1rem;
+    margin: 1.5rem 0 0.5rem;
+    /* Tighter margins */
     z-index: 20;
-    /* High z-index for clickability */
 }
 
 .sky-install-btn {
@@ -159,7 +203,6 @@
     cursor: pointer;
     white-space: nowrap;
     pointer-events: auto;
-    /* Explicitly interactive */
 
     background: linear-gradient(135deg, var(--action), var(--action-hover));
     color: #fff;
@@ -218,62 +261,57 @@
     font-weight: 500;
 }
 
-/* ---------- DENSE TROUGH CLOUDS ---------- */
+/* ---------- DENSE TROUGH CLOUDS & FADE ---------- */
 .clouds-layer {
     width: 100%;
     overflow: hidden;
     position: relative;
     height: 160px;
-    margin-top: auto;
+    margin-top: -10px;
+    /* Pull them closer to button */
 
-    @media (min-width: 900px) {
-        height: 160px;
-    }
-
-    /* Blending mask */
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 60%);
-    mask-image: linear-gradient(to bottom, transparent 0%, black 60%);
+    /* Advanced blending and bottom vanish fade */
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
 }
 
 .clouds-marquee {
     display: flex;
     width: max-content;
     height: 100%;
-    animation: driftClouds 50s linear infinite;
-    /* Persistent flow as requested */
+    animation: driftClouds 55s linear infinite;
 }
 
 .cloud-chunk {
     display: flex;
     align-items: flex-end;
-    /* Overlap handling via negative margins in HTML */
 }
 
 .cloud {
     flex-shrink: 0;
     color: var(--border-strong);
-    opacity: 0.75;
+    opacity: 0.85;
     filter: blur(1.5px);
 
     html.light-theme & {
-        color: rgba(0, 0, 0, 0.12);
-        opacity: 0.85;
+        color: rgba(0, 0, 0, 0.15);
+        opacity: 0.9;
     }
 
     &.massive {
-        width: clamp(280px, 40vw, 550px);
+        width: clamp(300px, 45vw, 600px);
     }
 
     &.big {
-        width: clamp(220px, 30vw, 420px);
+        width: clamp(240px, 35vw, 480px);
     }
 
     &.medium {
-        width: clamp(160px, 20vw, 300px);
+        width: clamp(180px, 25vw, 350px);
     }
 
     &.small {
-        width: clamp(100px, 12vw, 180px);
+        width: clamp(120px, 15vw, 220px);
     }
 }
 
@@ -314,11 +352,37 @@
 
     0%,
     100% {
-        transform: translateY(0) rotate(-0.3deg);
+        transform: translateY(0) rotate(-0.2deg);
     }
 
     50% {
-        transform: translateY(-20px) rotate(0.6deg);
+        transform: translateY(-15px) rotate(0.4deg);
+    }
+}
+
+@keyframes windJitter {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(1px, 0.5px);
+    }
+}
+
+@keyframes streakPass {
+    0% {
+        transform: translateX(200%) scaleX(0.5);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: translateX(-200%) scaleX(1.5);
+        opacity: 0;
     }
 }
 
