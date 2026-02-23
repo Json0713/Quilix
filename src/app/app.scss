@@ -9,7 +9,7 @@
 
   position: relative;
   isolation: isolate;
-  // overflow: hidden;
+  overflow: hidden;
 }
 
 .app-root::before {
@@ -36,6 +36,6 @@
   min-width: 0;
   min-height: 0;
 
-  // overflow: auto;
+  overflow: auto;
   position: relative;
 }
