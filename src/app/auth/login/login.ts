@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TitleCasePipe } from '@angular/common';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { WorkspaceService } from '../../core/workspaces/workspace.service';
@@ -12,11 +13,12 @@ import { TimeAgoPipe } from '../../shared/ui/common/time-ago/time-ago-pipe';
 
 import { ToastRelayService } from '../../services/ui/common/toast/toast-relay';
 import { ModalService } from '../../services/ui/common/modal/modal';
+import { WorkspaceVisualComponent } from './workspace-visual/workspace-visual';
 
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterModule, Spinner, TimeAgoPipe],
+  imports: [FormsModule, RouterModule, Spinner, TimeAgoPipe, WorkspaceVisualComponent, TitleCasePipe],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -31,6 +33,9 @@ export class Login implements OnInit, OnDestroy {
 
   deletingWorkspaceId: string | null = null;
   loadingWorkspaceId: string | null = null;
+
+  /** Mobile view toggle */
+  showAllWorkspaces = false;
 
   /** 
    * Tracks IDs present BEFORE a creation starts to prevent flickering
@@ -142,13 +147,21 @@ export class Login implements OnInit, OnDestroy {
   }
 
   confirmDelete(workspace: Workspace): void {
+    if (this.loadingWorkspaceId) return;
     this.loadingWorkspaceId = workspace.id;
 
     setTimeout(async () => {
-      await this.auth.deleteWorkspace(workspace.id);
+      try {
+        await this.auth.deleteWorkspace(workspace.id);
 
-      this.deletingWorkspaceId = null;
-      this.loadingWorkspaceId = null;
+        // Reset toggle if the list becomes empty or we deleted the one we were showing
+        if (this.workspaces.length <= 1) {
+          this.showAllWorkspaces = false;
+        }
+      } finally {
+        this.deletingWorkspaceId = null;
+        this.loadingWorkspaceId = null;
+      }
     }, 1200);
   }
 
