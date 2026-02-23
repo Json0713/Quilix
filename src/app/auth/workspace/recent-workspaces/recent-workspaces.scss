@@ -7,7 +7,7 @@
 
 .login-split-container {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     min-height: 100vh;
     background: var(--bg);
     overflow: hidden; // Keep split container stable during content shifts
@@ -25,7 +25,7 @@
     justify-content: center;
     padding: 3rem 1.5rem;
     background: var(--bg);
-    animation: fadeIn 0.6s ease-out forwards;
+    animation: fadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 
     @media (max-width: 899px) {
         order: 2;
@@ -192,6 +192,7 @@
         min-width: 0;
 
         strong {
+            display: block; // Required for truncation to work on inline element
             font-size: 0.95rem;
             color: var(--text-main);
             white-space: nowrap;
@@ -331,7 +332,7 @@
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(6px); // Reduced movement for stability
+        transform: translateX(-20px);
     }
 
     to {
