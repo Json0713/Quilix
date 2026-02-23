@@ -23,7 +23,7 @@
     display: flex;
     align-items: center; // Vertical centering on desktop
     justify-content: center;
-    padding: 3rem 1.5rem;
+    padding: 2rem 1.5rem;
     background: var(--bg);
     animation: fadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 
@@ -106,21 +106,12 @@
 
 /* WORKSPACE LIST AREA */
 .scroll-area {
-    max-height: 480px;
+    max-height: 380px;
     overflow-y: auto;
     padding-right: 4px;
 
     &::-webkit-scrollbar {
         width: 5px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: var(--border);
-        border-radius: 10px;
     }
 }
 
@@ -160,49 +151,48 @@
             opacity: 0.7;
             pointer-events: none;
         }
-    }
 
-    .ws-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-size: 1.25rem;
-        flex-shrink: 0;
-        position: relative;
-
-        .ws-mini-spinner {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.2);
+        .ws-icon {
+            width: 40px;
+            height: 40px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-    }
-
-    .ws-meta {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-
-        strong {
-            display: block; // Required for truncation to work on inline element
-            font-size: 0.95rem;
-            color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            color: #fff;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            position: relative;
         }
 
-        small {
-            font-size: 0.8rem;
-            color: var(--text-alt);
+        .ws-meta {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+
+            strong {
+                display: block;
+                font-size: 0.95rem;
+                color: var(--text-main);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            small {
+                font-size: 0.8rem;
+                color: var(--text-alt);
+            }
+        }
+
+        .ws-card-loading {
+            margin: auto;
+            margin-right: 14px;
+            padding-right: 4px;
+            display: flex;
+            align-items: center;
+            opacity: 0.8;
         }
     }
 
@@ -337,6 +327,6 @@
 
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(0);
     }
 }

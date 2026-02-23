@@ -44,16 +44,16 @@
                             [attr.aria-label]="'Continue ' + ws.name" [attr.aria-busy]="loadingWorkspaceId === ws.id">
                             <div class="ws-icon" [style.background]="getAvatarColor(ws.id)" aria-hidden="true">
                                 <i class="bi {{ getAvatarIcon(ws.id) }}"></i>
-                                @if (loadingWorkspaceId === ws.id) {
-                                <div class="ws-mini-spinner">
-                                    <app-spinner [size]="16" />
-                                </div>
-                                }
                             </div>
                             <div class="ws-meta">
                                 <strong class="truncate">{{ ws.name }}</strong>
                                 <small>{{ ws.role | titlecase }} • {{ ws.lastActiveAt | timeAgo }}</small>
                             </div>
+                            @if (loadingWorkspaceId === ws.id) {
+                            <div class="ws-card-loading">
+                                <app-spinner [size]="20" />
+                            </div>
+                            }
                         </div>
 
                         <button class="delete-action" (click)="requestDelete(ws); $event.stopPropagation()"
