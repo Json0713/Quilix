@@ -38,7 +38,8 @@
     max-width: 440px;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2.0rem;
+    margin: 0;
 }
 
 /* BRANDING */
@@ -93,26 +94,7 @@
         align-items: center;
         gap: 1rem;
         margin-bottom: 0.5rem;
-
-        .back-link {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-alt);
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-
-            &:hover {
-                background: var(--bg-hover);
-                color: var(--text-main);
-                border-color: var(--accent);
-            }
-        }
+        
     }
 
     h1 {
@@ -225,8 +207,8 @@
     padding: 0.9rem;
     border-radius: 12px;
     border: none;
-    background: var(--text-main);
-    color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: var(--text-white);
     font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
@@ -251,6 +233,7 @@
     text-align: center;
     font-size: 0.95rem;
     color: var(--text-alt);
+    margin-bottom: 0;
 
     a {
         color: var(--action);
@@ -279,7 +262,7 @@
 
     @media (max-width: 899px) {
         order: 1;
-        height: 30vh;
+        height: 200px;
     }
 }
 
