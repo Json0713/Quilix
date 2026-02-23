@@ -11,7 +11,11 @@ export const PUBLIC_ROUTES: Routes = [
       },
       {
         path: 'login',
-        loadComponent: () => import('../auth/login/login').then(m => m.Login)
+        loadComponent: () => import('../auth/login/recent-workspaces/recent-workspaces').then(m => m.RecentWorkspacesComponent)
+      },
+      {
+        path: 'create-workspace',
+        loadComponent: () => import('../auth/login/create-workspace/create-workspace').then(m => m.CreateWorkspaceComponent)
       }
     ]
   }

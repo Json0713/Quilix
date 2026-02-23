@@ -1,26 +1,36 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { WorkspaceRole } from '../../../core/interfaces/workspace';
 import { Spinner } from '../../../shared/ui/common/spinner/spinner';
+import { WorkspaceVisualComponent } from '../workspace-visual/workspace-visual';
+import { ModalService } from '../../../services/ui/common/modal/modal';
 
 @Component({
     selector: 'app-create-workspace',
     standalone: true,
-    imports: [FormsModule, Spinner],
+    imports: [CommonModule, FormsModule, RouterModule, Spinner, WorkspaceVisualComponent],
     templateUrl: './create-workspace.html',
     styleUrl: './create-workspace.scss',
 })
 export class CreateWorkspaceComponent {
-    @Output() cancel = new EventEmitter<void>();
-    @Output() created = new EventEmitter<WorkspaceRole>();
 
     name = '';
     role: WorkspaceRole = 'personal';
     isSubmitting = false;
     errorMessage: string | null = null;
 
-    constructor(private auth: AuthService) { }
+    constructor(
+        private auth: AuthService,
+        private modal: ModalService,
+        private router: Router
+    ) { }
+
+    openImport(): void {
+        this.modal.openImport();
+    }
 
     async createWorkspace(): Promise<void> {
         if (this.name.trim().length < 2 || !this.role || this.isSubmitting) return;
@@ -43,7 +53,7 @@ export class CreateWorkspaceComponent {
         // UX Delay for "Preparing Workspace" feel
         setTimeout(() => {
             localStorage.setItem('justLoggedIn', 'true');
-            this.created.emit(result.workspace!.role);
+            this.router.navigate([result.workspace!.role === 'personal' ? '/personal' : '/team']);
             this.isSubmitting = false;
         }, 1800);
     }

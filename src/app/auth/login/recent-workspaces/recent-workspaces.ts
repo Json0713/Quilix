@@ -1,22 +1,22 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { WorkspaceService } from '../../../core/workspaces/workspace.service';
 import { Workspace, WorkspaceRole } from '../../../core/interfaces/workspace';
 import { Spinner } from '../../../shared/ui/common/spinner/spinner';
 import { TimeAgoPipe } from '../../../shared/ui/common/time-ago/time-ago-pipe';
 import { ModalService } from '../../../services/ui/common/modal/modal';
+import { WorkspaceVisualComponent } from '../workspace-visual/workspace-visual';
 
 @Component({
     selector: 'app-recent-workspaces',
     standalone: true,
-    imports: [CommonModule, Spinner, TimeAgoPipe, TitleCasePipe],
+    imports: [CommonModule, RouterModule, Spinner, TimeAgoPipe, TitleCasePipe, WorkspaceVisualComponent],
     templateUrl: './recent-workspaces.html',
     styleUrl: './recent-workspaces.scss',
 })
 export class RecentWorkspacesComponent implements OnInit, OnDestroy {
-    @Output() createNew = new EventEmitter<void>();
-    @Output() loggedIn = new EventEmitter<WorkspaceRole>();
 
     workspaces: Workspace[] = [];
     loading = true;
@@ -28,7 +28,8 @@ export class RecentWorkspacesComponent implements OnInit, OnDestroy {
     constructor(
         private workspaceService: WorkspaceService,
         private auth: AuthService,
-        private modal: ModalService
+        private modal: ModalService,
+        private router: Router
     ) { }
 
     ngOnInit(): void {
@@ -51,7 +52,7 @@ export class RecentWorkspacesComponent implements OnInit, OnDestroy {
         setTimeout(async () => {
             await this.auth.loginExisting(workspace);
             localStorage.setItem('justLoggedIn', 'true');
-            this.loggedIn.emit(workspace.role);
+            this.router.navigate([workspace.role === 'personal' ? '/personal' : '/team']);
             this.loadingWorkspaceId = null;
         }, 1500);
     }

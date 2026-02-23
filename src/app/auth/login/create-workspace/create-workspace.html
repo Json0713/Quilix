@@ -1,51 +1,84 @@
-<div class="auth-box">
-    <div class="header-actions">
-        <button type="button" class="back-link" (click)="cancel.emit()" aria-label="Back to workspaces">
-            <i class="bi bi-chevron-left" aria-hidden="true"></i>
-        </button>
-        <h2 id="create-title">Create Workspace</h2>
-    </div>
-    <p class="subtitle">Start a fresh local environment for your projects.</p>
+<div class="login-split-container">
 
-    <form class="auth-form" (ngSubmit)="createWorkspace()" novalidate>
-        <!-- Name -->
-        <div class="form-group">
-            <label for="name">Workspace Name</label>
-            <input id="name" type="text" name="name" placeholder="Name your project..." [(ngModel)]="name" required
-                minlength="2" maxlength="80" autocomplete="off" [class.invalid]="errorMessage" />
-            @if (errorMessage) {
-            <small class="error-text">{{ errorMessage }}</small>
-            }
-        </div>
+    <!-- Left Side: Interactive Area -->
+    <div class="login-form-side">
+        <div class="login-card">
 
-        <!-- Role Selection -->
-        <div class="form-group">
-            <label>Focus Mode</label>
-            <div class="role-selector" [class.is-team]="role === 'team'">
-                <div class="selector-glider"></div>
-
-                <button type="button" class="role-option" [class.active]="role === 'personal'"
-                    (click)="role = 'personal'">
-                    <i class="bi bi-mortarboard"></i>
-                    <span>Personal</span>
+            <!-- Header / Brand -->
+            <header class="brand-header">
+                <div class="brand-logo" routerLink="/meta" role="link" aria-label="Quilix Home">
+                    <i class="bi bi-feather" aria-hidden="true"></i>
+                    <span>Quilix</span>
+                </div>
+                <button type="button" class="import-btn" (click)="$event.stopPropagation(); openImport()"
+                    aria-label="Import Backup">
+                    <i class="bi bi-cloud-arrow-down" aria-hidden="true"></i>
                 </button>
+            </header>
 
-                <button type="button" class="role-option" [class.active]="role === 'team'" (click)="role = 'team'">
-                    <i class="bi bi-person-workspace"></i>
-                    <span>Team</span>
-                </button>
+            <div class="header-text">
+                <div class="header-actions">
+                    <button type="button" class="back-link" routerLink="/login" aria-label="Back to workspaces">
+                        <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                    </button>
+                    <h1 id="create-title">Create Workspace</h1>
+                </div>
+                <p class="subtitle">Start a fresh local environment for your projects.</p>
             </div>
-        </div>
 
-        <!-- Action -->
-        <button type="submit" class="submit-btn" [disabled]="name.trim().length < 2 || !role || isSubmitting"
-            [attr.aria-busy]="isSubmitting">
-            @if (isSubmitting) {
-            <app-spinner [size]="18" class="btn-spinner" aria-hidden="true"></app-spinner>
-            <span>Preparing...</span>
-            } @else {
-            <span>Start Workspace</span>
-            }
-        </button>
-    </form>
+            <form class="auth-form" (ngSubmit)="createWorkspace()" novalidate>
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="name">Workspace Name</label>
+                    <input id="name" type="text" name="name" placeholder="Name your project..." [(ngModel)]="name"
+                        required minlength="2" maxlength="80" autocomplete="off" [class.invalid]="errorMessage" />
+                    @if (errorMessage) {
+                    <small class="error-text">{{ errorMessage }}</small>
+                    }
+                </div>
+
+                <!-- Role Selection -->
+                <div class="form-group">
+                    <label>Focus Mode</label>
+                    <div class="role-selector" [class.is-team]="role === 'team'">
+                        <div class="selector-glider"></div>
+
+                        <button type="button" class="role-option" [class.active]="role === 'personal'"
+                            (click)="role = 'personal'">
+                            <i class="bi bi-mortarboard"></i>
+                            <span>Personal</span>
+                        </button>
+
+                        <button type="button" class="role-option" [class.active]="role === 'team'"
+                            (click)="role = 'team'">
+                            <i class="bi bi-person-workspace"></i>
+                            <span>Team</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action -->
+                <button type="submit" class="submit-btn" [disabled]="name.trim().length < 2 || !role || isSubmitting"
+                    [attr.aria-busy]="isSubmitting">
+                    @if (isSubmitting) {
+                    <app-spinner [size]="18" class="btn-spinner" aria-hidden="true"></app-spinner>
+                    <span>Preparing...</span>
+                    } @else {
+                    <span>Start Workspace</span>
+                    }
+                </button>
+            </form>
+
+            <p class="login-link">
+                Already have a workspace? <a routerLink="/login">Go to list</a>
+            </p>
+
+        </div>
+    </div>
+
+    <!-- Right Side: Visual -->
+    <div class="login-visual-side">
+        <app-workspace-visual></app-workspace-visual>
+    </div>
+
 </div>
