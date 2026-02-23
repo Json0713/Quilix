@@ -113,6 +113,11 @@
     /* Firefox */
     scrollbar-width: thin;
     scrollbar-color: rgba(79, 163, 168, 0.45) transparent;
+
+    @media screen and (max-width: 768px) {
+        max-height: 230px;
+        
+    }
 }
 
 .workspace-list {
