@@ -1,0 +1,50 @@
+<div class="auth-box">
+    <div class="header-actions">
+        <button type="button" class="back-link" (click)="cancel.emit()" title="Back to workspaces">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <h2>Create Workspace</h2>
+    </div>
+    <p class="subtitle">Start a fresh local environment for your projects.</p>
+
+    <form class="auth-form" (ngSubmit)="createWorkspace()" novalidate>
+        <!-- Name -->
+        <div class="form-group">
+            <label for="name">Workspace Name</label>
+            <input id="name" type="text" name="name" placeholder="Name your project..." [(ngModel)]="name" required
+                minlength="2" maxlength="80" autocomplete="off" [class.invalid]="errorMessage" />
+            @if (errorMessage) {
+            <small class="error-text">{{ errorMessage }}</small>
+            }
+        </div>
+
+        <!-- Role Selection -->
+        <div class="form-group">
+            <label>Focus Mode</label>
+            <div class="role-selector" [class.is-team]="role === 'team'">
+                <div class="selector-glider"></div>
+
+                <button type="button" class="role-option" [class.active]="role === 'personal'"
+                    (click)="role = 'personal'">
+                    <i class="bi bi-mortarboard"></i>
+                    <span>Personal</span>
+                </button>
+
+                <button type="button" class="role-option" [class.active]="role === 'team'" (click)="role = 'team'">
+                    <i class="bi bi-person-workspace"></i>
+                    <span>Team</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Action -->
+        <button type="submit" class="submit-btn" [disabled]="name.trim().length < 2 || !role || isSubmitting">
+            @if (isSubmitting) {
+            <app-spinner [size]="18" class="btn-spinner"></app-spinner>
+            <span>Preparing...</span>
+            } @else {
+            <span>Start Workspace</span>
+            }
+        </button>
+    </form>
+</div>

@@ -14,124 +14,23 @@
           <p class="brand-subtitle">Plan tasks • Organize projects • Academic workflows</p>
         </header>
 
-        <section class="auth-box">
-          <h2>Create Workspace</h2>
-          <p class="subtitle">Start a fresh local environment for your projects.</p>
-
-          <form class="auth-form" (ngSubmit)="createWorkspace()" novalidate>
-            <!-- Name -->
-            <div class="form-group">
-              <label for="name">Workspace Name</label>
-              <input id="name" type="text" name="name" placeholder="Name your project..." [(ngModel)]="name" required
-                minlength="2" maxlength="80" autocomplete="off" [class.invalid]="errorMessage" />
-              @if (errorMessage) {
-              <small class="error-text">{{ errorMessage }}</small>
-              }
-            </div>
-
-            <!-- Role Selection -->
-            <div class="form-group">
-              <label>Focus Mode</label>
-              <div class="role-selector" [class.is-team]="role === 'team'">
-                <div class="selector-glider"></div>
-
-                <button type="button" class="role-option" [class.active]="role === 'personal'"
-                  (click)="role = 'personal'">
-                  <i class="bi bi-mortarboard"></i>
-                  <span>Personal</span>
-                </button>
-
-                <button type="button" class="role-option" [class.active]="role === 'team'" (click)="role = 'team'">
-                  <i class="bi bi-person-workspace"></i>
-                  <span>Team</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Action -->
-            <button type="submit" class="submit-btn" [disabled]="name.trim().length < 2 || !role || isSubmitting">
-              @if (isSubmitting) {
-              <app-spinner [size]="18" class="btn-spinner"></app-spinner>
-              <span>Preparing...</span>
-              } @else {
-              <span>Start Workspace</span>
-              }
-            </button>
-          </form>
-        </section>
-
-        <!-- Recent Workspaces -->
-        <section class="recent-section">
-          <div class="section-header">
-            <h3>Recent Activity</h3>
-            <button type="button" class="import-link" (click)="openImport()">
-              <i class="bi bi-cloud-arrow-down"></i>
-              Import
-            </button>
-          </div>
-
-          @if (loading) {
-          <div class="recent-loading">
-            <app-spinner [size]="24" />
-          </div>
-          } @else {
-          @if (workspaces.length === 0) {
-          <div class="recent-empty">
-            <p>No recent local workspaces found.</p>
-          </div>
-          } @else {
-          <div class="workspace-scroll-container">
-            <ul class="workspace-list" [class.show-all]="showAllWorkspaces">
-              @for (ws of workspaces; track ws.id; let first = $first) {
-              @if (showAllWorkspaces || first) {
-              <li class="workspace-card" [class.confirming]="deletingWorkspaceId === ws.id">
-
-                @if (deletingWorkspaceId !== ws.id) {
-                <div class="ws-main" (click)="continueWorkspace(ws)" [class.loading]="loadingWorkspaceId === ws.id">
-                  <div class="ws-icon" [style.background]="getAvatarColor(ws.id)">
-                    <i class="bi {{ getAvatarIcon(ws.id) }}"></i>
-                  </div>
-                  <div class="ws-meta">
-                    <strong class="truncate">{{ ws.name }}</strong>
-                    <small>{{ ws.role | titlecase }} • {{ ws.lastActiveAt | timeAgo }}</small>
-                  </div>
-
-                  @if (loadingWorkspaceId === ws.id) {
-                  <app-spinner [size]="18" class="ws-loading-spinner" />
-                  }
-                </div>
-
-                <button class="delete-btn" (click)="requestDelete(ws); $event.stopPropagation()" title="Delete">
-                  <i class="bi bi-trash3"></i>
-                </button>
-                } @else {
-                <!-- Confirm Delete -->
-                <div class="ws-confirm">
-                  <span>Delete?</span>
-                  <div class="confirm-btns">
-                    <button class="btn-danger" (click)="confirmDelete(ws)">
-                      @if (loadingWorkspaceId === ws.id) { <app-spinner [size]="14" /> }
-                      @else { Yes }
-                    </button>
-                    <button class="btn-ghost" (click)="cancelDelete()">Cancel</button>
-                  </div>
-                </div>
-                }
-              </li>
-              }
-              }
-            </ul>
-
-            @if (workspaces.length > 1) {
-            <button class="toggle-list-btn" (click)="showAllWorkspaces = !showAllWorkspaces">
-              {{ showAllWorkspaces ? 'Show Less' : 'View ' + (workspaces.length - 1) + ' more' }}
-              <i class="bi" [class.bi-chevron-down]="!showAllWorkspaces" [class.bi-chevron-up]="showAllWorkspaces"></i>
-            </button>
-            }
+        <main class="view-container">
+          <!-- Recent Workspaces View -->
+          @if (currentView === 'recent') {
+          <div class="view-fade">
+            <app-recent-workspaces (createNew)="switchToCreate()" (loggedIn)="onWorkspaceLoggedIn($event)">
+            </app-recent-workspaces>
           </div>
           }
+
+          <!-- Create Workspace View -->
+          @if (currentView === 'create') {
+          <div class="view-fade">
+            <app-create-workspace (cancel)="switchToRecent()" (created)="onWorkspaceCreated($event)">
+            </app-create-workspace>
+          </div>
           }
-        </section>
+        </main>
 
       </div>
     </div>
