@@ -94,14 +94,14 @@
 }
 
 /* VIEW TRANSITIONS */
-.view-container {
-    position: relative;
-    min-height: 480px; // Maintain height during switches
-}
+// .view-container {
+//     position: relative;
+//     min-height: 480px; // Maintain height during switches
+// }
 
-.view-fade {
-    animation: viewFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+// .view-fade {
+//     animation: viewFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+// }
 
 /* RIGHT SIDE: VISUAL */
 .login-visual-side {
