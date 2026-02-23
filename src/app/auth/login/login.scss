@@ -1,13 +1,13 @@
 :host {
     display: block;
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
 }
 
 .login-split-container {
     display: grid;
     grid-template-columns: 1fr;
-    height: 100vh;
+    min-height: 100vh;
     background: var(--bg);
 
     @media (min-width: 900px) {
@@ -17,8 +17,7 @@
 
 /* LEFT SIDE: FORM */
 .login-form-side {
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     background: var(--bg);
@@ -34,7 +33,6 @@
 
 .content-scroller {
     flex: 1;
-    overflow-y: auto;
     display: flex;
     justify-content: center;
     padding: 3rem 1.5rem;

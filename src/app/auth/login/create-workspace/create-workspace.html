@@ -1,9 +1,9 @@
 <div class="auth-box">
     <div class="header-actions">
-        <button type="button" class="back-link" (click)="cancel.emit()" title="Back to workspaces">
-            <i class="bi bi-chevron-left"></i>
+        <button type="button" class="back-link" (click)="cancel.emit()" aria-label="Back to workspaces">
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
         </button>
-        <h2>Create Workspace</h2>
+        <h2 id="create-title">Create Workspace</h2>
     </div>
     <p class="subtitle">Start a fresh local environment for your projects.</p>
 
@@ -38,9 +38,10 @@
         </div>
 
         <!-- Action -->
-        <button type="submit" class="submit-btn" [disabled]="name.trim().length < 2 || !role || isSubmitting">
+        <button type="submit" class="submit-btn" [disabled]="name.trim().length < 2 || !role || isSubmitting"
+            [attr.aria-busy]="isSubmitting">
             @if (isSubmitting) {
-            <app-spinner [size]="18" class="btn-spinner"></app-spinner>
+            <app-spinner [size]="18" class="btn-spinner" aria-hidden="true"></app-spinner>
             <span>Preparing...</span>
             } @else {
             <span>Start Workspace</span>

@@ -4,8 +4,9 @@
             <h3>Recent Activity</h3>
             <p>Select a workspace to resume your flow.</p>
         </div>
-        <button type="button" class="import-btn" (click)="$event.stopPropagation(); openImport()" title="Import Backup">
-            <i class="bi bi-cloud-arrow-down"></i>
+        <button type="button" class="import-btn" (click)="$event.stopPropagation(); openImport()"
+            aria-label="Import Backup">
+            <i class="bi bi-cloud-arrow-down" aria-hidden="true"></i>
         </button>
     </div>
 
@@ -27,8 +28,10 @@
             <li class="workspace-card" [class.confirming]="deletingWorkspaceId === ws.id">
 
                 @if (deletingWorkspaceId !== ws.id) {
-                <div class="ws-main" (click)="continueWorkspace(ws)" [class.loading]="loadingWorkspaceId === ws.id">
-                    <div class="ws-icon" [style.background]="getAvatarColor(ws.id)">
+                <div class="ws-main" (click)="continueWorkspace(ws)" [class.loading]="loadingWorkspaceId === ws.id"
+                    role="button" [attr.aria-label]="'Continue ' + ws.name"
+                    [attr.aria-busy]="loadingWorkspaceId === ws.id">
+                    <div class="ws-icon" [style.background]="getAvatarColor(ws.id)" aria-hidden="true">
                         <i class="bi {{ getAvatarIcon(ws.id) }}"></i>
                         @if (loadingWorkspaceId === ws.id) {
                         <div class="ws-mini-spinner">
@@ -42,8 +45,9 @@
                     </div>
                 </div>
 
-                <button class="delete-action" (click)="requestDelete(ws); $event.stopPropagation()" title="Delete">
-                    <i class="bi bi-x-lg"></i>
+                <button class="delete-action" (click)="requestDelete(ws); $event.stopPropagation()"
+                    aria-label="Delete workspace">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
                 </button>
                 } @else {
                 <div class="ws-confirm">
