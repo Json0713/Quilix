@@ -110,9 +110,9 @@
     overflow-y: auto;
     padding-right: 4px;
 
-    &::-webkit-scrollbar {
-        width: 5px;
-    }
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(79, 163, 168, 0.45) transparent;
 }
 
 .workspace-list {

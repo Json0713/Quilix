@@ -173,12 +173,14 @@ body::-webkit-scrollbar,
   height: 6px;
 }
 
+/* Back of Scrollbar */
 html::-webkit-scrollbar-track,
 body::-webkit-scrollbar-track,
 *::-webkit-scrollbar-track {
   background: transparent;
 }
 
+/* Scrollbar */
 html::-webkit-scrollbar-thumb,
 body::-webkit-scrollbar-thumb,
 *::-webkit-scrollbar-thumb {
