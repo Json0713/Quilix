@@ -10,10 +10,16 @@ export interface ContactMessage {
     createdAt: number;
 }
 
+export interface Setting {
+    key: string;
+    value: any;
+}
+
 export class AppDatabase extends Dexie {
     workspaces!: Table<Workspace, string>;
     sessions!: Table<Session, string>;
     contacts!: Table<ContactMessage, string>;
+    settings!: Table<Setting, string>;
 
     constructor() {
         super('QuilixGlobalDB');
@@ -25,6 +31,10 @@ export class AppDatabase extends Dexie {
 
         this.version(2).stores({
             contacts: 'id, createdAt'
+        });
+
+        this.version(3).stores({
+            settings: 'key'
         });
 
         // Open database connection early to optimize initial load

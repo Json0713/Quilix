@@ -1,13 +1,14 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { liveQuery } from 'dexie';
 import { db } from '../db/app-db';
 import { Workspace, WorkspaceRole } from '../interfaces/workspace';
-
+import { FileSystemService } from '../services/file-system.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class WorkspaceService {
+    private fileSystem = inject(FileSystemService);
 
     // Real-time observable of workspaces, sorted by lastActiveAt
     readonly workspaces$ = liveQuery(() =>
@@ -30,6 +31,18 @@ export class WorkspaceService {
 
     async create(name: string, role: WorkspaceRole): Promise<Workspace> {
         const now = Date.now();
+        const storageMode = await this.fileSystem.getStorageMode();
+        let folderPath: string | undefined = undefined;
+
+        if (storageMode === 'filesystem') {
+            const handle = await this.fileSystem.getOrCreateWorkspaceFolder(name.trim());
+            if (handle) {
+                folderPath = `Quilix/${name.trim()}`;
+                console.log(`[WorkspaceService] Local folder created at: ${folderPath}`);
+            } else {
+                console.warn('[WorkspaceService] Failed to create local folder, falling back to metadata only.');
+            }
+        }
 
         const workspace: Workspace = {
             id: crypto.randomUUID(),
@@ -37,6 +50,7 @@ export class WorkspaceService {
             role,
             createdAt: now,
             lastActiveAt: now,
+            folderPath
         };
 
         await db.workspaces.add(workspace);

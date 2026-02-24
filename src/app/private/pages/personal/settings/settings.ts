@@ -2,11 +2,12 @@ import { Component, inject, signal } from '@angular/core';
 import { AppThemeService } from '../../../../core/theme/app-theme/app-theme.service';
 import { OsNotificationService } from '../../../../core/notifications/os-notification.service';
 import { Export } from '../../../../shared/components/export/export';
+import { StorageToggleComponent } from '../../../../shared/ui/system/storage-toggle/storage-toggle';
 
 @Component({
   selector: 'app-personal-settings',
   standalone: true,
-  imports: [Export],
+  imports: [Export, StorageToggleComponent],
   templateUrl: './settings.html',
   styleUrl: './settings.scss',
 })
