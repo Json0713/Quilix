@@ -61,6 +61,33 @@ export class WorkspaceService {
         await db.workspaces.update(workspaceId, { lastActiveAt: Date.now() });
     }
 
+    /**
+     * Migrate existing workspaces to the local file system.
+     * Iterates over all workspaces and creates a folder for them if one doesn't exist.
+     */
+    async migrateToFileSystem(): Promise<void> {
+        const all = await this.getAll();
+        const handle = await this.fileSystem.getStoredHandle();
+
+        if (!handle) {
+            console.warn('[WorkspaceService] Cannot migrate: No file system handle found.');
+            return;
+        }
+
+        for (const w of all) {
+            if (!w.folderPath) {
+                const folderHandle = await this.fileSystem.getOrCreateWorkspaceFolder(w.name);
+                if (folderHandle) {
+                    const newPath = `Quilix/${w.name}`;
+                    await db.workspaces.update(w.id, { folderPath: newPath });
+                    console.log(`[WorkspaceService] Migrated workspace ${w.name} to ${newPath}`);
+                } else {
+                    console.error(`[WorkspaceService] Failed to create folder for ${w.name} during migration.`);
+                }
+            }
+        }
+    }
+
     async delete(workspaceId: string): Promise<void> {
         await db.workspaces.delete(workspaceId);
     }

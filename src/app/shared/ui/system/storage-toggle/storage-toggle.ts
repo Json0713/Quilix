@@ -2,6 +2,8 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FileSystemService } from '../../../../core/services/file-system.service';
 
+import { WorkspaceService } from '../../../../core/workspaces/workspace.service';
+
 @Component({
     selector: 'app-storage-toggle',
     standalone: true,
@@ -11,6 +13,7 @@ import { FileSystemService } from '../../../../core/services/file-system.service
 })
 export class StorageToggleComponent implements OnInit {
     private fileSystem = inject(FileSystemService);
+    private workspaceService = inject(WorkspaceService);
 
     isSupported = signal<boolean>(false);
     storageMode = signal<'indexeddb' | 'filesystem'>('indexeddb');
@@ -33,6 +36,7 @@ export class StorageToggleComponent implements OnInit {
                 const success = await this.fileSystem.requestDirectoryAccess();
                 if (success) {
                     this.storageMode.set('filesystem');
+                    await this.workspaceService.migrateToFileSystem();
                 }
             } else {
                 await this.fileSystem.disableFileSystem();
