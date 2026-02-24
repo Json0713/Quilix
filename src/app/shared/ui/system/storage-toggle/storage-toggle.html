@@ -1,0 +1,25 @@
+<div class="storage-toggle-container" [class.unsupported]="!isSupported()">
+    <div class="toggle-info">
+        <div class="icon-box">
+            <i class="bi" [class.bi-folder2-open]="storageMode() === 'filesystem'"
+                [class.bi-database]="storageMode() === 'indexeddb'"></i>
+        </div>
+        <div class="text-content">
+            <h3>Local File System Storage</h3>
+            <p>{{ isSupported() ? 'Store workspace files directly on your device for enhanced performance and offline
+                access.' : 'This feature is only available in Chromium-based browsers.' }}</p>
+        </div>
+    </div>
+
+    <div class="toggle-action">
+        @if (isSupported()) {
+        <button class="toggle-btn" [class.active]="storageMode() === 'filesystem'" [disabled]="isProcessing()"
+            (click)="toggleStorage()">
+            <span class="toggle-slider"></span>
+            <span class="toggle-label">{{ storageMode() === 'filesystem' ? 'Enabled' : 'Disabled' }}</span>
+        </button>
+        } @else {
+        <span class="badge-unsupported">Not Supported</span>
+        }
+    </div>
+</div>
