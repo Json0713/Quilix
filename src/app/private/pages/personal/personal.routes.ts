@@ -16,6 +16,10 @@ export const PERSONAL_ROUTES: Routes = [
       {
         path: 'settings',
         loadComponent: () => import('./settings/settings').then(m => m.PersonalSettings)
+      },
+      {
+        path: 'workspaces',
+        loadComponent: () => import('./workspaces/workspaces').then(m => m.PersonalWorkspaces)
       }
     ]
   }

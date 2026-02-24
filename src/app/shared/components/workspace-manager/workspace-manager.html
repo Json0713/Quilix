@@ -1,0 +1,66 @@
+<div class="manager-container">
+    <div class="manager-header">
+        <h2>My Workspaces</h2>
+        <p>Manage your workspaces and their associated local files.</p>
+    </div>
+
+    @if (isLoading()) {
+    <div class="loading-state">
+        <i class="bi bi-arrow-repeat spin"></i>
+        <span>Loading workspaces...</span>
+    </div>
+    } @else if (workspaces().length === 0) {
+    <div class="empty-state">
+        <i class="bi bi-folder-x"></i>
+        <p>No workspaces found.</p>
+    </div>
+    } @else {
+    <div class="workspace-list">
+        @for (ws of workspaces(); track ws.id) {
+        <div class="workspace-card" [class.missing]="ws.isMissingOnDisk">
+            <div class="card-info">
+                <div class="icon-wrapper">
+                    <i class="bi" [class.bi-person-workspace]="ws.role === 'personal'"
+                        [class.bi-people]="ws.role === 'team'">
+                    </i>
+                </div>
+                <div class="details">
+                    <h3>{{ ws.name }}</h3>
+                    <span class="role-badge" [class.team]="ws.role === 'team'">
+                        {{ ws.role | titlecase }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-status">
+                @if (isFileSystemMode()) {
+                @if (ws.isMissingOnDisk) {
+                <div class="status-badge error">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span>Folder Missing</span>
+                </div>
+                <button class="btn btn-primary restore-btn" [disabled]="ws.isRestoring" (click)="restoreWorkspace(ws)">
+                    @if (ws.isRestoring) {
+                    <i class="bi bi-arrow-repeat spin"></i> Restoring...
+                    } @else {
+                    <i class="bi bi-arrow-counterclockwise"></i> Restore
+                    }
+                </button>
+                } @else {
+                <div class="status-badge success">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Folder Synced</span>
+                </div>
+                }
+                } @else {
+                <div class="status-badge info">
+                    <i class="bi bi-database"></i>
+                    <span>IndexedDB</span>
+                </div>
+                }
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>

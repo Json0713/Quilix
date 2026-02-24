@@ -16,6 +16,10 @@ export const TEAM_ROUTES: Routes = [
       {
         path: 'settings',
         loadComponent: () => import('./settings/settings').then(m => m.TeamSettings)
+      },
+      {
+        path: 'workspaces',
+        loadComponent: () => import('./workspaces/workspaces').then(m => m.TeamWorkspaces)
       }
     ]
   }

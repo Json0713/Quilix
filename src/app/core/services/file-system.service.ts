@@ -101,4 +101,32 @@ export class FileSystemService {
         const setting = await db.settings.get('storageMode');
         return setting ? setting.value : 'indexeddb';
     }
+
+    /**
+     * Check if a workspace folder exists on disk.
+     */
+    async checkFolderExists(workspaceName: string): Promise<boolean> {
+        const rootHandle = await this.getStoredHandle();
+        if (!rootHandle) return false;
+
+        try {
+            const quilixRoot = await rootHandle.getDirectoryHandle(this.QUILIX_ROOT, { create: false });
+            await quilixRoot.getDirectoryHandle(workspaceName, { create: false });
+            return true;
+        } catch (err: any) {
+            if (err.name === 'NotFoundError') {
+                return false;
+            }
+            console.error(`[FileSystem] Error checking folder for ${workspaceName}:`, err);
+            return false;
+        }
+    }
+
+    /**
+     * Restore a missing workspace folder on disk.
+     */
+    async restoreFolder(workspaceName: string): Promise<boolean> {
+        const handle = await this.getOrCreateWorkspaceFolder(workspaceName);
+        return handle !== null;
+    }
 }
