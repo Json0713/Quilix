@@ -62,6 +62,80 @@
     }
 }
 
+/* ── Re-auth banner ── */
+.reauth-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    background: rgba(230, 162, 60, 0.08);
+    border: 1px solid rgba(230, 162, 60, 0.3);
+    border-radius: 10px;
+
+    .reauth-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+        min-width: 0;
+
+        >i {
+            font-size: 22px;
+            color: #e6a23c;
+            flex-shrink: 0;
+        }
+
+        .reauth-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            strong {
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-main);
+            }
+
+            span {
+                font-size: 12px;
+                color: var(--text-muted);
+            }
+        }
+    }
+
+    .reauth-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        background: #e6a23c;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        flex-shrink: 0;
+
+        &:hover:not(:disabled) {
+            background: #d49330;
+        }
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        i {
+            font-size: 14px;
+        }
+    }
+}
+
 /* ── Selection toolbar ── */
 .selection-toolbar {
     display: flex;
@@ -470,6 +544,17 @@
             .select-toggle-btn {
                 align-self: flex-start;
             }
+        }
+    }
+
+    .reauth-banner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px 14px;
+
+        .reauth-btn {
+            align-self: flex-start;
         }
     }
 

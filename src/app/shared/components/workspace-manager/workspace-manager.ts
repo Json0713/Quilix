@@ -24,6 +24,8 @@ export class WorkspaceManagerComponent implements OnInit {
     workspaces = signal<ManagedWorkspace[]>([]);
     isLoading = signal<boolean>(true);
     isFileSystemMode = signal<boolean>(false);
+    needsReauth = signal<boolean>(false);
+    isReauthing = signal<boolean>(false);
 
     // ── Selection state ──
     selectionMode = signal<boolean>(false);
@@ -75,8 +77,15 @@ export class WorkspaceManagerComponent implements OnInit {
             let isMissingOnDisk = false;
 
             if (this.isFileSystemMode() && ws.folderPath) {
-                const exists = await this.fileSystem.checkFolderExists(ws.name);
-                isMissingOnDisk = !exists;
+                const result = await this.fileSystem.checkFolderExists(ws.name);
+                if (result === 'no-permission') {
+                    // Permission lost — don't mark as missing, show re-auth banner instead
+                    this.needsReauth.set(true);
+                    isMissingOnDisk = false;
+                } else {
+                    this.needsReauth.set(false);
+                    isMissingOnDisk = !result;
+                }
             }
 
             const existing = currentMap.get(ws.id);
@@ -98,6 +107,23 @@ export class WorkspaceManagerComponent implements OnInit {
                 ids.forEach(id => { if (validIds.has(id)) next.add(id); });
                 return next;
             });
+        }
+    }
+
+    // ── Re-auth (user-gesture triggered) ──
+
+    async reconnectStorage() {
+        if (this.isReauthing()) return;
+        this.isReauthing.set(true);
+
+        try {
+            const granted = await this.fileSystem.requestPermissionWithGesture();
+            if (granted) {
+                this.needsReauth.set(false);
+                await this.quietLoadWorkspaces();
+            }
+        } finally {
+            this.isReauthing.set(false);
         }
     }
 

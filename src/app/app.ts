@@ -50,16 +50,19 @@ export class App {
   private async validateFileSystem() {
     const mode = await this.fileSystem.getStorageMode();
     if (mode === 'filesystem') {
-      const handle = await this.fileSystem.getStoredHandle();
-      if (handle) {
-        // Only run queryPermission by skipping the direct requestPermission prompt on normal boot
-        const granted = await this.fileSystem.verifyPermission(handle, true, false);
-        if (!granted) {
-          // File system permission lacks user activation. Will request when interacting with files.
-          // Don't disable filesystem or throw error. The handle is stored, 
-          // let the app degrade gracefully or prompt when the user explicitly triggers a file operation.
+      try {
+        const handle = await this.fileSystem.getStoredHandle();
+        if (handle) {
+          // Silent check only — don't prompt on boot (requires user gesture)
+          await this.fileSystem.verifyPermission(handle, true, false);
+          // hasPermission signal is set inside verifyPermission
+        } else {
+          // Handle is missing (cleared, corrupted, or from another origin)
+          await this.fileSystem.disableFileSystem();
         }
-      } else {
+      } catch (err) {
+        // Handle deserialization failure — stored handle is incompatible
+        console.warn('[FileSystem] Stored handle is invalid, disabling filesystem:', err);
         await this.fileSystem.disableFileSystem();
       }
     }
