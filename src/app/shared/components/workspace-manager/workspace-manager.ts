@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, HostListener } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Workspace } from '../../../core/interfaces/workspace';
 import { WorkspaceService } from '../../../core/workspaces/workspace.service';
@@ -25,13 +25,32 @@ export class WorkspaceManagerComponent implements OnInit {
     isLoading = signal<boolean>(true);
     isFileSystemMode = signal<boolean>(false);
 
+    // ── Selection state ──
+    selectionMode = signal<boolean>(false);
+    selectedIds = signal<Set<string>>(new Set());
+    confirmingBulkTrash = signal<boolean>(false);
+    isBulkProcessing = signal<boolean>(false);
+
+    selectedCount = computed(() => this.selectedIds().size);
+    isAllSelected = computed(() => {
+        const ws = this.workspaces();
+        const sel = this.selectedIds();
+        return ws.length > 0 && sel.size === ws.length;
+    });
+    hasSelectedMissing = computed(() => {
+        const sel = this.selectedIds();
+        return this.workspaces().some(w => sel.has(w.id) && w.isMissingOnDisk);
+    });
+
+    // ── Single-item state ──
+    confirmingTrashId = signal<string | null>(null);
+
     async ngOnInit() {
         await this.loadWorkspaces();
     }
 
     @HostListener('window:focus')
     async onWindowFocus() {
-        // Dynamically re-check folders when the user returns to the browser
         await this.quietLoadWorkspaces();
     }
 
@@ -50,8 +69,6 @@ export class WorkspaceManagerComponent implements OnInit {
         this.isFileSystemMode.set(mode === 'filesystem');
 
         const managed: ManagedWorkspace[] = [];
-
-        // Preserve current 'isRestoring' or 'isTrashing' states so UI doesn't flicker
         const currentMap = new Map(this.workspaces().map(w => [w.id, w]));
 
         for (const ws of rawWorkspaces) {
@@ -72,7 +89,107 @@ export class WorkspaceManagerComponent implements OnInit {
         }
 
         this.workspaces.set(managed);
+
+        // Clean up stale selections after reload
+        if (this.selectionMode()) {
+            const validIds = new Set(managed.map(w => w.id));
+            this.selectedIds.update(ids => {
+                const next = new Set<string>();
+                ids.forEach(id => { if (validIds.has(id)) next.add(id); });
+                return next;
+            });
+        }
     }
+
+    // ── Selection methods ──
+
+    toggleSelectionMode() {
+        if (this.selectionMode()) {
+            this.exitSelectionMode();
+        } else {
+            this.selectionMode.set(true);
+        }
+    }
+
+    exitSelectionMode() {
+        this.selectionMode.set(false);
+        this.selectedIds.set(new Set());
+        this.confirmingBulkTrash.set(false);
+    }
+
+    toggleSelect(id: string) {
+        this.selectedIds.update(ids => {
+            const next = new Set(ids);
+            if (next.has(id)) {
+                next.delete(id);
+            } else {
+                next.add(id);
+            }
+            return next;
+        });
+    }
+
+    isSelected(id: string): boolean {
+        return this.selectedIds().has(id);
+    }
+
+    toggleSelectAll() {
+        if (this.isAllSelected()) {
+            this.selectedIds.set(new Set());
+        } else {
+            const allIds = new Set(this.workspaces().map(w => w.id));
+            this.selectedIds.set(allIds);
+        }
+    }
+
+    // ── Bulk trash ──
+
+    requestBulkTrash() {
+        if (this.selectedCount() === 0) return;
+        this.confirmingBulkTrash.set(true);
+    }
+
+    cancelBulkTrash() {
+        this.confirmingBulkTrash.set(false);
+    }
+
+    async confirmBulkTrash() {
+        if (this.isBulkProcessing()) return;
+        this.isBulkProcessing.set(true);
+
+        try {
+            const ids = Array.from(this.selectedIds());
+            for (const id of ids) {
+                await this.workspaceService.moveToTrash(id);
+            }
+            this.workspaces.update(list => list.filter(w => !this.selectedIds().has(w.id)));
+            this.exitSelectionMode();
+        } finally {
+            this.isBulkProcessing.set(false);
+        }
+    }
+
+    // ── Bulk folder restore ──
+
+    async bulkRestoreFolders() {
+        if (this.isBulkProcessing() || !this.hasSelectedMissing()) return;
+        this.isBulkProcessing.set(true);
+
+        try {
+            const selected = this.workspaces().filter(w => this.selectedIds().has(w.id) && w.isMissingOnDisk);
+            for (const ws of selected) {
+                const success = await this.fileSystem.restoreFolder(ws.name);
+                if (success) {
+                    this.updateWorkspaceState(ws.id, { isMissingOnDisk: false });
+                }
+            }
+            this.exitSelectionMode();
+        } finally {
+            this.isBulkProcessing.set(false);
+        }
+    }
+
+    // ── Single-item actions ──
 
     async restoreWorkspace(workspace: ManagedWorkspace) {
         if (workspace.isRestoring || !workspace.isMissingOnDisk) return;
@@ -96,8 +213,6 @@ export class WorkspaceManagerComponent implements OnInit {
         }
     }
 
-    confirmingTrashId = signal<string | null>(null);
-
     requestTrash(workspace: ManagedWorkspace) {
         this.confirmingTrashId.set(workspace.id);
     }
@@ -118,7 +233,6 @@ export class WorkspaceManagerComponent implements OnInit {
 
         try {
             await this.workspaceService.moveToTrash(workspace.id);
-            // Remove from local list to reflect UI instantly
             this.workspaces.update(list => list.filter(w => w.id !== workspace.id));
         } catch (error) {
             console.error(`Error moving workspace to trash: ${workspace.name}`, error);

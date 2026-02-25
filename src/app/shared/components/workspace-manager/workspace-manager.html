@@ -1,8 +1,69 @@
 <div class="manager-container">
     <div class="manager-header">
-        <h2>My Workspaces</h2>
-        <p>Manage your workspaces and their associated local files.</p>
+        <div class="header-text">
+            <h2>My Workspaces</h2>
+            <p>Manage your workspaces and their associated local files.</p>
+        </div>
+
+        @if (!isLoading() && workspaces().length > 0) {
+        <button class="select-toggle-btn" (click)="toggleSelectionMode()" [class.active]="selectionMode()">
+            @if (selectionMode()) {
+            <i class="bi bi-x-lg"></i>
+            <span>Cancel</span>
+            } @else {
+            <i class="bi bi-check2-square"></i>
+            <span>Select</span>
+            }
+        </button>
+        }
     </div>
+
+    <!-- Selection toolbar -->
+    @if (selectionMode()) {
+    <div class="selection-toolbar">
+        <div class="toolbar-left">
+            <button class="toolbar-btn checkbox-btn" (click)="toggleSelectAll()" [class.checked]="isAllSelected()">
+                <i class="bi" [class.bi-check-square-fill]="isAllSelected()" [class.bi-square]="!isAllSelected()"></i>
+            </button>
+            <span class="selection-count">
+                {{ selectedCount() }} selected
+            </span>
+        </div>
+
+        <div class="toolbar-actions">
+            @if (confirmingBulkTrash()) {
+            <div class="bulk-confirm">
+                <span class="confirm-label">Trash {{ selectedCount() }} workspace{{ selectedCount() > 1 ? 's' : ''
+                    }}?</span>
+                <button class="toolbar-btn confirm-yes" (click)="confirmBulkTrash()" [disabled]="isBulkProcessing()">
+                    @if (isBulkProcessing()) {
+                    <i class="bi bi-arrow-repeat spin"></i>
+                    } @else {
+                    Yes
+                    }
+                </button>
+                <button class="toolbar-btn confirm-no" (click)="cancelBulkTrash()"
+                    [disabled]="isBulkProcessing()">No</button>
+            </div>
+            } @else {
+            @if (isFileSystemMode() && hasSelectedMissing()) {
+            <button class="toolbar-btn restore-action" (click)="bulkRestoreFolders()" [disabled]="isBulkProcessing()">
+                @if (isBulkProcessing()) {
+                <i class="bi bi-arrow-repeat spin"></i>
+                } @else {
+                <i class="bi bi-arrow-counterclockwise"></i>
+                }
+                <span class="btn-label">Restore Folders</span>
+            </button>
+            }
+            <button class="toolbar-btn trash-action" (click)="requestBulkTrash()" [disabled]="selectedCount() === 0">
+                <i class="bi bi-trash3"></i>
+                <span class="btn-label">Trash</span>
+            </button>
+            }
+        </div>
+    </div>
+    }
 
     @if (isLoading()) {
     <div class="loading-state">
@@ -17,7 +78,17 @@
     } @else {
     <div class="workspace-list">
         @for (ws of workspaces(); track ws.id) {
-        <div class="workspace-card" [class.missing]="ws.isMissingOnDisk">
+        <div class="workspace-card" [class.missing]="ws.isMissingOnDisk" [class.selected]="isSelected(ws.id)"
+            [class.in-select-mode]="selectionMode()" (click)="selectionMode() ? toggleSelect(ws.id) : null">
+
+            <!-- Selection checkbox (square) -->
+            @if (selectionMode()) {
+            <div class="card-checkbox" (click)="$event.stopPropagation(); toggleSelect(ws.id)">
+                <i class="bi" [class.bi-check-square-fill]="isSelected(ws.id)"
+                    [class.bi-square]="!isSelected(ws.id)"></i>
+            </div>
+            }
+
             <div class="card-info">
                 <div class="icon-wrapper">
                     <i class="bi" [class.bi-person-workspace]="ws.role === 'personal'"
@@ -32,6 +103,7 @@
                 </div>
             </div>
 
+            @if (!selectionMode()) {
             <div class="card-status">
                 @if (isFileSystemMode()) {
                 @if (ws.isMissingOnDisk) {
@@ -87,6 +159,7 @@
                     }
                 </div>
             </div>
+            }
         </div>
         }
     </div>
