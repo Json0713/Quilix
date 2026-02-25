@@ -105,33 +105,65 @@ export class FileSystemService {
             return null;
         }
 
-        // Quick check: if we already know we have permission, avoid re-querying
+        // Quick check: if we already know we have permission, skip re-verification
         if (this.hasPermission()) {
             return handle;
         }
 
-        // Silent check only — no user prompt
+        // Silent check — no prompt, also verify handle is truly functional
         const granted = await this.verifyPermission(handle, true, false);
-        return granted ? handle : null;
+        if (!granted) return null;
+
+        // Verify the handle actually works (not just 'granted' in name only)
+        const works = await this.testHandleAccess(handle);
+        if (!works) {
+            this.hasPermission.set(false);
+            return null;
+        }
+
+        return handle;
     }
 
     /**
-     * Re-request permission with an active user gesture.
-     * Call this from a click handler (e.g., "Reconnect Storage" button).
-     * Returns true if permission was re-granted.
+     * Test if a handle is truly functional by performing a real operation.
+     * On mobile Chrome, handles can report 'granted' but still fail on actual use.
      */
-    async requestPermissionWithGesture(): Promise<boolean> {
-        const handle = await this.getStoredHandle();
-        if (!handle) {
-            await this.disableFileSystem();
+    private async testHandleAccess(handle: FileSystemDirectoryHandle): Promise<boolean> {
+        try {
+            // Try to iterate entries — this reveals stale handles
+            const iter = (handle as any).entries();
+            await iter.next();
+            return true;
+        } catch {
             return false;
         }
+    }
 
-        const granted = await this.verifyPermission(handle, true, true);
-        if (!granted) {
-            console.warn('[FileSystem] User denied re-permission request.');
+    /**
+     * Reconnect to local storage with a user gesture.
+     * Strategy:
+     *   1. Try requestPermission() on the stored handle
+     *   2. Verify the handle actually works with a real operation
+     *   3. If step 1 or 2 fails (common on mobile), re-pick directory entirely
+     * Call this from a click handler (e.g., "Reconnect Storage" button).
+     */
+    async requestPermissionWithGesture(): Promise<boolean> {
+        // Step 1: Try to revive the stored handle
+        const storedHandle = await this.getStoredHandle();
+        if (storedHandle) {
+            const granted = await this.verifyPermission(storedHandle, true, true);
+            if (granted) {
+                // Step 2: Verify it actually works
+                const works = await this.testHandleAccess(storedHandle);
+                if (works) {
+                    return true;
+                }
+                console.warn('[FileSystem] Handle reports granted but is stale, re-picking directory.');
+            }
         }
-        return granted;
+
+        // Step 3: Fallback — re-pick directory to get a fresh handle
+        return await this.requestDirectoryAccess();
     }
 
     /**

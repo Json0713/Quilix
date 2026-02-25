@@ -120,6 +120,8 @@ export class WorkspaceManagerComponent implements OnInit {
             const granted = await this.fileSystem.requestPermissionWithGesture();
             if (granted) {
                 this.needsReauth.set(false);
+                // Re-create workspace folders in the (possibly re-picked) directory
+                await this.workspaceService.migrateToFileSystem();
                 await this.quietLoadWorkspaces();
             }
         } finally {
