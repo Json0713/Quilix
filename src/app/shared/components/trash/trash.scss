@@ -189,20 +189,22 @@
     gap: 12px;
 }
 
+/* ── Card (mirrors workspace-manager card design) ── */
 .workspace-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
-    background: var(--surface);
+    padding: 20px;
+    background: var(--surface-main);
     border: 1px solid var(--border);
     border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
 
     &:hover {
-        background: var(--bg);
+        background: var(--surface-hover, var(--surface-main));
+        border-color: var(--accent);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
     }
 
     &.processing {
@@ -252,8 +254,8 @@
         .icon-wrapper {
             width: 48px;
             height: 48px;
-            background: rgba(108, 117, 125, 0.1);
-            color: #6c757d;
+            background: var(--accent-low, rgba(79, 163, 168, 0.1));
+            color: var(--accent);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -263,13 +265,10 @@
         }
 
         .details {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
             min-width: 0;
 
             h3 {
-                margin: 0;
+                margin: 0 0 4px;
                 font-size: 16px;
                 font-weight: 600;
                 color: var(--text-main);
@@ -278,11 +277,6 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
-            }
-
-            .time-info {
-                font-size: 12px;
-                color: var(--text-muted);
             }
 
             .role-badge {
@@ -294,7 +288,6 @@
                 border-radius: 999px;
                 background: rgba(255, 255, 255, 0.1);
                 color: var(--text-muted);
-                width: fit-content;
 
                 &.team {
                     background: rgba(13, 110, 253, 0.15);
@@ -304,57 +297,119 @@
         }
     }
 
-    .card-actions {
+    /* card-status: matches workspace-manager card-status layout */
+    .card-status {
         display: flex;
-        gap: 8px;
+        align-items: center;
+        gap: 16px;
         flex-shrink: 0;
 
-        .btn {
-            border-radius: 8px;
-            padding: 8px 12px;
+        .status-badge {
             display: flex;
             align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
 
-            i {
-                font-size: 16px;
-            }
-
-            &.btn-outline-primary {
-                color: var(--accent);
-                border-color: var(--accent-low);
-
-                &:hover {
-                    background: var(--accent);
-                    color: white;
-                }
-            }
-
-            &.btn-outline-danger {
-                color: #dc3545;
-                border-color: rgba(220, 53, 69, 0.2);
-
-                &:hover {
-                    background: #dc3545;
-                    color: white;
-                }
+            &.trashed {
+                color: var(--warning, #e6a23c);
             }
         }
 
-        .confirm-overlay {
+        .time-info {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .card-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: var(--bg-card);
-            padding: 4px 8px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-left: 1px solid var(--border);
+            padding-left: 16px;
+            margin-left: 8px;
+            gap: 4px;
 
-            span {
-                font-size: 13px;
-                font-weight: 500;
-                color: #dc3545;
+            .action-btn {
+                background: transparent;
+                border: none;
+                color: var(--text-muted);
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                font-size: 16px;
+
+                &.restore-btn:hover:not(:disabled) {
+                    background: rgba(25, 135, 84, 0.1);
+                    color: #198754;
+                }
+
+                &.delete-btn:hover:not(:disabled) {
+                    background: rgba(220, 53, 69, 0.1);
+                    color: #dc3545;
+                }
+
+                &:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+            }
+
+            .confirm-actions {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+
+                .confirm-text {
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: var(--text-main);
+                }
+
+                .btn-group {
+                    display: flex;
+                    gap: 6px;
+
+                    button {
+                        border: none;
+                        padding: 4px 12px;
+                        border-radius: 6px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+
+                        &.confirm-yes {
+                            background: rgba(220, 53, 69, 0.1);
+                            color: #dc3545;
+
+                            &:hover:not(:disabled) {
+                                background: #dc3545;
+                                color: white;
+                            }
+                        }
+
+                        &.confirm-no {
+                            background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+                            color: var(--text-muted);
+
+                            &:hover:not(:disabled) {
+                                background: var(--bg-active, rgba(255, 255, 255, 0.1));
+                                color: var(--text-main);
+                            }
+                        }
+
+                        &:disabled {
+                            opacity: 0.5;
+                            cursor: not-allowed;
+                        }
+                    }
+                }
             }
         }
     }
@@ -431,9 +486,9 @@
     }
 
     .workspace-card {
-        padding: 14px;
+        padding: 16px;
 
-        /* Selection mode: horizontal with checkbox + info inline */
+        /* Selection mode: horizontal row */
         &.in-select-mode {
             flex-direction: row;
             align-items: center;
@@ -457,7 +512,7 @@
             }
         }
 
-        /* Non-selection mode: stack vertically */
+        /* Non-selection mode: stack card-status below */
         &:not(.in-select-mode) {
             flex-direction: column;
             align-items: stretch;
@@ -473,10 +528,17 @@
                 }
             }
 
-            .card-actions {
+            .card-status {
+                flex-wrap: wrap;
+                gap: 10px;
                 padding-top: 12px;
                 border-top: 1px solid var(--border);
-                justify-content: flex-end;
+
+                .card-actions {
+                    border-left: none;
+                    padding-left: 0;
+                    margin-left: auto;
+                }
             }
         }
     }
@@ -542,22 +604,22 @@
         }
 
         &:not(.in-select-mode) {
+            padding: 14px;
+
             .card-info .details h3 {
                 font-size: 14px;
             }
 
-            .card-actions {
-                .btn {
-                    padding: 10px 14px;
-                    min-height: 44px;
-
-                    i {
-                        font-size: 18px;
-                    }
+            .card-status .card-actions {
+                .action-btn {
+                    width: 44px;
+                    height: 44px;
+                    font-size: 18px;
                 }
 
-                .confirm-overlay {
-                    flex-wrap: wrap;
+                .confirm-actions {
+                    flex-direction: column;
+                    align-items: flex-start;
                     gap: 8px;
                 }
             }

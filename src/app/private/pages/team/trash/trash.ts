@@ -7,7 +7,7 @@ import { TrashComponent } from '../../../../shared/components/trash/trash';
     standalone: true,
     imports: [CommonModule, TrashComponent],
     template: `
-        <div class="page-container" style="padding: 24px;">
+        <div class="page-container" style="padding: 14px;">
             <app-trash></app-trash>
         </div>
     `
