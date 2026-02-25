@@ -17,9 +17,9 @@ export class TimeAgoPipe implements PipeTransform, OnDestroy {
   constructor(
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
-  ) {}
+  ) { }
 
-  transform(value: number | string | Date | null): string {
+  transform(value: number | string | Date | null | undefined): string {
     if (!value) return '';
 
     const date = this.toDate(value);

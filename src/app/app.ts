@@ -52,11 +52,12 @@ export class App {
     if (mode === 'filesystem') {
       const handle = await this.fileSystem.getStoredHandle();
       if (handle) {
-        const granted = await this.fileSystem.verifyPermission(handle, true);
+        // Only run queryPermission by skipping the direct requestPermission prompt on normal boot
+        const granted = await this.fileSystem.verifyPermission(handle, true, false);
         if (!granted) {
-          console.warn('[App] File system permission not granted, falling back to indexeddb');
-          await this.fileSystem.disableFileSystem();
-          this.toast.warning('Local storage permission was not granted. Falling back to IndexedDB.');
+          // File system permission lacks user activation. Will request when interacting with files.
+          // Don't disable filesystem or throw error. The handle is stored, 
+          // let the app degrade gracefully or prompt when the user explicitly triggers a file operation.
         }
       } else {
         await this.fileSystem.disableFileSystem();

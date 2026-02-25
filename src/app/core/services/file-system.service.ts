@@ -46,7 +46,7 @@ export class FileSystemService {
     /**
      * Check and request permission for the stored handle.
      */
-    async verifyPermission(handle: FileSystemDirectoryHandle, readWrite = true): Promise<boolean> {
+    async verifyPermission(handle: FileSystemDirectoryHandle, readWrite = true, withRequest = true): Promise<boolean> {
         const options: any = { mode: readWrite ? 'readwrite' : 'read' };
 
         // Check if permission is already granted
@@ -54,13 +54,37 @@ export class FileSystemService {
             return true;
         }
 
-        // Request permission (must be triggered by a user gesture generally, 
-        // but on startup we might just check and revert if not granted)
+        if (!withRequest) {
+            return false; // Do not trigger an error on load without user gesture
+        }
+
+        // Request permission (must be triggered by a user gesture generally)
         if ((await (handle as any).requestPermission(options)) === 'granted') {
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Delete a workspace folder permanently from local disk.
+     */
+    async permanentlyDeleteWorkspaceFolder(workspaceName: string): Promise<boolean> {
+        const rootHandle = await this.getStoredHandle();
+        if (!rootHandle) return false;
+
+        try {
+            const quilixRoot = await rootHandle.getDirectoryHandle(this.QUILIX_ROOT, { create: false });
+            // removeEntry is supported in File System Access API
+            await (quilixRoot as any).removeEntry(workspaceName, { recursive: true });
+            return true;
+        } catch (err: any) {
+            if (err.name === 'NotFoundError') {
+                return true; // Already gone
+            }
+            console.error(`[FileSystem] Error deleting folder for ${workspaceName}:`, err);
+            return false;
+        }
     }
 
     /**

@@ -1,0 +1,185 @@
+.trash-container {
+    padding: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+
+    .trash-header {
+        margin-bottom: 32px;
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0 0 8px;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 14px;
+        }
+    }
+}
+
+.workspace-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.workspace-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--bg-soft, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+        background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+    }
+
+    &.processing {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .card-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .icon-wrapper {
+            width: 48px;
+            height: 48px;
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            h3 {
+                margin: 0;
+                font-size: 16px;
+                font-weight: 600;
+                color: var(--text-main);
+                text-decoration: line-through;
+                opacity: 0.8;
+            }
+
+            .time-info {
+                font-size: 12px;
+                color: var(--text-muted);
+            }
+
+            .role-badge {
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 2px 8px;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--text-muted);
+                width: fit-content;
+
+                &.team {
+                    background: rgba(13, 110, 253, 0.15);
+                    color: #6ea8fe;
+                }
+            }
+        }
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 8px;
+
+        .btn {
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+
+            i {
+                font-size: 16px;
+            }
+
+            &.btn-outline-primary {
+                color: var(--accent);
+                border-color: var(--accent-low);
+
+                &:hover {
+                    background: var(--accent);
+                    color: white;
+                }
+            }
+
+            &.btn-outline-danger {
+                color: #dc3545;
+                border-color: rgba(220, 53, 69, 0.2);
+
+                &:hover {
+                    background: #dc3545;
+                    color: white;
+                }
+            }
+        }
+
+        .confirm-overlay {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-card);
+            padding: 4px 8px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+            span {
+                font-size: 13px;
+                font-weight: 500;
+                color: #dc3545;
+            }
+        }
+    }
+}
+
+.loading-state,
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 0;
+    color: var(--text-muted);
+
+    i {
+        font-size: 32px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}

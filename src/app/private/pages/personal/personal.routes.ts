@@ -20,6 +20,10 @@ export const PERSONAL_ROUTES: Routes = [
       {
         path: 'workspaces',
         loadComponent: () => import('./workspaces/workspaces').then(m => m.PersonalWorkspaces)
+      },
+      {
+        path: 'trash',
+        loadComponent: () => import('./trash/trash').then(m => m.PersonalTrash)
       }
     ]
   }

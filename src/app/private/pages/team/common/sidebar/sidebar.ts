@@ -22,6 +22,10 @@ export class TeamSidebarComponent {
         { label: 'Workspaces', icon: 'bi bi-folder2-open', route: './workspaces' },
     ];
 
+    systemItems = [
+        { label: 'Trash', icon: 'bi bi-trash3', route: './trash' },
+    ];
+
     toggleSidebar() {
         if (this.isMobileOpen()) {
             this.sidebarService.closeMobile();

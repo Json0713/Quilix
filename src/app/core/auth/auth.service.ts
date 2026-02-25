@@ -68,7 +68,7 @@ export class AuthService {
   }
 
   async deleteWorkspace(workspaceId: string): Promise<void> {
-    await this.workspaces.delete(workspaceId);
+    await this.workspaces.moveToTrash(workspaceId);
 
     const session = await this.getSession();
     if (session?.workspaceId === workspaceId) {

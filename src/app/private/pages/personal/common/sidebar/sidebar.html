@@ -14,7 +14,7 @@
     </div>
 
     <nav class="sidebar-nav">
-        <ul class="nav-list">
+        <ul class="nav-list main-nav">
             @for (item of navItems; track item.label) {
             <li class="nav-item">
                 <a [routerLink]="item.route" routerLinkActive="active"
@@ -28,6 +28,28 @@
             </li>
             }
         </ul>
+
+        <div class="nav-section system-nav">
+            @if (!isCollapsed()) {
+            <div class="section-title">System</div>
+            } @else {
+            <div class="section-divider"></div>
+            }
+            <ul class="nav-list">
+                @for (item of systemItems; track item.label) {
+                <li class="nav-item">
+                    <a [routerLink]="item.route" routerLinkActive="active"
+                        [routerLinkActiveOptions]="{ exact: item.route === './' }" class="nav-link" [title]="item.label"
+                        (click)="onItemClick()">
+                        <i [class]="item.icon" class="nav-icon"></i>
+                        @if (!isCollapsed()) {
+                        <span class="nav-label">{{ item.label }}</span>
+                        }
+                    </a>
+                </li>
+                }
+            </ul>
+        </div>
     </nav>
 
     <div class="sidebar-footer">

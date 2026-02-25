@@ -20,6 +20,10 @@ export const TEAM_ROUTES: Routes = [
       {
         path: 'workspaces',
         loadComponent: () => import('./workspaces/workspaces').then(m => m.TeamWorkspaces)
+      },
+      {
+        path: 'trash',
+        loadComponent: () => import('./trash/trash').then(m => m.TeamTrash)
       }
     ]
   }

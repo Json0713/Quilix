@@ -1,0 +1,62 @@
+<div class="trash-container">
+    <div class="trash-header">
+        <h2>Trash</h2>
+        <p>Items in trash are automatically deleted forever after 30 days.</p>
+    </div>
+
+    @if (isLoading()) {
+    <div class="loading-state">
+        <i class="bi bi-arrow-repeat spin"></i>
+        <span>Loading...</span>
+    </div>
+    } @else if (trashedWorkspaces().length === 0) {
+    <div class="empty-state">
+        <i class="bi bi-trash3"></i>
+        <p>Your trash is empty.</p>
+    </div>
+    } @else {
+    <div class="workspace-list">
+        @for (ws of trashedWorkspaces(); track ws.id) {
+        <div class="workspace-card" [class.processing]="processingId() === ws.id">
+            <div class="card-info">
+                <div class="icon-wrapper">
+                    <i class="bi" [class.bi-person-workspace]="ws.role === 'personal'"
+                        [class.bi-people]="ws.role === 'team'">
+                    </i>
+                </div>
+                <div class="details">
+                    <h3>{{ ws.name }}</h3>
+                    <span class="role-badge" [class.team]="ws.role === 'team'">
+                        {{ ws.role | titlecase }}
+                    </span>
+                    <span class="time-info">
+                        Trashed {{ ws.trashedAt | timeAgo }} • {{ getDaysLeft(ws.trashedAt) }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                @if (confirmingDeleteId() === ws.id) {
+                <div class="confirm-overlay">
+                    <span>Delete permanently?</span>
+                    <button class="btn btn-sm btn-danger" (click)="confirmDelete(ws.id)"
+                        [disabled]="processingId() === ws.id">Yes</button>
+                    <button class="btn btn-sm btn-outline-secondary" (click)="cancelDelete()"
+                        [disabled]="processingId() === ws.id">No</button>
+                </div>
+                } @else {
+                <button class="btn btn-outline-primary restore-btn" (click)="restoreWorkspace(ws.id)"
+                    [disabled]="processingId() === ws.id" title="Restore">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </button>
+                <button class="btn btn-outline-danger delete-btn" (click)="requestPermanentDelete(ws.id)"
+                    [disabled]="processingId() === ws.id" title="Delete Permanently">
+                    <i class="bi bi-trash"></i>
+                </button>
+                }
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>

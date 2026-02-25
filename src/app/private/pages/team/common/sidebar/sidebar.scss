@@ -6,8 +6,8 @@
     background-color: var(--surface-main);
     color: var(--text-main);
     border-right: none;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     position: fixed;
     top: 0;
@@ -111,6 +111,27 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+        }
+
+        .nav-section {
+            margin-top: 1.5rem;
+
+            .section-title {
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: var(--text-muted);
+                opacity: 0.6;
+                padding: 0 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .section-divider {
+                height: 1px;
+                background: rgba(255, 255, 255, 0.1);
+                margin: 0 0.5rem 0.5rem;
+            }
         }
 
         .nav-link {

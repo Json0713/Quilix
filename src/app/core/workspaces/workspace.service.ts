@@ -12,11 +12,28 @@ export class WorkspaceService {
 
     // Real-time observable of workspaces, sorted by lastActiveAt
     readonly workspaces$ = liveQuery(() =>
-        db.workspaces.orderBy('lastActiveAt').reverse().toArray()
+        db.workspaces
+            .orderBy('lastActiveAt')
+            .reverse()
+            .filter(w => !w.trashedAt)
+            .toArray()
+    );
+
+    // Real-time observable of trashed workspaces
+    readonly trashedWorkspaces$ = liveQuery(() =>
+        db.workspaces
+            .filter(w => !!w.trashedAt)
+            .toArray()
     );
 
     async getAll(): Promise<Workspace[]> {
-        return db.workspaces.orderBy('lastActiveAt').reverse().toArray();
+        const all = await db.workspaces.orderBy('lastActiveAt').reverse().toArray();
+        return all.filter(w => !w.trashedAt);
+    }
+
+    async getTrashed(): Promise<Workspace[]> {
+        const all = await db.workspaces.toArray();
+        return all.filter(w => !!w.trashedAt);
     }
 
     async getById(id: string): Promise<Workspace | undefined> {
@@ -26,7 +43,7 @@ export class WorkspaceService {
     async existsByName(name: string): Promise<boolean> {
         const normalized = name.trim().toLowerCase();
         const all = await db.workspaces.toArray();
-        return all.some(w => w.name.toLowerCase() === normalized);
+        return all.some(w => w.name.toLowerCase() === normalized && !w.trashedAt);
     }
 
     async create(name: string, role: WorkspaceRole): Promise<Workspace> {
@@ -62,6 +79,35 @@ export class WorkspaceService {
     }
 
     /**
+     * Move a workspace to the trash.
+     */
+    async moveToTrash(workspaceId: string): Promise<void> {
+        await db.workspaces.update(workspaceId, { trashedAt: Date.now() });
+    }
+
+    /**
+     * Restore a workspace from the trash.
+     */
+    async restoreFromTrash(workspaceId: string): Promise<void> {
+        await db.workspaces.update(workspaceId, { trashedAt: undefined as any });
+    }
+
+    /**
+     * Permanently delete a workspace from the database and disk if applicable.
+     */
+    async permanentlyDelete(workspaceId: string): Promise<void> {
+        const workspace = await this.getById(workspaceId);
+        if (!workspace) return;
+
+        const storageMode = await this.fileSystem.getStorageMode();
+        if (storageMode === 'filesystem' && workspace.folderPath) {
+            await this.fileSystem.permanentlyDeleteWorkspaceFolder(workspace.name);
+        }
+
+        await db.workspaces.delete(workspaceId);
+    }
+
+    /**
      * Migrate existing workspaces to the local file system.
      * Iterates over all workspaces and creates a folder for them if one doesn't exist.
      */
@@ -87,9 +133,4 @@ export class WorkspaceService {
             }
         }
     }
-
-    async delete(workspaceId: string): Promise<void> {
-        await db.workspaces.delete(workspaceId);
-    }
-
 }
