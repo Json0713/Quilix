@@ -32,7 +32,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    background: var(--bg-soft, rgba(255, 255, 255, 0.03));
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
     transition: all 0.2s ease;
@@ -40,7 +40,7 @@
     overflow: hidden;
 
     &:hover {
-        background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+        background: var(--bg);
     }
 
     &.processing {
