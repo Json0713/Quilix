@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { Workspace } from '../../../core/interfaces/workspace';
 import { WorkspaceService } from '../../../core/workspaces/workspace.service';
+import { FileSystemService } from '../../../core/services/file-system.service';
 import { TimeAgoPipe } from '../../ui/common/time-ago/time-ago-pipe';
 
 @Component({
@@ -13,6 +14,7 @@ import { TimeAgoPipe } from '../../ui/common/time-ago/time-ago-pipe';
 })
 export class TrashComponent implements OnInit, OnDestroy {
     private workspaceService = inject(WorkspaceService);
+    private fileSystem = inject(FileSystemService);
 
     trashedWorkspaces = signal<Workspace[]>([]);
     isLoading = signal<boolean>(true);
@@ -27,6 +29,11 @@ export class TrashComponent implements OnInit, OnDestroy {
     confirmingBulkDelete = signal<boolean>(false);
     isBulkProcessing = signal<boolean>(false);
 
+    // ── Filesystem re-auth state ──
+    isFileSystemMode = signal<boolean>(false);
+    needsReauth = signal<boolean>(false);
+    isReauthing = signal<boolean>(false);
+
     selectedCount = computed(() => this.selectedIds().size);
     isAllSelected = computed(() => {
         const ws = this.trashedWorkspaces();
@@ -36,7 +43,14 @@ export class TrashComponent implements OnInit, OnDestroy {
 
     private sub: any;
 
-    ngOnInit() {
+    async ngOnInit() {
+        // Check filesystem mode and permission state
+        const mode = await this.fileSystem.getStorageMode();
+        this.isFileSystemMode.set(mode === 'filesystem');
+        if (this.isFileSystemMode() && !this.fileSystem.hasPermission()) {
+            this.needsReauth.set(true);
+        }
+
         this.sub = this.workspaceService.trashedWorkspaces$.subscribe((list: Workspace[]) => {
             this.trashedWorkspaces.set(list);
             this.isLoading.set(false);
@@ -55,6 +69,24 @@ export class TrashComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.sub?.unsubscribe();
+    }
+
+    // ── Re-auth (user-gesture triggered) ──
+
+    async reconnectStorage() {
+        if (this.isReauthing()) return;
+        this.isReauthing.set(true);
+
+        try {
+            const granted = await this.fileSystem.requestPermissionWithGesture();
+            if (granted) {
+                this.needsReauth.set(false);
+                // Re-create workspace folders in the (possibly re-picked) directory
+                await this.workspaceService.migrateToFileSystem();
+            }
+        } finally {
+            this.isReauthing.set(false);
+        }
     }
 
     // ── Selection methods ──
@@ -131,6 +163,9 @@ export class TrashComponent implements OnInit, OnDestroy {
         this.isBulkProcessing.set(true);
 
         try {
+            // Ensure storage access before deleting folders
+            await this.ensureStorageForDelete();
+
             const ids = Array.from(this.selectedIds());
             for (const id of ids) {
                 await this.workspaceService.permanentlyDelete(id);
@@ -167,6 +202,8 @@ export class TrashComponent implements OnInit, OnDestroy {
         this.processingId.set(workspaceId);
 
         try {
+            // Ensure storage access before deleting folder
+            await this.ensureStorageForDelete();
             await this.workspaceService.permanentlyDelete(workspaceId);
         } finally {
             this.processingId.set(null);
@@ -180,5 +217,20 @@ export class TrashComponent implements OnInit, OnDestroy {
         const daysPassed = Math.floor((Date.now() - trashedAt) / msPerDay);
         const daysLeft = Math.max(0, 30 - daysPassed);
         return daysLeft === 1 ? '1 day left' : `${daysLeft} days left`;
+    }
+
+    /**
+     * If filesystem mode is on but permission is lost, try to reconnect inline.
+     * This makes permanent delete also clean up the folder on mobile.
+     */
+    private async ensureStorageForDelete(): Promise<void> {
+        if (!this.isFileSystemMode()) return;
+        if (this.fileSystem.hasPermission()) return;
+
+        // Try to get permission with gesture (we're inside a click handler)
+        const granted = await this.fileSystem.requestPermissionWithGesture();
+        if (granted) {
+            this.needsReauth.set(false);
+        }
     }
 }

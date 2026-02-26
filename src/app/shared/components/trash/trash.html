@@ -18,6 +18,28 @@
         }
     </div>
 
+    <!-- Re-auth banner (permission lost after reload on mobile) -->
+    @if (needsReauth() && isFileSystemMode()) {
+    <div class="reauth-banner">
+        <div class="reauth-info">
+            <i class="bi bi-shield-lock"></i>
+            <div class="reauth-text">
+                <strong>Storage access needed</strong>
+                <span>Reconnect to fully delete workspace folders from your device.</span>
+            </div>
+        </div>
+        <button class="reauth-btn" (click)="reconnectStorage()" [disabled]="isReauthing()">
+            @if (isReauthing()) {
+            <i class="bi bi-arrow-repeat spin"></i>
+            <span>Connecting...</span>
+            } @else {
+            <i class="bi bi-plug"></i>
+            <span>Reconnect Storage</span>
+            }
+        </button>
+    </div>
+    }
+
     <!-- Selection toolbar -->
     @if (selectionMode()) {
     <div class="selection-toolbar">
