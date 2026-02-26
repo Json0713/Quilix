@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { SidebarService } from '../../../../../core/sidebar/sidebar.service';
 import { AuthService } from '../../../../../core/auth/auth.service';
 import { SpaceService } from '../../../../../core/services/space.service';
+import { TabService } from '../../../../../core/services/tab.service';
 import { Space } from '../../../../../core/interfaces/space';
 import { Workspace } from '../../../../../core/interfaces/workspace';
 import { SettingsKitComponent } from '../settings-kit/settings-kit';
@@ -20,6 +21,7 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
     private sidebarService = inject(SidebarService);
     private authService = inject(AuthService);
     private spaceService = inject(SpaceService);
+    private tabService = inject(TabService);
 
     isCollapsed = this.sidebarService.isCollapsed;
     isMobileOpen = this.sidebarService.isMobileOpen;
@@ -74,6 +76,16 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
     }
 
     onItemClick() {
+        this.sidebarService.closeMobile();
+    }
+
+    onNavClick(item: { label: string; icon: string; route: string }) {
+        this.tabService.updateActiveTabRoute(item.route, item.label, item.icon);
+        this.sidebarService.closeMobile();
+    }
+
+    onSpaceClick(space: { name: string }) {
+        this.tabService.updateActiveTabRoute('./', space.name, 'bi bi-folder');
         this.sidebarService.closeMobile();
     }
 

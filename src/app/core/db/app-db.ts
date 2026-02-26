@@ -1,6 +1,7 @@
 import Dexie, { Table } from 'dexie';
 import { Workspace } from '../interfaces/workspace';
 import { Space } from '../interfaces/space';
+import { Tab } from '../interfaces/tab';
 import { Session } from '../interfaces/session';
 
 export interface ContactMessage {
@@ -22,6 +23,7 @@ export class AppDatabase extends Dexie {
     contacts!: Table<ContactMessage, string>;
     settings!: Table<Setting, string>;
     spaces!: Table<Space, string>;
+    tabs!: Table<Tab, string>;
 
     constructor() {
         super('QuilixGlobalDB');
@@ -41,6 +43,10 @@ export class AppDatabase extends Dexie {
 
         this.version(4).stores({
             spaces: 'id, workspaceId, order'
+        });
+
+        this.version(5).stores({
+            tabs: 'id, workspaceId, order'
         });
 
         // Open database connection early to optimize initial load

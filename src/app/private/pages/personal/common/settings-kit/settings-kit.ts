@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SidebarService } from '../../../../../core/sidebar/sidebar.service';
 import { AppThemeService } from '../../../../../core/theme/app-theme/app-theme.service';
 import { OsNotificationService } from '../../../../../core/notifications/os-notification.service';
+import { TabService } from '../../../../../core/services/tab.service';
 
 @Component({
   selector: 'app-personal-settings-kit',
@@ -15,6 +16,7 @@ export class SettingsKitComponent {
   private sidebarService = inject(SidebarService);
   private themeService = inject(AppThemeService);
   private osNotify = inject(OsNotificationService);
+  private tabService = inject(TabService);
 
   isCollapsed = this.sidebarService.isCollapsed;
   currentTheme = this.themeService.theme;
@@ -27,7 +29,7 @@ export class SettingsKitComponent {
   );
 
   handleSettingsClick(event: Event) {
-    // Navigate directly, but close mobile sidebar if open
+    this.tabService.updateActiveTabRoute('./settings', 'Settings', 'bi bi-gear');
     this.sidebarService.closeMobile();
   }
 

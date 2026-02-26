@@ -1,0 +1,21 @@
+<div class="tab-bar">
+    <div class="tab-list">
+        @for (tab of tabs(); track tab.id) {
+        <a class="tab-item" [class.active]="activeTab()?.id === tab.id" [routerLink]="tab.route"
+            routerLinkActive="route-active" [routerLinkActiveOptions]="{ exact: tab.route === './' }"
+            (click)="onTabClick(tab)" [title]="tab.label">
+            <i [class]="tab.icon + ' tab-icon'"></i>
+            <span class="tab-label">{{ tab.label }}</span>
+            @if (tabs().length > 1) {
+            <span class="tab-close" (click)="onCloseTab(tab, $event)" title="Close tab">
+                <i class="bi bi-x"></i>
+            </span>
+            }
+        </a>
+        }
+
+        <button class="tab-new" (click)="onNewTab()" title="New tab">
+            <i class="bi bi-plus"></i>
+        </button>
+    </div>
+</div>

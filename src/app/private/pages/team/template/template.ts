@@ -5,15 +5,20 @@ import { OsNotificationService } from '../../../../core/notifications/os-notific
 
 import { TeamSidebarComponent } from '../common/sidebar/sidebar';
 import { SidebarService } from '../../../../core/sidebar/sidebar.service';
+import { TabBarComponent } from '../../../../shared/ui/tab-bar/tab-bar';
+import { TabService } from '../../../../core/services/tab.service';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-team-template',
-  imports: [RouterOutlet, TeamSidebarComponent],
+  imports: [RouterOutlet, TeamSidebarComponent, TabBarComponent],
   templateUrl: './template.html',
   styleUrl: './template.scss',
 })
 export class TeamTemplate {
   private sidebarService = inject(SidebarService);
+  private tabService = inject(TabService);
+  private authService = inject(AuthService);
   isMobileOpen = this.sidebarService.isMobileOpen;
   isCollapsed = this.sidebarService.isCollapsed;
 
@@ -49,6 +54,12 @@ export class TeamTemplate {
   }
 
   ngOnInit(): void {
+    this.authService.getCurrentWorkspace().then(ws => {
+      if (ws) {
+        this.tabService.loadTabs(ws.id);
+      }
+    });
+
     const justLoggedIn = localStorage.getItem('justLoggedIn') === 'true';
 
     if (justLoggedIn && Notification.permission === 'granted') {

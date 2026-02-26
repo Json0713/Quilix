@@ -20,7 +20,7 @@
             <li class="nav-item">
                 <a [routerLink]="item.route" routerLinkActive="active"
                     [routerLinkActiveOptions]="{ exact: item.route === './' }" class="nav-link" [title]="item.label"
-                    (click)="onItemClick()">
+                    (click)="onNavClick(item)">
                     <i [class]="item.icon" class="nav-icon"></i>
                     @if (!isCollapsed()) {
                     <span class="nav-label">{{ item.label }}</span>
@@ -75,7 +75,7 @@
             <ul class="nav-list space-list">
                 @for (space of spaces(); track space.id) {
                 <li class="nav-item space-item" [class.menu-open]="openMenuId() === space.id">
-                    <a class="nav-link space-link" [title]="space.name" (click)="onItemClick()">
+                    <a class="nav-link space-link" [title]="space.name" (click)="onSpaceClick(space)">
                         <i class="bi bi-folder nav-icon"></i>
                         @if (!isCollapsed()) {
                         <span class="nav-label">{{ space.name }}</span>
@@ -113,7 +113,7 @@
         <ul class="nav-list">
             <li class="nav-item">
                 <a routerLink="./trash" routerLinkActive="active" class="nav-link" title="Trash"
-                    (click)="onItemClick()">
+                    (click)="onNavClick({ label: 'Trash', icon: 'bi bi-trash3', route: './trash' })">
                     <i class="bi bi-trash3 nav-icon"></i>
                     @if (!isCollapsed()) {
                     <span class="nav-label">Trash</span>
