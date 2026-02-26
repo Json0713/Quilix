@@ -1,22 +1,24 @@
 .tab-bar {
     display: flex;
     align-items: center;
-    height: 40px;
-    min-height: 40px;
+    height: 42px;
+    min-height: 42px;
     background: var(--surface-main);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     flex-shrink: 0;
-    position: sticky;
-    top: 0;
-    z-index: 50;
+    padding: 0 0.5rem;
+    gap: 4px;
 
     .tab-list {
         display: flex;
-        align-items: stretch;
-        height: 100%;
+        align-items: center;
+        gap: 4px;
         flex: 1;
         min-width: 0;
         overflow-x: auto;
+        padding: 4px 0;
+
+        // Custom ultra-thin scroll indicator
         scrollbar-width: none;
 
         &::-webkit-scrollbar {
@@ -24,29 +26,41 @@
         }
     }
 
+    // Custom scroll track indicator
+    &.has-overflow .tab-list::after {
+        content: '';
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
     .tab-item {
         display: flex;
         align-items: center;
-        gap: 6px;
-        height: 100%;
-        padding: 0 14px;
+        gap: 8px;
+        height: 30px;
+        padding: 0 12px;
         border: none;
-        border-right: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 12px;
         background: transparent;
         color: var(--text-muted);
-        font-size: 0.78rem;
+        font-size: 0.82rem;
         font-weight: 500;
         cursor: pointer;
-        transition: background 0.15s ease, color 0.15s ease;
+        transition: all 0.2s ease;
         white-space: nowrap;
-        min-width: 0;
-        max-width: 200px;
+        min-width: 120px;
+        max-width: 180px;
         flex-shrink: 0;
         text-decoration: none;
         position: relative;
 
         .tab-icon {
-            font-size: 0.82rem;
+            font-size: 0.95rem;
             flex-shrink: 0;
             opacity: 0.6;
         }
@@ -55,6 +69,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             min-width: 0;
+            flex: 1;
         }
 
         .tab-close {
@@ -63,17 +78,15 @@
             justify-content: center;
             width: 18px;
             height: 18px;
-            border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             background: transparent;
             color: var(--text-muted);
             cursor: pointer;
             opacity: 0;
-            transition: all 0.12s ease;
+            transition: all 0.15s ease;
             font-size: 0.8rem;
-            padding: 0;
-            margin-left: 4px;
             flex-shrink: 0;
+            margin-left: auto;
 
             &:hover {
                 background: rgba(255, 255, 255, 0.12);
@@ -81,39 +94,33 @@
             }
         }
 
+        // Hover — matches nav-link hover
         &:hover {
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--bg-hover);
             color: var(--text-main);
+
+            .tab-icon {
+                opacity: 0.8;
+            }
 
             .tab-close {
                 opacity: 1;
             }
         }
 
-        // Active tab (selected by our signal state)
+        // Active tab — matches nav-link .active
         &.active {
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--bg-active);
             color: var(--text-main);
-
-            // Bottom accent indicator
-            &::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 8px;
-                right: 8px;
-                height: 2px;
-                background: var(--accent);
-                border-radius: 2px 2px 0 0;
-            }
+            font-weight: 600;
 
             .tab-icon {
                 opacity: 1;
-                color: var(--accent);
+                color: var(--text-main);
             }
 
             .tab-close {
-                opacity: 0.5;
+                opacity: 0.4;
 
                 &:hover {
                     opacity: 1;
@@ -126,19 +133,19 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 32px;
-        min-width: 32px;
-        height: 100%;
+        width: 30px;
+        height: 30px;
         border: none;
+        border-radius: 10px;
         background: transparent;
         color: var(--text-muted);
         cursor: pointer;
-        transition: all 0.15s ease;
+        transition: all 0.2s ease;
         font-size: 0.95rem;
         flex-shrink: 0;
 
         &:hover {
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--bg-hover);
             color: var(--accent);
         }
     }
