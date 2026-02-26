@@ -35,6 +35,7 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
     spaces = signal<Space[]>([]);
     isCreating = signal<boolean>(false);
     newSpaceName = signal<string>('');
+    inputError = signal<string | null>(null);
 
     // ── Context menu state ──
     openMenuId = signal<string | null>(null);
@@ -80,27 +81,38 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
     // ── Space creation ──
 
     startCreating() {
+        // If sidebar is collapsed, expand it first to reveal the input
+        if (this.isCollapsed()) {
+            this.sidebarService.toggleCollapsed();
+        }
         this.isCreating.set(true);
         this.newSpaceName.set('');
-        setTimeout(() => this.spaceInputRef?.nativeElement?.focus(), 50);
+        this.inputError.set(null);
+        setTimeout(() => this.spaceInputRef?.nativeElement?.focus(), 150);
     }
 
     cancelCreating() {
         this.isCreating.set(false);
         this.newSpaceName.set('');
+        this.inputError.set(null);
+    }
+
+    onSpaceInput(value: string) {
+        this.newSpaceName.set(value);
+        const error = this.spaceService.validateName(value);
+        this.inputError.set(error);
     }
 
     async confirmCreate() {
+        if (this.inputError()) return; // Don't submit with validation error
         const workspace = this.activeWorkspace();
         if (!workspace) return;
 
         const raw = this.newSpaceName().trim();
-        const error = raw ? this.spaceService.validateName(raw) : null;
-        if (error) return;
-
         await this.spaceService.create(workspace.id, workspace.name, raw || undefined);
         this.isCreating.set(false);
         this.newSpaceName.set('');
+        this.inputError.set(null);
     }
 
     onSpaceInputKeydown(event: KeyboardEvent) {
