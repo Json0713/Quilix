@@ -29,6 +29,70 @@
             }
         </ul>
 
+        <!-- MySpace section (only when workspace is active) -->
+        @if (activeWorkspace()) {
+        <div class="nav-section spaces-section">
+            @if (!isCollapsed()) {
+            <div class="section-title">MySpace</div>
+            } @else {
+            <div class="section-divider"></div>
+            }
+
+            <!-- + New nav button -->
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <button class="nav-link new-space-nav" (click)="startCreating()" title="New space">
+                        <i class="bi bi-plus-lg nav-icon"></i>
+                        @if (!isCollapsed()) {
+                        <span class="nav-label">New</span>
+                        }
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Inline create input -->
+            @if (isCreating() && !isCollapsed()) {
+            <div class="space-create-inline">
+                <i class="bi bi-folder-plus create-icon"></i>
+                <input #spaceInput type="text" class="space-name-input" placeholder="New space" [value]="newSpaceName()"
+                    (input)="newSpaceName.set($any($event.target).value)" (keydown)="onSpaceInputKeydown($event)"
+                    (blur)="confirmCreate()" maxlength="50" />
+            </div>
+            }
+
+            <!-- Space list -->
+            <ul class="nav-list space-list">
+                @for (space of spaces(); track space.id) {
+                <li class="nav-item space-item" [class.menu-open]="openMenuId() === space.id">
+                    <a class="nav-link space-link" [title]="space.name" (click)="onItemClick()">
+                        <i class="bi bi-folder nav-icon"></i>
+                        @if (!isCollapsed()) {
+                        <span class="nav-label">{{ space.name }}</span>
+                        }
+                    </a>
+
+                    <!-- 3-dot menu (only expanded mode) -->
+                    @if (!isCollapsed()) {
+                    <button class="space-menu-trigger" (click)="toggleMenu(space.id, $event)" title="Options">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+
+                    @if (openMenuId() === space.id) {
+                    <div class="space-menu-dropdown">
+                        <button class="dropdown-item delete-item" (click)="deleteSpace(space.id, $event)">
+                            <i class="bi bi-trash3"></i>
+                            <span>Delete</span>
+                        </button>
+                    </div>
+                    }
+                    }
+                </li>
+                }
+            </ul>
+        </div>
+        }
+
+        <!-- System section (pre-footer) -->
         <div class="nav-section system-nav">
             @if (!isCollapsed()) {
             <div class="section-title">System</div>
@@ -36,18 +100,15 @@
             <div class="section-divider"></div>
             }
             <ul class="nav-list">
-                @for (item of systemItems; track item.label) {
                 <li class="nav-item">
-                    <a [routerLink]="item.route" routerLinkActive="active"
-                        [routerLinkActiveOptions]="{ exact: item.route === './' }" class="nav-link" [title]="item.label"
+                    <a routerLink="./trash" routerLinkActive="active" class="nav-link" title="Trash"
                         (click)="onItemClick()">
-                        <i [class]="item.icon" class="nav-icon"></i>
+                        <i class="bi bi-trash3 nav-icon"></i>
                         @if (!isCollapsed()) {
-                        <span class="nav-label">{{ item.label }}</span>
+                        <span class="nav-label">Trash</span>
                         }
                     </a>
                 </li>
-                }
             </ul>
         </div>
     </nav>
