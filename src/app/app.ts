@@ -16,7 +16,7 @@ import { GlobalSyncService } from './core/sync/global-sync.service';
 import { Tooltip } from './shared/ui/common/tooltip/tooltip';
 import { TooltipManagerService } from './core/services/tooltip-manager.service';
 import { FileSystemService } from './core/services/file-system.service';
-
+import { SystemSyncService } from './core/services/system-sync.service';
 
 @Component({
   selector: 'app-root',
@@ -37,6 +37,7 @@ export class App {
   private sync: GlobalSyncService = inject(GlobalSyncService);
   private tooltipManager = inject(TooltipManagerService);
   private fileSystem = inject(FileSystemService);
+  private systemSync = inject(SystemSyncService);
 
   constructor() {
     this.toastRelay.consume();
@@ -44,6 +45,7 @@ export class App {
     this.theme.init();
     this.sync.init();
     this.tooltipManager.init();
+    this.systemSync.init();
     this.validateFileSystem();
   }
 

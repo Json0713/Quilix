@@ -5,6 +5,7 @@ import { Space } from '../../../core/interfaces/space';
 import { WorkspaceService } from '../../../core/workspaces/workspace.service';
 import { FileSystemService } from '../../../core/services/file-system.service';
 import { SpaceService } from '../../../core/services/space.service';
+import { SystemSyncService } from '../../../core/services/system-sync.service';
 
 export interface ManagedWorkspace extends Workspace {
     isMissingOnDisk?: boolean;
@@ -28,6 +29,7 @@ export class WorkspaceManagerComponent implements OnInit {
     private workspaceService = inject(WorkspaceService);
     private fileSystem = inject(FileSystemService);
     private spaceService = inject(SpaceService);
+    private systemSync = inject(SystemSyncService);
 
     workspaces = signal<ManagedWorkspace[]>([]);
     isLoading = signal<boolean>(true);
@@ -139,6 +141,7 @@ export class WorkspaceManagerComponent implements OnInit {
             const granted = await this.fileSystem.requestPermissionWithGesture();
             if (granted) {
                 this.needsReauth.set(false);
+                await this.systemSync.importStateFromDisk();
                 // Re-create workspace folders in the (possibly re-picked) directory
                 await this.workspaceService.migrateToFileSystem();
                 await this.quietLoadWorkspaces();
