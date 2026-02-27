@@ -24,6 +24,10 @@ export const TEAM_ROUTES: Routes = [
       {
         path: 'trash',
         loadComponent: () => import('./trash/trash').then(m => m.TeamTrash)
+      },
+      {
+        path: 'spaces/:spaceId',
+        loadComponent: () => import('./space-view/space-view').then(m => m.SpaceView)
       }
     ]
   }

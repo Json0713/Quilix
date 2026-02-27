@@ -86,9 +86,8 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
         this.sidebarService.closeMobile();
     }
 
-    onSpaceClick(space: { name: string }) {
-        // Spaces don't have dedicated routes yet — use home route but show space name in tab
-        this.tabService.updateActiveTabRoute('./', space.name, 'bi bi-folder');
+    onSpaceClick(space: Space) {
+        this.tabService.updateActiveTabRoute(`./spaces/${space.id}`, space.name, 'bi bi-folder');
         this.sidebarService.closeMobile();
     }
 

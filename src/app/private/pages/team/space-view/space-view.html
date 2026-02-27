@@ -1,0 +1,40 @@
+<section class="page">
+    <div class="page-container">
+
+        @if (loading()) {
+        <div class="space-loading">
+            <i class="bi bi-arrow-repeat spin"></i>
+        </div>
+        } @else if (space()) {
+
+        <header class="page-header">
+            <div class="page-header-content">
+                <div class="space-title-group">
+                    <i class="bi bi-folder space-title-icon"></i>
+                    <h1 class="page-title">{{ space()!.name }}</h1>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <section class="space-empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-folder2-open"></i>
+                </div>
+                <h3>This space is empty</h3>
+                <p>Start adding content to this space. Files, notes, and documents you create will appear here.</p>
+            </section>
+        </main>
+
+        } @else {
+
+        <div class="space-not-found">
+            <i class="bi bi-folder-x"></i>
+            <h3>Space not found</h3>
+            <p>This space may have been deleted or moved.</p>
+        </div>
+
+        }
+
+    </div>
+</section>

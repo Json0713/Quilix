@@ -37,6 +37,14 @@ export class SpaceService {
     }
 
     /**
+     * Get a single space by ID.
+     */
+    async getById(spaceId: string): Promise<Space | null> {
+        const space = await db.spaces.get(spaceId);
+        return space ?? null;
+    }
+
+    /**
      * Create a new space inside a workspace.
      * @param workspaceId Parent workspace ID
      * @param workspaceName Parent workspace name (for filesystem path)

@@ -84,8 +84,8 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
         this.sidebarService.closeMobile();
     }
 
-    onSpaceClick(space: { name: string }) {
-        this.tabService.updateActiveTabRoute('./', space.name, 'bi bi-folder');
+    onSpaceClick(space: Space) {
+        this.tabService.updateActiveTabRoute(`./spaces/${space.id}`, space.name, 'bi bi-folder');
         this.sidebarService.closeMobile();
     }
 

@@ -75,7 +75,8 @@
             <ul class="nav-list space-list">
                 @for (space of spaces(); track space.id) {
                 <li class="nav-item space-item" [class.menu-open]="openMenuId() === space.id">
-                    <a class="nav-link space-link" [title]="space.name" routerLink="./" (click)="onSpaceClick(space)">
+                    <a class="nav-link space-link" [title]="space.name" [routerLink]="'./spaces/' + space.id"
+                        routerLinkActive="active" (click)="onSpaceClick(space)">
                         <i class="bi bi-folder nav-icon"></i>
                         @if (!isCollapsed()) {
                         <span class="nav-label">{{ space.name }}</span>
