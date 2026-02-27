@@ -101,7 +101,8 @@
     <div class="workspace-list">
         @for (ws of workspaces(); track ws.id) {
         <div class="workspace-card" [class.missing]="ws.isMissingOnDisk" [class.selected]="isSelected(ws.id)"
-            [class.in-select-mode]="selectionMode()" (click)="selectionMode() ? toggleSelect(ws.id) : null">
+            [class.in-select-mode]="selectionMode()" [class.expanded]="expandedWorkspaceId() === ws.id"
+            (click)="selectionMode() ? toggleSelect(ws.id) : null">
 
             <!-- Selection checkbox (square) -->
             @if (selectionMode()) {
@@ -170,6 +171,14 @@
                         </div>
                     </div>
                     } @else {
+                    <!-- Expand/collapse toggle -->
+                    @if (isFileSystemMode() && !ws.isMissingOnDisk) {
+                    <button class="action-btn expand-btn" (click)="toggleExpand(ws)"
+                        [class.active]="expandedWorkspaceId() === ws.id" aria-label="View spaces" title="View spaces">
+                        <i class="bi" [class.bi-chevron-down]="expandedWorkspaceId() === ws.id"
+                            [class.bi-chevron-right]="expandedWorkspaceId() !== ws.id"></i>
+                    </button>
+                    }
                     <button class="action-btn trash-btn" [disabled]="ws.isTrashing" (click)="requestTrash(ws)"
                         aria-label="Move to trash" title="Move to trash">
                         @if (ws.isTrashing) {
@@ -180,6 +189,66 @@
                     </button>
                     }
                 </div>
+            </div>
+            }
+
+            <!-- Expanded space list -->
+            @if (expandedWorkspaceId() === ws.id && !selectionMode()) {
+            <div class="space-panel">
+                @if (isLoadingSpaces()) {
+                <div class="space-loading">
+                    <i class="bi bi-arrow-repeat spin"></i>
+                    <span>Loading spaces...</span>
+                </div>
+                } @else if (getSpaces(ws.id).length === 0) {
+                <div class="space-empty">
+                    <span>No spaces in this workspace</span>
+                </div>
+                } @else {
+                @if (hasMissingSpaces(ws.id)) {
+                <div class="space-panel-toolbar">
+                    <span class="missing-count">
+                        {{ getSpaces(ws.id).length }} space{{ getSpaces(ws.id).length > 1 ? 's' : '' }}
+                    </span>
+                    <button class="restore-all-btn" (click)="restoreAllSpaces(ws)">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Restore All
+                    </button>
+                </div>
+                }
+                <div class="space-list">
+                    @for (space of getSpaces(ws.id); track space.id) {
+                    <div class="space-row" [class.missing]="space.isMissingOnDisk">
+                        <div class="space-info">
+                            <i class="bi bi-folder2"></i>
+                            <span class="space-name">{{ space.name }}</span>
+                        </div>
+                        <div class="space-status">
+                            @if (space.isMissingOnDisk) {
+                            <span class="status-badge error">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                Missing
+                            </span>
+                            <button class="space-restore-btn" [disabled]="space.isRestoring"
+                                (click)="restoreSpace(ws, space)">
+                                @if (space.isRestoring) {
+                                <i class="bi bi-arrow-repeat spin"></i>
+                                } @else {
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                                Restore
+                                }
+                            </button>
+                            } @else {
+                            <span class="status-badge success">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Synced
+                            </span>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
             </div>
             }
         </div>

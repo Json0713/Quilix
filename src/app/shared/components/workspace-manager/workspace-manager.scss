@@ -268,6 +268,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     padding: 20px;
     background: var(--surface-main);
     border: 1px solid var(--border);
@@ -499,6 +500,157 @@
                     }
                 }
             }
+        }
+    }
+
+    // Expanded state
+    &.expanded {
+        border-color: var(--accent);
+    }
+
+    // ── Space Panel ──
+    .space-panel {
+        width: 100%;
+        border-top: 1px solid var(--border);
+        padding-top: 16px;
+        margin-top: 4px;
+
+        .space-loading,
+        .space-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 0;
+            font-size: 13px;
+            color: var(--text-muted);
+
+            i {
+                font-size: 14px;
+            }
+        }
+
+        .space-panel-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 10px;
+
+            .missing-count {
+                font-size: 12px;
+                font-weight: 500;
+                color: var(--text-muted);
+            }
+
+            .restore-all-btn {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                padding: 4px 12px;
+                border: none;
+                border-radius: 6px;
+                background: rgba(25, 135, 84, 0.1);
+                color: #198754;
+                font-size: 11px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    background: #198754;
+                    color: white;
+                }
+            }
+        }
+
+        .space-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .space-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: var(--bg-hover, rgba(255, 255, 255, 0.02));
+            transition: background 0.15s ease;
+
+            &:hover {
+                background: var(--bg-active, rgba(255, 255, 255, 0.04));
+            }
+
+            &.missing {
+                background: rgba(220, 53, 69, 0.04);
+            }
+
+            .space-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex: 1;
+                min-width: 0;
+
+                i {
+                    font-size: 14px;
+                    color: var(--text-muted);
+                    flex-shrink: 0;
+                }
+
+                .space-name {
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: var(--text-main);
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+
+            .space-status {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-shrink: 0;
+            }
+
+            .space-restore-btn {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                padding: 3px 10px;
+                border: none;
+                border-radius: 6px;
+                background: rgba(220, 53, 69, 0.1);
+                color: #dc3545;
+                font-size: 11px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover:not(:disabled) {
+                    background: #dc3545;
+                    color: white;
+                }
+
+                &:disabled {
+                    opacity: 0.6;
+                    cursor: wait;
+                }
+            }
+        }
+    }
+
+    .expand-btn {
+        &.active {
+            color: var(--accent) !important;
+        }
+
+        &:hover:not(:disabled) {
+            background: var(--bg-active, rgba(255, 255, 255, 0.08)) !important;
+            color: var(--text-main) !important;
         }
     }
 }

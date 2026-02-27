@@ -240,6 +240,34 @@ export class SpaceService {
 
     // ── Filesystem Operations ──
 
+    /**
+     * Check if a space folder exists on disk inside its workspace folder.
+     */
+    async checkSpaceFolderExists(workspaceName: string, folderName: string): Promise<boolean | 'no-permission'> {
+        const wsHandle = await this.fileSystem.getOrCreateWorkspaceFolder(workspaceName);
+        if (!wsHandle) return 'no-permission';
+
+        try {
+            await wsHandle.getDirectoryHandle(folderName, { create: false });
+            return true;
+        } catch (err: any) {
+            if (err.name === 'NotFoundError') return false;
+            return 'no-permission';
+        }
+    }
+
+    /**
+     * Restore a missing space folder on disk.
+     */
+    async restoreSpaceFolder(workspaceName: string, folderName: string): Promise<boolean> {
+        try {
+            await this.createSpaceFolder(workspaceName, folderName);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     private async createSpaceFolder(workspaceName: string, folderName: string): Promise<void> {
         try {
             const wsHandle = await this.fileSystem.getOrCreateWorkspaceFolder(workspaceName);
