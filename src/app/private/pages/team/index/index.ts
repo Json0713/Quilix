@@ -2,11 +2,10 @@ import { Component, OnInit } from '@angular/core';
 
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
-import { Export } from "../../../../shared/components/export/export";
 
 @Component({
   selector: 'app-team-index',
-  imports: [Export],
+  imports: [],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
