@@ -205,12 +205,13 @@
                 width: 100%;
                 border: none;
                 background: transparent;
-                color: var(--accent);
+                color: var(--action);
+                margin-bottom: 4px;
                 cursor: pointer;
                 opacity: 0.8;
 
                 .nav-icon {
-                    color: var(--accent);
+                    color: var(--action);
                 }
 
                 &:hover {
@@ -228,7 +229,7 @@
 
                 .create-icon {
                     font-size: 1.1rem;
-                    color: var(--accent);
+                    color: var(--action);
                     flex-shrink: 0;
                     margin-top: 6px;
                 }
@@ -249,7 +250,7 @@
                         transition: border-color 0.2s ease;
 
                         &:focus {
-                            border-color: var(--accent);
+                            border-color: var(--action);
                         }
 
                         &::placeholder {
@@ -299,6 +300,7 @@
 
                 .space-link {
                     flex: 1;
+                    padding: 0.32rem 1.0rem;
 
                     .nav-icon {
                         font-size: 1rem;
