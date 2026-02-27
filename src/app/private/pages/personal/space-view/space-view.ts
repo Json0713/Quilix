@@ -5,7 +5,7 @@ import { SpaceService } from '../../../../core/services/space.service';
 import { Space } from '../../../../core/interfaces/space';
 
 @Component({
-    selector: 'app-space-view',
+    selector: 'app-personal-space-view',
     standalone: true,
     imports: [],
     templateUrl: './space-view.html',
