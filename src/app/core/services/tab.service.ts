@@ -116,6 +116,35 @@ export class TabService {
         this.activeTab.set(updated);
     }
 
+    /**
+     * Update the label of any tab whose route contains the given spaceId.
+     * Used when a space is renamed to keep tab labels in sync.
+     */
+    async updateTabLabelBySpaceId(spaceId: string, newLabel: string): Promise<void> {
+        const routeFragment = `./spaces/${spaceId}`;
+        const current = this.tabs();
+        let changed = false;
+
+        for (const tab of current) {
+            if (tab.route === routeFragment) {
+                await db.tabs.update(tab.id, { label: newLabel });
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            this.tabs.update(tabs =>
+                tabs.map(t => t.route === routeFragment ? { ...t, label: newLabel } : t)
+            );
+
+            // Also update activeTab if it matches
+            const active = this.activeTab();
+            if (active && active.route === routeFragment) {
+                this.activeTab.set({ ...active, label: newLabel });
+            }
+        }
+    }
+
     // ── Helpers ──
 
     private buildTab(workspaceId: string, route: string, label: string, icon: string, order: number): Tab {

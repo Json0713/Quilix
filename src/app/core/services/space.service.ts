@@ -18,12 +18,38 @@ export class SpaceService {
      * Live-query observable of spaces for a workspace, ordered by creation.
      */
     liveSpaces$(workspaceId: string) {
-        return liveQuery(() =>
-            db.spaces
+        return liveQuery(async () => {
+            const all = await db.spaces
                 .where('workspaceId')
                 .equals(workspaceId)
-                .sortBy('order')
-        );
+                .sortBy('order');
+            return all.filter(s => !s.trashedAt);
+        });
+    }
+
+    /**
+     * Live-query observable for a single space by ID.
+     * Returns null when space is trashed or deleted.
+     */
+    liveSpace$(spaceId: string) {
+        return liveQuery(async () => {
+            const space = await db.spaces.get(spaceId);
+            if (!space || space.trashedAt) return null;
+            return space;
+        });
+    }
+
+    /**
+     * Live-query observable of trashed spaces for a workspace.
+     */
+    liveTrashedSpaces$(workspaceId: string) {
+        return liveQuery(async () => {
+            const all = await db.spaces
+                .where('workspaceId')
+                .equals(workspaceId)
+                .toArray();
+            return all.filter(s => !!s.trashedAt);
+        });
     }
 
     /**
@@ -81,6 +107,7 @@ export class SpaceService {
 
     /**
      * Rename a space.
+     * On filesystem mode: creates new folder, removes old one.
      */
     async rename(spaceId: string, newName: string, workspaceName: string): Promise<boolean> {
         const space = await db.spaces.get(spaceId);
@@ -90,12 +117,13 @@ export class SpaceService {
         if (!sanitized) return false;
 
         const newFolderName = this.toFolderName(sanitized);
+        const oldFolderName = space.folderName;
 
-        // Rename folder on filesystem if applicable
+        // Rename folder on filesystem: create new → delete old
         const storageMode = await this.fileSystem.getStorageMode();
-        if (storageMode === 'filesystem') {
-            // Create new folder, old one stays (filesystem doesn't support rename directly)
+        if (storageMode === 'filesystem' && newFolderName !== oldFolderName) {
             await this.createSpaceFolder(workspaceName, newFolderName);
+            await this.deleteSpaceFolder(workspaceName, oldFolderName);
         }
 
         await db.spaces.update(spaceId, { name: sanitized, folderName: newFolderName });
@@ -103,16 +131,42 @@ export class SpaceService {
     }
 
     /**
-     * Delete a space.
+     * Move a space to trash (soft-delete).
+     * Folder is preserved on disk — only removed on permanent delete.
      */
-    async delete(spaceId: string, workspaceName: string): Promise<boolean> {
+    async moveToTrash(spaceId: string, _workspaceName: string): Promise<boolean> {
+        const space = await db.spaces.get(spaceId);
+        if (!space) return false;
+
+        await db.spaces.update(spaceId, { trashedAt: Date.now() });
+        return true;
+    }
+
+    /**
+     * Restore a space from trash.
+     * Folder was preserved on disk, so just clear trashedAt.
+     */
+    async restoreFromTrash(spaceId: string, _workspaceName: string): Promise<boolean> {
+        const space = await db.spaces.get(spaceId);
+        if (!space) return false;
+
+        await db.spaces.update(spaceId, { trashedAt: undefined as any });
+        return true;
+    }
+
+    /**
+     * Permanently delete a space — removes DB record and filesystem folder.
+     */
+    async permanentlyDelete(spaceId: string, workspaceName?: string): Promise<boolean> {
         const space = await db.spaces.get(spaceId);
         if (!space) return false;
 
         // Delete folder on filesystem if applicable
-        const storageMode = await this.fileSystem.getStorageMode();
-        if (storageMode === 'filesystem') {
-            await this.deleteSpaceFolder(workspaceName, space.folderName);
+        if (workspaceName) {
+            const storageMode = await this.fileSystem.getStorageMode();
+            if (storageMode === 'filesystem') {
+                await this.deleteSpaceFolder(workspaceName, space.folderName);
+            }
         }
 
         await db.spaces.delete(spaceId);

@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, OnDestroy, ElementRef, ViewChild, HostListener } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, ElementRef, ViewChild, ViewChildren, QueryList, HostListener } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -38,11 +38,18 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
     isCreating = signal<boolean>(false);
     newSpaceName = signal<string>('');
     inputError = signal<string | null>(null);
+    private isSubmitting = false;
 
     // ── Context menu state ──
     openMenuId = signal<string | null>(null);
 
+    // ── Rename state ──
+    renamingSpaceId = signal<string | null>(null);
+    renameValue = signal<string>('');
+    renameError = signal<string | null>(null);
+
     @ViewChild('spaceInput') spaceInputRef!: ElementRef<HTMLInputElement>;
+    @ViewChildren('renameInput') renameInputRefs!: QueryList<ElementRef<HTMLInputElement>>;
 
     private spaceSub: any;
 
@@ -64,6 +71,16 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
     onDocumentClick() {
         if (this.openMenuId()) {
             this.openMenuId.set(null);
+        }
+    }
+
+    // Close rename on outside click (if not clicking the rename input)
+    @HostListener('document:mousedown', ['$event'])
+    onDocumentMousedown(event: MouseEvent) {
+        if (!this.renamingSpaceId()) return;
+        const target = event.target as HTMLElement;
+        if (!target.closest('.space-rename-inline')) {
+            this.confirmRename();
         }
     }
 
@@ -114,20 +131,28 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
     }
 
     async confirmCreate() {
+        if (this.isSubmitting) return;
         if (this.inputError()) return;
         const workspace = this.activeWorkspace();
         if (!workspace) return;
 
-        const raw = this.newSpaceName().trim();
-        await this.spaceService.create(workspace.id, workspace.name, raw || undefined);
-        this.isCreating.set(false);
-        this.newSpaceName.set('');
-        this.inputError.set(null);
+        this.isSubmitting = true;
+        try {
+            const raw = this.newSpaceName().trim();
+            await this.spaceService.create(workspace.id, workspace.name, raw || undefined);
+            this.isCreating.set(false);
+            this.newSpaceName.set('');
+            this.inputError.set(null);
+        } finally {
+            this.isSubmitting = false;
+        }
     }
 
     onSpaceInputKeydown(event: KeyboardEvent) {
         if (event.key === 'Enter') {
             event.preventDefault();
+            const input = event.target as HTMLInputElement;
+            input.blur();
             this.confirmCreate();
         } else if (event.key === 'Escape') {
             this.cancelCreating();
@@ -141,13 +166,70 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
         this.openMenuId.set(this.openMenuId() === spaceId ? null : spaceId);
     }
 
-    async deleteSpace(spaceId: string, event: Event) {
+    async trashSpace(spaceId: string, event: Event) {
         event.stopPropagation();
         this.openMenuId.set(null);
 
         const workspace = this.activeWorkspace();
         if (!workspace) return;
 
-        await this.spaceService.delete(spaceId, workspace.name);
+        await this.spaceService.moveToTrash(spaceId, workspace.name);
+    }
+
+    // ── Rename ──
+
+    startRename(space: Space, event: Event) {
+        event.stopPropagation();
+        this.openMenuId.set(null);
+        this.renamingSpaceId.set(space.id);
+        this.renameValue.set(space.name);
+        this.renameError.set(null);
+        setTimeout(() => {
+            const input = this.renameInputRefs?.first?.nativeElement;
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        }, 50);
+    }
+
+    onRenameInput(value: string) {
+        this.renameValue.set(value);
+        const error = this.spaceService.validateName(value);
+        this.renameError.set(error);
+    }
+
+    async confirmRename() {
+        const spaceId = this.renamingSpaceId();
+        if (!spaceId) return;
+        if (this.renameError()) { this.cancelRename(); return; }
+
+        const workspace = this.activeWorkspace();
+        if (!workspace) return;
+
+        const raw = this.renameValue().trim();
+        if (raw) {
+            await this.spaceService.rename(spaceId, raw, workspace.name);
+            await this.tabService.updateTabLabelBySpaceId(spaceId, raw);
+        }
+
+        this.renamingSpaceId.set(null);
+        this.renameValue.set('');
+        this.renameError.set(null);
+    }
+
+    cancelRename() {
+        this.renamingSpaceId.set(null);
+        this.renameValue.set('');
+        this.renameError.set(null);
+    }
+
+    onRenameKeydown(event: KeyboardEvent) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            this.confirmRename();
+        } else if (event.key === 'Escape') {
+            this.cancelRename();
+        }
     }
 }

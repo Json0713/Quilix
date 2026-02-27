@@ -19,22 +19,31 @@ export class SpaceView implements OnInit, OnDestroy {
     loading = signal(true);
 
     private paramSub!: Subscription;
+    private spaceSub: any;
 
     ngOnInit() {
-        this.paramSub = this.route.params.subscribe(async params => {
+        this.paramSub = this.route.params.subscribe(params => {
             const spaceId = params['spaceId'];
             this.loading.set(true);
 
-            if (spaceId) {
-                const found = await this.spaceService.getById(spaceId);
-                this.space.set(found);
-            }
+            this.spaceSub?.unsubscribe();
 
-            this.loading.set(false);
+            if (spaceId) {
+                this.spaceSub = this.spaceService.liveSpace$(spaceId).subscribe(
+                    (space: Space | null) => {
+                        this.space.set(space);
+                        this.loading.set(false);
+                    }
+                );
+            } else {
+                this.space.set(null);
+                this.loading.set(false);
+            }
         });
     }
 
     ngOnDestroy() {
         this.paramSub?.unsubscribe();
+        this.spaceSub?.unsubscribe();
     }
 }

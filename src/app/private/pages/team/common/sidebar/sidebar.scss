@@ -306,6 +306,49 @@
                         font-size: 1rem;
                         opacity: 0.7;
                     }
+
+                    .nav-label {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        min-width: 0;
+                    }
+                }
+
+                // Inline rename input
+                .space-rename-inline {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 0.18rem 0.75rem;
+
+                    .rename-icon {
+                        font-size: 1rem;
+                        opacity: 0.7;
+                        flex-shrink: 0;
+                    }
+
+                    .space-rename-input {
+                        flex: 1;
+                        min-width: 0;
+                        background: var(--bg-muted);
+                        border: 1px solid var(--action);
+                        border-radius: 6px;
+                        padding: 3px 8px;
+                        font-size: 0.85rem;
+                        color: var(--text-main);
+                        outline: none;
+                        transition: border-color 0.2s ease;
+
+                        &::placeholder {
+                            color: var(--text-muted);
+                            opacity: 0.6;
+                        }
+                    }
+
+                    &.has-error .space-rename-input {
+                        border-color: #ef4444;
+                    }
                 }
 
                 .space-menu-trigger {
@@ -334,7 +377,8 @@
                 }
 
                 &:hover .space-menu-trigger,
-                &.menu-open .space-menu-trigger {
+                &.menu-open .space-menu-trigger,
+                &:has(.space-link.active) .space-menu-trigger {
                     opacity: 1;
                 }
 
@@ -343,7 +387,7 @@
                     right: 4px;
                     top: 100%;
                     z-index: 100;
-                    min-width: 130px;
+                    min-width: 150px;
                     background: var(--surface-main);
                     border: 1px solid var(--border);
                     border-radius: 10px;
@@ -355,7 +399,7 @@
                         align-items: center;
                         gap: 8px;
                         width: 100%;
-                        padding: 1px 12px;
+                        padding: 4px 16px;
                         border: none;
                         border-radius: 8px;
                         background: transparent;
@@ -372,7 +416,7 @@
                             background: var(--bg-hover);
                         }
 
-                        &.delete-item {
+                        &.trash-item {
                             color: #ef4444;
 
                             &:hover {

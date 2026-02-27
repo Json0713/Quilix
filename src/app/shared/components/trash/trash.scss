@@ -61,6 +61,34 @@
     }
 }
 
+/* ── Trash sections ── */
+.trash-section {
+    margin-bottom: 24px;
+
+    .section-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        opacity: 0.6;
+        margin-bottom: 12px;
+    }
+}
+
+/* ── Space card overrides ── */
+.space-card {
+    .space-icon {
+        background: rgba(255, 180, 50, 0.1) !important;
+        color: #ffb432 !important;
+    }
+
+    .space-badge {
+        background: rgba(255, 180, 50, 0.15) !important;
+        color: #ffb432 !important;
+    }
+}
+
 /* ── Re-auth banner ── */
 .reauth-banner {
     display: flex;

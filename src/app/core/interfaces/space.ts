@@ -5,4 +5,5 @@ export interface Space {
     folderName: string;
     createdAt: number;
     order: number;
+    trashedAt?: number;
 }

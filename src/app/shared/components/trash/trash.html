@@ -5,7 +5,7 @@
             <p>Items in trash are automatically deleted forever after 30 days.</p>
         </div>
 
-        @if (!isLoading() && trashedWorkspaces().length > 0) {
+        @if (!isLoading() && hasAnyTrashed()) {
         <button class="select-toggle-btn" (click)="toggleSelectionMode()" [class.active]="selectionMode()">
             @if (selectionMode()) {
             <i class="bi bi-x-lg"></i>
@@ -90,84 +90,170 @@
         <i class="bi bi-arrow-repeat spin"></i>
         <span>Loading...</span>
     </div>
-    } @else if (trashedWorkspaces().length === 0) {
+    } @else if (!hasAnyTrashed()) {
     <div class="empty-state">
         <i class="bi bi-trash3"></i>
         <p>Your trash is empty.</p>
     </div>
     } @else {
-    <div class="workspace-list">
-        @for (ws of trashedWorkspaces(); track ws.id) {
-        <div class="workspace-card" [class.processing]="processingId() === ws.id" [class.selected]="isSelected(ws.id)"
-            [class.in-select-mode]="selectionMode()" (click)="selectionMode() ? toggleSelect(ws.id) : null">
 
-            <!-- Selection checkbox (square) -->
-            @if (selectionMode()) {
-            <div class="card-checkbox" (click)="$event.stopPropagation(); toggleSelect(ws.id)">
-                <i class="bi" [class.bi-check-square-fill]="isSelected(ws.id)"
-                    [class.bi-square]="!isSelected(ws.id)"></i>
-            </div>
-            }
+    <!-- Workspaces section -->
+    @if (trashedWorkspaces().length > 0) {
+    <div class="trash-section">
+        <div class="section-label">Workspaces</div>
+        <div class="workspace-list">
+            @for (ws of trashedWorkspaces(); track ws.id) {
+            <div class="workspace-card" [class.processing]="processingId() === ws.id"
+                [class.selected]="isSelected('ws:' + ws.id)" [class.in-select-mode]="selectionMode()"
+                (click)="selectionMode() ? toggleSelect('ws:' + ws.id) : null">
 
-            <div class="card-info">
-                <div class="icon-wrapper">
-                    <i class="bi" [class.bi-person-workspace]="ws.role === 'personal'"
-                        [class.bi-people]="ws.role === 'team'">
-                    </i>
+                <!-- Selection checkbox (square) -->
+                @if (selectionMode()) {
+                <div class="card-checkbox" (click)="$event.stopPropagation(); toggleSelect('ws:' + ws.id)">
+                    <i class="bi" [class.bi-check-square-fill]="isSelected('ws:' + ws.id)"
+                        [class.bi-square]="!isSelected('ws:' + ws.id)"></i>
                 </div>
-                <div class="details">
-                    <h3>{{ ws.name }}</h3>
-                    <span class="role-badge" [class.team]="ws.role === 'team'">
-                        {{ ws.role | titlecase }}
-                    </span>
-                </div>
-            </div>
+                }
 
-            @if (!selectionMode()) {
-            <div class="card-status">
-                <div class="status-badge trashed">
-                    <i class="bi bi-clock-history"></i>
-                    <span>{{ getDaysLeft(ws.trashedAt) }}</span>
-                </div>
-                <span class="time-info">Trashed {{ ws.trashedAt | timeAgo }}</span>
-
-                <div class="card-actions">
-                    @if (confirmingDeleteId() === ws.id) {
-                    <div class="confirm-actions">
-                        <span class="confirm-text">Delete permanently?</span>
-                        <div class="btn-group">
-                            <button class="confirm-yes" (click)="confirmDelete(ws.id)"
-                                [disabled]="processingId() === ws.id">
-                                @if (processingId() === ws.id) {
-                                <i class="bi bi-arrow-repeat spin"></i>
-                                } @else {
-                                Yes
-                                }
-                            </button>
-                            <button class="confirm-no" (click)="cancelDelete()"
-                                [disabled]="processingId() === ws.id">No</button>
-                        </div>
+                <div class="card-info">
+                    <div class="icon-wrapper">
+                        <i class="bi" [class.bi-person-workspace]="ws.role === 'personal'"
+                            [class.bi-people]="ws.role === 'team'">
+                        </i>
                     </div>
-                    } @else {
-                    <button class="action-btn restore-btn" [disabled]="processingId() === ws.id"
-                        (click)="restoreWorkspace(ws.id)" aria-label="Restore" title="Restore">
-                        @if (processingId() === ws.id) {
-                        <i class="bi bi-arrow-repeat spin"></i>
-                        } @else {
-                        <i class="bi bi-arrow-counterclockwise"></i>
-                        }
-                    </button>
-                    <button class="action-btn delete-btn" [disabled]="processingId() === ws.id"
-                        (click)="requestPermanentDelete(ws.id)" aria-label="Delete permanently"
-                        title="Delete permanently">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                    }
+                    <div class="details">
+                        <h3>{{ ws.name }}</h3>
+                        <span class="role-badge" [class.team]="ws.role === 'team'">
+                            {{ ws.role | titlecase }}
+                        </span>
+                    </div>
                 </div>
+
+                @if (!selectionMode()) {
+                <div class="card-status">
+                    <div class="status-badge trashed">
+                        <i class="bi bi-clock-history"></i>
+                        <span>{{ getDaysLeft(ws.trashedAt) }}</span>
+                    </div>
+                    <span class="time-info">Trashed {{ ws.trashedAt | timeAgo }}</span>
+
+                    <div class="card-actions">
+                        @if (confirmingDeleteId() === ws.id) {
+                        <div class="confirm-actions">
+                            <span class="confirm-text">Delete permanently?</span>
+                            <div class="btn-group">
+                                <button class="confirm-yes" (click)="confirmDelete(ws.id)"
+                                    [disabled]="processingId() === ws.id">
+                                    @if (processingId() === ws.id) {
+                                    <i class="bi bi-arrow-repeat spin"></i>
+                                    } @else {
+                                    Yes
+                                    }
+                                </button>
+                                <button class="confirm-no" (click)="cancelDelete()"
+                                    [disabled]="processingId() === ws.id">No</button>
+                            </div>
+                        </div>
+                        } @else {
+                        <button class="action-btn restore-btn" [disabled]="processingId() === ws.id"
+                            (click)="restoreWorkspace(ws.id)" aria-label="Restore" title="Restore">
+                            @if (processingId() === ws.id) {
+                            <i class="bi bi-arrow-repeat spin"></i>
+                            } @else {
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            }
+                        </button>
+                        <button class="action-btn delete-btn" [disabled]="processingId() === ws.id"
+                            (click)="requestPermanentDelete(ws.id)" aria-label="Delete permanently"
+                            title="Delete permanently">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        }
+                    </div>
+                </div>
+                }
             </div>
             }
         </div>
-        }
     </div>
+    }
+
+    <!-- Spaces section -->
+    @if (trashedSpaces().length > 0) {
+    <div class="trash-section">
+        <div class="section-label">Spaces</div>
+        <div class="workspace-list">
+            @for (space of trashedSpaces(); track space.id) {
+            <div class="workspace-card space-card" [class.processing]="processingId() === space.id"
+                [class.selected]="isSelected('sp:' + space.id)" [class.in-select-mode]="selectionMode()"
+                (click)="selectionMode() ? toggleSelect('sp:' + space.id) : null">
+
+                <!-- Selection checkbox -->
+                @if (selectionMode()) {
+                <div class="card-checkbox" (click)="$event.stopPropagation(); toggleSelect('sp:' + space.id)">
+                    <i class="bi" [class.bi-check-square-fill]="isSelected('sp:' + space.id)"
+                        [class.bi-square]="!isSelected('sp:' + space.id)"></i>
+                </div>
+                }
+
+                <div class="card-info">
+                    <div class="icon-wrapper space-icon">
+                        <i class="bi bi-folder"></i>
+                    </div>
+                    <div class="details">
+                        <h3>{{ space.name }}</h3>
+                        <span class="role-badge space-badge">Space</span>
+                    </div>
+                </div>
+
+                @if (!selectionMode()) {
+                <div class="card-status">
+                    <div class="status-badge trashed">
+                        <i class="bi bi-clock-history"></i>
+                        <span>{{ getDaysLeft(space.trashedAt) }}</span>
+                    </div>
+                    <span class="time-info">Trashed {{ space.trashedAt | timeAgo }}</span>
+
+                    <div class="card-actions">
+                        @if (confirmingDeleteSpaceId() === space.id) {
+                        <div class="confirm-actions">
+                            <span class="confirm-text">Delete permanently?</span>
+                            <div class="btn-group">
+                                <button class="confirm-yes" (click)="confirmDeleteSpace(space.id)"
+                                    [disabled]="processingId() === space.id">
+                                    @if (processingId() === space.id) {
+                                    <i class="bi bi-arrow-repeat spin"></i>
+                                    } @else {
+                                    Yes
+                                    }
+                                </button>
+                                <button class="confirm-no" (click)="cancelDeleteSpace()"
+                                    [disabled]="processingId() === space.id">No</button>
+                            </div>
+                        </div>
+                        } @else {
+                        <button class="action-btn restore-btn" [disabled]="processingId() === space.id"
+                            (click)="restoreSpace(space.id)" aria-label="Restore" title="Restore">
+                            @if (processingId() === space.id) {
+                            <i class="bi bi-arrow-repeat spin"></i>
+                            } @else {
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            }
+                        </button>
+                        <button class="action-btn delete-btn" [disabled]="processingId() === space.id"
+                            (click)="requestDeleteSpace(space.id)" aria-label="Delete permanently"
+                            title="Delete permanently">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+    </div>
+    }
+
     }
 </div>

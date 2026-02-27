@@ -1,7 +1,10 @@
 import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { Workspace } from '../../../core/interfaces/workspace';
+import { Space } from '../../../core/interfaces/space';
 import { WorkspaceService } from '../../../core/workspaces/workspace.service';
+import { SpaceService } from '../../../core/services/space.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { FileSystemService } from '../../../core/services/file-system.service';
 import { TimeAgoPipe } from '../../ui/common/time-ago/time-ago-pipe';
 
@@ -14,9 +17,12 @@ import { TimeAgoPipe } from '../../ui/common/time-ago/time-ago-pipe';
 })
 export class TrashComponent implements OnInit, OnDestroy {
     private workspaceService = inject(WorkspaceService);
+    private spaceService = inject(SpaceService);
+    private authService = inject(AuthService);
     private fileSystem = inject(FileSystemService);
 
     trashedWorkspaces = signal<Workspace[]>([]);
+    trashedSpaces = signal<Space[]>([]);
     isLoading = signal<boolean>(true);
 
     // ── Single-item UI state ──
@@ -36,12 +42,15 @@ export class TrashComponent implements OnInit, OnDestroy {
 
     selectedCount = computed(() => this.selectedIds().size);
     isAllSelected = computed(() => {
-        const ws = this.trashedWorkspaces();
+        const total = this.trashedWorkspaces().length + this.trashedSpaces().length;
         const sel = this.selectedIds();
-        return ws.length > 0 && sel.size === ws.length;
+        return total > 0 && sel.size === total;
     });
+    hasAnyTrashed = computed(() => this.trashedWorkspaces().length > 0 || this.trashedSpaces().length > 0);
 
-    private sub: any;
+    private wsSub: any;
+    private spaceSub: any;
+    private activeWorkspaceName: string | null = null;
 
     async ngOnInit() {
         // Check filesystem mode and permission state
@@ -51,13 +60,14 @@ export class TrashComponent implements OnInit, OnDestroy {
             this.needsReauth.set(true);
         }
 
-        this.sub = this.workspaceService.trashedWorkspaces$.subscribe((list: Workspace[]) => {
+        this.wsSub = this.workspaceService.trashedWorkspaces$.subscribe((list: Workspace[]) => {
             this.trashedWorkspaces.set(list);
             this.isLoading.set(false);
 
             // Clean up stale selections
             if (this.selectionMode()) {
-                const validIds = new Set(list.map(w => w.id));
+                const validIds = new Set(list.map(w => 'ws:' + w.id));
+                this.trashedSpaces().forEach(s => validIds.add('sp:' + s.id));
                 this.selectedIds.update(ids => {
                     const next = new Set<string>();
                     ids.forEach(id => { if (validIds.has(id)) next.add(id); });
@@ -65,10 +75,20 @@ export class TrashComponent implements OnInit, OnDestroy {
                 });
             }
         });
+
+        // Load trashed spaces for the current workspace
+        const workspace = await this.authService.getCurrentWorkspace();
+        if (workspace) {
+            this.activeWorkspaceName = workspace.name;
+            this.spaceSub = this.spaceService.liveTrashedSpaces$(workspace.id).subscribe(
+                (list: Space[]) => this.trashedSpaces.set(list)
+            );
+        }
     }
 
     ngOnDestroy() {
-        this.sub?.unsubscribe();
+        this.wsSub?.unsubscribe();
+        this.spaceSub?.unsubscribe();
     }
 
     // ── Re-auth (user-gesture triggered) ──
@@ -125,7 +145,10 @@ export class TrashComponent implements OnInit, OnDestroy {
         if (this.isAllSelected()) {
             this.selectedIds.set(new Set());
         } else {
-            const allIds = new Set(this.trashedWorkspaces().map(w => w.id));
+            const allIds = new Set([
+                ...this.trashedWorkspaces().map(w => 'ws:' + w.id),
+                ...this.trashedSpaces().map(s => 'sp:' + s.id)
+            ]);
             this.selectedIds.set(allIds);
         }
     }
@@ -138,8 +161,12 @@ export class TrashComponent implements OnInit, OnDestroy {
 
         try {
             const ids = Array.from(this.selectedIds());
-            for (const id of ids) {
-                await this.workspaceService.restoreFromTrash(id);
+            for (const prefixedId of ids) {
+                if (prefixedId.startsWith('ws:')) {
+                    await this.workspaceService.restoreFromTrash(prefixedId.slice(3));
+                } else if (prefixedId.startsWith('sp:') && this.activeWorkspaceName) {
+                    await this.spaceService.restoreFromTrash(prefixedId.slice(3), this.activeWorkspaceName);
+                }
             }
             this.exitSelectionMode();
         } finally {
@@ -167,8 +194,12 @@ export class TrashComponent implements OnInit, OnDestroy {
             await this.ensureStorageForDelete();
 
             const ids = Array.from(this.selectedIds());
-            for (const id of ids) {
-                await this.workspaceService.permanentlyDelete(id);
+            for (const prefixedId of ids) {
+                if (prefixedId.startsWith('ws:')) {
+                    await this.workspaceService.permanentlyDelete(prefixedId.slice(3));
+                } else if (prefixedId.startsWith('sp:')) {
+                    await this.spaceService.permanentlyDelete(prefixedId.slice(3), this.activeWorkspaceName ?? undefined);
+                }
             }
             this.exitSelectionMode();
         } finally {
@@ -231,6 +262,42 @@ export class TrashComponent implements OnInit, OnDestroy {
         const granted = await this.fileSystem.requestPermissionWithGesture();
         if (granted) {
             this.needsReauth.set(false);
+        }
+    }
+
+    // ── Space-specific actions ──
+
+    async restoreSpace(spaceId: string) {
+        if (this.processingId()) return;
+        if (!this.activeWorkspaceName) return;
+        this.processingId.set(spaceId);
+
+        try {
+            await this.spaceService.restoreFromTrash(spaceId, this.activeWorkspaceName);
+        } finally {
+            this.processingId.set(null);
+        }
+    }
+
+    confirmingDeleteSpaceId = signal<string | null>(null);
+
+    requestDeleteSpace(spaceId: string) {
+        this.confirmingDeleteSpaceId.set(spaceId);
+    }
+
+    cancelDeleteSpace() {
+        this.confirmingDeleteSpaceId.set(null);
+    }
+
+    async confirmDeleteSpace(spaceId: string) {
+        if (this.processingId()) return;
+        this.processingId.set(spaceId);
+
+        try {
+            await this.spaceService.permanentlyDelete(spaceId, this.activeWorkspaceName ?? undefined);
+        } finally {
+            this.processingId.set(null);
+            this.confirmingDeleteSpaceId.set(null);
         }
     }
 }

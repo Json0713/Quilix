@@ -75,8 +75,18 @@
             <ul class="nav-list space-list">
                 @for (space of spaces(); track space.id) {
                 <li class="nav-item space-item" [class.menu-open]="openMenuId() === space.id">
+
+                    @if (renamingSpaceId() === space.id) {
+                    <!-- Inline rename input -->
+                    <div class="space-rename-inline" [class.has-error]="renameError()">
+                        <i class="bi bi-folder nav-icon rename-icon"></i>
+                        <input #renameInput type="text" class="space-rename-input" [value]="renameValue()"
+                            (input)="onRenameInput($any($event.target).value)" (keydown)="onRenameKeydown($event)"
+                            maxlength="50" />
+                    </div>
+                    } @else {
                     <a class="nav-link space-link" [title]="space.name" [routerLink]="'./spaces/' + space.id"
-                        routerLinkActive="active" (click)="onSpaceClick(space)">
+                        routerLinkActive="active" #rla="routerLinkActive" (click)="onSpaceClick(space)">
                         <i class="bi bi-folder nav-icon"></i>
                         @if (!isCollapsed()) {
                         <span class="nav-label">{{ space.name }}</span>
@@ -90,11 +100,16 @@
 
                     @if (openMenuId() === space.id) {
                     <div class="space-menu-dropdown">
-                        <button class="dropdown-item delete-item" (click)="deleteSpace(space.id, $event)">
+                        <button class="dropdown-item rename-item" (click)="startRename(space, $event)">
+                            <i class="bi bi-pencil"></i>
+                            <span>Rename</span>
+                        </button>
+                        <button class="dropdown-item trash-item" (click)="trashSpace(space.id, $event)">
                             <i class="bi bi-trash3"></i>
-                            <span>Delete</span>
+                            <span>Move to Trash</span>
                         </button>
                     </div>
+                    }
                     }
                     }
                 </li>
