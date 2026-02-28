@@ -1,7 +1,7 @@
 .sidebar {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: calc(100% - 42px);
     width: 260px;
     background-color: var(--surface-main);
     color: var(--text-main);
@@ -10,7 +10,7 @@
         transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     position: fixed;
-    top: 0;
+    top: 42px;
     left: 0;
 
     z-index: 1100; // Higher than backdrop
@@ -578,7 +578,7 @@
 @media (max-width: 770px) {
     .sidebar {
         position: fixed;
-        top: 0;
+        top: 42px;
         left: 0;
         bottom: 0;
         width: 280px; // Slightly wider for mobile

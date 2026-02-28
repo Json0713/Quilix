@@ -1,5 +1,8 @@
 <div class="layout-wrapper" [class.collapsed]="isCollapsed()">
 
+  <!-- Global Tab Bar at Top -->
+  <app-tab-bar class="global-tab-bar" />
+
   <!-- Mobile Toggle Button -->
   <button class="mobile-toggle" (click)="toggleMobileSidebar()" aria-label="Toggle Menu">
     <i class="bi bi-layout-sidebar"></i>
@@ -13,7 +16,6 @@
   <app-team-sidebar />
 
   <section class="team-root">
-    <app-tab-bar />
     <main class="team">
       <!-- @if (showEnableNotif) {
       <div class="notification-banner p-3">
