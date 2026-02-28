@@ -24,6 +24,7 @@ export class NavigationBar implements OnInit {
     private router = inject(Router);
 
     @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+    @ViewChild('navSearch') navSearch!: ElementRef<HTMLDivElement>;
 
     breadcrumbs: Breadcrumb[] = [];
     isMobileOpen = this.sidebarService.isMobileOpen;
@@ -48,6 +49,22 @@ export class NavigationBar implements OnInit {
             event.preventDefault(); // Stop default browser behavior natively
             if (this.searchInput) {
                 this.searchInput.nativeElement.focus();
+            }
+        }
+    }
+
+    @HostListener('window:resize')
+    onResize() {
+        if (window.innerWidth > 768 && this.isMobileSearchActive) {
+            this.closeMobileSearch();
+        }
+    }
+
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: MouseEvent) {
+        if (this.isMobileSearchActive && this.navSearch) {
+            if (!this.navSearch.nativeElement.contains(event.target as Node)) {
+                this.closeMobileSearch();
             }
         }
     }

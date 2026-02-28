@@ -31,22 +31,26 @@
     </div>
 
     <!-- Right: Global Search -->
-    <div class="nav-search" [class.mobile-search-active]="isMobileSearchActive">
-        <!-- Mobile Search Toggle Icon -->
-        <button class="mobile-search-toggle" (click)="toggleMobileSearch()" title="Search">
+    <div #navSearch class="nav-search" [class.mobile-search-active]="isMobileSearchActive">
+        <!-- Mobile Search Toggle Icon (always visible on mobile) -->
+        <button class="mobile-search-toggle" (click)="toggleMobileSearch()" title="Search"
+            [class.active]="isMobileSearchActive">
             <i class="bi bi-search"></i>
         </button>
 
-        <!-- The actual search input wrapper -->
-        <div class="search-input-wrapper">
-            <!-- Mobile Close Button (inside wrapper) -->
+        <!-- Dropdown / Desktop Input Area -->
+        <div class="search-container" [class.dropdown-active]="isMobileSearchActive">
+            <div class="search-input-wrapper">
+                <i class="bi bi-search search-icon" *ngIf="!isMobileSearchActive"></i>
+                <input type="text" #searchInput class="global-search-input" placeholder="Search everywhere...">
+                <!-- Keyboard shortcut hint like macOS Spotlight -->
+                <div class="search-shortcut">Ctrl K</div>
+            </div>
+
+            <!-- Mobile Close Button (beside the input wrapper in dropdown) -->
             <button class="mobile-search-close" (click)="closeMobileSearch()" *ngIf="isMobileSearchActive">
                 <i class="bi bi-x-lg"></i>
             </button>
-            <i class="bi bi-search search-icon" *ngIf="!isMobileSearchActive"></i>
-            <input type="text" #searchInput class="global-search-input" placeholder="Search everywhere...">
-            <!-- Keyboard shortcut hint like macOS Spotlight -->
-            <div class="search-shortcut">Ctrl K</div>
         </div>
     </div>
 </div>
