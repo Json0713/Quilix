@@ -1,4 +1,10 @@
 <div class="navigation-bar">
+    <!-- Mobile Sidebar Toggle -->
+    <button class="nav-mobile-toggle" [class.hidden]="isMobileOpen()" (click)="toggleMobileSidebar()"
+        aria-label="Toggle Menu">
+        <i class="bi bi-layout-sidebar"></i>
+    </button>
+
     <!-- Left: Window Controls (File Manager style) -->
     <div class="nav-controls">
         <button class="nav-btn" [class.disabled]="!canGoBack" (click)="goBack()" title="Back">
@@ -25,9 +31,19 @@
     </div>
 
     <!-- Right: Global Search -->
-    <div class="nav-search">
+    <div class="nav-search" [class.mobile-search-active]="isMobileSearchActive">
+        <!-- Mobile Search Toggle Icon -->
+        <button class="mobile-search-toggle" (click)="toggleMobileSearch()" title="Search">
+            <i class="bi bi-search"></i>
+        </button>
+
+        <!-- The actual search input wrapper -->
         <div class="search-input-wrapper">
-            <i class="bi bi-search search-icon"></i>
+            <!-- Mobile Close Button (inside wrapper) -->
+            <button class="mobile-search-close" (click)="closeMobileSearch()" *ngIf="isMobileSearchActive">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <i class="bi bi-search search-icon" *ngIf="!isMobileSearchActive"></i>
             <input type="text" #searchInput class="global-search-input" placeholder="Search everywhere...">
             <!-- Keyboard shortcut hint like macOS Spotlight -->
             <div class="search-shortcut">Ctrl K</div>

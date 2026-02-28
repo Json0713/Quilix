@@ -6,11 +6,6 @@
   <!-- Global Address/Navigation Bar -->
   <app-navigation-bar />
 
-  <!-- Mobile Toggle Button -->
-  <button class="mobile-toggle" (click)="toggleMobileSidebar()" aria-label="Toggle Menu">
-    <i class="bi bi-layout-sidebar"></i>
-  </button>
-
   <!-- Sidebar Backdrop (Mobile Only) -->
   @if (isMobileOpen()) {
   <div class="sidebar-backdrop" (click)="closeMobileSidebar()"></div>

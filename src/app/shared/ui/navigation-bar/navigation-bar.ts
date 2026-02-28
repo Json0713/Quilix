@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
 import { NavigationControlService } from '../../../core/services/navigation-control.service';
+import { SidebarService } from '../../../core/sidebar/sidebar.service';
 
 interface Breadcrumb {
     label: string;
@@ -19,11 +20,14 @@ interface Breadcrumb {
 })
 export class NavigationBar implements OnInit {
     private navControl = inject(NavigationControlService);
+    private sidebarService = inject(SidebarService);
     private router = inject(Router);
 
     @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
     breadcrumbs: Breadcrumb[] = [];
+    isMobileOpen = this.sidebarService.isMobileOpen;
+    isMobileSearchActive = false;
 
     constructor() {
         this.router.events.pipe(
@@ -66,6 +70,25 @@ export class NavigationBar implements OnInit {
 
     refresh() {
         this.navControl.refresh();
+    }
+
+    toggleMobileSidebar() {
+        this.sidebarService.toggleMobile();
+    }
+
+    toggleMobileSearch() {
+        this.isMobileSearchActive = !this.isMobileSearchActive;
+        if (this.isMobileSearchActive) {
+            setTimeout(() => {
+                if (this.searchInput) {
+                    this.searchInput.nativeElement.focus();
+                }
+            }, 50);
+        }
+    }
+
+    closeMobileSearch() {
+        this.isMobileSearchActive = false;
     }
 
     private generateBreadcrumbs() {
