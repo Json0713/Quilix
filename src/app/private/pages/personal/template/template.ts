@@ -5,12 +5,13 @@ import { OsNotificationService } from '../../../../core/notifications/os-notific
 import { PersonalSidebarComponent } from '../common/sidebar/sidebar';
 import { SidebarService } from '../../../../core/sidebar/sidebar.service';
 import { TabBarComponent } from '../../../../shared/ui/tab-bar/tab-bar';
+import { NavigationBar } from '../../../../shared/ui/navigation-bar/navigation-bar';
 import { TabService } from '../../../../core/services/tab.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-personal-template',
-  imports: [RouterOutlet, PersonalSidebarComponent, TabBarComponent],
+  imports: [RouterOutlet, PersonalSidebarComponent, TabBarComponent, NavigationBar],
   templateUrl: './template.html',
   styleUrl: './template.scss',
 })

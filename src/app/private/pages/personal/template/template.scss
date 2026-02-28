@@ -6,7 +6,7 @@
 .layout-wrapper {
   display: flex;
   flex: 1;
-  padding-top: 42px;
+  padding-top: 90px;
 
   min-height: 100vh;
   min-width: 0;
@@ -27,7 +27,7 @@
 .mobile-toggle {
   display: none;
   position: fixed;
-  top: calc(42px + 1.25rem);
+  top: calc(90px + 1.25rem);
   left: 1.25rem;
   z-index: 1050;
   width: 32px;
@@ -57,7 +57,7 @@
 .sidebar-backdrop {
   display: none;
   position: fixed;
-  top: 42px;
+  top: 90px;
   left: 0;
   right: 0;
   bottom: 0;

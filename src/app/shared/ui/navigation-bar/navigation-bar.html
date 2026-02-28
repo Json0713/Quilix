@@ -1,0 +1,36 @@
+<div class="navigation-bar">
+    <!-- Left: Window Controls (File Manager style) -->
+    <div class="nav-controls">
+        <button class="nav-btn" [class.disabled]="!canGoBack" (click)="goBack()" title="Back">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <button class="nav-btn" [class.disabled]="!canGoForward" (click)="goForward()" title="Forward">
+            <i class="bi bi-arrow-right"></i>
+        </button>
+        <button class="nav-btn" (click)="refresh()" title="Refresh">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
+    </div>
+
+    <!-- Center: Address Bar / Breadcrumbs -->
+    <div class="nav-address-bar">
+        <div class="breadcrumbs">
+            <ng-container *ngFor="let crumb of breadcrumbs; let i = index">
+                <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast">
+                    {{ crumb.label }}
+                </a>
+                <i *ngIf="!crumb.isLast" class="bi bi-chevron-right breadcrumb-separator"></i>
+            </ng-container>
+        </div>
+    </div>
+
+    <!-- Right: Global Search -->
+    <div class="nav-search">
+        <div class="search-input-wrapper">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" #searchInput class="global-search-input" placeholder="Search everywhere...">
+            <!-- Keyboard shortcut hint like macOS Spotlight -->
+            <div class="search-shortcut">Ctrl K</div>
+        </div>
+    </div>
+</div>
