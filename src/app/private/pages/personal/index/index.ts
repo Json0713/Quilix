@@ -1,38 +1,36 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
-import { AuthService } from '../../../../core/auth/auth.service';
-import { ModalService } from '../../../../services/ui/common/modal/modal';
+import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
+import { Breadcrumb } from '../../../../shared/ui/common/breadcrumb/breadcrumb';
+import { StorageAnalyticsService, StorageMetrics } from '../../../../core/services/storage-analytics.service';
+import { Loader } from '../../../../shared/ui/common/loader/loader';
 
 @Component({
   selector: 'app-personal-index',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, Breadcrumb, Loader],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
 export class PersonalIndex implements OnInit {
+  private breadcrumbService = inject(BreadcrumbService);
+  public analytics = inject(StorageAnalyticsService);
 
-  constructor(
-    private auth: AuthService,
-    private modal: ModalService,
-  ) { }
+  isLoading = signal<boolean>(true);
+  metrics = signal<StorageMetrics | null>(null);
 
-  ngOnInit(): void {
-    // Oninitialization logic can be added here if needed.
-    // ...
+  async ngOnInit() {
+    this.breadcrumbService.setTitle('Personal Home');
+
+    // Simulate slight natural loading to let background fs queries resolve warmly
+    const payload = await this.analytics.getMetrics();
+    this.metrics.set(payload);
+    this.isLoading.set(false);
   }
 
-  async logout(): Promise<void> {
-    const confirmed = await this.modal.confirm(
-      'Are you sure you want to log out?',
-      {
-        title: 'Confirm Logout',
-        confirmText: 'Logout',
-        cancelText: 'Cancel',
-      }
-    );
-
-    if (!confirmed) return;
-
-    await this.auth.logout();
+  get pieChartStyle(): string {
+    const p = this.metrics()?.percentage || 0;
+    return `conic-gradient(var(--primary) ${p}%, var(--surface-alt) ${p}%)`;
   }
 }

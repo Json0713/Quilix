@@ -1,36 +1,66 @@
-<section class="page">
-  <div class="page-container">
+<app-breadcrumb></app-breadcrumb>
 
-    <!-- Page header -->
-    <header class="page-header">
-      <div class="page-header-content">
-        <h1 class="page-title">Personal Workspace</h1>
+<div class="dashboard-container" *ngIf="!isLoading()">
 
-        <!-- Temporary actions (move to settings later) -->
-        <div class="page-actions">
-          <button
-            type="button"
-            class="btn btn-danger rounded-5"
-            (click)="logout()"
-          >
-            Logout
-          </button>
+  <!-- Storage Overview Cards -->
+  <div class="metrics-grid">
+
+    <!-- Health / Primary Chart -->
+    <div class="metric-card primary-card">
+      <div class="chart-container">
+        <div class="donut-chart" [style.background]="pieChartStyle">
+          <div class="donut-hole">
+            <span class="percentage">{{ metrics()?.percentageDisplay }}%</span>
+            <span class="subtext">Used</span>
+          </div>
         </div>
       </div>
-    </header>
+      <div class="card-details">
+        <h3>Storage Health</h3>
+        <p>Engine: <strong>{{ metrics()?.mode === 'filesystem' ? 'Local System' : 'IndexedDB' }}</strong></p>
+      </div>
+    </div>
 
-    <!-- Page main content -->
-    <main class="page-content">
+    <!-- Capacity Card -->
+    <div class="metric-card stat-card">
+      <div class="stat-icon type-capacity">
+        <i class="fi fi-rr-database"></i>
+      </div>
+      <div class="stat-text">
+        <span class="label">Capacity Used <span class="badge">{{ metrics()?.mode === 'filesystem' ? 'Drive' : 'Database'
+            }}</span></span>
+        <span class="value">{{ analytics.formatBytes(metrics()?.usage || 0) }}</span>
+        <span class="limit">of {{ analytics.formatBytes(metrics()?.quota || 0) }} max limit</span>
+      </div>
+    </div>
 
-      <section class="page-section">
-        <h2>Welcome, To your Personal Workspace!</h2>
-        <p>
-          This is your workspace where you can access your courses
-          and track your progress.
-        </p>
-      </section>
+    <!-- Workspace Record Count -->
+    <div class="metric-card stat-card">
+      <div class="stat-icon type-records">
+        <i class="fi fi-rr-folder"></i>
+      </div>
+      <div class="stat-text">
+        <span class="label">Current Workspace Spaces</span>
+        <span class="value">{{ metrics()?.totalSpaces || 0 }}</span>
+        <span class="limit">Active data directories</span>
+      </div>
+    </div>
 
-    </main>
+    <!-- Global Tabs -->
+    <div class="metric-card stat-card">
+      <div class="stat-icon type-entities">
+        <i class="fi fi-rr-layers"></i>
+      </div>
+      <div class="stat-text">
+        <span class="label">Total System Entities</span>
+        <span class="value">{{ metrics()?.totalEntities || 0 }}</span>
+        <span class="limit">Records mapping system-wide</span>
+      </div>
+    </div>
 
   </div>
-</section>
+</div>
+
+<div class="loading-state" *ngIf="isLoading()">
+  <app-loader></app-loader>
+</div>
