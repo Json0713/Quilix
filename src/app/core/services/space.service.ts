@@ -142,6 +142,17 @@ export class SpaceService {
     }
 
     /**
+     * Batch update all space sequential positions natively from Drag & Drop CDK mutations.
+     */
+    async updateSpaceOrders(orderedSpaces: Space[]): Promise<void> {
+        // Re-assign order properties natively mapped down from their organized UI index constraints
+        const updatedSpaces = orderedSpaces.map((space, index) => ({ ...space, order: index }));
+
+        // Batch persist the exact physical DOM order out to Dexie
+        await db.spaces.bulkPut(updatedSpaces);
+    }
+
+    /**
      * Move a space to trash (soft-delete).
      * Folder is preserved on disk — only removed on permanent delete.
      */

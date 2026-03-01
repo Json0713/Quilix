@@ -1,7 +1,8 @@
 import { Component, inject, signal, OnInit, OnDestroy, ElementRef, ViewChild, ViewChildren, QueryList, HostListener } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { SidebarService } from '../../../../../core/sidebar/sidebar.service';
 import { AuthService } from '../../../../../core/auth/auth.service';
 import { SpaceService } from '../../../../../core/services/space.service';
@@ -13,7 +14,7 @@ import { SettingsKitComponent } from '../settings-kit/settings-kit';
 @Component({
     selector: 'app-team-sidebar',
     standalone: true,
-    imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, SettingsKitComponent],
+    imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, DragDropModule, SettingsKitComponent],
     templateUrl: './sidebar.html',
     styleUrl: './sidebar.scss',
 })
@@ -22,6 +23,8 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
     private authService = inject(AuthService);
     private spaceService = inject(SpaceService);
     private tabService = inject(TabService);
+    private router = inject(Router);
+    private route = inject(ActivatedRoute);
 
     isCollapsed = this.sidebarService.isCollapsed;
     isMobileOpen = this.sidebarService.isMobileOpen;
@@ -104,6 +107,51 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
     onSpaceClick(space: Space) {
         this.tabService.updateActiveTabRoute(`./spaces/${space.id}`, space.name, 'bi bi-folder');
         this.sidebarService.closeMobile();
+    }
+
+    // ── Space Ordering & Tear-off ──
+    async onSpaceDrop(event: CdkDragDrop<Space[]>) {
+        const currentSpaces = [...this.spaces()];
+
+        // Tear-off Logic: If the user dragged a Space outside the sidebar constraints
+        if (!event.isPointerOverContainer) {
+            const spaceToTear = currentSpaces[event.previousIndex];
+
+            // Generate secure explicit 1-time token mapping isolated window handoff parameters
+            const tearOffId = crypto.randomUUID();
+            const spaceRoute = `./spaces/${spaceToTear.id}`;
+
+            // We do not have history since the space isn't an active tab currently.
+            // We just pass the target constraints exactly like how we render sidebar native clicks.
+            const transferData = {
+                tabState: { route: spaceRoute, label: spaceToTear.name, icon: 'bi bi-folder' },
+                historyPayload: '' // Empty stack for a fresh window
+            };
+
+            // Write payload natively
+            localStorage.setItem(`quilix_tearoff_${tearOffId}`, JSON.stringify(transferData));
+
+            // Construct strictly isolated absolute URL payloads
+            const targetUrl = this.router.createUrlTree([spaceRoute], {
+                relativeTo: this.route,
+                queryParams: { tearOffId }
+            }).toString();
+
+            // Fire separate physical popup identical to OS bounds
+            window.open(targetUrl, '_blank', 'popup,width=1024,height=768');
+            return;
+        }
+
+        // Internal Reordering Logic
+        if (event.previousIndex !== event.currentIndex) {
+            // Natively mutate array sorting mathematically inside the local Signal
+            moveItemInArray(currentSpaces, event.previousIndex, event.currentIndex);
+            // Optimistically update the UI so there's no layout jitter!
+            this.spaces.set(currentSpaces);
+
+            // Sync permanent state
+            await this.spaceService.updateSpaceOrders(currentSpaces);
+        }
     }
 
     // ── Space creation ──
