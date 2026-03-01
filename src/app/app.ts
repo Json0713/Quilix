@@ -17,6 +17,7 @@ import { Tooltip } from './shared/ui/common/tooltip/tooltip';
 import { TooltipManagerService } from './core/services/tooltip-manager.service';
 import { FileSystemService } from './core/services/file-system.service';
 import { SystemSyncService } from './core/services/system-sync.service';
+import { PwaNavigationService } from './core/services/pwa-navigation.service';
 
 @Component({
   selector: 'app-root',
@@ -38,6 +39,7 @@ export class App {
   private tooltipManager = inject(TooltipManagerService);
   private fileSystem = inject(FileSystemService);
   private systemSync = inject(SystemSyncService);
+  private pwaNav = inject(PwaNavigationService);
 
   constructor() {
     this.toastRelay.consume();
@@ -47,6 +49,7 @@ export class App {
     this.tooltipManager.init();
     this.systemSync.init();
     this.validateFileSystem();
+    this.pwaNav.init();
   }
 
   private async validateFileSystem() {
