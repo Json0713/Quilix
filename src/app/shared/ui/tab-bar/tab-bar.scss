@@ -129,6 +129,12 @@
         }
     }
 
+    .tab-separator {
+        color: rgba(113, 113, 113, 0.255);
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
     .tab-new {
         display: flex;
         align-items: center;
@@ -141,7 +147,7 @@
         color: var(--text-muted);
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 0.95rem;
+        font-size: 1.2rem;
         flex-shrink: 0;
 
         &:hover {
