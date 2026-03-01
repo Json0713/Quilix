@@ -61,6 +61,11 @@ export class AppDatabase extends Dexie {
             });
         });
 
+        // Add compound indexing to vastly speed up Window-specific tab lookups
+        this.version(7).stores({
+            tabs: 'id, workspaceId, windowId, [workspaceId+windowId], order'
+        });
+
         // Open database connection early to optimize initial load
         this.open().catch(err => {
             console.error('[DB] Failed to open database:', err);

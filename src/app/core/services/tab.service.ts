@@ -17,10 +17,19 @@ export class TabService {
 
     constructor() {
         let existingId = sessionStorage.getItem('quilix_windowId');
-        if (!existingId) {
+
+        // INTERCEPT WINDOW CLONES:
+        // window.open natively copies sessionStorage from parent to child, carrying over the WRONG Window ID.
+        // If we boot up with a tearOffId parameter, we FORCE a brand new Window ID to violently separate scopes.
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('tearOffId')) {
+            existingId = crypto.randomUUID();
+            sessionStorage.setItem('quilix_windowId', existingId);
+        } else if (!existingId) {
             existingId = crypto.randomUUID();
             sessionStorage.setItem('quilix_windowId', existingId);
         }
+
         this.windowSessionId = existingId;
     }
 
@@ -31,7 +40,8 @@ export class TabService {
 
         // Ensure we load strictly tabs mapped to this physical Window scope
         let existing = await db.tabs
-            .where({ workspaceId: workspaceId, windowId: this.windowSessionId })
+            .where('[workspaceId+windowId]')
+            .equals([workspaceId, this.windowSessionId])
             .sortBy('order');
 
         // Check if this Window was spawned as a Tear-off!
@@ -44,13 +54,17 @@ export class TabService {
                 const parsedTearOff = JSON.parse(rawPayload);
 
                 // Construct strictly localized Tab physically bound here now
-                const tornTab = this.buildTab(
+                // We generate the UUID immediately to map the history perfectly explicitly.
+                const newTabId = crypto.randomUUID();
+                const tornTab: Tab = {
+                    id: newTabId,
                     workspaceId,
-                    parsedTearOff.tabState.route,
-                    parsedTearOff.tabState.label,
-                    parsedTearOff.tabState.icon,
-                    0
-                );
+                    windowId: this.windowSessionId,
+                    label: parsedTearOff.tabState.label,
+                    icon: parsedTearOff.tabState.icon,
+                    route: parsedTearOff.tabState.route,
+                    order: 0
+                };
 
                 await db.tabs.add(tornTab);
                 existing = [tornTab];
@@ -64,7 +78,7 @@ export class TabService {
                 setTimeout(() => {
                     const navService = (window as any)._quilix_nav_service_bootstrapper;
                     if (navService && parsedTearOff.historyPayload) {
-                        navService.injectExternalHistoryPayload(parsedTearOff.historyPayload);
+                        navService.injectSingleTabHistory(newTabId, parsedTearOff.historyPayload);
                     }
                 }, 100);
             }

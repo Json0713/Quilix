@@ -56,11 +56,11 @@ export class TabBarComponent {
             // Generate secure explicit 1-time token for handoff
             const tearOffId = crypto.randomUUID();
 
-            // Intercept internal history mappings natively
+            // Intercept internal history mappings natively for this ONE specific tab!
             let historyPayload = '';
             const navService = (window as any)._quilix_nav_service_bootstrapper;
-            if (navService && typeof navService.exportHistoryPayload === 'function') {
-                historyPayload = navService.exportHistoryPayload();
+            if (navService && typeof navService.exportSingleTabHistory === 'function') {
+                historyPayload = navService.exportSingleTabHistory(tabToTear.id);
             }
 
             // Consolidate the data explicitly for passing boundaries

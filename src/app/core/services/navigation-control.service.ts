@@ -27,6 +27,14 @@ export class NavigationControlService {
     private isTravelingHistory = false;
 
     constructor() {
+        // INTERCEPT WINDOW CLONES:
+        // window.open natively copies sessionStorage from parent to child, bringing the ENTIRE parent's history!
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('tearOffId')) {
+            // Shred the incorrectly cloned array. Pure new physical window instance!
+            sessionStorage.removeItem('quilix_tabHistories');
+        }
+
         this.loadHistories();
 
         // Expose to window for tear-off payload injections during application boot sequence
@@ -121,20 +129,22 @@ export class NavigationControlService {
         window.location.reload();
     }
 
-    // Exposed payload injection for when a Tab is natively torn-off and requires migration hand-off
-    injectExternalHistoryPayload(payload: string): void {
-        this.tabHistories = new Map(JSON.parse(payload));
+    // Exposed payload injection strictly mapping the SINGLE requested tab to its NEW UUID identity
+    injectSingleTabHistory(newTabId: string, payload: string): void {
+        this.tabHistories.clear(); // Safe as it's a completely virgin window
+        this.tabHistories.set(newTabId, JSON.parse(payload));
         this.saveHistories();
     }
 
-    // Explicit helper for TabService tear-off packaging
-    exportHistoryPayload(): string {
-        return JSON.stringify(Array.from(this.tabHistories.entries()));
+    // Explicit helper exporting solely the specific Tab being violently torn-off
+    exportSingleTabHistory(tabId: string): string {
+        const hist = this.tabHistories.get(tabId) || { history: [], forward: [] };
+        return JSON.stringify(hist);
     }
 
     private saveHistories(): void {
         try {
-            const serialized = this.exportHistoryPayload();
+            const serialized = JSON.stringify(Array.from(this.tabHistories.entries()));
             sessionStorage.setItem('quilix_tabHistories', serialized);
         } catch (e) {
             console.error('Failed to save tab histories to sessionStorage', e);
