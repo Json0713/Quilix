@@ -298,6 +298,11 @@
             .space-item {
                 position: relative;
 
+                // Block native mobile OS popup menus during CDK long-press delays
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+
                 .space-link {
                     flex: 1;
                     padding: 0.32rem 1.0rem;

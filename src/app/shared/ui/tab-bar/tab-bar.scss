@@ -59,6 +59,11 @@
         text-decoration: none;
         position: relative;
 
+        // Block mobile OS native "Copy Link" Context Menus during CDK Drag delays
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+
         .tab-icon {
             font-size: 0.95rem;
             flex-shrink: 0;
