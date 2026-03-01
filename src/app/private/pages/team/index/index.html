@@ -30,7 +30,9 @@
         <span class="label">Capacity Used <span class="badge">{{ metrics()?.mode === 'filesystem' ? 'Drive' : 'Database'
             }}</span></span>
         <div class="value-row">
-          <span class="value">{{ analytics.formatBytes(metrics()?.usage || 0) }}</span>
+          @for (m of [metrics()]; track m?.usage) {
+          <span class="value roll-up">{{ analytics.formatBytes(m?.usage || 0) }}</span>
+          }
           <span class="limit">Max {{ analytics.formatBytes(metrics()?.quota || 0) }}</span>
         </div>
       </div>
@@ -43,21 +45,10 @@
       <div class="stat-text">
         <span class="label">Current Workspace Spaces</span>
         <div class="value-row">
-          <span class="value">{{ metrics()?.totalSpaces || 0 }}</span>
+          @for (m of [metrics()]; track m?.usage) {
+          <span class="value roll-up">{{ m?.totalSpaces || 0 }}</span>
+          }
           <span class="limit">Active directories</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="metric-card stat-card">
-      <div class="stat-icon type-entities">
-        <i class="bi bi-layers"></i>
-      </div>
-      <div class="stat-text">
-        <span class="label">Total System Entities</span>
-        <div class="value-row">
-          <span class="value">{{ metrics()?.totalEntities || 0 }}</span>
-          <span class="limit">Records system-wide</span>
         </div>
       </div>
     </div>

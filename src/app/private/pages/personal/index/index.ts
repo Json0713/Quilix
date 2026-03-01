@@ -41,6 +41,7 @@ export class PersonalIndex implements OnInit, OnDestroy {
 
   get pieChartStyle(): string {
     const p = this.metrics()?.percentage || 0;
-    return `conic-gradient(var(--primary) ${p}%, var(--surface-alt) ${p}%)`;
+    const color = this.metrics()?.color || 'var(--primary)';
+    return `conic-gradient(${color} ${p}%, var(--surface-alt) ${p}%)`;
   }
 }

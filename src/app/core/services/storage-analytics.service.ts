@@ -12,7 +12,8 @@ export interface StorageMetrics {
     quota: number; // Total Bytes Quota
     usage: number; // Used Bytes
     percentage: number; // 0-100 float
-    percentageDisplay: string; // The UI string map (e.g. '< 1')
+    percentageDisplay: string; // The UI string map (e.g. '0.01')
+    color: string; // Dynamic neon hex string natively mapped to utilization
 }
 
 @Injectable({
@@ -49,30 +50,43 @@ export class StorageAnalyticsService {
         let quota = 0;
         let percentage = 0;
 
+        // Secure Chromium Native Navigator Allocations universally
+        if (navigator.storage && navigator.storage.estimate) {
+            const estimate = await navigator.storage.estimate();
+            if (estimate.quota) quota = estimate.quota;
+        }
+
         if (mode === 'indexeddb') {
-            // Execute Chromium Native Navigator Analytics
             if (navigator.storage && navigator.storage.estimate) {
                 const estimate = await navigator.storage.estimate();
                 usage = estimate.usage || 0;
-                quota = estimate.quota || 0;
-                percentage = quota > 0 ? (usage / quota) * 100 : 0;
             }
         } else if (mode === 'filesystem') {
             // Execute Native FileSystem Scan
-            quota = 10 * 1024 * 1024 * 1024; // 10GB Virtual Quota limit standard
             usage = await this.recursivelyComputeFilesystemSize();
-            percentage = (usage / quota) * 100;
-            if (percentage > 100) percentage = 100; // Cap
         }
 
-        // Ensure 0% is prevented visually if space is physically utilized
-        let percentageDisplay = percentage.toFixed(1);
-        if (usage > 0 && percentage < 0.1) {
-            percentageDisplay = '0.1';
-            percentage = 0.5; // Bump the purely visual conic-gradient slightly so the pie chart isn't empty
+        percentage = quota > 0 ? (usage / quota) * 100 : 0;
+        if (percentage > 100) percentage = 100; // Cap
+
+        // Strict fraction constraints for aesthetics
+        let percentageDisplay = percentage.toFixed(2);
+        if (usage > 0 && percentage < 0.01) {
+            percentageDisplay = '0.01';
+            percentage = 0.5; // Bump purely visual conic-gradient slightly so chart isn't empty
         } else if (usage === 0) {
-            percentageDisplay = '0';
+            percentageDisplay = '0.00';
             percentage = 0;
+        }
+
+        // Dynamic Neon Threshold Coloring
+        let color = '#10b981'; // 0-25%: Emerald Green
+        if (percentage >= 75) {
+            color = '#ef4444'; // Neon Red
+        } else if (percentage >= 50) {
+            color = '#f97316'; // Neon Orange
+        } else if (percentage >= 25) {
+            color = '#f59e0b'; // Amber
         }
 
         return {
@@ -82,7 +96,8 @@ export class StorageAnalyticsService {
             usage,
             quota,
             percentage,
-            percentageDisplay
+            percentageDisplay,
+            color
         };
     }
 

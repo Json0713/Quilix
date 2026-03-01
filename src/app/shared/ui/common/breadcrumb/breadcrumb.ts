@@ -33,7 +33,8 @@ import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/bre
     .hairline {
       flex-grow: 1;
       height: 1px;
-      background-color: var(--border-color, rgba(255, 255, 255, 0.1));
+      background-color: var(--text-main, #374151);
+      opacity: 0.15;
     }
   `]
 })
