@@ -1,0 +1,68 @@
+<div class="task-detail-container">
+    <div class="task-main-view">
+        <div class="task-header-meta">
+            <div class="status-badge" [ngClass]="'status-' + task.status">
+                @if (task.status === 'todo') {
+                <i class="bi bi-circle"></i> To Do
+                } @else if (task.status === 'progress') {
+                <i class="bi bi-circle-half"></i> In Progress
+                } @else {
+                <i class="bi bi-check-circle-fill"></i> Completed
+                }
+            </div>
+            <span class="created-date">Created on {{ task.createdAt | date:'mediumDate' }}</span>
+        </div>
+
+        <h2 class="task-title">{{ task.title }}</h2>
+
+        <div class="task-description-section">
+            <h4 class="section-title">Description</h4>
+            @if (task.description) {
+            <p class="description-text">{{ task.description }}</p>
+            } @else {
+            <p class="empty-text">No description provided...</p>
+            }
+        </div>
+
+        <div class="task-attachments-section">
+            <h4 class="section-title">Attachments</h4>
+            <div class="attachments-grid">
+                <button class="add-attachment-btn">
+                    <i class="bi bi-plus-lg"></i> Add File
+                </button>
+                <!-- Existing files would render here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar for Notes -->
+    <div class="task-sidebar-view">
+        <h4 class="section-title"><i class="bi bi-chat-text"></i> Activity & Notes</h4>
+
+        <div class="notes-feed">
+            @for (note of notes; track note.id) {
+            <div class="note-card">
+                <div class="note-header">
+                    <span class="note-author">{{ note.author }}</span>
+                    <span class="note-time">{{ note.timestamp | date:'shortTime' }}</span>
+                </div>
+                <p class="note-body">{{ note.text }}</p>
+            </div>
+            } @empty {
+            <div class="empty-state">
+                <i class="bi bi-chat-left-dots"></i>
+                <span>No notes yet. Start the conversation!</span>
+            </div>
+            }
+        </div>
+
+        <div class="note-input-area">
+            <textarea [(ngModel)]="newNoteText" placeholder="Write a note..." rows="3"
+                (keydown.enter)="addNote(); $event.preventDefault()">
+            </textarea>
+            <button class="btn primary submit-note" (click)="addNote()" [disabled]="!newNoteText.trim()">
+                Save Note
+            </button>
+        </div>
+    </div>
+</div>

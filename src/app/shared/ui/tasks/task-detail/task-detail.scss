@@ -1,0 +1,281 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.task-detail-container {
+    display: flex;
+    gap: 32px;
+    margin-top: -10px;
+    /* Offset the rigid modal padding slightly */
+    height: 60vh;
+    min-height: 500px;
+    max-height: 700px;
+}
+
+.task-main-view {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-right: 24px;
+    overflow-y: auto;
+
+    /* Custom thin scrollbar */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--surface-alt);
+        border-radius: 4px;
+    }
+}
+
+.task-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .status-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 20px;
+
+        &.status-todo {
+            background: var(--surface-alt);
+            color: var(--text-main);
+        }
+
+        &.status-progress {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        &.status-completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+    }
+
+    .created-date {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+}
+
+.task-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-top: 0;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.task-description-section {
+    background: var(--surface-main);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    border-radius: 12px;
+
+    .description-text {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--text-main);
+        white-space: pre-wrap;
+    }
+
+    .empty-text {
+        margin: 0;
+        font-size: 0.95rem;
+        font-style: italic;
+        color: var(--text-muted);
+    }
+}
+
+.attachments-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    .add-attachment-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: transparent;
+        border: 2px dashed var(--border-color);
+        color: var(--text-muted);
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+    }
+}
+
+/* Sidebar Analytics */
+.task-sidebar-view {
+    flex: 1;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-main);
+    border-left: 1px solid var(--border-color);
+    padding-left: 24px;
+
+    .section-title {
+        margin-bottom: 20px;
+    }
+}
+
+.notes-feed {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 20px;
+
+    /* Custom thin scrollbar */
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--surface-alt);
+        border-radius: 4px;
+    }
+}
+
+.note-card {
+    background: var(--surface-alt);
+    padding: 12px 16px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .note-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .note-author {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .note-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    }
+
+    .note-body {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--text-main);
+        line-height: 1.5;
+    }
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    height: 100px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px dashed var(--border-color);
+
+    i {
+        font-size: 2rem;
+        opacity: 0.5;
+    }
+}
+
+.note-input-area {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    textarea {
+        width: 100%;
+        background: var(--surface-main);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        border-radius: 12px;
+        padding: 12px;
+        font-family: inherit;
+        font-size: 0.9rem;
+        resize: none;
+        transition: border-color 0.2s;
+
+        &:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        &::placeholder {
+            color: var(--text-muted);
+        }
+    }
+
+    .submit-note {
+        align-self: flex-end;
+        padding: 8px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Responsiveness */
+@media (max-width: 900px) {
+    .task-detail-container {
+        flex-direction: column;
+        height: auto;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    .task-main-view {
+        padding-right: 0;
+        overflow-y: visible;
+    }
+
+    .task-sidebar-view {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid var(--border-color);
+        padding-top: 24px;
+        min-height: 400px;
+    }
+}

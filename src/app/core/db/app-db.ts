@@ -3,6 +3,7 @@ import { Workspace } from '../interfaces/workspace';
 import { Space } from '../interfaces/space';
 import { Tab } from '../interfaces/tab';
 import { Session } from '../interfaces/session';
+import { Task } from '../interfaces/task';
 
 export interface ContactMessage {
     id: string;
@@ -24,6 +25,7 @@ export class AppDatabase extends Dexie {
     settings!: Table<Setting, string>;
     spaces!: Table<Space, string>;
     tabs!: Table<Tab, string>;
+    tasks!: Table<Task, string>;
 
     constructor() {
         super('QuilixGlobalDB');
@@ -64,6 +66,11 @@ export class AppDatabase extends Dexie {
         // Add compound indexing to vastly speed up Window-specific tab lookups
         this.version(7).stores({
             tabs: 'id, workspaceId, windowId, [workspaceId+windowId], order'
+        });
+
+        // Scaffold Tasks Native Storage Engine
+        this.version(8).stores({
+            tasks: 'id, workspaceId, status, [workspaceId+status], order'
         });
 
         // Open database connection early to optimize initial load

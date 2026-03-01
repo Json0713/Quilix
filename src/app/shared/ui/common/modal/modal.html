@@ -1,91 +1,77 @@
 @if (modal.modal()) {
-  <div class="modal-backdrop" (click)="cancel()"></div>
+<div class="modal-backdrop" (click)="cancel()"></div>
 
-  <div class="modal-wrapper" role="dialog" aria-modal="true">
-    <div class="modal-card">
+<div class="modal-wrapper" role="dialog" aria-modal="true">
+  <div class="modal-card" [class.modal-xl]="modal.modal()?.view === 'task'">
 
-      <!-- CLOSE BUTTON -->
-      <button
-        type="button"
-        class="modal-close"
-        aria-label="Close modal"
-        (click)="cancel()"
-      >
-        <i class="bi bi-x-lg"></i>
-      </button>
+    <!-- CLOSE BUTTON -->
+    <button type="button" class="modal-close" aria-label="Close modal" (click)="cancel()">
+      <i class="bi bi-x-lg"></i>
+    </button>
 
-      <!-- TITLE -->
-      <h3 class="modal-title">
-        {{ modal.modal()?.title }}
-      </h3>
+    <!-- TITLE -->
+    <h3 class="modal-title">
+      {{ modal.modal()?.title }}
+    </h3>
 
-      @switch (modal.modal()?.type) {
+    @switch (modal.modal()?.type) {
 
-        @case ('custom') {
-          @if (modal.modal()?.view === 'import') {
-            <app-import/>
-          }
-        }
+    @case ('custom') {
+    @if (modal.modal()?.view === 'import') {
+    <app-import />
+    } @else if (modal.modal()?.view === 'task') {
+    <app-task-detail [task]="modal.modal()!.taskData!"></app-task-detail>
+    }
+    }
 
-        @default {
+    @default {
 
-          <!-- (info / success / warning / error) -->
-          @if (
-            modal.modal()?.notice &&
-            !noticeDismissed &&
-            modal.modal()?.notice?.scope !== 'always'
-          ) {
-            <div
-              class="modal-notice"
-              [attr.data-type]="modal.modal()?.notice?.type"
-            >
-              <i
-                class="bi modal-notice-icon"
-                [ngClass]="{
+    <!-- (info / success / warning / error) -->
+    @if (
+    modal.modal()?.notice &&
+    !noticeDismissed &&
+    modal.modal()?.notice?.scope !== 'always'
+    ) {
+    <div class="modal-notice" [attr.data-type]="modal.modal()?.notice?.type">
+      <i class="bi modal-notice-icon" [ngClass]="{
                   'bi-info-circle': modal.modal()?.notice?.type === 'info',
                   'bi-check-circle': modal.modal()?.notice?.type === 'success',
                   'bi-exclamation-circle': modal.modal()?.notice?.type === 'warning',
                   'bi-x-circle': modal.modal()?.notice?.type === 'error'
-                }"
-              ></i>
+                }"></i>
 
-              <span class="modal-notice-text">
-                {{ modal.modal()?.notice?.message }}
-              </span>
+      <span class="modal-notice-text">
+        {{ modal.modal()?.notice?.message }}
+      </span>
 
-              @if (modal.modal()?.notice?.scope === 'once') {
-                <button
-                  type="button"
-                  class="modal-notice-close"
-                  aria-label="Dismiss notice"
-                  (click)="dismissNotice()"
-                >
-                  <i class="bi bi-x"></i>
-                </button>
-              }
-            </div>
-          }
-
-          <!-- MESSAGE -->
-          <p class="modal-message">
-            {{ modal.modal()?.message }}
-          </p>
-
-          <!-- ACTIONS -->
-          <div class="modal-actions">
-            @if (modal.modal()?.type === 'confirm') {
-              <button class="btn secondary" (click)="cancel()">
-                {{ modal.modal()?.cancelText }}
-              </button>
-            }
-
-            <button class="btn primary" (click)="confirm()">
-              {{ modal.modal()?.confirmText }}
-            </button>
-          </div>
-        }
-
+      @if (modal.modal()?.notice?.scope === 'once') {
+      <button type="button" class="modal-notice-close" aria-label="Dismiss notice" (click)="dismissNotice()">
+        <i class="bi bi-x"></i>
+      </button>
       }
     </div>
+    }
+
+    <!-- MESSAGE -->
+    <p class="modal-message">
+      {{ modal.modal()?.message }}
+    </p>
+
+    <!-- ACTIONS -->
+    <div class="modal-actions">
+      @if (modal.modal()?.type === 'confirm') {
+      <button class="btn secondary" (click)="cancel()">
+        {{ modal.modal()?.cancelText }}
+      </button>
+      }
+
+      <button class="btn primary" (click)="confirm()">
+        {{ modal.modal()?.confirmText }}
+      </button>
+    </div>
+    }
+
+    }
   </div>
+</div>
 }

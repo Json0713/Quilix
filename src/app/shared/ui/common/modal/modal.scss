@@ -22,15 +22,34 @@
 /* CARD */
 .modal-card {
   position: relative;
+  background: var(--surface-main);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 32px;
   width: 100%;
-  max-width: 420px;
-  background: var(--surface);
-  border-radius: 18px;
-  padding: 24px 22px 22px;
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.15),
-    0 8px 16px rgba(0, 0, 0, 0.08);
+  max-width: 480px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
   animation: scaleIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &.modal-xl {
+    max-width: 1000px;
+    padding: 0;
+    /* Let edge-to-edge content dictate */
+    overflow: hidden;
+    /* Round edges explicitly */
+
+    .modal-title {
+      display: none;
+      /* Hide generic title for massive detailed views */
+    }
+
+    app-task-detail {
+      padding: 32px;
+    }
+  }
 }
 
 /* CLOSE BUTTON */
@@ -77,7 +96,8 @@
   font-weight: 600;
   color: var(--text-main);
   margin-bottom: 0.75rem;
-  padding-right: 2rem; /* space for X button */
+  padding-right: 2rem;
+  /* space for X button */
 }
 
 /* MESSAGE */
@@ -127,11 +147,9 @@
 
 /* PRIMARY */
 .btn.primary {
-  background: linear-gradient(
-    160deg,
-    var(--primary),
-    var(--primary-soft)
-  );
+  background: linear-gradient(160deg,
+      var(--primary),
+      var(--primary-soft));
   color: var(--text-white);
 }
 
@@ -151,8 +169,13 @@
 
 /* ANIMATIONS */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
@@ -160,6 +183,7 @@
     opacity: 0;
     transform: scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -248,4 +272,3 @@
     background: rgba(0, 0, 0, 0.05);
   }
 }
-

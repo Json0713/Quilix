@@ -1,0 +1,62 @@
+<div class="task-card" [class.is-completed]="task.status === 'completed'" (click)="openDetails()">
+    <div class="task-header">
+        <div class="task-title-group">
+            <h3 class="task-title">{{ task.title }}</h3>
+        </div>
+
+        <div class="header-actions">
+            @if (task.status === 'progress') {
+            <span class="task-badge badge-progress">In Progress</span>
+            } @else if (task.status === 'completed') {
+            <span class="task-badge badge-completed">Done</span>
+            }
+
+            <div class="task-context-menu" (click)="toggleMenu($event)" [class.open]="isMenuOpen()">
+                <button class="context-btn" title="Options"><i class="bi bi-three-dots"></i></button>
+                <!-- Dropdown Scaffold -->
+                <div class="context-dropdown" [class.show]="isMenuOpen()">
+                    <button class="dropdown-item"><i class="bi bi-pencil"></i> Update</button>
+                    <button class="dropdown-item delete"><i class="bi bi-trash"></i> Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (task.description) {
+    <div class="task-body">
+        <p class="task-desc">
+            {{ task.description }}
+        </p>
+    </div>
+    }
+
+    <div class="task-actions">
+        <!-- Always available add note -->
+        <button class="action-btn" title="Notes">
+            <i class="bi bi-chat-text"></i>
+            @if (task.notesCount > 0) {
+            <span>{{ task.notesCount }}</span>
+            } @else {
+            <span>Notes</span>
+            }
+        </button>
+
+        <button class="action-btn" title="Images">
+            <i class="bi bi-image"></i>
+            @if (task.imagesCount > 0) {
+            <span>{{ task.imagesCount }}</span>
+            } @else {
+            <span>Images</span>
+            }
+        </button>
+
+        <button class="action-btn" title="Files">
+            <i class="bi bi-paperclip"></i>
+            @if (task.filesCount > 0) {
+            <span>{{ task.filesCount }}</span>
+            } @else {
+            <span>Files</span>
+            }
+        </button>
+    </div>
+</div>

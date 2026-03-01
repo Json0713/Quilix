@@ -1,0 +1,17 @@
+<div class="task-column animate-fade-in">
+    <div class="column-header">
+        <h3 class="board-title">
+            {{ title }}
+            <span class="task-count">{{ tasks.length }}</span>
+        </h3>
+    </div>
+
+    <div class="task-list" cdkDropList [id]="status" [cdkDropListData]="tasks" [cdkDropListConnectedTo]="connectedTo"
+        (cdkDropListDropped)="dropped.emit($event)">
+
+        @for (task of tasks; track task.id) {
+        <!-- Use cdkDrag strictly atop the physical UI card bounds -->
+        <app-task-card [task]="task" cdkDrag [cdkDragData]="task"></app-task-card>
+        }
+    </div>
+</div>

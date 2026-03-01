@@ -1,0 +1,23 @@
+:host {
+    display: block;
+    width: 100%;
+    /* CRITICAL requirement guaranteeing the CDK drag items physically float beyond standard boundaries effortlessly */
+    padding-bottom: 24px;
+}
+
+.board-canvas {
+    display: flex;
+    gap: 32px;
+    min-height: 400px;
+    align-items: flex-start;
+}
+
+/* Horizontal Overflow Scrollbar Tweaks */
+::-webkit-scrollbar {
+    height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--surface-alt);
+    border-radius: 4px;
+}

@@ -1,0 +1,16 @@
+<div class="board-canvas" cdkDropListGroup>
+    <!-- Todo Lane -->
+    <app-task-column title="Todo" status="todo" [tasks]="todoTasks" [connectedTo]="['progress', 'completed']"
+        (dropped)="drop($event)">
+    </app-task-column>
+
+    <!-- In Progress Lane -->
+    <app-task-column title="In Progress" status="progress" [tasks]="progressTasks" [connectedTo]="['todo', 'completed']"
+        (dropped)="drop($event)">
+    </app-task-column>
+
+    <!-- Completed Lane -->
+    <app-task-column title="Done" status="completed" [tasks]="completedTasks" [connectedTo]="['todo', 'progress']"
+        (dropped)="drop($event)">
+    </app-task-column>
+</div>

@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { ModalConfig } from '../../../../shared/ui/common/modal/modal.model';
+import { Task } from '../../../../core/interfaces/task';
 
 @Injectable({
   providedIn: 'root',
@@ -62,6 +63,16 @@ export class ModalService {
       type: 'custom',
       title: 'Import Backup',
       view: 'import',
+    });
+  }
+
+  openTaskDetail(task: Task): void {
+    this._modal.set({
+      id: ++this.id,
+      type: 'custom',
+      title: `Task-${task.id.substring(0, 4).toUpperCase()} Details`,
+      view: 'task',
+      taskData: task
     });
   }
 

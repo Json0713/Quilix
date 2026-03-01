@@ -1,0 +1,94 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 320px;
+    flex: 1;
+}
+
+.task-column {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 20px;
+    background: transparent;
+}
+
+.column-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 4px;
+    /* Margin parity with metrics */
+
+    .board-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .task-count {
+        font-size: 0.9rem;
+        background: var(--surface-alt);
+        color: var(--text-muted);
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-weight: 700;
+    }
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 150px;
+    /* Crucial structural padding ensuring active target lanes */
+    padding-bottom: 24px;
+    flex-grow: 1;
+}
+
+/* CDK Drag Drop Physics Classes */
+::ng-deep {
+    .cdk-drag-preview {
+        box-sizing: border-box;
+        border-radius: 16px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+        opacity: 0.95;
+    }
+
+    .cdk-drag-placeholder {
+        opacity: 0.3;
+        background: transparent;
+        border: 2px dashed var(--primary);
+        border-radius: 16px;
+        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .cdk-drag-animating {
+        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+.task-list.cdk-drop-list-dragging ::ng-deep app-task-card:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
