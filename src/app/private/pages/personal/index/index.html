@@ -1,6 +1,7 @@
 <app-breadcrumb></app-breadcrumb>
 
-<div class="dashboard-container" *ngIf="!isLoading()">
+@if (!isLoading()) {
+<div class="dashboard-container">
 
   <!-- Storage Overview Cards -->
   <div class="metrics-grid">
@@ -24,7 +25,7 @@
     <!-- Capacity Card -->
     <div class="metric-card stat-card">
       <div class="stat-icon type-capacity">
-        <i class="fi fi-rr-database"></i>
+        <i class="bi bi-database"></i>
       </div>
       <div class="stat-text">
         <span class="label">Capacity Used <span class="badge">{{ metrics()?.mode === 'filesystem' ? 'Drive' : 'Database'
@@ -37,7 +38,7 @@
     <!-- Workspace Record Count -->
     <div class="metric-card stat-card">
       <div class="stat-icon type-records">
-        <i class="fi fi-rr-folder"></i>
+        <i class="bi bi-folder2"></i>
       </div>
       <div class="stat-text">
         <span class="label">Current Workspace Spaces</span>
@@ -49,7 +50,7 @@
     <!-- Global Tabs -->
     <div class="metric-card stat-card">
       <div class="stat-icon type-entities">
-        <i class="fi fi-rr-layers"></i>
+        <i class="bi bi-layers"></i>
       </div>
       <div class="stat-text">
         <span class="label">Total System Entities</span>
@@ -60,7 +61,10 @@
 
   </div>
 </div>
+}
 
-<div class="loading-state" *ngIf="isLoading()">
+@if (isLoading()) {
+<div class="loading-state">
   <app-loader></app-loader>
 </div>
+}

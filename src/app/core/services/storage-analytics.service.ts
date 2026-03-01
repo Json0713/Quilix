@@ -1,4 +1,6 @@
 import { Injectable, inject } from '@angular/core';
+import { liveQuery } from 'dexie';
+import { Observable, from } from 'rxjs';
 import { FileSystemService } from './file-system.service';
 import { AuthService } from '../auth/auth.service';
 import { db } from '../db/app-db';
@@ -19,6 +21,13 @@ export interface StorageMetrics {
 export class StorageAnalyticsService {
     private fileSystem = inject(FileSystemService);
     private auth = inject(AuthService);
+
+    /**
+     * Exposes a real-time reactive feed of Dashboard metrics driven by Dexie liveQuery.
+     */
+    watchMetrics(): Observable<StorageMetrics> {
+        return from(liveQuery(() => this.getMetrics())) as unknown as Observable<StorageMetrics>;
+    }
 
     /**
      * Computes the aggregate analytical payload for Dashboard rendering.
@@ -59,7 +68,7 @@ export class StorageAnalyticsService {
         // Ensure 0% is prevented visually if space is physically utilized
         let percentageDisplay = percentage.toFixed(1);
         if (usage > 0 && percentage < 0.1) {
-            percentageDisplay = '< 0.1';
+            percentageDisplay = '0.1';
             percentage = 0.5; // Bump the purely visual conic-gradient slightly so the pie chart isn't empty
         } else if (usage === 0) {
             percentageDisplay = '0';

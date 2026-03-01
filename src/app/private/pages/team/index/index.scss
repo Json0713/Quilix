@@ -21,16 +21,15 @@
 
 .metric-card {
   background: var(--surface-main);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
   align-items: center;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: var(--surface-alt);
-    border-color: var(--primary);
+    background-color: none;
   }
 }
 
@@ -122,18 +121,21 @@
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
-    background: var(--surface-alt);
+    background: transparent;
 
     &.type-capacity {
-      color: var(--text-main);
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
     }
 
     &.type-records {
-      color: var(--text-main);
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
     }
 
     &.type-entities {
-      color: var(--text-main);
+      background: rgba(139, 92, 246, 0.1);
+      color: #8b5cf6;
     }
   }
 
