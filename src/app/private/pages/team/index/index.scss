@@ -100,9 +100,25 @@
     font-size: 0.95rem;
     color: var(--text-alt);
 
-    strong {
-      color: var(--primary);
-      font-weight: 500;
+    strong.engine-badge {
+      margin-left: 0.5rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      display: inline-flex;
+      align-items: center;
+
+      &.filesystem {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+      }
+
+      &.indexeddb {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+      }
     }
   }
 }
@@ -163,19 +179,33 @@
       }
     }
 
-    .value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 0.25rem;
-    }
+    .value-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      width: 100%;
+      gap: 1rem;
 
-    .limit {
-      font-size: 0.8rem;
-      color: var(--text-alt);
+      .value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-main);
+        line-height: 1;
+      }
+
+      .limit {
+        font-size: 0.75rem;
+        color: var(--text-main);
+        background: var(--surface-alt);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
     }
   }
 }
+
 
 .loading-state {
   display: flex;

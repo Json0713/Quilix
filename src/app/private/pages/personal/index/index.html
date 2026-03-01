@@ -18,7 +18,9 @@
       </div>
       <div class="card-details">
         <h3>Storage Health</h3>
-        <p>Engine: <strong>{{ metrics()?.mode === 'filesystem' ? 'Local System' : 'IndexedDB' }}</strong></p>
+        <p>Engine: <strong class="engine-badge" [class.filesystem]="metrics()?.mode === 'filesystem'"
+            [class.indexeddb]="metrics()?.mode === 'indexeddb'">{{ metrics()?.mode === 'filesystem' ? 'Local System' :
+            'IndexedDB' }}</strong></p>
       </div>
     </div>
 
@@ -30,8 +32,10 @@
       <div class="stat-text">
         <span class="label">Capacity Used <span class="badge">{{ metrics()?.mode === 'filesystem' ? 'Drive' : 'Database'
             }}</span></span>
-        <span class="value">{{ analytics.formatBytes(metrics()?.usage || 0) }}</span>
-        <span class="limit">of {{ analytics.formatBytes(metrics()?.quota || 0) }} max limit</span>
+        <div class="value-row">
+          <span class="value">{{ analytics.formatBytes(metrics()?.usage || 0) }}</span>
+          <span class="limit">Max {{ analytics.formatBytes(metrics()?.quota || 0) }}</span>
+        </div>
       </div>
     </div>
 
@@ -42,8 +46,10 @@
       </div>
       <div class="stat-text">
         <span class="label">Current Workspace Spaces</span>
-        <span class="value">{{ metrics()?.totalSpaces || 0 }}</span>
-        <span class="limit">Active data directories</span>
+        <div class="value-row">
+          <span class="value">{{ metrics()?.totalSpaces || 0 }}</span>
+          <span class="limit">Active directories</span>
+        </div>
       </div>
     </div>
 
@@ -54,8 +60,10 @@
       </div>
       <div class="stat-text">
         <span class="label">Total System Entities</span>
-        <span class="value">{{ metrics()?.totalEntities || 0 }}</span>
-        <span class="limit">Records mapping system-wide</span>
+        <div class="value-row">
+          <span class="value">{{ metrics()?.totalEntities || 0 }}</span>
+          <span class="limit">Records system-wide</span>
+        </div>
       </div>
     </div>
 
