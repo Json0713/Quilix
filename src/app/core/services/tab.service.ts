@@ -146,6 +146,18 @@ export class TabService {
         }
     }
 
+    // ── Reorder Tabs ──
+    async updateTabOrders(orderedTabs: Tab[]): Promise<void> {
+        // Re-assign order properties based on their new cleanly organized index
+        const updatedTabs = orderedTabs.map((tab, index) => ({ ...tab, order: index }));
+
+        // Optimistically update the UI Signal
+        this.tabs.set(updatedTabs);
+
+        // Batch persist the order values to Dexie asynchronously
+        await db.tabs.bulkPut(updatedTabs);
+    }
+
     // ── Helpers ──
 
     private buildTab(workspaceId: string, route: string, label: string, icon: string, order: number): Tab {

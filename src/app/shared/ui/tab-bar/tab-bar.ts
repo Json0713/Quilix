@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { Router, ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TabService } from '../../../core/services/tab.service';
 import { Tab } from '../../../core/interfaces/tab';
 
 @Component({
     selector: 'app-tab-bar',
     standalone: true,
-    imports: [RouterLink, RouterLinkActive],
+    imports: [RouterLink, RouterLinkActive, DragDropModule],
     templateUrl: './tab-bar.html',
     styleUrl: './tab-bar.scss',
 })
@@ -36,6 +37,37 @@ export class TabBarComponent {
         if (newRoute) {
             // Navigate to the nearest tab's route, relative to current layout
             this.router.navigate([newRoute], { relativeTo: this.route });
+        }
+    }
+
+    // Handled strictly by CDK Drag and Drop events
+    async onTabDrop(event: CdkDragDrop<Tab[]>) {
+        const currentTabs = [...this.tabs()];
+
+        // Tear-off Logic: If the user dropped the tab entirely outside the bounds of the tab bar container
+        if (!event.isPointerOverContainer) {
+            const tabToTear = currentTabs[event.previousIndex];
+
+            // Construct strictly absolute web pathways mapping exact state
+            const targetUrl = this.router.createUrlTree([tabToTear.route], { relativeTo: this.route }).toString();
+
+            // Physically spawn a true separate Application Process view popup 
+            window.open(targetUrl, '_blank', 'popup,width=1024,height=768');
+
+            // Terminate the local tab to simulate a physical transfer
+            const newRoute = await this.tabService.closeTab(tabToTear.id);
+            if (newRoute) {
+                this.router.navigate([newRoute], { relativeTo: this.route });
+            }
+            return;
+        }
+
+        // Internal Reordering Logic
+        if (event.previousIndex !== event.currentIndex) {
+            // Mutate the array indices natively
+            moveItemInArray(currentTabs, event.previousIndex, event.currentIndex);
+            // Submit strict batch sorting commands down to Dexie DB bounds
+            await this.tabService.updateTabOrders(currentTabs);
         }
     }
 }

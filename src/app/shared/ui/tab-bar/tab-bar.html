@@ -1,9 +1,10 @@
 <div class="tab-bar">
-    <div class="tab-list">
+    <div class="tab-list" cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="onTabDrop($event)">
         @for (tab of tabs(); track tab.id) {
-        <a class="tab-item" [class.active]="activeTab()?.id === tab.id" [routerLink]="tab.route"
+        <a class="tab-item" cdkDrag [class.active]="activeTab()?.id === tab.id" [routerLink]="tab.route"
             routerLinkActive="route-active" [routerLinkActiveOptions]="{ exact: tab.route === './' }"
             (click)="onTabClick(tab)" [title]="tab.label">
+
             <i [class]="tab.icon + ' tab-icon'"></i>
             <span class="tab-label">{{ tab.label }}</span>
             @if (tabs().length > 1) {
@@ -11,6 +12,12 @@
                 <i class="bi bi-x"></i>
             </span>
             }
+
+            <!-- Clean visual representation while tearing off or sorting -->
+            <div *cdkDragPreview class="tab-item-preview">
+                <i [class]="tab.icon + ' tab-icon'"></i>
+                <span class="tab-label">{{ tab.label }}</span>
+            </div>
         </a>
         }
 
