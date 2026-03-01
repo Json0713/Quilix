@@ -4,7 +4,7 @@ import { Tab } from '../interfaces/tab';
 
 @Injectable({ providedIn: 'root' })
 export class TabService {
-    /** All tabs for the active workspace */
+    /** All tabs for the active workspace, bounded strictly to this specific Browser Window */
     tabs = signal<Tab[]>([]);
 
     /** Currently active tab */
@@ -12,17 +12,65 @@ export class TabService {
 
     private currentWorkspaceId: string | null = null;
 
+    // Explicit UUID identifying this specific OS Window context (Survives Refresh, Isolated from Popups)
+    private readonly windowSessionId: string;
+
+    constructor() {
+        let existingId = sessionStorage.getItem('quilix_windowId');
+        if (!existingId) {
+            existingId = crypto.randomUUID();
+            sessionStorage.setItem('quilix_windowId', existingId);
+        }
+        this.windowSessionId = existingId;
+    }
+
     // ── Load tabs for a workspace ──
 
     async loadTabs(workspaceId: string): Promise<void> {
         this.currentWorkspaceId = workspaceId;
 
+        // Ensure we load strictly tabs mapped to this physical Window scope
         let existing = await db.tabs
-            .where('workspaceId')
-            .equals(workspaceId)
+            .where({ workspaceId: workspaceId, windowId: this.windowSessionId })
             .sortBy('order');
 
-        // First login → auto-create a Home tab
+        // Check if this Window was spawned as a Tear-off!
+        const urlParams = new URLSearchParams(window.location.search);
+        const tearOffId = urlParams.get('tearOffId');
+
+        if (tearOffId) {
+            const rawPayload = localStorage.getItem(`quilix_tearoff_${tearOffId}`);
+            if (rawPayload) {
+                const parsedTearOff = JSON.parse(rawPayload);
+
+                // Construct strictly localized Tab physically bound here now
+                const tornTab = this.buildTab(
+                    workspaceId,
+                    parsedTearOff.tabState.route,
+                    parsedTearOff.tabState.label,
+                    parsedTearOff.tabState.icon,
+                    0
+                );
+
+                await db.tabs.add(tornTab);
+                existing = [tornTab];
+
+                // Remove the URL param cleanly without reloading
+                window.history.replaceState(null, '', window.location.pathname);
+                // Wipe the handoff transfer file 
+                localStorage.removeItem(`quilix_tearoff_${tearOffId}`);
+
+                // Inform the caller this happened so NavigationControlService can pick up its history payload later
+                setTimeout(() => {
+                    const navService = (window as any)._quilix_nav_service_bootstrapper;
+                    if (navService && parsedTearOff.historyPayload) {
+                        navService.injectExternalHistoryPayload(parsedTearOff.historyPayload);
+                    }
+                }, 100);
+            }
+        }
+
+        // First login or blank launch → auto-create a standard empty Home tab
         if (existing.length === 0) {
             const homeTab = this.buildTab(workspaceId, './', 'Home', 'bi bi-house', 0);
             await db.tabs.add(homeTab);
@@ -31,8 +79,8 @@ export class TabService {
 
         this.tabs.set(existing);
 
-        // Restore last active tab from settings, or default to first
-        const activeId = await this.getSetting(`activeTab:${workspaceId}`);
+        // Restore last active tab scoped to this window, or default to first
+        const activeId = await this.getSetting(`activeTab:${workspaceId}:${this.windowSessionId}`);
         const active = existing.find(t => t.id === activeId) ?? existing[0];
         this.activeTab.set(active);
     }
@@ -67,9 +115,9 @@ export class TabService {
 
         this.activeTab.set(tab);
 
-        // Persist active tab for this workspace
+        // Persist active tab strictly mapped to this specific Window scope
         if (this.currentWorkspaceId) {
-            await this.setSetting(`activeTab:${this.currentWorkspaceId}`, tabId);
+            await this.setSetting(`activeTab:${this.currentWorkspaceId}:${this.windowSessionId}`, tabId);
         }
     }
 
@@ -164,6 +212,7 @@ export class TabService {
         return {
             id: crypto.randomUUID(),
             workspaceId,
+            windowId: this.windowSessionId,
             label,
             icon,
             route,

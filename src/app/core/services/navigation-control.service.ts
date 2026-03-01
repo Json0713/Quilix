@@ -29,6 +29,9 @@ export class NavigationControlService {
     constructor() {
         this.loadHistories();
 
+        // Expose to window for tear-off payload injections during application boot sequence
+        (window as any)._quilix_nav_service_bootstrapper = this;
+
         // Listen to router events and build history naturally
         this.router.events.pipe(
             filter(event => event instanceof NavigationEnd)
@@ -118,23 +121,34 @@ export class NavigationControlService {
         window.location.reload();
     }
 
+    // Exposed payload injection for when a Tab is natively torn-off and requires migration hand-off
+    injectExternalHistoryPayload(payload: string): void {
+        this.tabHistories = new Map(JSON.parse(payload));
+        this.saveHistories();
+    }
+
+    // Explicit helper for TabService tear-off packaging
+    exportHistoryPayload(): string {
+        return JSON.stringify(Array.from(this.tabHistories.entries()));
+    }
+
     private saveHistories(): void {
         try {
-            const serialized = JSON.stringify(Array.from(this.tabHistories.entries()));
-            localStorage.setItem('quilix_tabHistories', serialized);
+            const serialized = this.exportHistoryPayload();
+            sessionStorage.setItem('quilix_tabHistories', serialized);
         } catch (e) {
-            console.error('Failed to save tab histories to localStorage', e);
+            console.error('Failed to save tab histories to sessionStorage', e);
         }
     }
 
     private loadHistories(): void {
         try {
-            const stored = localStorage.getItem('quilix_tabHistories');
+            const stored = sessionStorage.getItem('quilix_tabHistories');
             if (stored) {
                 this.tabHistories = new Map(JSON.parse(stored));
             }
         } catch (e) {
-            console.error('Failed to load tab histories from localStorage', e);
+            console.error('Failed to load tab histories from sessionStorage', e);
         }
     }
 }

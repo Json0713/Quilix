@@ -46,12 +46,37 @@ export class TabBarComponent {
 
         // Tear-off Logic: If the user dropped the tab entirely outside the bounds of the tab bar container
         if (!event.isPointerOverContainer) {
+            // Cannot tear-off if it's the last remaining tab in the window instance!
+            if (currentTabs.length <= 1) {
+                return;
+            }
+
             const tabToTear = currentTabs[event.previousIndex];
 
-            // Construct strictly absolute web pathways mapping exact state
-            const targetUrl = this.router.createUrlTree([tabToTear.route], { relativeTo: this.route }).toString();
+            // Generate secure explicit 1-time token for handoff
+            const tearOffId = crypto.randomUUID();
 
-            // Physically spawn a true separate Application Process view popup 
+            // Intercept internal history mappings natively
+            let historyPayload = '';
+            const navService = (window as any)._quilix_nav_service_bootstrapper;
+            if (navService && typeof navService.exportHistoryPayload === 'function') {
+                historyPayload = navService.exportHistoryPayload();
+            }
+
+            // Consolidate the data explicitly for passing boundaries
+            const transferData = {
+                tabState: { route: tabToTear.route, label: tabToTear.label, icon: tabToTear.icon },
+                historyPayload: historyPayload
+            };
+
+            // Write to shared bridge
+            localStorage.setItem(`quilix_tearoff_${tearOffId}`, JSON.stringify(transferData));
+
+            // Construct strictly absolute web pathways mapping exact state plus ID
+            const tree = this.router.createUrlTree([tabToTear.route], { relativeTo: this.route, queryParams: { tearOffId } });
+            const targetUrl = tree.toString();
+
+            // Physically spawn a true separate Application Process view popup
             window.open(targetUrl, '_blank', 'popup,width=1024,height=768');
 
             // Terminate the local tab to simulate a physical transfer

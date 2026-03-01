@@ -49,6 +49,18 @@ export class AppDatabase extends Dexie {
             tabs: 'id, workspaceId, order'
         });
 
+        this.version(6).stores({
+            tabs: 'id, workspaceId, windowId, order'
+        }).upgrade(trans => {
+            // Because older tabs do not possess a windowId, we must migrate existing rows
+            // To prevent all previous tabs disappearing, default set their windowId to 'default-window'
+            return trans.table('tabs').toCollection().modify(tab => {
+                if (!tab.windowId) {
+                    tab.windowId = 'default-window';
+                }
+            });
+        });
+
         // Open database connection early to optimize initial load
         this.open().catch(err => {
             console.error('[DB] Failed to open database:', err);
