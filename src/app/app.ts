@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, HostListener } from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { AppThemeService } from './core/theme/app-theme/app-theme.service';
 
@@ -67,6 +67,19 @@ export class App {
         console.warn('[FileSystem] Stored handle is invalid, disabling filesystem:', err);
         await this.fileSystem.disableFileSystem();
       }
+    }
+  }
+
+  // ── Global Native Desktop Keyboard Shortcuts ──
+  @HostListener('window:keydown', ['$event'])
+  onGlobalKeyDown(event: KeyboardEvent) {
+    // Intercept Ctrl+Q (or Cmd+Q on Mac) to spawn a fresh Quilix environment perfectly mimicking native PWA popups
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'q') {
+      event.preventDefault(); // Bypass any aggressive browser hijacking
+
+      // Fire a completely isolated OS popup pointed directly at the absolute root Origin!
+      // This will instantly boot up a clean Tab Engine natively without polluting any internal Window params.
+      window.open(window.location.origin, '_blank', 'popup,width=1024,height=768');
     }
   }
 
