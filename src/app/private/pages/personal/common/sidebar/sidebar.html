@@ -75,7 +75,8 @@
             <ul class="nav-list space-list" cdkDropList [cdkDropListData]="spaces()"
                 (cdkDropListDropped)="onSpaceDrop($event)">
                 @for (space of spaces(); track space.id) {
-                <li class="nav-item space-item" [class.menu-open]="openMenuId() === space.id" cdkDrag>
+                <li class="nav-item space-item" [class.menu-open]="openMenuId() === space.id" cdkDrag
+                    [cdkDragStartDelay]="{ touch: 250, mouse: 0 }">
                     <div *cdkDragPreview class="sidebar-drag-preview">
                         <i class="bi bi-folder nav-icon"></i>
                         <span class="nav-label">{{ space.name }}</span>
