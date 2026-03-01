@@ -177,7 +177,7 @@ body::-webkit-scrollbar,
 html::-webkit-scrollbar-track,
 body::-webkit-scrollbar-track,
 *::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.351);
 }
 
 /* Scrollbar */
@@ -201,7 +201,7 @@ body::-webkit-scrollbar-thumb:hover,
 }
 
 .main::-webkit-scrollbar-thumb {
-  background-color: (9, 91, 108, 0.834);
+  background-color: rgba(9, 91, 108, 0.834);
   border-radius: 3px;
 }
 
@@ -218,7 +218,7 @@ body::-webkit-scrollbar-thumb:hover,
   html::-webkit-scrollbar-thumb,
   body::-webkit-scrollbar-thumb,
   *::-webkit-scrollbar-thumb {
-    background-color: (9, 91, 108, 0.834);
+    background-color: rgba(9, 91, 108, 0.834);
   }
 }
 
