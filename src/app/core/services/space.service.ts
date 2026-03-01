@@ -40,6 +40,17 @@ export class SpaceService {
     }
 
     /**
+     * Live-query observable for a single space by ID regardless of trash status.
+     * Useful for Breadcrumbs and audit trails mapping.
+     */
+    liveSpaceAnyStatus$(spaceId: string) {
+        return liveQuery(async () => {
+            const space = await db.spaces.get(spaceId);
+            return space ?? null;
+        });
+    }
+
+    /**
      * Live-query observable of trashed spaces for a workspace.
      */
     liveTrashedSpaces$(workspaceId: string) {

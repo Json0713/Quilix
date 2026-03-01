@@ -22,7 +22,8 @@
     <div class="nav-address-bar">
         <div class="breadcrumbs">
             <ng-container *ngFor="let crumb of breadcrumbs; let i = index">
-                <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast" (click)="onBreadcrumbClick(crumb)">
+                <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast"
+                    [class.deleted-space]="crumb.isDeleted" (click)="onBreadcrumbClick(crumb)">
                     {{ crumb.label }}
                 </a>
                 <i *ngIf="!crumb.isLast" class="bi bi-chevron-right breadcrumb-separator"></i>
@@ -42,7 +43,7 @@
         <div class="search-container" [class.dropdown-active]="isMobileSearchActive">
             <div class="search-input-wrapper">
                 <i class="bi bi-search search-icon" *ngIf="!isMobileSearchActive"></i>
-                <input type="text" #searchInput class="global-search-input" placeholder="Search everywhere...">
+                <input type="text" #searchInput class="global-search-input" placeholder="Search ...">
                 <!-- Keyboard shortcut hint like macOS Spotlight -->
                 <div class="search-shortcut">Ctrl K</div>
             </div>

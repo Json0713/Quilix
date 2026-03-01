@@ -1,15 +1,20 @@
-import { Component, inject, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, OnInit, HostListener, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
 import { NavigationControlService } from '../../../core/services/navigation-control.service';
 import { SidebarService } from '../../../core/sidebar/sidebar.service';
 import { TabService } from '../../../core/services/tab.service';
+import { SpaceService } from '../../../core/services/space.service';
+import { Space } from '../../../core/interfaces/space';
+import { Subscription } from 'dexie';
 
 interface Breadcrumb {
     label: string;
     url: string;
     isLast: boolean;
+    isSpace?: boolean;
+    isDeleted?: boolean;
 }
 
 @Component({
@@ -19,10 +24,11 @@ interface Breadcrumb {
     templateUrl: './navigation-bar.html',
     styleUrls: ['./navigation-bar.scss']
 })
-export class NavigationBar implements OnInit {
+export class NavigationBar implements OnInit, OnDestroy {
     private navControl = inject(NavigationControlService);
     private sidebarService = inject(SidebarService);
     private tabService = inject(TabService);
+    private spaceService = inject(SpaceService);
     private router = inject(Router);
 
     @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
@@ -31,6 +37,8 @@ export class NavigationBar implements OnInit {
     breadcrumbs: Breadcrumb[] = [];
     isMobileOpen = this.sidebarService.isMobileOpen;
     isMobileSearchActive = false;
+
+    private spaceSub?: Subscription;
 
     constructor() {
         this.router.events.pipe(
@@ -115,6 +123,7 @@ export class NavigationBar implements OnInit {
         const parts = url.split('/').filter(p => p);
 
         this.breadcrumbs = [];
+        this.clearSpaceSub();
 
         if (parts.length > 0) {
             const root = parts[0]; // personal or team
@@ -126,12 +135,19 @@ export class NavigationBar implements OnInit {
 
             if (parts.length > 1) {
                 if (parts[1] === 'spaces' && parts.length > 2) {
-                    // It's a space view
+                    const spaceId = parts[2];
+
+                    // Pre-fill with placeholder until subscription resolves
                     this.breadcrumbs.push({
-                        label: 'Space ' + parts[2].substring(0, 4), // Fallback if no specific name
-                        url: `/${root}/spaces/${parts[2]}`,
-                        isLast: true
+                        label: 'Space ' + spaceId.substring(0, 4),
+                        url: `/${root}/spaces/${spaceId}`,
+                        isLast: true,
+                        isSpace: true
                     });
+
+                    // Kick off the live space query to reactively update the breadcrumb name and status
+                    this.monitorSpaceDetails(spaceId);
+
                 } else {
                     // Other generic routes (Tasks, Settings, etc.)
                     let currentUrl = `/${root}`;
@@ -164,5 +180,38 @@ export class NavigationBar implements OnInit {
 
         // Push precise metadata so History tracking captures label/icon dynamically!
         this.tabService.updateActiveTabRoute(route, crumb.label, icon);
+    }
+
+    private monitorSpaceDetails(spaceId: string) {
+        // Observe the exact space for renames or trash status
+        this.spaceSub = this.spaceService.liveSpaceAnyStatus$(spaceId).subscribe((space: Space | null) => {
+            if (space) {
+                const spaceCrumb = this.breadcrumbs.find(b => b.isSpace && b.url.includes(spaceId));
+                if (spaceCrumb) {
+                    spaceCrumb.label = space.name;
+                    spaceCrumb.isDeleted = !!space.trashedAt;
+
+                    // If it is the active tab and its label changed, sync it silently to the Tab System
+                    if (spaceCrumb.isLast) {
+                        this.tabService.updateActiveTabRoute(
+                            this.router.url.split('?')[0].replace('/personal/', './').replace('/team/', './'),
+                            space.name,
+                            'bi bi-folder'
+                        );
+                    }
+                }
+            }
+        });
+    }
+
+    private clearSpaceSub() {
+        if (this.spaceSub) {
+            this.spaceSub.unsubscribe();
+            this.spaceSub = undefined;
+        }
+    }
+
+    ngOnDestroy() {
+        this.clearSpaceSub();
     }
 }
