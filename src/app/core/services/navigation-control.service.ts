@@ -1,37 +1,66 @@
 import { Injectable, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
+import { TabService } from './tab.service';
+
+export interface HistoryEntry {
+    url: string;
+    tabState: { route: string; label: string; icon: string; };
+}
+
+export interface TabHistory {
+    history: HistoryEntry[];
+    forward: HistoryEntry[];
+}
 
 @Injectable({
     providedIn: 'root'
 })
 export class NavigationControlService {
     private router = inject(Router);
+    private tabService = inject(TabService);
 
-    // Maintain our own distinct history stack
-    private historyStack: string[] = [];
-    private forwardStack: string[] = [];
+    // Maintain a distinct history stack per tab ID
+    private tabHistories = new Map<string, TabHistory>();
 
     // Track if a navigation is user-initiated vs back/forward action
     private isTravelingHistory = false;
 
     constructor() {
+        this.loadHistories();
+
         // Listen to router events and build history naturally
         this.router.events.pipe(
             filter(event => event instanceof NavigationEnd)
         ).subscribe((event: any) => {
             const url = event.urlAfterRedirects || event.url;
+            const activeTab = this.tabService.activeTab();
+
+            if (!activeTab) return;
+
+            const tabId = activeTab.id;
+            if (!this.tabHistories.has(tabId)) {
+                this.tabHistories.set(tabId, { history: [], forward: [] });
+            }
+
+            const tabHistory = this.tabHistories.get(tabId)!;
 
             if (!this.isTravelingHistory) {
                 // Normal navigation: add to history, clear forward stack
-                if (this.historyStack.length === 0 || this.historyStack[this.historyStack.length - 1] !== url) {
-                    this.historyStack.push(url);
-                    // Optional: Limit history stack size if needed (e.g., max 50 items)
-                    if (this.historyStack.length > 50) {
-                        this.historyStack.shift();
+                if (tabHistory.history.length === 0 || tabHistory.history[tabHistory.history.length - 1].url !== url) {
+                    tabHistory.history.push({
+                        url: url,
+                        // Freeze the metadata state as it is at this exact route
+                        tabState: { route: activeTab.route, label: activeTab.label, icon: activeTab.icon }
+                    });
+
+                    // Limit history stack size if needed (e.g., max 50 items) per tab
+                    if (tabHistory.history.length > 50) {
+                        tabHistory.history.shift();
                     }
                 }
-                this.forwardStack = [];
+                tabHistory.forward = [];
+                this.saveHistories();
             } else {
                 // Reset flag after history travel resolves
                 this.isTravelingHistory = false;
@@ -39,36 +68,73 @@ export class NavigationControlService {
         });
     }
 
+    private getActiveTabHistory(): TabHistory | undefined {
+        const activeTab = this.tabService.activeTab();
+        if (!activeTab) return undefined;
+        return this.tabHistories.get(activeTab.id);
+    }
+
     get canGoBack(): boolean {
-        return this.historyStack.length > 1;
+        const hist = this.getActiveTabHistory();
+        return hist ? hist.history.length > 1 : false;
     }
 
     get canGoForward(): boolean {
-        return this.forwardStack.length > 0;
+        const hist = this.getActiveTabHistory();
+        return hist ? hist.forward.length > 0 : false;
     }
 
     goBack(): void {
-        if (this.canGoBack) {
+        const hist = this.getActiveTabHistory();
+        if (hist && this.canGoBack) {
             this.isTravelingHistory = true;
-            const currentUrl = this.historyStack.pop()!;
-            this.forwardStack.push(currentUrl);
+            const currentEntry = hist.history.pop()!;
+            hist.forward.push(currentEntry);
+            this.saveHistories();
 
-            const previousUrl = this.historyStack[this.historyStack.length - 1];
-            this.router.navigateByUrl(previousUrl);
+            const previousEntry = hist.history[hist.history.length - 1];
+
+            // Restore exact tab metadata matching the previous path
+            this.tabService.updateActiveTabRoute(previousEntry.tabState.route, previousEntry.tabState.label, previousEntry.tabState.icon);
+            this.router.navigateByUrl(previousEntry.url);
         }
     }
 
     goForward(): void {
-        if (this.canGoForward) {
+        const hist = this.getActiveTabHistory();
+        if (hist && this.canGoForward) {
             this.isTravelingHistory = true;
-            const nextUrl = this.forwardStack.pop()!;
-            this.historyStack.push(nextUrl);
+            const nextEntry = hist.forward.pop()!;
+            hist.history.push(nextEntry);
+            this.saveHistories();
 
-            this.router.navigateByUrl(nextUrl);
+            // Restore exact tab metadata matching the forward path
+            this.tabService.updateActiveTabRoute(nextEntry.tabState.route, nextEntry.tabState.label, nextEntry.tabState.icon);
+            this.router.navigateByUrl(nextEntry.url);
         }
     }
 
     refresh(): void {
         window.location.reload();
+    }
+
+    private saveHistories(): void {
+        try {
+            const serialized = JSON.stringify(Array.from(this.tabHistories.entries()));
+            localStorage.setItem('quilix_tabHistories', serialized);
+        } catch (e) {
+            console.error('Failed to save tab histories to localStorage', e);
+        }
+    }
+
+    private loadHistories(): void {
+        try {
+            const stored = localStorage.getItem('quilix_tabHistories');
+            if (stored) {
+                this.tabHistories = new Map(JSON.parse(stored));
+            }
+        } catch (e) {
+            console.error('Failed to load tab histories from localStorage', e);
+        }
     }
 }

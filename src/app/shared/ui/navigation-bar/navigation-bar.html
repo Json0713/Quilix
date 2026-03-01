@@ -22,7 +22,7 @@
     <div class="nav-address-bar">
         <div class="breadcrumbs">
             <ng-container *ngFor="let crumb of breadcrumbs; let i = index">
-                <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast">
+                <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast" (click)="onBreadcrumbClick(crumb)">
                     {{ crumb.label }}
                 </a>
                 <i *ngIf="!crumb.isLast" class="bi bi-chevron-right breadcrumb-separator"></i>

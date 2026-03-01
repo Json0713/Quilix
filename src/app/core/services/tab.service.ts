@@ -107,13 +107,14 @@ export class TabService {
 
         const updated: Tab = { ...tab, route, label, icon };
 
-        await db.tabs.update(tab.id, { route, label, icon });
-
-        // Update signals
+        // Optimistically update signals synchronously so Angular Router NavigationEnd captures precise state
         this.tabs.update(tabs =>
             tabs.map(t => t.id === tab.id ? updated : t)
         );
         this.activeTab.set(updated);
+
+        // Background persist to IndexedDB
+        await db.tabs.update(tab.id, { route, label, icon });
     }
 
     /**

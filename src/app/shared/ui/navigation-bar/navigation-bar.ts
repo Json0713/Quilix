@@ -4,6 +4,7 @@ import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
 import { NavigationControlService } from '../../../core/services/navigation-control.service';
 import { SidebarService } from '../../../core/sidebar/sidebar.service';
+import { TabService } from '../../../core/services/tab.service';
 
 interface Breadcrumb {
     label: string;
@@ -21,6 +22,7 @@ interface Breadcrumb {
 export class NavigationBar implements OnInit {
     private navControl = inject(NavigationControlService);
     private sidebarService = inject(SidebarService);
+    private tabService = inject(TabService);
     private router = inject(Router);
 
     @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
@@ -145,5 +147,22 @@ export class NavigationBar implements OnInit {
                 }
             }
         }
+    }
+
+    onBreadcrumbClick(crumb: Breadcrumb) {
+        let icon = 'bi bi-folder';
+        if (crumb.label === 'Home') icon = 'bi bi-house';
+        else if (crumb.label === 'Settings') icon = 'bi bi-gear';
+        else if (crumb.label === 'Trash') icon = 'bi bi-trash3';
+
+        let route = crumb.url;
+        if (crumb.url === '/personal' || crumb.url === '/team') {
+            route = './';
+        } else if (crumb.url.startsWith('/personal/') || crumb.url.startsWith('/team/')) {
+            route = './' + crumb.url.split('/').slice(2).join('/');
+        }
+
+        // Push precise metadata so History tracking captures label/icon dynamically!
+        this.tabService.updateActiveTabRoute(route, crumb.label, icon);
     }
 }
