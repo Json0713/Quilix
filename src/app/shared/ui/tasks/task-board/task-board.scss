@@ -1,8 +1,14 @@
 :host {
     display: block;
     width: 100%;
+    overflow-x: auto;
+
     /* CRITICAL requirement guaranteeing the CDK drag items physically float beyond standard boundaries effortlessly */
     padding-bottom: 24px;
+
+    /* Premium Thin Horizontal Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(79, 163, 168, 0.45) transparent;
 }
 
 .board-canvas {
@@ -14,10 +20,10 @@
 
 /* Horizontal Overflow Scrollbar Tweaks */
 ::-webkit-scrollbar {
-    height: 8px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--surface-alt);
-    border-radius: 4px;
+    background: rgba(79, 163, 168, 0.45);
+    border-radius: 3px;
 }

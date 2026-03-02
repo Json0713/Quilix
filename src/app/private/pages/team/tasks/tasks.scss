@@ -9,9 +9,23 @@
 
 /* Metrics Grid Alignment */
 .metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
     gap: 24px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+
+    /* Premium Thin Horizontal Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(79, 163, 168, 0.45) transparent;
+
+    &::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(79, 163, 168, 0.45);
+        border-radius: 3px;
+    }
 }
 
 .metric-card {
@@ -19,6 +33,8 @@
     border-radius: 16px;
     padding: 24px;
     display: flex;
+    flex: 1;
+    min-width: 320px;
     align-items: center;
     gap: 20px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
@@ -105,6 +121,10 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    
+    border-radius: 20px;
+    padding: 24px;
+    background-color: rgba(0, 0, 0, 0.025);
 
     .board-title {
         font-size: 1.25rem;
