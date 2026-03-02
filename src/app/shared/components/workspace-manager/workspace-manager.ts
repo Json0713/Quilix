@@ -1,11 +1,14 @@
 import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 import { Workspace } from '../../../core/interfaces/workspace';
 import { Space } from '../../../core/interfaces/space';
 import { WorkspaceService } from '../../../core/workspaces/workspace.service';
 import { FileSystemService } from '../../../core/services/file-system.service';
 import { SpaceService } from '../../../core/services/space.service';
 import { SystemSyncService } from '../../../core/services/system-sync.service';
+import { Breadcrumb } from '../../ui/common/breadcrumb/breadcrumb';
+import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
 
 export interface ManagedWorkspace extends Workspace {
     isMissingOnDisk?: boolean;
@@ -21,7 +24,7 @@ export interface ManagedSpace extends Space {
 @Component({
     selector: 'app-workspace-manager',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, DragDropModule, Breadcrumb],
     templateUrl: './workspace-manager.html',
     styleUrl: './workspace-manager.scss',
 })
@@ -30,6 +33,11 @@ export class WorkspaceManagerComponent implements OnInit {
     private fileSystem = inject(FileSystemService);
     private spaceService = inject(SpaceService);
     private systemSync = inject(SystemSyncService);
+    private breadcrumbService = inject(BreadcrumbService);
+
+    get totalWorkspaces() { return this.workspaces().length; }
+    get syncedFolders() { return this.workspaces().filter(w => !w.isMissingOnDisk).length; }
+    get missingFolders() { return this.workspaces().filter(w => w.isMissingOnDisk).length; }
 
     workspaces = signal<ManagedWorkspace[]>([]);
     isLoading = signal<boolean>(true);
@@ -63,6 +71,7 @@ export class WorkspaceManagerComponent implements OnInit {
     isLoadingSpaces = signal(false);
 
     async ngOnInit() {
+        this.breadcrumbService.setTitle('Manage Workspaces');
         await this.loadWorkspaces();
     }
 
@@ -385,6 +394,24 @@ export class WorkspaceManagerComponent implements OnInit {
             const spaces = next.get(workspaceId) ?? [];
             next.set(workspaceId, spaces.map(s => s.id === spaceId ? { ...s, ...updates } : s));
             return next;
+        });
+    }
+
+    // ── Drag & Drop ──
+
+    onDrop(event: CdkDragDrop<ManagedWorkspace[]>) {
+        if (event.previousIndex === event.currentIndex || this.selectionMode()) return;
+
+        const updatedWorkspaces = [...this.workspaces()];
+        moveItemInArray(updatedWorkspaces, event.previousIndex, event.currentIndex);
+
+        // Update local signal to immediately reflect the reorder
+        this.workspaces.set(updatedWorkspaces);
+
+        // Prepare bulk updates using the new indices
+        const updates = updatedWorkspaces.map((ws, i) => ({ id: ws.id, order: i }));
+        this.workspaceService.updateWorkspaceOrder(updates).catch(err => {
+            console.error('Failed to update workspace order', err);
         });
     }
 }

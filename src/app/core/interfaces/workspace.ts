@@ -6,6 +6,7 @@ export interface Workspace {
     role: WorkspaceRole;
     createdAt: number;
     lastActiveAt: number;
+    order?: number;
     trashedAt?: number;
     folderPath?: string; // Optional reference to local folder
 }

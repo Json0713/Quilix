@@ -10,14 +10,16 @@ import { FileSystemService } from '../services/file-system.service';
 export class WorkspaceService {
     private fileSystem = inject(FileSystemService);
 
-    // Real-time observable of workspaces, sorted by lastActiveAt
-    readonly workspaces$ = liveQuery(() =>
-        db.workspaces
-            .orderBy('lastActiveAt')
-            .reverse()
-            .filter(w => !w.trashedAt)
-            .toArray()
-    );
+    // Real-time observable of workspaces, sorted by order, then lastActiveAt
+    readonly workspaces$ = liveQuery(async () => {
+        const ws = await db.workspaces.filter(w => !w.trashedAt).toArray();
+        return ws.sort((a, b) => {
+            const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
+            const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
+            if (orderA !== orderB) return orderA - orderB;
+            return b.lastActiveAt - a.lastActiveAt;
+        });
+    });
 
     // Real-time observable of trashed workspaces
     readonly trashedWorkspaces$ = liveQuery(() =>
@@ -27,8 +29,13 @@ export class WorkspaceService {
     );
 
     async getAll(): Promise<Workspace[]> {
-        const all = await db.workspaces.orderBy('lastActiveAt').reverse().toArray();
-        return all.filter(w => !w.trashedAt);
+        const all = await db.workspaces.filter(w => !w.trashedAt).toArray();
+        return all.sort((a, b) => {
+            const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
+            const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
+            if (orderA !== orderB) return orderA - orderB;
+            return b.lastActiveAt - a.lastActiveAt;
+        });
     }
 
     async getTrashed(): Promise<Workspace[]> {
@@ -76,6 +83,17 @@ export class WorkspaceService {
 
     async updateLastActive(workspaceId: string): Promise<void> {
         await db.workspaces.update(workspaceId, { lastActiveAt: Date.now() });
+    }
+
+    /**
+     * Bulk update workspace ordering.
+     */
+    async updateWorkspaceOrder(updates: { id: string; order: number }[]): Promise<void> {
+        await db.transaction('rw', db.workspaces, async () => {
+            for (const update of updates) {
+                await db.workspaces.update(update.id, { order: update.order });
+            }
+        });
     }
 
     /**
