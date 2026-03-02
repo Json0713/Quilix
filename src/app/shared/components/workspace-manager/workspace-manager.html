@@ -64,14 +64,14 @@
         }
     </div>
 
-    <!-- Re-auth banner -->
+    <!-- Re-auth banner (permission lost after reload on mobile) -->
     @if (needsReauth() && isFileSystemMode()) {
     <div class="reauth-banner">
         <div class="reauth-info">
             <i class="bi bi-shield-lock"></i>
             <div class="reauth-text">
                 <strong>Storage access needed</strong>
-                <span>Reconnect to fully manage and sync workspace folders from your device.</span>
+                <span>Reconnect to fully delete workspace folders from your device.</span>
             </div>
         </div>
         <button class="reauth-btn" (click)="reconnectStorage()" [disabled]="isReauthing()">
@@ -185,9 +185,11 @@
                         <div class="space-row" [class.missing]="space.isMissingOnDisk"
                             style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--surface-alt); border-radius: 8px;">
                             <div class="space-info"
-                                style="display: flex; align-items: center; gap: 12px; color: var(--text-main);">
-                                <i class="bi bi-folder2" style="color: var(--primary);"></i>
-                                <span class="space-name" style="font-weight: 500;">{{ space.name }}</span>
+                                style="display: flex; align-items: center; gap: 12px; color: var(--text-main); flex: 1; min-width: 0;">
+                                <i class="bi bi-folder2" style="color: var(--primary); flex-shrink: 0;"></i>
+                                <span class="space-name"
+                                    style="font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">{{
+                                    space.name }}</span>
                             </div>
                             <div class="space-status" style="display: flex; align-items: center; gap: 12px;">
                                 @if (space.isMissingOnDisk) {
@@ -443,9 +445,11 @@
                         <div class="space-row" [class.missing]="space.isMissingOnDisk"
                             style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--surface-alt); border-radius: 8px;">
                             <div class="space-info"
-                                style="display: flex; align-items: center; gap: 12px; color: var(--text-main);">
-                                <i class="bi bi-folder2" style="color: var(--primary);"></i>
-                                <span class="space-name" style="font-weight: 500;">{{ space.name }}</span>
+                                style="display: flex; align-items: center; gap: 12px; color: var(--text-main); flex: 1; min-width: 0;">
+                                <i class="bi bi-folder2" style="color: var(--primary); flex-shrink: 0;"></i>
+                                <span class="space-name"
+                                    style="font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">{{
+                                    space.name }}</span>
                             </div>
                             <div class="space-status" style="display: flex; align-items: center; gap: 12px;">
                                 @if (space.isMissingOnDisk) {
