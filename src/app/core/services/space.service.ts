@@ -64,6 +64,13 @@ export class SpaceService {
     }
 
     /**
+     * Get the total count of all spaces across all workspaces.
+     */
+    async getTotalCount(): Promise<number> {
+        return db.spaces.count();
+    }
+
+    /**
      * Get all spaces for a workspace.
      */
     async getByWorkspace(workspaceId: string): Promise<Space[]> {

@@ -2,7 +2,7 @@
     <app-breadcrumb></app-breadcrumb>
 
     <!-- Metrics Grid -->
-    <div class="metrics-grid">
+    <div class="metrics-grid" style="display: flex; flex-wrap: wrap; margin-bottom: 24px; gap: 24px;">
         <!-- Total Workspaces -->
         <div class="metric-card stat-card">
             <div class="stat-icon type-total">
@@ -32,7 +32,8 @@
             </div>
         </div>
 
-        <!-- Missing Folders -->
+        @if (missingFolders > 0) {
+        <!-- Missing Folders (Warning) -->
         <div class="metric-card stat-card">
             <div class="stat-icon type-progress">
                 <i class="bi bi-exclamation-triangle-fill"></i>
@@ -45,26 +46,179 @@
                 </div>
             </div>
         </div>
+        } @else {
+        <!-- Total Spaces (No Missing Folders) -->
+        <div class="metric-card stat-card">
+            <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                <i class="bi bi-folder2"></i>
+            </div>
+            <div class="stat-text">
+                <span class="label">Total Spaces</span>
+                <div class="value-row">
+                    <span class="value">{{ totalSpaces() }}</span>
+                    <span class="limit">Directories</span>
+                </div>
+            </div>
+        </div>
+        }
         }
     </div>
 
     <!-- Re-auth banner -->
     @if (needsReauth() && isFileSystemMode()) {
-    <div class="reauth-banner card-banner error-banner">
+    <div class="reauth-banner">
         <div class="reauth-info">
-            <i class="bi bi-shield-lock" style="font-size: 24px;"></i>
+            <i class="bi bi-shield-lock"></i>
             <div class="reauth-text">
-                <strong>Storage access expired</strong>
-                <span>Reconnect to check folder status and manage local files.</span>
+                <strong>Storage access needed</strong>
+                <span>Reconnect to fully manage and sync workspace folders from your device.</span>
             </div>
         </div>
-        <button class="action-btn error-btn" (click)="reconnectStorage()" [disabled]="isReauthing()">
+        <button class="reauth-btn" (click)="reconnectStorage()" [disabled]="isReauthing()">
             @if (isReauthing()) {
-            <i class="bi bi-arrow-repeat spin"></i> <span>Connecting...</span>
+            <i class="bi bi-arrow-repeat spin"></i>
+            <span>Connecting...</span>
             } @else {
-            <i class="bi bi-plug"></i> <span>Reconnect Storage</span>
+            <i class="bi bi-plug"></i>
+            <span>Reconnect Storage</span>
             }
         </button>
+    </div>
+    }
+
+    <!-- Current Workspace Section -->
+    @if (currentWorkspace()) {
+    <div class="task-board-section" style="margin-bottom: 32px;">
+        <div class="board-actions" style="margin-bottom: 24px;">
+            <h2 class="board-title" style="margin: 0; padding-left: 4px;">My Workspace</h2>
+        </div>
+        <div class="workspace-list task-list">
+            <div class="workspace-card task-card" [class.missing]="currentWorkspace()!.isMissingOnDisk"
+                [class.expanded]="expandedWorkspaceId() === currentWorkspace()!.id">
+
+                <div class="task-header">
+                    <div class="task-title-group" style="min-width: 0; flex: 1;">
+                        <div class="icon-wrapper"
+                            style="font-size: 1.3rem; color: var(--primary); width: 32px; text-align: center; flex-shrink: 0;">
+                            <i class="bi" [class.bi-person-workspace]="currentWorkspace()!.role === 'personal'"
+                                [class.bi-people]="currentWorkspace()!.role === 'team'">
+                            </i>
+                        </div>
+                        <div class="details" style="display: flex; flex-direction: column; gap: 14px; min-width: 0;">
+                            <h3 class="task-title"
+                                style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">
+                                {{ currentWorkspace()!.name }}
+                            </h3>
+                            <span class="task-badge" [class.badge-progress]="currentWorkspace()!.role === 'team'"
+                                [class.badge-personal]="currentWorkspace()!.role === 'personal'"
+                                style="width: fit-content;">
+                                {{ currentWorkspace()!.role | titlecase }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-status" style="display: flex; align-items: center; gap: 16px;">
+                        @if (isFileSystemMode()) {
+                        @if (currentWorkspace()!.isMissingOnDisk) {
+                        <div class="task-badge badge-error" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                            <i class="bi bi-exclamation-triangle-fill"></i> Folder Missing
+                        </div>
+                        <button class="action-btn"
+                            [disabled]="currentWorkspace()!.isRestoring || currentWorkspace()!.isTrashing"
+                            (click)="restoreWorkspace(currentWorkspace()!)">
+                            @if (currentWorkspace()!.isRestoring) {
+                            <i class="bi bi-arrow-repeat spin"></i> Restoring...
+                            } @else {
+                            <i class="bi bi-arrow-counterclockwise"></i> Restore
+                            }
+                        </button>
+                        } @else {
+                        <div class="task-badge badge-success"
+                            style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <i class="bi bi-check-circle-fill"></i> Synced
+                        </div>
+                        }
+                        } @else {
+                        <div class="task-badge badge-info" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                            <i class="bi bi-database"></i> IndexedDB
+                        </div>
+                        }
+
+                        <div class="card-actions" style="display: flex; gap: 8px;">
+                            @if (isFileSystemMode() && !currentWorkspace()!.isMissingOnDisk) {
+                            <button class="action-btn expand-btn" (click)="toggleExpand(currentWorkspace()!)"
+                                [class.active]="expandedWorkspaceId() === currentWorkspace()!.id" title="View spaces">
+                                <i class="bi" [class.bi-chevron-down]="expandedWorkspaceId() === currentWorkspace()!.id"
+                                    [class.bi-chevron-right]="expandedWorkspaceId() !== currentWorkspace()!.id"></i>
+                            </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @if (expandedWorkspaceId() === currentWorkspace()!.id) {
+                <div class="space-panel"
+                    style="margin-top: 16px; padding-left: 48px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                    @if (isLoadingSpaces()) {
+                    <div class="space-loading" style="color: var(--text-muted); font-size: 0.9rem;">
+                        <i class="bi bi-arrow-repeat spin"></i> Loading spaces...
+                    </div>
+                    } @else if (getSpaces(currentWorkspace()!.id).length === 0) {
+                    <div class="space-empty" style="color: var(--text-muted); font-size: 0.9rem;">
+                        <span>No spaces in this workspace</span>
+                    </div>
+                    } @else {
+                    @if (hasMissingSpaces(currentWorkspace()!.id)) {
+                    <div class="space-panel-toolbar"
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <span class="missing-count" style="font-size: 0.9rem; color: var(--text-muted);">
+                            {{ getSpaces(currentWorkspace()!.id).length }} space{{
+                            getSpaces(currentWorkspace()!.id).length > 1 ? 's' : '' }}
+                        </span>
+                        <button class="action-btn" (click)="restoreAllSpaces(currentWorkspace()!)">
+                            <i class="bi bi-arrow-counterclockwise"></i> Restore All
+                        </button>
+                    </div>
+                    }
+                    <div class="space-list" style="display: flex; flex-direction: column; gap: 12px;">
+                        @for (space of getSpaces(currentWorkspace()!.id); track space.id) {
+                        <div class="space-row" [class.missing]="space.isMissingOnDisk"
+                            style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--surface-alt); border-radius: 8px;">
+                            <div class="space-info"
+                                style="display: flex; align-items: center; gap: 12px; color: var(--text-main);">
+                                <i class="bi bi-folder2" style="color: var(--primary);"></i>
+                                <span class="space-name" style="font-weight: 500;">{{ space.name }}</span>
+                            </div>
+                            <div class="space-status" style="display: flex; align-items: center; gap: 12px;">
+                                @if (space.isMissingOnDisk) {
+                                <span class="task-badge badge-error"
+                                    style="background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 0.75rem;">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> Missing
+                                </span>
+                                <button class="action-btn" [disabled]="space.isRestoring"
+                                    (click)="restoreSpace(currentWorkspace()!, space)"
+                                    style="padding: 6px 12px; font-size: 0.8rem;">
+                                    @if (space.isRestoring) {
+                                    <i class="bi bi-arrow-repeat spin"></i>
+                                    } @else {
+                                    <i class="bi bi-arrow-counterclockwise"></i> Restore
+                                    }
+                                </button>
+                                } @else {
+                                <span class="task-badge badge-success"
+                                    style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.75rem;">
+                                    <i class="bi bi-check-circle-fill"></i> Synced
+                                </span>
+                                }
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+        </div>
     </div>
     }
 
@@ -75,11 +229,11 @@
             <h2 class="board-title" style="margin: 0; padding-left: 4px;">Workspaces Track</h2>
 
             <div class="board-controls flex gap-3" style="display: flex; gap: 12px; align-items: center;">
-                @if (!isLoading() && workspaces().length > 0) {
+                @if (!isLoading() && otherWorkspaces().length > 0) {
                 <button class="action-btn" (click)="toggleSelectionMode()" [class.active]="selectionMode()"
-                    style="background: var(--surface-alt); color: var(--text-main); border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500;">
+                    style="background: var(--surface); color: var(--text-main); border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500;">
                     @if (selectionMode()) {
-                    <i class="bi bi-x-lg"></i><span>Cancel Select</span>
+                    <i class="bi bi-x-lg"></i><span>Cancel</span>
                     } @else {
                     <i class="bi bi-check2-square"></i><span>Select</span>
                     }
@@ -106,7 +260,7 @@
             <div class="toolbar-actions" style="display: flex; gap: 12px; align-items: center;">
                 @if (confirmingBulkTrash()) {
                 <div class="bulk-confirm" style="display: flex; align-items: center; gap: 12px;">
-                    <span class="confirm-label" style="font-weight: 500; color: var(--text-muted);">Trash {{
+                    <span class="confirm-label" style="font-weight: 500; color: var(--text-alt);">Trash {{
                         selectedCount() }} workspace{{ selectedCount() > 1 ? 's' : '' }}?</span>
                     <button class="action-btn confirm-yes" (click)="confirmBulkTrash()" [disabled]="isBulkProcessing()"
                         style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
@@ -146,31 +300,24 @@
             <i class="bi bi-arrow-repeat spin" style="font-size: 2rem; margin-bottom: 16px; display: block;"></i>
             <span>Loading workspaces...</span>
         </div>
-        } @else if (workspaces().length === 0) {
+        } @else if (otherWorkspaces().length === 0) {
         <div class="empty-state"
             style="padding: 60px 20px; text-align: center; background: var(--surface-main); border-radius: 16px;">
             <i class="bi bi-folder-x"
                 style="font-size: 3rem; color: var(--text-muted); margin-bottom: 16px; display: block;"></i>
-            <p style="color: var(--text-muted); margin: 0; font-size: 1.1rem;">No workspaces found.</p>
+            <p style="color: var(--text-muted); margin: 0; font-size: 1.1rem;">No other workspaces found.</p>
         </div>
         } @else {
         <div class="workspace-list task-list" cdkDropList (cdkDropListDropped)="onDrop($event)"
             [cdkDropListDisabled]="selectionMode()">
-            @for (ws of workspaces(); track ws.id) {
+            @for (ws of otherWorkspaces(); track ws.id) {
             <div class="workspace-card task-card" cdkDrag [class.missing]="ws.isMissingOnDisk"
                 [class.selected]="isSelected(ws.id)" [class.in-select-mode]="selectionMode()"
                 [class.expanded]="expandedWorkspaceId() === ws.id"
                 (click)="selectionMode() ? toggleSelect(ws.id) : null">
 
-                <!-- Custom Preview during drag -->
-                <div *cdkDragPreview class="workspace-card task-card drag-preview"
-                    style="background: var(--surface-main); padding: 24px; border-radius: 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); opacity: 0.95;">
-                    <i class="bi bi-grip-vertical" style="color: var(--text-muted);"></i>
-                    <div style="font-weight: 600; font-size: 1.1rem; color: var(--text-main);">{{ ws.name }}</div>
-                </div>
-
                 <div class="task-header">
-                    <div class="task-title-group">
+                    <div class="task-title-group" style="min-width: 0; flex: 1;">
                         @if (!selectionMode()) {
                         <div class="drag-handle" cdkDragHandle style="margin-right: 8px;">
                             <i class="bi bi-grip-vertical" style="font-size: 1.2rem;"></i>
@@ -180,20 +327,23 @@
                         @if (selectionMode()) {
                         <div class="task-checkbox" (click)="$event.stopPropagation(); toggleSelect(ws.id)">
                             <i class="bi" [class.bi-check-square-fill]="isSelected(ws.id)"
-                                [class.bi-square]="!isAllSelected()"></i>
+                                [class.bi-square]="!isSelected(ws.id)"></i>
                         </div>
                         }
 
                         <div class="icon-wrapper"
-                            style="font-size: 1.3rem; color: var(--primary); width: 32px; text-align: center;">
+                            style="font-size: 1.3rem; color: var(--primary); width: 32px; text-align: center; flex-shrink: 0;">
                             <i class="bi" [class.bi-person-workspace]="ws.role === 'personal'"
                                 [class.bi-people]="ws.role === 'team'">
                             </i>
                         </div>
-                        <div class="details" style="display: flex; flex-direction: column; gap: 4px;">
-                            <h3 class="task-title">{{ ws.name }}</h3>
+                        <div class="details" style="display: flex; flex-direction: column; gap: 14px; min-width: 0;">
+                            <h3 class="task-title"
+                                style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">
+                                {{ ws.name }}
+                            </h3>
                             <span class="task-badge" [class.badge-progress]="ws.role === 'team'"
-                                [class.badge-completed]="ws.role === 'personal'" style="width: fit-content;">
+                                [class.badge-personal]="ws.role === 'personal'" style="width: fit-content;">
                                 {{ ws.role | titlecase }}
                             </span>
                         </div>
@@ -230,7 +380,7 @@
                             @if (confirmingTrashId() === ws.id) {
                             <div class="confirm-actions flex align-items-center gap-2"
                                 style="display: flex; gap: 8px; align-items: center;">
-                                <span class="confirm-text text-sm">Trash it?</span>
+                                <span class="confirm-text text-sm" style="color: var(--text-alt);">Trash it?</span>
                                 <button class="action-btn" (click)="confirmTrash(ws)" [disabled]="ws.isTrashing"
                                     style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
                                     @if (ws.isTrashing) {

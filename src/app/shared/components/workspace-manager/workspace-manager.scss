@@ -11,22 +11,9 @@
 /* Metrics Grid */
 .metrics-grid {
     display: flex;
+    flex-wrap: wrap;
     gap: 24px;
-    overflow-x: auto;
     padding-bottom: 12px;
-
-    /* Premium Thin Horizontal Scrollbar */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(79, 163, 168, 0.45) transparent;
-
-    &::-webkit-scrollbar {
-        height: 6px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: rgba(79, 163, 168, 0.45);
-        border-radius: 3px;
-    }
 }
 
 .metric-card {
@@ -115,50 +102,75 @@
     }
 }
 
-/* Base Banners */
-.card-banner {
-    background: var(--surface-main);
-    border-radius: 16px;
-    padding: 24px;
+/* ── Re-auth banner ── */
+.reauth-banner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-
-    &.error-banner {
-        border-left: 4px solid #ef4444;
-    }
+    gap: 16px;
+    padding: 14px 18px;
+    background: rgba(230, 162, 60, 0.08);
+    border: 1px solid rgba(230, 162, 60, 0.3);
+    border-radius: 10px;
 
     .reauth-info {
         display: flex;
         align-items: center;
-        gap: 16px;
-        color: var(--text-main);
+        gap: 12px;
+        flex: 1;
+        min-width: 0;
 
-        i {
-            color: #ef4444;
+        >i {
+            font-size: 22px;
+            color: #e6a23c;
+            flex-shrink: 0;
         }
 
         .reauth-text {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
+
+            strong {
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-main);
+            }
 
             span {
+                font-size: 12px;
                 color: var(--text-muted);
-                font-size: 0.95rem;
             }
         }
     }
 
-    .error-btn {
-        background: rgba(239, 68, 68, 0.1) !important;
-        color: #ef4444 !important;
+    .reauth-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        background: #e6a23c;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        flex-shrink: 0;
 
-        &:hover {
-            background: #ef4444 !important;
-            color: white !important;
+        &:hover:not(:disabled) {
+            background: #d49330;
+        }
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        i {
+            font-size: 14px;
         }
     }
 }
@@ -200,9 +212,13 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
+    &.in-select-mode {
+        cursor: pointer;
+        user-select: none;
+    }
+
     &.selected {
         border-color: var(--primary);
-        background: rgba(var(--primary-rgb), 0.03);
     }
 
     .task-header {
@@ -216,36 +232,64 @@
         display: flex;
         align-items: center;
         gap: 16px;
-    }
+        min-width: 0;
+        flex: 1;
 
-    .task-checkbox {
-        font-size: 24px;
-        color: var(--text-muted);
-        cursor: pointer;
-        transition: color 0.2s ease;
-        line-height: 1;
+        .task-checkbox {
+            i {
+                font-size: 1.25rem;
+                color: var(--text-muted);
+                transition: color 0.2s ease;
 
-        &:hover {
-            color: var(--primary);
+                &.bi-check-square-fill {
+                    color: var(--primary);
+                }
+            }
+
+            &:hover i.bi-square {
+                color: var(--text-main);
+            }
         }
 
-        &.checked {
-            color: #10b981;
-        }
-    }
+        .icon-wrapper {
+            background: rgba(var(--primary-rgb), 0.1);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
 
-    .task-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: var(--text-main);
-        margin: 0;
+            i {
+                color: var(--primary);
+                font-size: 1.2rem;
+            }
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+            overflow: hidden;
+
+            .task-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: var(--text-main);
+                margin: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
     }
 
     .task-badge {
-        font-size: 12px;
-        font-weight: 600;
-        padding: 6px 16px;
+        padding: 4px 12px;
         border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
         white-space: nowrap;
         display: inline-flex;
         align-items: center;
@@ -259,6 +303,12 @@
         &.badge-completed {
             background: rgba(16, 185, 129, 0.1);
             color: #10b981;
+        }
+
+        &.badge-personal {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-radius: 6px;
         }
     }
 
@@ -277,7 +327,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: var(--surface-alt);
+    background: var(--surface);
     border: none;
     color: var(--text-alt);
     font-size: 0.85rem;
@@ -304,15 +354,25 @@
 
 /* Drag & Drop Utility Classes */
 .cdk-drag-preview {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.05);
-    background: var(--surface-main);
+    box-sizing: border-box;
     border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    background: var(--surface-main);
     opacity: 0.95;
     z-index: 1000;
 }
 
 .cdk-drag-placeholder {
-    opacity: 0;
+    opacity: 1;
+    border: 2px dashed var(--border-color);
+    background: transparent;
+    border-radius: 16px;
+    box-shadow: none !important;
+
+    // Hide standard content in the drop-zone to purely showcase it as a gap
+    * {
+        visibility: hidden !important;
+    }
 }
 
 .cdk-drag-animating {

@@ -7,6 +7,7 @@ import { WorkspaceService } from '../../../core/workspaces/workspace.service';
 import { FileSystemService } from '../../../core/services/file-system.service';
 import { SpaceService } from '../../../core/services/space.service';
 import { SystemSyncService } from '../../../core/services/system-sync.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { Breadcrumb } from '../../ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
 
@@ -33,6 +34,7 @@ export class WorkspaceManagerComponent implements OnInit {
     private fileSystem = inject(FileSystemService);
     private spaceService = inject(SpaceService);
     private systemSync = inject(SystemSyncService);
+    private authService = inject(AuthService);
     private breadcrumbService = inject(BreadcrumbService);
 
     get totalWorkspaces() { return this.workspaces().length; }
@@ -44,6 +46,12 @@ export class WorkspaceManagerComponent implements OnInit {
     isFileSystemMode = signal<boolean>(false);
     needsReauth = signal<boolean>(false);
     isReauthing = signal<boolean>(false);
+
+    currentWorkspaceId = signal<string | null>(null);
+    totalSpaces = signal<number>(0);
+
+    currentWorkspace = computed(() => this.workspaces().find(w => w.id === this.currentWorkspaceId()));
+    otherWorkspaces = computed(() => this.workspaces().filter(w => w.id !== this.currentWorkspaceId()));
 
     // ── Selection state ──
     selectionMode = signal<boolean>(false);
@@ -73,6 +81,13 @@ export class WorkspaceManagerComponent implements OnInit {
     async ngOnInit() {
         this.breadcrumbService.setTitle('Manage Workspaces');
         await this.loadWorkspaces();
+
+        // Load independent metrics
+        this.totalSpaces.set(await this.spaceService.getTotalCount());
+        const currentWs = await this.authService.getCurrentWorkspace();
+        if (currentWs) {
+            this.currentWorkspaceId.set(currentWs.id);
+        }
     }
 
     @HostListener('window:focus')
@@ -402,8 +417,19 @@ export class WorkspaceManagerComponent implements OnInit {
     onDrop(event: CdkDragDrop<ManagedWorkspace[]>) {
         if (event.previousIndex === event.currentIndex || this.selectionMode()) return;
 
+        // Clone the original full array to manipulate
         const updatedWorkspaces = [...this.workspaces()];
-        moveItemInArray(updatedWorkspaces, event.previousIndex, event.currentIndex);
+
+        // The event indices are based on the filtered `otherWorkspaces` array, so we must map them 
+        // to their actual indices in the `workspaces` array.
+        const otherWs = this.otherWorkspaces();
+        const draggedWs = otherWs[event.previousIndex];
+        const targetWs = otherWs[event.currentIndex];
+
+        const actualPrevIndex = updatedWorkspaces.findIndex(w => w.id === draggedWs.id);
+        const actualCurrentIndex = updatedWorkspaces.findIndex(w => w.id === targetWs.id);
+
+        moveItemInArray(updatedWorkspaces, actualPrevIndex, actualCurrentIndex);
 
         // Update local signal to immediately reflect the reorder
         this.workspaces.set(updatedWorkspaces);
