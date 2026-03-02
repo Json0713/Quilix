@@ -88,8 +88,8 @@
 
     <!-- Current Workspace Section -->
     @if (currentWorkspace()) {
-    <div class="task-board-section" style="margin-bottom: 32px;">
-        <div class="board-actions" style="margin-bottom: 24px;">
+    <div class="task-board-section" style="margin-bottom: 2px;">
+        <div class="board-actions" style="margin-bottom: 4px;">
             <h2 class="board-title" style="margin: 0; padding-left: 4px;">My Workspace</h2>
         </div>
         <div class="workspace-list task-list">
@@ -158,7 +158,7 @@
 
                 @if (expandedWorkspaceId() === currentWorkspace()!.id) {
                 <div class="space-panel"
-                    style="margin-top: 16px; padding-left: 48px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                    style="margin-top: 16px; padding-left: 4px; border-top: 1px solid var(--border-color); padding-top: 16px;">
                     @if (isLoadingSpaces()) {
                     <div class="space-loading" style="color: var(--text-muted); font-size: 0.9rem;">
                         <i class="bi bi-arrow-repeat spin"></i> Loading spaces...
@@ -419,7 +419,7 @@
                 <!-- Expanded space list -->
                 @if (expandedWorkspaceId() === ws.id && !selectionMode()) {
                 <div class="space-panel"
-                    style="margin-top: 16px; padding-left: 48px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                    style="margin-top: 16px; padding-left: 4px; border-top: 1px solid var(--border-color); padding-top: 16px;">
                     @if (isLoadingSpaces()) {
                     <div class="space-loading" style="color: var(--text-muted); font-size: 0.9rem;">
                         <i class="bi bi-arrow-repeat spin"></i> Loading spaces...
