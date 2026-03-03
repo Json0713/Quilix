@@ -116,6 +116,23 @@
     flex-direction: column;
     gap: 16px;
     min-height: 200px;
+
+    .drag-handle {
+        color: var(--text-muted);
+        cursor: grab;
+        margin-right: 8px;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+
+        &:active {
+            cursor: grabbing;
+        }
+
+        i {
+            font-size: 1.2rem;
+        }
+    }
 }
 
 /* Action Buttons */
@@ -171,32 +188,41 @@
 /* Drag & Drop Utility Classes */
 .cdk-drag-preview {
     box-sizing: border-box;
-    border-radius: 16px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    background: var(--surface-main);
-    opacity: 0.95;
-    z-index: 1000;
-}
+    cursor: grabbing !important;
 
-.cdk-drag-placeholder {
-    opacity: 1;
-    border: 2px dashed var(--border-color);
-    background: transparent;
-    border-radius: 16px;
-    box-shadow: none !important;
-
-    // Hide standard content in the drop-zone to purely showcase it as a gap
-    * {
-        visibility: hidden !important;
+    .workspace-card {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+        border-color: var(--primary) !important;
+        transform: scale(1.02);
+        transition: transform 0.2s cubic-bezier(0.2, 1, 0.2, 1), box-shadow 0.2s cubic-bezier(0.2, 1, 0.2, 1);
+        z-index: 1000;
     }
 }
 
-.cdk-drag-animating {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+.cdk-drag-placeholder {
+    opacity: 0.4 !important;
+    transition: opacity 250ms cubic-bezier(0.2, 1, 0.2, 1);
+
+    .workspace-card {
+        border: 2px dashed var(--primary) !important;
+        background: rgba(var(--primary-rgb), 0.02) !important;
+        box-shadow: none !important;
+
+        /* Hide complex inner content to keep it clean */
+        * {
+            visibility: hidden !important;
+        }
+    }
 }
 
-.workspace-list.cdk-drop-list-dragging .workspace-card:not(.cdk-drag-placeholder) {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+/* Animate the item that is being dragged to its final position */
+.cdk-drag-animating {
+    transition: transform 300ms cubic-bezier(0.2, 1, 0.2, 1);
+}
+
+/* Animate all other list items smoothly out of the way */
+.workspace-list.cdk-drop-list-dragging app-workspace-card:not(.cdk-drag-placeholder) {
+    transition: transform 300ms cubic-bezier(0.2, 1, 0.2, 1);
 }
 
 /* Animations */

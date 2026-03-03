@@ -140,8 +140,9 @@
                 (cancelTrash)="cancelTrash()" (toggleSelect)="toggleSelect($event)"
                 (restoreAllSpaces)="restoreAllSpaces($event)"
                 (restoreSpace)="restoreSpace($event.workspace, $event.space)">
-                <div *cdkDragPreview></div>
-                <div *cdkDragPlaceholder></div>
+                <div class="drag-handle" dragHandle cdkDragHandle>
+                    <i class="bi bi-grip-vertical"></i>
+                </div>
             </app-workspace-card>
             }
         </div>

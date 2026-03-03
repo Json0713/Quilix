@@ -5,9 +5,7 @@
     <div class="workspace-header">
         <div class="workspace-title-group">
             @if (!isSelectionMode && !isCurrentWorkspace) {
-            <div class="drag-handle" cdkDragHandle>
-                <i class="bi bi-grip-vertical"></i>
-            </div>
+            <ng-content select="[dragHandle]"></ng-content>
             }
 
             @if (isSelectionMode && !isCurrentWorkspace) {

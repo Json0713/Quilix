@@ -143,21 +143,6 @@
         }
     }
 
-    .drag-handle {
-        color: var(--text-muted);
-        cursor: grab;
-        margin-right: 8px;
-        padding: 4px;
-
-        &:active {
-            cursor: grabbing;
-        }
-
-        i {
-            font-size: 1.2rem;
-        }
-    }
-
     .card-status {
         display: flex;
         align-items: center;
