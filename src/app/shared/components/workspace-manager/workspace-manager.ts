@@ -10,8 +10,8 @@ import { SystemSyncService } from '../../../core/services/system-sync.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Breadcrumb } from '../../ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
-import { WorkspaceMetricsComponent } from './workspace-metrics/workspace-metrics.component';
-import { WorkspaceCardComponent } from './workspace-card/workspace-card.component';
+import { WorkspaceMetricsComponent } from './workspace-metrics/workspace-metrics';
+import { WorkspaceCardComponent } from './workspace-card/workspace-card';
 
 export interface ManagedWorkspace extends Workspace {
     isMissingOnDisk?: boolean;

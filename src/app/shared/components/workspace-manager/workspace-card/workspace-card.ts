@@ -7,8 +7,8 @@ import { ManagedWorkspace, ManagedSpace } from '../workspace-manager';
     selector: 'app-workspace-card',
     standalone: true,
     imports: [CommonModule, DragDropModule],
-    templateUrl: './workspace-card.component.html',
-    styleUrls: ['./workspace-card.component.scss']
+    templateUrl: './workspace-card.html',
+    styleUrls: ['./workspace-card.scss']
 })
 export class WorkspaceCardComponent {
     @Input({ required: true }) workspace!: ManagedWorkspace;
