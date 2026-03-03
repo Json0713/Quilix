@@ -10,6 +10,8 @@ import { SystemSyncService } from '../../../core/services/system-sync.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Breadcrumb } from '../../ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
+import { WorkspaceMetricsComponent } from './workspace-metrics/workspace-metrics.component';
+import { WorkspaceCardComponent } from './workspace-card/workspace-card.component';
 
 export interface ManagedWorkspace extends Workspace {
     isMissingOnDisk?: boolean;
@@ -25,7 +27,7 @@ export interface ManagedSpace extends Space {
 @Component({
     selector: 'app-workspace-manager',
     standalone: true,
-    imports: [CommonModule, DragDropModule, Breadcrumb],
+    imports: [CommonModule, DragDropModule, Breadcrumb, WorkspaceMetricsComponent, WorkspaceCardComponent],
     templateUrl: './workspace-manager.html',
     styleUrl: './workspace-manager.scss',
 })

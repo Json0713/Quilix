@@ -1,0 +1,153 @@
+<div class="workspace-card" [class.missing]="workspace.isMissingOnDisk" [class.selected]="isSelected"
+    [class.in-select-mode]="isSelectionMode" [class.expanded]="isExpanded"
+    (click)="isSelectionMode ? toggleSelect.emit(workspace.id) : null">
+
+    <div class="workspace-header">
+        <div class="workspace-title-group">
+            @if (!isSelectionMode && !isCurrentWorkspace) {
+            <div class="drag-handle" cdkDragHandle>
+                <i class="bi bi-grip-vertical"></i>
+            </div>
+            }
+
+            @if (isSelectionMode && !isCurrentWorkspace) {
+            <div class="workspace-checkbox" (click)="$event.stopPropagation(); toggleSelect.emit(workspace.id)">
+                <i class="bi" [class.bi-check-square-fill]="isSelected" [class.bi-square]="!isSelected"></i>
+            </div>
+            }
+
+            <div class="icon-wrapper">
+                <i class="bi" [class.bi-person-workspace]="workspace.role === 'personal'"
+                    [class.bi-people]="workspace.role === 'team'">
+                </i>
+            </div>
+            <div class="details">
+                <h3 class="workspace-title">
+                    {{ workspace.name }}
+                </h3>
+                <span class="workspace-badge" [class.badge-progress]="workspace.role === 'team'"
+                    [class.badge-personal]="workspace.role === 'personal'">
+                    {{ workspace.role | titlecase }}
+                </span>
+            </div>
+        </div>
+
+        @if (!isSelectionMode) {
+        <div class="card-status">
+            @if (isFileSystemMode) {
+            @if (workspace.isMissingOnDisk) {
+            <div class="workspace-badge badge-error">
+                <i class="bi bi-exclamation-triangle-fill"></i> Folder Missing
+            </div>
+            <button class="action-btn" [disabled]="workspace.isRestoring || workspace.isTrashing"
+                (click)="restoreWorkspace.emit(workspace)">
+                @if (workspace.isRestoring) {
+                <i class="bi bi-arrow-repeat spin"></i> Restoring...
+                } @else {
+                <i class="bi bi-arrow-counterclockwise"></i> Restore
+                }
+            </button>
+            } @else {
+            <div class="workspace-badge badge-success">
+                <i class="bi bi-check-circle-fill"></i> Synced
+            </div>
+            }
+            } @else {
+            <div class="workspace-badge badge-info">
+                <i class="bi bi-database"></i> IndexedDB
+            </div>
+            }
+
+            <div class="card-actions">
+                @if (isConfirmingTrash) {
+                <div class="confirm-actions">
+                    <span class="confirm-text text-sm">Trash it?</span>
+                    <button class="action-btn confirm-yes" (click)="confirmTrash.emit(workspace)"
+                        [disabled]="workspace.isTrashing">
+                        @if (workspace.isTrashing) {
+                        <i class="bi bi-arrow-repeat spin"></i>
+                        } @else {
+                        Yes
+                        }
+                    </button>
+                    <button class="action-btn" (click)="cancelTrash.emit()"
+                        [disabled]="workspace.isTrashing">No</button>
+                </div>
+                } @else {
+                @if (isFileSystemMode && !workspace.isMissingOnDisk) {
+                <button class="action-btn expand-btn" (click)="toggleExpand.emit(workspace)" [class.active]="isExpanded"
+                    title="View spaces">
+                    <i class="bi" [class.bi-chevron-down]="isExpanded" [class.bi-chevron-right]="!isExpanded"></i>
+                </button>
+                }
+                @if (!isCurrentWorkspace) {
+                <button class="action-btn trash-btn" [disabled]="workspace.isTrashing"
+                    (click)="requestTrash.emit(workspace)" title="Move to trash">
+                    @if (workspace.isTrashing) {
+                    <i class="bi bi-arrow-repeat spin"></i>
+                    } @else {
+                    <i class="bi bi-trash3"></i>
+                    }
+                </button>
+                }
+                }
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- Expanded space list -->
+    @if (isExpanded && !isSelectionMode) {
+    <div class="space-panel">
+        @if (isLoadingSpaces) {
+        <div class="space-loading">
+            <i class="bi bi-arrow-repeat spin"></i> Loading spaces...
+        </div>
+        } @else if (spaces.length === 0) {
+        <div class="space-empty">
+            <span>No spaces in this workspace</span>
+        </div>
+        } @else {
+        @if (hasMissingSpaces) {
+        <div class="space-panel-toolbar">
+            <span class="missing-count">
+                {{ spaces.length }} space{{ spaces.length > 1 ? 's' : '' }}
+            </span>
+            <button class="action-btn" (click)="restoreAllSpaces.emit(workspace)">
+                <i class="bi bi-arrow-counterclockwise"></i> Restore All
+            </button>
+        </div>
+        }
+        <div class="space-list">
+            @for (space of spaces; track space.id) {
+            <div class="space-row" [class.missing]="space.isMissingOnDisk">
+                <div class="space-info">
+                    <i class="bi bi-folder2 space-icon"></i>
+                    <span class="space-name">{{ space.name }}</span>
+                </div>
+                <div class="space-status">
+                    @if (space.isMissingOnDisk) {
+                    <span class="workspace-badge badge-error space-badge">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Missing
+                    </span>
+                    <button class="action-btn space-btn" [disabled]="space.isRestoring"
+                        (click)="restoreSpace.emit({ workspace: workspace, space: space })">
+                        @if (space.isRestoring) {
+                        <i class="bi bi-arrow-repeat spin"></i>
+                        } @else {
+                        <i class="bi bi-arrow-counterclockwise"></i> Restore
+                        }
+                    </button>
+                    } @else {
+                    <span class="workspace-badge badge-success space-badge">
+                        <i class="bi bi-check-circle-fill"></i> Synced
+                    </span>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+        }
+    </div>
+    }
+</div>

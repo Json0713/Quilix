@@ -1,0 +1,86 @@
+@if (isFileSystemMode) {
+<!-- Total Workspaces -->
+<div class="metric-card">
+    <div class="stat-icon type-total">
+        <i class="bi bi-folder-fill"></i>
+    </div>
+    <div class="stat-text">
+        <span class="label">Total Workspaces</span>
+        <div class="value-row">
+            <span class="value">{{ totalWorkspaces }}</span>
+            <span class="limit">Pipeline</span>
+        </div>
+    </div>
+</div>
+
+<!-- Synced Folders -->
+<div class="metric-card">
+    <div class="stat-icon type-completed">
+        <i class="bi bi-cloud-check-fill"></i>
+    </div>
+    <div class="stat-text">
+        <span class="label">Synced Folders</span>
+        <div class="value-row">
+            <span class="value">{{ syncedFolders }}</span>
+            <span class="limit">Resolved</span>
+        </div>
+    </div>
+</div>
+
+@if (missingFolders > 0) {
+<!-- Missing Folders (Warning) -->
+<div class="metric-card">
+    <div class="stat-icon type-progress">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    <div class="stat-text">
+        <span class="label">Missing Folders</span>
+        <div class="value-row">
+            <span class="value">{{ missingFolders }}</span>
+            <span class="limit">Action Required</span>
+        </div>
+    </div>
+</div>
+} @else {
+<!-- Total Spaces (No Missing Folders) -->
+<div class="metric-card">
+    <div class="stat-icon type-spaces">
+        <i class="bi bi-folder2"></i>
+    </div>
+    <div class="stat-text">
+        <span class="label">Total Spaces</span>
+        <div class="value-row">
+            <span class="value">{{ totalSpaces }}</span>
+            <span class="limit">Directories</span>
+        </div>
+    </div>
+</div>
+}
+} @else {
+<!-- IndexedDB Only Mode (Basic Metrics) -->
+<div class="metric-card">
+    <div class="stat-icon type-total">
+        <i class="bi bi-folder-fill"></i>
+    </div>
+    <div class="stat-text">
+        <span class="label">Total Workspaces</span>
+        <div class="value-row">
+            <span class="value">{{ totalWorkspaces }}</span>
+            <span class="limit">Local Only</span>
+        </div>
+    </div>
+</div>
+
+<div class="metric-card">
+    <div class="stat-icon type-spaces">
+        <i class="bi bi-folder2"></i>
+    </div>
+    <div class="stat-text">
+        <span class="label">Total Spaces</span>
+        <div class="value-row">
+            <span class="value">{{ totalSpaces }}</span>
+            <span class="limit">Entries</span>
+        </div>
+    </div>
+</div>
+}
