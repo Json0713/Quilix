@@ -13,7 +13,7 @@
             <i class="bi bi-shield-lock"></i>
             <div class="reauth-text">
                 <strong>Storage access needed</strong>
-                <span>Reconnect to fully delete workspace folders from your device.</span>
+                <span>Reconnect to workspace folders from your device.</span>
             </div>
         </div>
         <button class="reauth-btn" (click)="reconnectStorage()" [disabled]="isReauthing()">
@@ -22,7 +22,7 @@
             <span>Connecting...</span>
             } @else {
             <i class="bi bi-plug"></i>
-            <span>Reconnect Storage</span>
+            <span>Reconnect</span>
             }
         </button>
     </div>
