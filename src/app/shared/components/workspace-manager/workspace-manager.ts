@@ -13,7 +13,7 @@ import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadc
 import { WorkspaceMetricsComponent } from './workspace-metrics/workspace-metrics';
 import { WorkspaceCardComponent } from './workspace-card/workspace-card';
 import { StorageHealthBannerComponent } from '../storage-health-banner/storage-health-banner';
-import { SnackbarService } from '../snackbar/snackbar.service';
+import { SnackbarService } from '../../../services/ui/common/snackbar/snackbar.service';
 
 export interface ManagedWorkspace extends Workspace {
     isMissingOnDisk?: boolean;
@@ -232,11 +232,16 @@ export class WorkspaceManagerComponent implements OnInit {
 
         try {
             const ids = Array.from(this.selectedIds());
+            // Set trashing state for visual feedback
+            ids.forEach(id => this.updateWorkspaceState(id, { isTrashing: true }));
+
             for (const id of ids) {
                 await this.workspaceService.moveToTrash(id);
             }
             this.workspaces.update(list => list.filter(w => !this.selectedIds().has(w.id)));
+            this.snackbarService.info(`Moved ${ids.length} workspaces to trash.`);
             this.exitSelectionMode();
+            this.confirmingBulkTrash.set(false);
         } finally {
             this.isBulkProcessing.set(false);
         }

@@ -8,6 +8,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { FileSystemService } from '../../../core/services/file-system.service';
 import { TimeAgoPipe } from '../../ui/common/time-ago/time-ago-pipe';
 import { StorageHealthBannerComponent } from '../storage-health-banner/storage-health-banner';
+import { SnackbarService } from '../../../services/ui/common/snackbar/snackbar.service';
 
 @Component({
     selector: 'app-trash',
@@ -21,13 +22,14 @@ export class TrashComponent implements OnInit, OnDestroy {
     private spaceService = inject(SpaceService);
     private authService = inject(AuthService);
     private fileSystem = inject(FileSystemService);
+    private snackbarService = inject(SnackbarService);
 
     trashedWorkspaces = signal<Workspace[]>([]);
     trashedSpaces = signal<Space[]>([]);
     isLoading = signal<boolean>(true);
 
-    // ── Single-item UI state ──
-    processingId = signal<string | null>(null);
+    // ── Single-item & Bulk UI state ──
+    processingIds = signal<Set<string>>(new Set());
     confirmingDeleteId = signal<string | null>(null);
 
     // ── Selection state ──
@@ -162,6 +164,10 @@ export class TrashComponent implements OnInit, OnDestroy {
 
         try {
             const ids = Array.from(this.selectedIds());
+
+            // visually spin all selected items
+            this.processingIds.set(new Set(ids));
+
             for (const prefixedId of ids) {
                 if (prefixedId.startsWith('ws:')) {
                     await this.workspaceService.restoreFromTrash(prefixedId.slice(3));
@@ -169,9 +175,11 @@ export class TrashComponent implements OnInit, OnDestroy {
                     await this.spaceService.restoreFromTrash(prefixedId.slice(3), this.activeWorkspaceName);
                 }
             }
+            this.snackbarService.success(`Restored ${ids.length} items successfully.`);
             this.exitSelectionMode();
         } finally {
             this.isBulkProcessing.set(false);
+            this.processingIds.set(new Set());
         }
     }
 
@@ -195,6 +203,8 @@ export class TrashComponent implements OnInit, OnDestroy {
             await this.ensureStorageForDelete();
 
             const ids = Array.from(this.selectedIds());
+            this.processingIds.set(new Set(ids));
+
             for (const prefixedId of ids) {
                 if (prefixedId.startsWith('ws:')) {
                     await this.workspaceService.permanentlyDelete(prefixedId.slice(3));
@@ -202,22 +212,33 @@ export class TrashComponent implements OnInit, OnDestroy {
                     await this.spaceService.permanentlyDelete(prefixedId.slice(3), this.activeWorkspaceName ?? undefined);
                 }
             }
+            this.snackbarService.warning(`Permanently deleted ${ids.length} items.`);
             this.exitSelectionMode();
+            this.confirmingBulkDelete.set(false);
+        } catch (error) {
+            this.snackbarService.error('Error permanently deleting files.');
+            console.error(error);
         } finally {
             this.isBulkProcessing.set(false);
+            this.processingIds.set(new Set());
         }
     }
 
     // ── Single-item actions ──
 
     async restoreWorkspace(workspaceId: string) {
-        if (this.processingId()) return;
-        this.processingId.set(workspaceId);
+        if (this.processingIds().has('ws:' + workspaceId)) return;
+        this.processingIds.update(s => new Set(s).add('ws:' + workspaceId));
 
         try {
             await this.workspaceService.restoreFromTrash(workspaceId);
+            this.snackbarService.success('Workspace restored');
         } finally {
-            this.processingId.set(null);
+            this.processingIds.update(s => {
+                const next = new Set(s);
+                next.delete('ws:' + workspaceId);
+                return next;
+            });
         }
     }
 
@@ -230,15 +251,20 @@ export class TrashComponent implements OnInit, OnDestroy {
     }
 
     async confirmDelete(workspaceId: string) {
-        if (this.processingId()) return;
-        this.processingId.set(workspaceId);
+        if (this.processingIds().has('ws:' + workspaceId)) return;
+        this.processingIds.update(s => new Set(s).add('ws:' + workspaceId));
 
         try {
             // Ensure storage access before deleting folder
             await this.ensureStorageForDelete();
             await this.workspaceService.permanentlyDelete(workspaceId);
+            this.snackbarService.warning('Workspace permanently deleted');
         } finally {
-            this.processingId.set(null);
+            this.processingIds.update(s => {
+                const next = new Set(s);
+                next.delete('ws:' + workspaceId);
+                return next;
+            });
             this.confirmingDeleteId.set(null);
         }
     }
@@ -269,14 +295,19 @@ export class TrashComponent implements OnInit, OnDestroy {
     // ── Space-specific actions ──
 
     async restoreSpace(spaceId: string) {
-        if (this.processingId()) return;
+        if (this.processingIds().has('sp:' + spaceId)) return;
         if (!this.activeWorkspaceName) return;
-        this.processingId.set(spaceId);
+        this.processingIds.update(s => new Set(s).add('sp:' + spaceId));
 
         try {
             await this.spaceService.restoreFromTrash(spaceId, this.activeWorkspaceName);
+            this.snackbarService.success('Space restored');
         } finally {
-            this.processingId.set(null);
+            this.processingIds.update(s => {
+                const next = new Set(s);
+                next.delete('sp:' + spaceId);
+                return next;
+            });
         }
     }
 
@@ -291,13 +322,18 @@ export class TrashComponent implements OnInit, OnDestroy {
     }
 
     async confirmDeleteSpace(spaceId: string) {
-        if (this.processingId()) return;
-        this.processingId.set(spaceId);
+        if (this.processingIds().has('sp:' + spaceId)) return;
+        this.processingIds.update(s => new Set(s).add('sp:' + spaceId));
 
         try {
             await this.spaceService.permanentlyDelete(spaceId, this.activeWorkspaceName ?? undefined);
+            this.snackbarService.warning('Space permanently deleted');
         } finally {
-            this.processingId.set(null);
+            this.processingIds.update(s => {
+                const next = new Set(s);
+                next.delete('sp:' + spaceId);
+                return next;
+            });
             this.confirmingDeleteSpaceId.set(null);
         }
     }
