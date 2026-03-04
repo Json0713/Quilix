@@ -10,8 +10,15 @@ export const roleGuard = (requiredRole: WorkspaceRole): CanActivateFn => {
 
     const workspace = await auth.getCurrentWorkspace();
 
-    if (workspace?.role !== requiredRole) {
+    if (!workspace) {
       router.navigate(['/login']);
+      return false;
+    }
+
+    if (workspace.role !== requiredRole) {
+      // Redirect to the correct role's route instead of /login
+      // This prevents the login page flicker during cross-role workspace switches
+      router.navigate([workspace.role === 'personal' ? '/personal' : '/team']);
       return false;
     }
 

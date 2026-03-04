@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { RouterOutlet, Router, ActivatedRoute } from '@angular/router';
 
 import { OsNotificationService } from '../../../../core/notifications/os-notification.service';
 import { PersonalSidebarComponent } from '../common/sidebar/sidebar';
@@ -15,10 +15,13 @@ import { AuthService } from '../../../../core/auth/auth.service';
   templateUrl: './template.html',
   styleUrl: './template.scss',
 })
-export class PersonalTemplate {
+export class PersonalTemplate implements OnDestroy {
   private sidebarService = inject(SidebarService);
   private tabService = inject(TabService);
   private authService = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private authSub: any;
   isMobileOpen = this.sidebarService.isMobileOpen;
   isCollapsed = this.sidebarService.isCollapsed;
 
@@ -54,10 +57,14 @@ export class PersonalTemplate {
   }
 
   ngOnInit(): void {
-    // Load tabs for the active workspace
-    this.authService.getCurrentWorkspace().then(ws => {
-      if (ws) {
-        this.tabService.loadTabs(ws.id);
+    // Initial tab load
+    this.loadWorkspaceTabs();
+
+    // Re-load tabs when switching workspaces of the same role (personal→personal)
+    // Angular doesn't reinitialize the template when the route stays the same
+    this.authSub = this.authService.authEvents$.subscribe(event => {
+      if (event === 'LOGIN') {
+        this.loadWorkspaceTabs();
       }
     });
 
@@ -73,6 +80,22 @@ export class PersonalTemplate {
       }, 800);
 
       localStorage.removeItem('justLoggedIn');
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.authSub?.unsubscribe();
+  }
+
+  private async loadWorkspaceTabs(): Promise<void> {
+    const ws = await this.authService.getCurrentWorkspace();
+    if (ws) {
+      await this.tabService.loadTabs(ws.id);
+      // Navigate to the last active tab's route to restore workspace state
+      const activeTab = this.tabService.activeTab();
+      if (activeTab && activeTab.route && activeTab.route !== './') {
+        this.router.navigate([activeTab.route], { relativeTo: this.route });
+      }
     }
   }
 
