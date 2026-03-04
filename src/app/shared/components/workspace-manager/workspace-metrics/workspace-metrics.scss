@@ -24,6 +24,44 @@
     }
 }
 
+/* ... existing stat styles ... */
+
+@media (max-width: 770px) {
+    :host {
+        gap: 16px;
+    }
+
+    .metric-card {
+        padding: 16px;
+        gap: 16px;
+        min-width: 200px;
+        /* Allow cards to wrap more gracefully */
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .stat-text {
+        .label {
+            font-size: 12px;
+        }
+
+        .value-row .value {
+            font-size: 24px;
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .metric-card {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+}
+
 .stat-icon {
     width: 64px;
     height: 64px;

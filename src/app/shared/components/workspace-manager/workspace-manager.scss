@@ -296,12 +296,26 @@
     }
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
+/* ── Responsive: Folder Card Layout ── */
+@media (max-width: 770px) {
+    .dashboard-container {
+        padding: 12px;
+        gap: 20px;
+    }
+
+    .workspace-track-section {
+        gap: 16px;
+    }
+
     .track-actions {
         flex-direction: column;
         align-items: flex-start !important;
-        gap: 16px;
+        gap: 12px;
+
+        .track-title {
+            font-size: 1.1rem !important;
+            padding-left: 0;
+        }
 
         .track-controls {
             width: 100%;
@@ -309,15 +323,97 @@
         }
     }
 
+    /* Transform table into robust card grid */
+    .workspace-table {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+        min-height: auto;
+
+        .table-header {
+            display: none;
+        }
+    }
+
+    /* Drag handles visible on mobile per user request */
+    .drag-handle {
+        display: flex;
+    }
+
+    /* Selection toolbar stacks */
     .selection-toolbar {
         flex-direction: column;
         gap: 16px;
         align-items: flex-start;
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+
+        .toolbar-left {
+            width: 100%;
+            justify-content: space-between;
+            gap: 12px;
+
+            .workspace-checkbox {
+                font-size: 22px;
+            }
+        }
 
         .toolbar-actions {
             width: 100%;
             flex-wrap: wrap;
             justify-content: flex-end;
+            gap: 12px;
+
+            .bulk-confirm {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 12px;
+
+                .confirm-label {
+                    font-size: 0.9rem;
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    /* Loading & empty states */
+    .loading-state,
+    .empty-state {
+        padding: 48px 16px;
+        border-radius: 14px;
+        grid-column: 1 / -1;
+
+        i {
+            font-size: 2.5rem;
+        }
+
+        span,
+        p {
+            font-size: 1rem;
+        }
+    }
+
+    .action-btn {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Single column on very small screens to avoid narrow cards */
+@media (max-width: 500px) {
+    .workspace-table {
+        grid-template-columns: 1fr;
+    }
+
+    .selection-toolbar .toolbar-actions {
+        justify-content: center;
+
+        .action-btn {
+            flex: 1;
+            justify-content: center;
         }
     }
 }

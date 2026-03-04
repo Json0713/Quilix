@@ -20,33 +20,35 @@
         <span class="workspace-title">{{ workspace.name }}</span>
     </div>
 
-    <!-- Col: Date Modified -->
-    <div class="col-date">
-        {{ workspace.lastActiveAt | date:'MMM d, y' }}
-    </div>
+    <div class="col-metadata">
+        <!-- Col: Date Modified -->
+        <div class="col-date">
+            {{ workspace.lastActiveAt | date:'MMM d, y' }}
+        </div>
 
-    <!-- Col: File Size -->
-    <div class="col-size">
-        <span class="text-muted">--</span>
-    </div>
+        <!-- Col: File Size -->
+        <div class="col-size">
+            <span class="text-muted">--</span>
+        </div>
 
-    <!-- Col: Status -->
-    <div class="col-status">
-        @if (isFileSystemMode) {
-        @if (workspace.isMissingOnDisk) {
-        <span class="workspace-badge badge-error">
-            <i class="bi bi-exclamation-triangle-fill"></i> Missing
-        </span>
-        } @else {
-        <span class="workspace-badge badge-success">
-            <i class="bi bi-check-circle-fill"></i> Synced
-        </span>
-        }
-        } @else {
-        <span class="workspace-badge badge-info">
-            <i class="bi bi-database"></i> IndexedDB
-        </span>
-        }
+        <!-- Col: Status -->
+        <div class="col-status">
+            @if (isFileSystemMode) {
+            @if (workspace.isMissingOnDisk) {
+            <span class="workspace-badge badge-error">
+                <i class="bi bi-exclamation-triangle-fill"></i> Missing
+            </span>
+            } @else {
+            <span class="workspace-badge badge-success">
+                <i class="bi bi-check-circle-fill"></i> Synced
+            </span>
+            }
+            } @else {
+            <span class="workspace-badge badge-info">
+                <i class="bi bi-database"></i> IndexedDB
+            </span>
+            }
+        </div>
     </div>
 
     <!-- Col: Actions (Kebab Menu) -->
