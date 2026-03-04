@@ -1,6 +1,5 @@
 <div class="workspace-row" [class.missing]="workspace.isMissingOnDisk" [class.selected]="isSelected"
-    [class.in-select-mode]="isSelectionMode"
-    (click)="isSelectionMode ? toggleSelect.emit(workspace.id) : openWorkspace.emit(workspace)">
+    [class.in-select-mode]="isSelectionMode" (click)="isSelectionMode ? toggleSelect.emit(workspace.id) : null">
 
     <!-- Col: Name -->
     <div class="col-name">
@@ -60,6 +59,13 @@
 
             @if (isMenuOpen) {
             <div class="workspace-dropdown" [class.dropdown-up]="isLast">
+                @if (!isCurrentWorkspace && !workspace.isMissingOnDisk) {
+                <button class="dropdown-item switch-item" (click)="switchWorkspace.emit(workspace)">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Switch | Open</span>
+                </button>
+                }
+
                 <button class="dropdown-item" (click)="renameWorkspace.emit(workspace)">
                     <i class="bi bi-pencil"></i>
                     <span>Rename</span>

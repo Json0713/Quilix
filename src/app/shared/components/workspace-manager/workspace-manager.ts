@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 import { Workspace } from '../../../core/interfaces/workspace';
 import { Space } from '../../../core/interfaces/space';
@@ -36,6 +37,7 @@ export class WorkspaceManagerComponent implements OnInit {
     private authService = inject(AuthService);
     private breadcrumbService = inject(BreadcrumbService);
     private snackbarService = inject(SnackbarService);
+    private router = inject(Router);
 
     get totalWorkspaces() { return this.workspaces().length; }
     get syncedFolders() { return this.workspaces().filter(w => !w.isMissingOnDisk).length; }
@@ -322,16 +324,18 @@ export class WorkspaceManagerComponent implements OnInit {
         );
     }
 
-    // ── Session Navigation ──
-
-    async loginExistingWorkspace(workspace: ManagedWorkspace) {
-        if (workspace.isMissingOnDisk) return; // Prevent logging into missing folders
+    async switchToWorkspace(workspace: ManagedWorkspace) {
+        if (workspace.id === this.currentWorkspaceId()) return;
+        if (workspace.isMissingOnDisk) return;
 
         try {
+            this.snackbarService.info(`Switching to "${workspace.name}"...`);
             await this.authService.loginExisting(workspace);
-            // After successful session creation, the authService observable will emit LOGIN and redirect to root dashboard
+            localStorage.setItem('justLoggedIn', 'true');
+            this.router.navigate([workspace.role === 'personal' ? '/personal' : '/team']);
         } catch (error) {
-            console.error(`Failed to login to workspace: ${workspace.name}`, error);
+            console.error(`Failed to switch workspace: ${workspace.name}`, error);
+            this.snackbarService.error('Failed to switch workspace.');
         }
     }
 

@@ -183,6 +183,19 @@
                     background: var(--surface-alt);
                 }
 
+                &.switch-item {
+                    color: #3b82f6;
+                    font-weight: 500;
+
+                    i {
+                        color: #3b82f6;
+                    }
+
+                    &:hover {
+                        background: rgba(59, 130, 246, 0.1);
+                    }
+                }
+
                 &.trash-item {
                     color: #ef4444;
 

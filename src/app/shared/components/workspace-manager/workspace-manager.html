@@ -27,7 +27,6 @@
             <app-workspace-card [workspace]="currentWorkspace()!" [isCurrentWorkspace]="true"
                 [isFileSystemMode]="isFileSystemMode()" [isMenuOpen]="openMenuId() === currentWorkspace()!.id"
                 (restoreWorkspace)="restoreWorkspace($event)" (trashWorkspace)="trashWorkspace($event)"
-                (toggleSelect)="toggleSelect($event)" (openWorkspace)="loginExistingWorkspace($event)"
                 (toggleMenu)="toggleMenu(currentWorkspace()!.id, $event)">
             </app-workspace-card>
         </div>
@@ -125,7 +124,7 @@
                 [isFileSystemMode]="isFileSystemMode()" [isSelectionMode]="selectionMode()"
                 [isSelected]="isSelected(ws.id)" [isMenuOpen]="openMenuId() === ws.id" [isLast]="last"
                 (restoreWorkspace)="restoreWorkspace($event)" (trashWorkspace)="trashWorkspace($event)"
-                (toggleSelect)="toggleSelect($event)" (openWorkspace)="loginExistingWorkspace($event)"
+                (switchWorkspace)="switchToWorkspace($event)" (toggleSelect)="toggleSelect($event)"
                 (toggleMenu)="toggleMenu(ws.id, $event)">
                 <div class="drag-handle" dragHandle cdkDragHandle>
                     <i class="bi bi-grip-vertical"></i>

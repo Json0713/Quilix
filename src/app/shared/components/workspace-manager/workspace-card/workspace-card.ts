@@ -21,8 +21,8 @@ export class WorkspaceCardComponent {
 
     @Output() restoreWorkspace = new EventEmitter<ManagedWorkspace>();
     @Output() trashWorkspace = new EventEmitter<ManagedWorkspace>();
+    @Output() switchWorkspace = new EventEmitter<ManagedWorkspace>();
     @Output() toggleSelect = new EventEmitter<string>();
-    @Output() openWorkspace = new EventEmitter<ManagedWorkspace>();
     @Output() renameWorkspace = new EventEmitter<ManagedWorkspace>();
     @Output() toggleMenu = new EventEmitter<Event>();
 }
