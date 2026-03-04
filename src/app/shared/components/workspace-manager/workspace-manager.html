@@ -34,16 +34,19 @@
         <div class="track-actions">
             <h2 class="track-title">My Workspace</h2>
         </div>
-        <div class="workspace-list">
+        <div class="workspace-table">
+            <div class="table-header">
+                <div class="col-name">Name</div>
+                <div class="col-date">Date Modified</div>
+                <div class="col-size">File Size</div>
+                <div class="col-status">Status</div>
+            </div>
             <app-workspace-card [workspace]="currentWorkspace()!" [isCurrentWorkspace]="true"
-                [isFileSystemMode]="isFileSystemMode()" [isExpanded]="expandedWorkspaceId() === currentWorkspace()!.id"
-                [spaces]="getSpaces(currentWorkspace()!.id)" [isLoadingSpaces]="isLoadingSpaces()"
-                [hasMissingSpaces]="hasMissingSpaces(currentWorkspace()!.id)"
-                (restoreWorkspace)="restoreWorkspace($event)" (toggleExpand)="toggleExpand($event)"
-                (requestTrash)="requestTrash($event)" (confirmTrash)="confirmTrash($event)"
-                (cancelTrash)="cancelTrash()" (toggleSelect)="toggleSelect($event)"
-                (restoreAllSpaces)="restoreAllSpaces($event)"
-                (restoreSpace)="restoreSpace($event.workspace, $event.space)">
+                [isFileSystemMode]="isFileSystemMode()" [isMenuOpen]="openMenuId() === currentWorkspace()!.id"
+                (restoreWorkspace)="restoreWorkspace($event)" (requestTrash)="requestTrash($event)"
+                (confirmTrash)="confirmTrash($event)" (cancelTrash)="cancelTrash()"
+                (toggleSelect)="toggleSelect($event)" (openWorkspace)="loginExistingWorkspace($event)"
+                (toggleMenu)="toggleMenu(currentWorkspace()!.id, $event)">
             </app-workspace-card>
         </div>
     </div>
@@ -127,19 +130,22 @@
             <p>No other workspaces found.</p>
         </div>
         } @else {
-        <div class="workspace-list" cdkDropList (cdkDropListDropped)="onDrop($event)"
+        <div class="workspace-table" cdkDropList (cdkDropListDropped)="onDrop($event)"
             [cdkDropListDisabled]="selectionMode()">
-            @for (ws of otherWorkspaces(); track ws.id) {
+            <div class="table-header">
+                <div class="col-name">Name</div>
+                <div class="col-date">Date Modified</div>
+                <div class="col-size">File Size</div>
+                <div class="col-status">Status</div>
+            </div>
+            @for (ws of otherWorkspaces(); track ws.id; let last = $last) {
             <app-workspace-card cdkDrag [workspace]="ws" [isCurrentWorkspace]="false"
-                [isFileSystemMode]="isFileSystemMode()" [isExpanded]="expandedWorkspaceId() === ws.id"
-                [isSelectionMode]="selectionMode()" [isSelected]="isSelected(ws.id)"
-                [isConfirmingTrash]="confirmingTrashId() === ws.id" [spaces]="getSpaces(ws.id)"
-                [isLoadingSpaces]="isLoadingSpaces()" [hasMissingSpaces]="hasMissingSpaces(ws.id)"
-                (restoreWorkspace)="restoreWorkspace($event)" (toggleExpand)="toggleExpand($event)"
+                [isFileSystemMode]="isFileSystemMode()" [isSelectionMode]="selectionMode()"
+                [isSelected]="isSelected(ws.id)" [isConfirmingTrash]="confirmingTrashId() === ws.id"
+                [isMenuOpen]="openMenuId() === ws.id" [isLast]="last" (restoreWorkspace)="restoreWorkspace($event)"
                 (requestTrash)="requestTrash($event)" (confirmTrash)="confirmTrash($event)"
                 (cancelTrash)="cancelTrash()" (toggleSelect)="toggleSelect($event)"
-                (restoreAllSpaces)="restoreAllSpaces($event)"
-                (restoreSpace)="restoreSpace($event.workspace, $event.space)">
+                (openWorkspace)="loginExistingWorkspace($event)" (toggleMenu)="toggleMenu(ws.id, $event)">
                 <div class="drag-handle" dragHandle cdkDragHandle>
                     <i class="bi bi-grip-vertical"></i>
                 </div>

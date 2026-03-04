@@ -3,23 +3,25 @@
     width: 100%;
 }
 
-.workspace-card {
+.workspace-row {
     background: var(--surface-main);
-    border-radius: 16px;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
+    border-radius: 12px;
+    padding: 12px 24px;
+    display: grid;
+    grid-template-columns: minmax(200px, 2fr) 1fr 100px 120px 80px;
     gap: 16px;
+    align-items: center;
     transition: all 0.2s ease;
     border: 1px solid transparent;
+    cursor: pointer;
 
     &:hover {
+        background: var(--surface-alt);
         border-color: var(--border-color);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     }
 
     &.in-select-mode {
-        cursor: pointer;
         user-select: none;
     }
 
@@ -28,21 +30,21 @@
         background: rgba(var(--primary-rgb), 0.02);
     }
 
-    .workspace-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
+    &.missing {
+        border: 1px solid rgba(239, 68, 68, 0.2);
     }
 
-    .workspace-title-group {
+    .col-name {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 12px;
         min-width: 0;
-        flex: 1;
 
         .workspace-checkbox {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+
             i {
                 font-size: 1.25rem;
                 color: var(--text-muted);
@@ -60,181 +62,156 @@
 
         .icon-wrapper {
             background: rgba(var(--primary-rgb), 0.1);
-            border-radius: 12px;
-            padding: 10px;
+            border-radius: 8px;
+            padding: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            width: 38px;
-            height: 38px;
+            width: 34px;
+            height: 34px;
 
             i {
                 color: var(--primary);
-                font-size: 1.2rem;
-            }
-        }
-
-        .details {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            min-width: 0;
-            overflow: hidden;
-
-            .workspace-title {
                 font-size: 1.1rem;
-                font-weight: 600;
-                color: var(--text-main);
-                margin: 0;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
             }
         }
-    }
 
-    .workspace-badge {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        white-space: nowrap;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        width: fit-content;
-
-        &.badge-progress {
-            background: rgba(245, 158, 11, 0.1);
-            color: #f59e0b;
-            border-radius: 6px;
-        }
-
-        &.badge-completed {
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-        }
-
-        &.badge-personal {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-            border-radius: 6px;
-            /* User requested neo square for personal */
-        }
-
-        &.badge-error {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-        }
-
-        &.badge-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-        }
-
-        &.badge-info {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-        }
-
-        &.space-badge {
-            font-size: 0.75rem;
-        }
-    }
-
-    .card-status {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .card-actions {
-        display: flex;
-        gap: 8px;
-    }
-
-    .confirm-actions {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-
-        .confirm-text {
-            color: var(--text-alt);
-        }
-    }
-
-    /* Space Panel Styles */
-    .space-panel {
-        margin-top: 16px;
-        padding-left: 4px;
-        border-top: 1px solid var(--border-color);
-        padding-top: 16px;
-    }
-
-    .space-loading,
-    .space-empty {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-    }
-
-    .space-panel-toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-
-        .missing-count {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-    }
-
-    .space-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .space-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 16px;
-        background: var(--surface-alt);
-        border-radius: 8px;
-
-        &.missing {
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-    }
-
-    .space-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        color: var(--text-main);
-        flex: 1;
-        min-width: 0;
-
-        .space-icon {
-            color: var(--primary);
-            flex-shrink: 0;
-        }
-
-        .space-name {
+        .workspace-title {
+            font-size: 0.95rem;
             font-weight: 500;
+            color: var(--text-main);
+            margin: 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            display: block;
+        }
+
+    }
+
+    .col-date,
+    .col-size {
+        font-size: 0.9rem;
+        color: var(--text-alt);
+    }
+
+    .col-status {
+        display: flex;
+        align-items: center;
+
+        .workspace-badge {
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+
+            &.badge-error {
+                background: rgba(239, 68, 68, 0.1);
+                color: #ef4444;
+            }
+
+            &.badge-success {
+                background: rgba(16, 185, 129, 0.1);
+                color: #10b981;
+            }
+
+            &.badge-info {
+                background: rgba(59, 130, 246, 0.1);
+                color: #3b82f6;
+            }
         }
     }
 
-    .space-status {
+    .col-actions {
         display: flex;
+        justify-content: flex-end;
         align-items: center;
-        gap: 12px;
+        gap: 4px;
+
+        .workspace-menu-wrapper {
+            position: relative;
+        }
+
+        .workspace-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 4px;
+            z-index: 100;
+            min-width: 180px;
+            background: var(--surface-main);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+
+            &.dropdown-up {
+                top: auto;
+                bottom: 100%;
+                margin-top: 0;
+                margin-bottom: 4px;
+                box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.15);
+            }
+
+            .dropdown-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                width: 100%;
+                padding: 8px 16px;
+                border: none;
+                border-radius: 6px;
+                background: transparent;
+                color: var(--text-main);
+                font-size: 0.85rem;
+                cursor: pointer;
+                transition: all 0.15s ease;
+
+                i {
+                    font-size: 1rem;
+                    color: var(--text-muted);
+                }
+
+                &:hover {
+                    background: var(--surface-alt);
+                }
+
+                &.trash-item {
+                    color: #ef4444;
+
+                    i {
+                        color: #ef4444;
+                    }
+
+                    &:hover {
+                        background: rgba(239, 68, 68, 0.1);
+                    }
+                }
+
+                &:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+            }
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+
+            .confirm-text {
+                color: var(--text-alt);
+                font-size: 0.8rem;
+                white-space: nowrap;
+            }
+        }
     }
 }
 
@@ -242,24 +219,25 @@
 .action-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: var(--surface);
+    justify-content: center;
+    background: transparent;
     border: none;
     color: var(--text-alt);
-    font-size: 0.85rem;
-    font-weight: 500;
-    padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
+
+    /* Icon-only buttons */
+    width: 32px;
+    height: 32px;
 
     i {
         font-size: 1.1rem;
     }
 
     &:hover {
-        background: var(--primary);
-        color: #fff;
+        background: var(--surface);
+        color: var(--text-main);
     }
 
     &:disabled {
@@ -267,15 +245,21 @@
         cursor: not-allowed;
     }
 
-    &.trash-btn {
-        color: var(--text-muted);
-
-        &:hover {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-        }
+    &.trash-btn:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
     }
 
+    /* Text buttons */
+    &.confirm-yes,
+    &:contains("No") {
+        width: auto;
+        padding: 0 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    // Override specifically for the YES button
     &.confirm-yes {
         background: rgba(239, 68, 68, 0.1);
         color: #ef4444;
@@ -285,14 +269,16 @@
             color: white;
         }
     }
-
-    &.space-btn {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-    }
 }
 
-/* Spin Utility */
+/* Fallback for text buttons since :contains is a CSS4 draft generally not supported natively */
+.action-btn:where(:not(.trash-btn):not(.confirm-yes):not([title])) {
+    width: auto;
+    padding: 0 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
 .spin {
     animation: spin 1s linear infinite;
 }
@@ -309,21 +295,17 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-    .workspace-card .workspace-header {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: 16px;
-        width: 100%;
-        min-width: 0;
-    }
+    .workspace-row {
+        grid-template-columns: 1fr auto;
+        padding: 16px;
 
-    .workspace-card .workspace-title-group {
-        width: 100%;
-    }
+        .col-date,
+        .col-size {
+            display: none;
+        }
 
-    .workspace-card .card-status {
-        width: 100%;
-        justify-content: space-between;
-        margin-top: 8px;
+        .col-actions {
+            justify-content: flex-end;
+        }
     }
 }

@@ -19,11 +19,6 @@ export interface ManagedWorkspace extends Workspace {
     isTrashing?: boolean;
 }
 
-export interface ManagedSpace extends Space {
-    isMissingOnDisk?: boolean;
-    isRestoring?: boolean;
-}
-
 @Component({
     selector: 'app-workspace-manager',
     standalone: true,
@@ -74,11 +69,17 @@ export class WorkspaceManagerComponent implements OnInit {
 
     // ── Single-item state ──
     confirmingTrashId = signal<string | null>(null);
+    openMenuId = signal<string | null>(null);
 
-    // ── Space expansion state ──
-    expandedWorkspaceId = signal<string | null>(null);
-    spacesByWorkspace = signal<Map<string, ManagedSpace[]>>(new Map());
-    isLoadingSpaces = signal(false);
+    @HostListener('document:click')
+    closeAllMenus() {
+        this.openMenuId.set(null);
+    }
+
+    toggleMenu(id: string, event: Event) {
+        event.stopPropagation();
+        this.openMenuId.update(current => current === id ? null : id);
+    }
 
     async ngOnInit() {
         this.breadcrumbService.setTitle('Manage Workspaces');
@@ -95,12 +96,6 @@ export class WorkspaceManagerComponent implements OnInit {
     @HostListener('window:focus')
     async onWindowFocus() {
         await this.quietLoadWorkspaces();
-        // Re-check space folders for expanded workspace
-        const expandedId = this.expandedWorkspaceId();
-        if (expandedId) {
-            const ws = this.workspaces().find(w => w.id === expandedId);
-            if (ws) await this.loadSpacesForWorkspace(ws);
-        }
     }
 
     async loadWorkspaces() {
@@ -322,97 +317,19 @@ export class WorkspaceManagerComponent implements OnInit {
         );
     }
 
-    // ── Space expansion ──
+    // ── Session Navigation ──
 
-    async toggleExpand(workspace: ManagedWorkspace) {
-        if (this.expandedWorkspaceId() === workspace.id) {
-            this.expandedWorkspaceId.set(null);
-            return;
-        }
-
-        this.expandedWorkspaceId.set(workspace.id);
-        await this.loadSpacesForWorkspace(workspace);
-    }
-
-    private async loadSpacesForWorkspace(workspace: ManagedWorkspace) {
-        this.isLoadingSpaces.set(true);
+    async loginExistingWorkspace(workspace: ManagedWorkspace) {
+        if (workspace.isMissingOnDisk) return; // Prevent logging into missing folders
 
         try {
-            const allSpaces = await this.spaceService.getByWorkspace(workspace.id);
-            // Filter out trashed spaces
-            const activeSpaces = allSpaces.filter(s => !s.trashedAt);
-
-            const managed: ManagedSpace[] = [];
-            const currentMap = this.spacesByWorkspace().get(workspace.id);
-            const existingMap = new Map(currentMap?.map(s => [s.id, s]) ?? []);
-
-            for (const space of activeSpaces) {
-                let isMissingOnDisk = false;
-
-                if (this.isFileSystemMode() && workspace.folderPath) {
-                    const result = await this.spaceService.checkSpaceFolderExists(workspace.name, space.folderName);
-                    if (result !== 'no-permission') {
-                        isMissingOnDisk = !result;
-                    }
-                }
-
-                const existing = existingMap.get(space.id);
-                managed.push({
-                    ...space,
-                    isMissingOnDisk,
-                    isRestoring: existing?.isRestoring || false,
-                });
-            }
-
-            this.spacesByWorkspace.update(map => {
-                const next = new Map(map);
-                next.set(workspace.id, managed);
-                return next;
-            });
-        } finally {
-            this.isLoadingSpaces.set(false);
+            await this.authService.loginExisting(workspace);
+            // After successful session creation, the authService observable will emit LOGIN and redirect to root dashboard
+        } catch (error) {
+            console.error(`Failed to login to workspace: ${workspace.name}`, error);
         }
     }
 
-    getSpaces(workspaceId: string): ManagedSpace[] {
-        return this.spacesByWorkspace().get(workspaceId) ?? [];
-    }
-
-    hasMissingSpaces(workspaceId: string): boolean {
-        return this.getSpaces(workspaceId).some(s => s.isMissingOnDisk);
-    }
-
-    async restoreSpace(workspace: ManagedWorkspace, space: ManagedSpace) {
-        if (space.isRestoring || !space.isMissingOnDisk) return;
-
-        this.updateSpaceState(workspace.id, space.id, { isRestoring: true });
-
-        try {
-            const success = await this.spaceService.restoreSpaceFolder(workspace.name, space.folderName);
-            this.updateSpaceState(workspace.id, space.id, {
-                isRestoring: false,
-                isMissingOnDisk: !success,
-            });
-        } catch {
-            this.updateSpaceState(workspace.id, space.id, { isRestoring: false });
-        }
-    }
-
-    async restoreAllSpaces(workspace: ManagedWorkspace) {
-        const missing = this.getSpaces(workspace.id).filter(s => s.isMissingOnDisk);
-        for (const space of missing) {
-            await this.restoreSpace(workspace, space);
-        }
-    }
-
-    private updateSpaceState(workspaceId: string, spaceId: string, updates: Partial<ManagedSpace>) {
-        this.spacesByWorkspace.update(map => {
-            const next = new Map(map);
-            const spaces = next.get(workspaceId) ?? [];
-            next.set(workspaceId, spaces.map(s => s.id === spaceId ? { ...s, ...updates } : s));
-            return next;
-        });
-    }
 
     // ── Drag & Drop ──
 

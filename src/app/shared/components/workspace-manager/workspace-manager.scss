@@ -110,28 +110,48 @@
     }
 }
 
-/* Workspace List */
-.workspace-list {
+/* Workspace Table */
+.workspace-table {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
     min-height: 200px;
+    width: 100%;
 
-    .drag-handle {
+    .table-header {
+        display: grid;
+        grid-template-columns: minmax(200px, 2fr) 1fr 100px 120px 80px;
+        gap: 16px;
+        padding: 0 24px 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
         color: var(--text-muted);
-        cursor: grab;
-        margin-right: 8px;
-        padding: 4px;
-        display: flex;
-        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 4px;
 
-        &:active {
-            cursor: grabbing;
+        .col-name,
+        .col-date,
+        .col-size {
+            display: flex;
+            align-items: center;
         }
+    }
+}
 
-        i {
-            font-size: 1.2rem;
-        }
+.drag-handle {
+    color: var(--text-muted);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    margin-left: -8px;
+
+    &:active {
+        cursor: grabbing;
+    }
+
+    i {
+        font-size: 1.1rem;
     }
 }
 
@@ -221,7 +241,7 @@
 }
 
 /* Animate all other list items smoothly out of the way */
-.workspace-list.cdk-drop-list-dragging app-workspace-card:not(.cdk-drag-placeholder) {
+.workspace-table.cdk-drop-list-dragging app-workspace-card:not(.cdk-drag-placeholder) {
     transition: transform 300ms cubic-bezier(0.2, 1, 0.2, 1);
 }
 
