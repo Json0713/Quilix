@@ -12,6 +12,7 @@ import { Breadcrumb } from '../../ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { WorkspaceMetricsComponent } from './workspace-metrics/workspace-metrics';
 import { WorkspaceCardComponent } from './workspace-card/workspace-card';
+import { StorageHealthBannerComponent } from '../storage-health-banner/storage-health-banner';
 
 export interface ManagedWorkspace extends Workspace {
     isMissingOnDisk?: boolean;
@@ -22,7 +23,7 @@ export interface ManagedWorkspace extends Workspace {
 @Component({
     selector: 'app-workspace-manager',
     standalone: true,
-    imports: [CommonModule, DragDropModule, Breadcrumb, WorkspaceMetricsComponent, WorkspaceCardComponent],
+    imports: [CommonModule, DragDropModule, Breadcrumb, WorkspaceMetricsComponent, WorkspaceCardComponent, StorageHealthBannerComponent],
     templateUrl: './workspace-manager.html',
     styleUrl: './workspace-manager.scss',
 })

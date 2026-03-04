@@ -7,11 +7,12 @@ import { SpaceService } from '../../../core/services/space.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { FileSystemService } from '../../../core/services/file-system.service';
 import { TimeAgoPipe } from '../../ui/common/time-ago/time-ago-pipe';
+import { StorageHealthBannerComponent } from '../storage-health-banner/storage-health-banner';
 
 @Component({
     selector: 'app-trash',
     standalone: true,
-    imports: [CommonModule, TimeAgoPipe, TitleCasePipe],
+    imports: [CommonModule, TimeAgoPipe, TitleCasePipe, StorageHealthBannerComponent],
     templateUrl: './trash.html',
     styleUrl: './trash.scss',
 })

@@ -1,0 +1,53 @@
+<div class="health-banner" [ngClass]="bannerState">
+    @if (bannerState === 'indexeddb') {
+    <div class="banner-info">
+        <i class="bi bi-database"></i>
+        <div class="banner-text">
+            <strong>Running in Local Mode</strong>
+            <span>Currently using IndexedDB for storage. Connect FileSystem to sync local folders.</span>
+        </div>
+    </div>
+    <div class="banner-badge badge-blue">
+        <i class="bi bi-info-circle"></i> Local DB
+    </div>
+    } @else if (bannerState === 'reauth') {
+    <div class="banner-info">
+        <i class="bi bi-shield-lock"></i>
+        <div class="banner-text">
+            <strong>Storage access needed</strong>
+            <span>Reconnect to sync and manage workspace folders from your device.</span>
+        </div>
+    </div>
+    <button class="health-action-btn btn-warning" (click)="reconnectStorage.emit()" [disabled]="isReauthing">
+        @if (isReauthing) {
+        <i class="bi bi-arrow-repeat spin"></i>
+        <span>Connecting...</span>
+        } @else {
+        <i class="bi bi-plug"></i>
+        <span>Reconnect Storage</span>
+        }
+    </button>
+    } @else if (bannerState === 'missing') {
+    <div class="banner-info">
+        <i class="bi bi-exclamation-octagon"></i>
+        <div class="banner-text">
+            <strong>Missing Folders Detected</strong>
+            <span>{{ missingCount }} folder(s) are missing from your file system storage.</span>
+        </div>
+    </div>
+    <div class="banner-badge badge-red">
+        <i class="bi bi-x-circle"></i> Sync Error
+    </div>
+    } @else if (bannerState === 'synced') {
+    <div class="banner-info">
+        <i class="bi bi-cloud-check"></i>
+        <div class="banner-text">
+            <strong>Storage active and healthy</strong>
+            <span>All workspaces and spaces are fully synced with your device.</span>
+        </div>
+    </div>
+    <div class="banner-badge badge-green">
+        <i class="bi bi-check-circle"></i> Synced
+    </div>
+    }
+</div>
