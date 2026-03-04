@@ -27,7 +27,8 @@
 
     &.selected {
         border-color: var(--primary);
-        background: rgba(var(--primary-rgb), 0.02);
+        background: var(--surface-alt);
+        box-shadow: 0 0 0 1px var(--primary), 0 4px 12px rgba(0, 0, 0, 0.06);
     }
 
     &.missing {

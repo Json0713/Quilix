@@ -13,6 +13,7 @@ import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadc
 import { WorkspaceMetricsComponent } from './workspace-metrics/workspace-metrics';
 import { WorkspaceCardComponent } from './workspace-card/workspace-card';
 import { StorageHealthBannerComponent } from '../storage-health-banner/storage-health-banner';
+import { SnackbarService } from '../snackbar/snackbar.service';
 
 export interface ManagedWorkspace extends Workspace {
     isMissingOnDisk?: boolean;
@@ -34,6 +35,7 @@ export class WorkspaceManagerComponent implements OnInit {
     private systemSync = inject(SystemSyncService);
     private authService = inject(AuthService);
     private breadcrumbService = inject(BreadcrumbService);
+    private snackbarService = inject(SnackbarService);
 
     get totalWorkspaces() { return this.workspaces().length; }
     get syncedFolders() { return this.workspaces().filter(w => !w.isMissingOnDisk).length; }
@@ -69,7 +71,6 @@ export class WorkspaceManagerComponent implements OnInit {
     });
 
     // ── Single-item state ──
-    confirmingTrashId = signal<string | null>(null);
     openMenuId = signal<string | null>(null);
 
     @HostListener('document:click')
@@ -249,12 +250,19 @@ export class WorkspaceManagerComponent implements OnInit {
 
         try {
             const selected = this.workspaces().filter(w => this.selectedIds().has(w.id) && w.isMissingOnDisk);
+
+            // Set all to restoring state first for UI feedback
+            selected.forEach(ws => this.updateWorkspaceState(ws.id, { isRestoring: true }));
+
             for (const ws of selected) {
                 const success = await this.fileSystem.restoreFolder(ws.name);
                 if (success) {
-                    this.updateWorkspaceState(ws.id, { isMissingOnDisk: false });
+                    this.updateWorkspaceState(ws.id, { isRestoring: false, isMissingOnDisk: false });
+                } else {
+                    this.updateWorkspaceState(ws.id, { isRestoring: false });
                 }
             }
+            this.snackbarService.success(`Restored ${selected.length} workspace folders.`);
             this.exitSelectionMode();
         } finally {
             this.isBulkProcessing.set(false);
@@ -285,16 +293,7 @@ export class WorkspaceManagerComponent implements OnInit {
         }
     }
 
-    requestTrash(workspace: ManagedWorkspace) {
-        this.confirmingTrashId.set(workspace.id);
-    }
-
-    cancelTrash() {
-        this.confirmingTrashId.set(null);
-    }
-
-    async confirmTrash(workspace: ManagedWorkspace) {
-        this.confirmingTrashId.set(null);
+    async trashWorkspace(workspace: ManagedWorkspace) {
         await this.moveToTrash(workspace);
     }
 

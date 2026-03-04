@@ -16,14 +16,11 @@ export class WorkspaceCardComponent {
     @Input() isFileSystemMode = false;
     @Input() isSelectionMode = false;
     @Input() isSelected = false;
-    @Input() isConfirmingTrash = false;
     @Input() isMenuOpen = false;
     @Input() isLast = false;
 
     @Output() restoreWorkspace = new EventEmitter<ManagedWorkspace>();
-    @Output() requestTrash = new EventEmitter<ManagedWorkspace>();
-    @Output() confirmTrash = new EventEmitter<ManagedWorkspace>();
-    @Output() cancelTrash = new EventEmitter<void>();
+    @Output() trashWorkspace = new EventEmitter<ManagedWorkspace>();
     @Output() toggleSelect = new EventEmitter<string>();
     @Output() openWorkspace = new EventEmitter<ManagedWorkspace>();
     @Output() renameWorkspace = new EventEmitter<ManagedWorkspace>();

@@ -52,20 +52,6 @@
 
     <!-- Col: Actions (Kebab Menu) -->
     <div class="col-actions" (click)="$event.stopPropagation()">
-        @if (isConfirmingTrash) {
-        <div class="confirm-actions">
-            <span class="confirm-text">Trash it?</span>
-            <button class="action-btn confirm-yes" (click)="confirmTrash.emit(workspace)"
-                [disabled]="workspace.isTrashing">
-                @if (workspace.isTrashing) {
-                <i class="bi bi-arrow-repeat spin"></i>
-                } @else {
-                Yes
-                }
-            </button>
-            <button class="action-btn" (click)="cancelTrash.emit()" [disabled]="workspace.isTrashing">No</button>
-        </div>
-        } @else {
         <div class="workspace-menu-wrapper">
             <button class="action-btn menu-trigger" [class.active]="isMenuOpen" (click)="toggleMenu.emit($event)"
                 title="Options">
@@ -92,7 +78,7 @@
                 }
 
                 @if (!isCurrentWorkspace) {
-                <button class="dropdown-item trash-item" (click)="requestTrash.emit(workspace)"
+                <button class="dropdown-item trash-item" (click)="trashWorkspace.emit(workspace)"
                     [disabled]="workspace.isTrashing">
                     @if (workspace.isTrashing) {
                     <i class="bi bi-arrow-repeat spin"></i>
@@ -105,6 +91,5 @@
             </div>
             }
         </div>
-        }
     </div>
 </div>
