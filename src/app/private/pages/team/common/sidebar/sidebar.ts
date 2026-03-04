@@ -55,11 +55,23 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
     @ViewChildren('renameInput') renameInputRefs!: QueryList<ElementRef<HTMLInputElement>>;
 
     private spaceSub: any;
+    private authSub: any;
 
     async ngOnInit() {
+        await this.loadWorkspace();
+
+        this.authSub = this.authService.authEvents$.subscribe(async (event) => {
+            if (event === 'LOGIN') {
+                await this.loadWorkspace();
+            }
+        });
+    }
+
+    private async loadWorkspace() {
         const workspace = await this.authService.getCurrentWorkspace();
         if (workspace) {
             this.activeWorkspace.set(workspace);
+            this.spaceSub?.unsubscribe();
             this.spaceSub = this.spaceService.liveSpaces$(workspace.id).subscribe(
                 (list: Space[]) => this.spaces.set(list)
             );
@@ -68,6 +80,7 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.spaceSub?.unsubscribe();
+        this.authSub?.unsubscribe();
     }
 
     @HostListener('document:click')
