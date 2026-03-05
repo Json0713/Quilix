@@ -63,9 +63,9 @@ export class WorkspaceManagerComponent implements OnInit {
 
     selectedCount = computed(() => this.selectedIds().size);
     isAllSelected = computed(() => {
-        const ws = this.workspaces();
+        const otherWs = this.otherWorkspaces();
         const sel = this.selectedIds();
-        return ws.length > 0 && sel.size === ws.length;
+        return otherWs.length > 0 && sel.size === otherWs.length;
     });
     hasSelectedMissing = computed(() => {
         const sel = this.selectedIds();
@@ -74,6 +74,9 @@ export class WorkspaceManagerComponent implements OnInit {
 
     // ── Single-item state ──
     openMenuId = signal<string | null>(null);
+
+    // ── View state ──
+    viewMode = signal<'list' | 'card'>('list');
 
     @HostListener('document:click')
     closeAllMenus() {
@@ -95,6 +98,16 @@ export class WorkspaceManagerComponent implements OnInit {
         if (currentWs) {
             this.currentWorkspaceId.set(currentWs.id);
         }
+
+        const savedView = localStorage.getItem('workspaceViewMode');
+        if (savedView === 'list' || savedView === 'card') {
+            this.viewMode.set(savedView);
+        }
+    }
+
+    setViewMode(mode: 'list' | 'card') {
+        this.viewMode.set(mode);
+        localStorage.setItem('workspaceViewMode', mode);
     }
 
     @HostListener('window:focus')
@@ -212,7 +225,7 @@ export class WorkspaceManagerComponent implements OnInit {
         if (this.isAllSelected()) {
             this.selectedIds.set(new Set());
         } else {
-            const allIds = new Set(this.workspaces().map(w => w.id));
+            const allIds = new Set(this.otherWorkspaces().map(w => w.id));
             this.selectedIds.set(allIds);
         }
     }

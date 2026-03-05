@@ -32,6 +32,31 @@
             display: flex;
             gap: 12px;
             align-items: center;
+
+            .view-toggle {
+                display: flex;
+                gap: 4px;
+                background: var(--surface);
+                padding: 4px;
+                border-radius: 10px;
+
+                .action-btn {
+                    padding: 6px;
+                    border-radius: 6px;
+                    background: transparent;
+                    color: var(--text-muted);
+
+                    &.active {
+                        background: var(--primary);
+                        color: #fff;
+                    }
+
+                    &:hover:not(.active) {
+                        background: rgba(var(--text-main-rgb), 0.1);
+                        color: var(--text-main);
+                    }
+                }
+            }
         }
     }
 }
@@ -60,6 +85,17 @@
         .col-size {
             display: flex;
             align-items: center;
+        }
+    }
+
+    &.view-card {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+        min-height: auto;
+
+        .table-header {
+            display: none;
         }
     }
 }

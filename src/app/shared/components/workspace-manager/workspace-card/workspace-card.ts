@@ -18,6 +18,7 @@ export class WorkspaceCardComponent {
     @Input() isSelected = false;
     @Input() isMenuOpen = false;
     @Input() isLast = false;
+    @Input() viewMode: 'list' | 'card' = 'list';
 
     @Output() restoreWorkspace = new EventEmitter<ManagedWorkspace>();
     @Output() trashWorkspace = new EventEmitter<ManagedWorkspace>();
