@@ -176,7 +176,7 @@
         display: block;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
         transform: scale(1.02);
-        transition: transform 0.2s cubic-bezier(0.2, 1, 0.2, 1), box-shadow 0.2s cubic-bezier(0.2, 1, 0.2, 1);
+        transition: transform 0.25s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0, 0, 0.2, 1);
         z-index: 1000;
 
         /* Make the dragged inner card pop */
@@ -188,7 +188,7 @@
 
 .cdk-drag-placeholder {
     opacity: 0.4 !important;
-    transition: opacity 250ms cubic-bezier(0.2, 1, 0.2, 1);
+    transition: opacity 250ms cubic-bezier(0, 0, 0.2, 1);
 
     app-workspace-card {
         ::ng-deep .workspace-row {
@@ -206,12 +206,12 @@
 
 /* Animate the item that is being dragged to its final position */
 .cdk-drag-animating {
-    transition: transform 300ms cubic-bezier(0.2, 1, 0.2, 1);
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 /* Animate all other list items smoothly out of the way */
 .workspace-table.cdk-drop-list-dragging app-workspace-card:not(.cdk-drag-placeholder) {
-    transition: transform 300ms cubic-bezier(0.2, 1, 0.2, 1) !important;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1) !important;
 }
 
 /* Animations */
@@ -363,6 +363,10 @@
         .track-controls {
             width: 100%;
             justify-content: flex-end;
+
+            .view-toggle {
+                display: none !important;
+            }
         }
     }
 
