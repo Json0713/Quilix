@@ -172,12 +172,17 @@
     box-sizing: border-box;
     cursor: grabbing !important;
 
-    .workspace-card {
+    app-workspace-card {
+        display: block;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-        border-color: var(--primary) !important;
         transform: scale(1.02);
         transition: transform 0.2s cubic-bezier(0.2, 1, 0.2, 1), box-shadow 0.2s cubic-bezier(0.2, 1, 0.2, 1);
         z-index: 1000;
+
+        /* Make the dragged inner card pop */
+        ::ng-deep .workspace-row {
+            border-color: var(--primary) !important;
+        }
     }
 }
 
@@ -185,14 +190,16 @@
     opacity: 0.4 !important;
     transition: opacity 250ms cubic-bezier(0.2, 1, 0.2, 1);
 
-    .workspace-card {
-        border: 2px dashed var(--primary) !important;
-        background: rgba(var(--primary-rgb), 0.02) !important;
-        box-shadow: none !important;
+    app-workspace-card {
+        ::ng-deep .workspace-row {
+            border: 2px dashed var(--primary) !important;
+            background: rgba(var(--primary-rgb), 0.02) !important;
+            box-shadow: none !important;
 
-        /* Hide complex inner content to keep it clean */
-        * {
-            visibility: hidden !important;
+            /* Hide complex inner content to keep it clean */
+            * {
+                visibility: hidden !important;
+            }
         }
     }
 }
@@ -204,7 +211,7 @@
 
 /* Animate all other list items smoothly out of the way */
 .workspace-table.cdk-drop-list-dragging app-workspace-card:not(.cdk-drag-placeholder) {
-    transition: transform 300ms cubic-bezier(0.2, 1, 0.2, 1);
+    transition: transform 300ms cubic-bezier(0.2, 1, 0.2, 1) !important;
 }
 
 /* Animations */
