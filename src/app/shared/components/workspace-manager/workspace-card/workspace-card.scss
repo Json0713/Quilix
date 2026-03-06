@@ -62,7 +62,7 @@
         }
 
         .icon-wrapper {
-            background: rgba(var(--primary-rgb), 0.1);
+            background: rgba(16, 185, 129, 0.010);
             border-radius: 8px;
             padding: 8px;
             display: flex;
@@ -73,7 +73,7 @@
             height: 34px;
 
             i {
-                color: var(--primary);
+                color: var(--action);
                 font-size: 1.1rem;
             }
         }

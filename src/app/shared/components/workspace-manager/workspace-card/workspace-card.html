@@ -13,9 +13,11 @@
         }
 
         <div class="icon-wrapper">
-            <i class="bi" [class.bi-person-workspace]="workspace.role === 'personal'"
-                [class.bi-people]="workspace.role === 'team'">
-            </i>
+            <!-- <i class="bi" 
+                [class.bi-folder2]="workspace.role === 'personal'"
+                [class.bi-folder2-open]="workspace.role === 'team'">
+            </i> -->
+            <i class="bi bi-archive"></i>
         </div>
 
         <span class="workspace-title">{{ workspace.name }}</span>
