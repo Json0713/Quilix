@@ -25,7 +25,8 @@
             <div class="glass-form-container">
 
                 <!-- Form View -->
-                <form class="glass-form" (ngSubmit)="onSubmit()" *ngIf="!isSuccess">
+                @if (!isSuccess) {
+                <form class="glass-form" (ngSubmit)="onSubmit()">
 
                     <div class="form-row">
                         <div class="form-group">
@@ -50,19 +51,23 @@
                     <div class="form-actions">
                         <button type="submit" class="primary-btn submit-btn"
                             [disabled]="isSubmitting || !form.name || !form.email || !form.message">
-                            <span *ngIf="!isSubmitting">Send Message <i class="bi bi-send-fill"></i></span>
-                            <span *ngIf="isSubmitting" class="spinner-inline">Sending...</span>
+                            @if (!isSubmitting) {
+                            <span>Send Message <i class="bi bi-send-fill"></i></span>
+                            } @else {
+                            <span class="spinner-inline">Sending...</span>
+                            }
                         </button>
                     </div>
                 </form>
-
+                } @else {
                 <!-- Success View -->
-                <div class="success-state" *ngIf="isSuccess">
+                <div class="success-state">
                     <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
                     <h3 class="success-title">Message Delivered</h3>
                     <p class="success-message">Thanks for reaching out! I've securely stored your message locally via
                         Dexie and I'll be in touch soon.</p>
                 </div>
+                }
 
             </div>
 

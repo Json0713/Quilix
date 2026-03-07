@@ -18,22 +18,28 @@
         <div class="marquee-container">
             <div class="marquee-track">
                 <!-- Original Set -->
-                <div class="tech-pill" *ngFor="let item of techStack">
+                @for (item of techStack; track item.label) {
+                <div class="tech-pill">
                     <i class="bi {{ item.icon }}" [style.color]="item.color"></i>
                     <span>{{ item.label }}</span>
                 </div>
+                }
 
                 <!-- Duplicated Set for Loop Seamlessness -->
-                <div class="tech-pill" *ngFor="let item of techStack" aria-hidden="true">
+                @for (item of techStack; track item.label) {
+                <div class="tech-pill" aria-hidden="true">
                     <i class="bi {{ item.icon }}" [style.color]="item.color"></i>
                     <span>{{ item.label }}</span>
                 </div>
+                }
 
                 <!-- Third Set for Ultra-Wide Screens -->
-                <div class="tech-pill" *ngFor="let item of techStack" aria-hidden="true">
+                @for (item of techStack; track item.label) {
+                <div class="tech-pill" aria-hidden="true">
                     <i class="bi {{ item.icon }}" [style.color]="item.color"></i>
                     <span>{{ item.label }}</span>
                 </div>
+                }
             </div>
         </div>
 

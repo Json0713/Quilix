@@ -21,13 +21,15 @@
     <!-- Center: Address Bar / Breadcrumbs -->
     <div class="nav-address-bar">
         <div class="breadcrumbs">
-            <ng-container *ngFor="let crumb of breadcrumbs; let i = index">
-                <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast"
-                    [class.deleted-space]="crumb.isDeleted" (click)="onBreadcrumbClick(crumb)">
-                    {{ crumb.label }}
-                </a>
-                <i *ngIf="!crumb.isLast" class="bi bi-chevron-right breadcrumb-separator"></i>
-            </ng-container>
+            @for (crumb of breadcrumbs; track crumb.url; let i = $index) {
+            <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast"
+                [class.deleted-space]="crumb.isDeleted" (click)="onBreadcrumbClick(crumb)">
+                {{ crumb.label }}
+            </a>
+            @if (!crumb.isLast) {
+            <i class="bi bi-chevron-right breadcrumb-separator"></i>
+            }
+            }
         </div>
     </div>
 
@@ -42,16 +44,20 @@
         <!-- Dropdown / Desktop Input Area -->
         <div class="search-container" [class.dropdown-active]="isMobileSearchActive">
             <div class="search-input-wrapper">
-                <i class="bi bi-search search-icon" *ngIf="!isMobileSearchActive"></i>
+                @if (!isMobileSearchActive) {
+                <i class="bi bi-search search-icon"></i>
+                }
                 <input type="text" #searchInput class="global-search-input" placeholder="Search ...">
                 <!-- Keyboard shortcut hint like macOS Spotlight -->
                 <div class="search-shortcut">Ctrl K</div>
             </div>
 
             <!-- Mobile Close Button (beside the input wrapper in dropdown) -->
-            <button class="mobile-search-close" (click)="closeMobileSearch()" *ngIf="isMobileSearchActive">
+            @if (isMobileSearchActive) {
+            <button class="mobile-search-close" (click)="closeMobileSearch()">
                 <i class="bi bi-x-lg"></i>
             </button>
+            }
         </div>
     </div>
 </div>
