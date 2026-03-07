@@ -20,9 +20,10 @@
         <div class="suggestions-grid">
             @for (ws of suggestionWorkspaces(); track ws.id) {
             <app-workspace-card [workspace]="ws" [isCurrentWorkspace]="ws.id === currentWorkspaceId()"
-                [isFileSystemMode]="isFileSystemMode()" [isMenuOpen]="openMenuId() === ws.id" [viewMode]="'card'"
-                (restoreWorkspace)="restoreWorkspace($event)" (trashWorkspace)="trashWorkspace($event)"
-                (switchWorkspace)="switchToWorkspace($event)" (toggleMenu)="toggleMenu(ws.id, $event)">
+                [isFileSystemMode]="isFileSystemMode()" [isMenuOpen]="openMenuId() === 'suggestion-' + ws.id"
+                [viewMode]="'card'" (restoreWorkspace)="restoreWorkspace($event)"
+                (trashWorkspace)="trashWorkspace($event)" (switchWorkspace)="switchToWorkspace($event)"
+                (toggleMenu)="toggleMenu('suggestion-' + ws.id, $event)">
             </app-workspace-card>
             }
         </div>
@@ -129,10 +130,10 @@
             @for (ws of otherWorkspaces(); track ws.id; let last = $last) {
             <app-workspace-card cdkDrag [workspace]="ws" [isCurrentWorkspace]="false"
                 [isFileSystemMode]="isFileSystemMode()" [isSelectionMode]="selectionMode()"
-                [isSelected]="isSelected(ws.id)" [isMenuOpen]="openMenuId() === ws.id" [isLast]="last"
+                [isSelected]="isSelected(ws.id)" [isMenuOpen]="openMenuId() === 'track-' + ws.id" [isLast]="last"
                 [viewMode]="viewMode()" (restoreWorkspace)="restoreWorkspace($event)"
                 (trashWorkspace)="trashWorkspace($event)" (switchWorkspace)="switchToWorkspace($event)"
-                (toggleSelect)="toggleSelect($event)" (toggleMenu)="toggleMenu(ws.id, $event)">
+                (toggleSelect)="toggleSelect($event)" (toggleMenu)="toggleMenu('track-' + ws.id, $event)">
                 <div class="drag-handle" dragHandle cdkDragHandle>
                     <i class="bi bi-grip-vertical"></i>
                 </div>
