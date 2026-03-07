@@ -479,7 +479,8 @@
 }
 
 @mixin card-selection-mode {
-    padding-left: 48px;
+    padding-left: 28px;
+    cursor: pointer;
 
     .col-name .icon-wrapper {
         margin-left: 0;
