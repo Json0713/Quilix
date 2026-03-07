@@ -55,6 +55,15 @@ export class WorkspaceManagerComponent implements OnInit {
     currentWorkspace = computed(() => this.workspaces().find(w => w.id === this.currentWorkspaceId()));
     otherWorkspaces = computed(() => this.workspaces().filter(w => w.id !== this.currentWorkspaceId()));
 
+    /** Suggestions: current workspace + top 3 most recently active others */
+    suggestionWorkspaces = computed(() => {
+        const current = this.currentWorkspace();
+        const recent = [...this.otherWorkspaces()]
+            .sort((a, b) => b.lastActiveAt - a.lastActiveAt)
+            .slice(0, 3);
+        return current ? [current, ...recent] : recent;
+    });
+
     // ── Selection state ──
     selectionMode = signal<boolean>(false);
     selectedIds = signal<Set<string>>(new Set());

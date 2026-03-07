@@ -61,6 +61,33 @@
     }
 }
 
+/* Suggestions Section (always card/grid view) */
+.workspace-suggestions-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .suggestions-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 4px;
+
+        .track-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0;
+            padding-left: 4px;
+        }
+    }
+}
+
+.suggestions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
 /* Workspace Table */
 .workspace-table {
     display: flex;
@@ -71,7 +98,7 @@
 
     .table-header {
         display: grid;
-        grid-template-columns: minmax(200px, 2fr) 1fr 100px 120px 80px;
+        grid-template-columns: minmax(200px, 2fr) 100px 1fr 100px 120px 80px;
         gap: 16px;
         padding: 0 24px 12px;
         font-size: 0.85rem;
@@ -81,6 +108,7 @@
         margin-bottom: 4px;
 
         .col-name,
+        .col-type,
         .col-date,
         .col-size {
             display: flex;
@@ -370,6 +398,11 @@
         }
     }
 
+    .workspace-suggestions-section .suggestions-header .track-title {
+        font-size: 1.1rem;
+        padding-left: 0;
+    }
+
     /* Transform table into robust card grid */
     .workspace-table {
         display: grid;
@@ -451,7 +484,9 @@
 
 /* Single column on very small screens to avoid narrow cards */
 @media (max-width: 500px) {
-    .workspace-table {
+
+    .workspace-table,
+    .suggestions-grid {
         grid-template-columns: 1fr;
     }
 

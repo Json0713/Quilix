@@ -11,24 +11,20 @@
         [missingCount]="missingFolders" [isReauthing]="isReauthing()" (reconnectStorage)="reconnectStorage()">
     </app-storage-health-banner>
 
-    <!-- Current Workspace Section -->
-    @if (currentWorkspace()) {
-    <div class="workspace-track-section">
-        <div class="track-actions">
+    <!-- Suggestions Section (My Workspace) -->
+    @if (suggestionWorkspaces().length > 0) {
+    <div class="workspace-suggestions-section">
+        <div class="suggestions-header">
             <h2 class="track-title">My Workspace</h2>
         </div>
-        <div class="workspace-table" [class.view-card]="viewMode() === 'card'">
-            <div class="table-header">
-                <div class="col-name">Name</div>
-                <div class="col-date">Date Modified</div>
-                <div class="col-size">File Size</div>
-                <div class="col-status">Status</div>
-            </div>
-            <app-workspace-card [workspace]="currentWorkspace()!" [isCurrentWorkspace]="true"
-                [isFileSystemMode]="isFileSystemMode()" [isMenuOpen]="openMenuId() === currentWorkspace()!.id"
-                [viewMode]="viewMode()" (restoreWorkspace)="restoreWorkspace($event)"
-                (trashWorkspace)="trashWorkspace($event)" (toggleMenu)="toggleMenu(currentWorkspace()!.id, $event)">
+        <div class="suggestions-grid">
+            @for (ws of suggestionWorkspaces(); track ws.id) {
+            <app-workspace-card [workspace]="ws" [isCurrentWorkspace]="ws.id === currentWorkspaceId()"
+                [isFileSystemMode]="isFileSystemMode()" [isMenuOpen]="openMenuId() === ws.id" [viewMode]="'card'"
+                (restoreWorkspace)="restoreWorkspace($event)" (trashWorkspace)="trashWorkspace($event)"
+                (switchWorkspace)="switchToWorkspace($event)" (toggleMenu)="toggleMenu(ws.id, $event)">
             </app-workspace-card>
+            }
         </div>
     </div>
     }
@@ -125,6 +121,7 @@
             [cdkDropListDisabled]="selectionMode()" [class.view-card]="viewMode() === 'card'">
             <div class="table-header">
                 <div class="col-name">Name</div>
+                <div class="col-type">Type</div>
                 <div class="col-date">Date Modified</div>
                 <div class="col-size">File Size</div>
                 <div class="col-status">Status</div>

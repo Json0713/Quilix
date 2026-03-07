@@ -13,10 +13,6 @@
         }
 
         <div class="icon-wrapper">
-            <!-- <i class="bi" 
-                [class.bi-folder2]="workspace.role === 'personal'"
-                [class.bi-folder2-open]="workspace.role === 'team'">
-            </i> -->
             <i class="bi bi-archive"></i>
         </div>
 
@@ -24,6 +20,19 @@
     </div>
 
     <div class="col-metadata">
+        <!-- Col: Type -->
+        <div class="col-type">
+            @if (workspace.role === 'personal') {
+            <span class="workspace-badge badge-personal">
+                <i class="bi bi-person-fill"></i> Personal
+            </span>
+            } @else {
+            <span class="workspace-badge badge-team">
+                <i class="bi bi-people-fill"></i> Team
+            </span>
+            }
+        </div>
+
         <!-- Col: Date Modified -->
         <div class="col-date">
             {{ workspace.lastActiveAt | date:'MMM d, y' }}

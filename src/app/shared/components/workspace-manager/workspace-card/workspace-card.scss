@@ -8,7 +8,7 @@
     border-radius: 12px;
     padding: 12px 24px;
     display: grid;
-    grid-template-columns: minmax(200px, 2fr) 1fr 100px 120px 80px;
+    grid-template-columns: minmax(200px, 2fr) 100px 1fr 100px 120px 80px;
     gap: 16px;
     align-items: center;
     transition: all 0.2s ease;
@@ -87,43 +87,63 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
     }
 
-    .col-date,
+    .col-date {
+        font-size: 0.9rem;
+        color: var(--text-alt);
+    }
+
+    .col-type,
     .col-size {
         font-size: 0.9rem;
         color: var(--text-alt);
     }
 
+    .col-type {
+        display: flex;
+        align-items: center;
+    }
+
     .col-status {
         display: flex;
         align-items: center;
+    }
 
-        .workspace-badge {
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            white-space: nowrap;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+    .workspace-badge {
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
 
-            &.badge-error {
-                background: rgba(239, 68, 68, 0.1);
-                color: #ef4444;
-            }
+        &.badge-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
 
-            &.badge-success {
-                background: rgba(16, 185, 129, 0.1);
-                color: #10b981;
-            }
+        &.badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
 
-            &.badge-info {
-                background: rgba(59, 130, 246, 0.1);
-                color: #3b82f6;
-            }
+        &.badge-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        &.badge-personal {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-radius: 4px;
+        }
+
+        &.badge-team {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
         }
     }
 
@@ -299,21 +319,22 @@
     }
 }
 
+/* List view: col-metadata children become direct grid items */
 .col-metadata {
     display: contents;
 }
 
-/* ── Responsive: Folder Card Mixins ── */
+/* ── Card Layout Mixin ── */
 @mixin card-layout {
     display: grid;
     grid-template-areas:
-        "handle icon name   actions"
-        "handle icon meta   actions";
-    grid-template-columns: auto 40px 1fr auto;
+        "handle icon title  date    actions"
+        "handle icon type   status  actions";
+    grid-template-columns: auto 40px 1fr auto auto;
     grid-template-rows: auto auto;
     position: relative;
     padding: 16px;
-    gap: 6px 12px;
+    gap: 4px 12px;
     border: 1px solid var(--border-color);
     border-radius: 14px;
     background: var(--surface-main);
@@ -331,7 +352,7 @@
         box-shadow: 0 0 0 1px var(--primary), 0 4px 12px rgba(0, 0, 0, 0.06);
     }
 
-    /* Name section — includes handle, icon, title */
+    /* Name section — display: contents so children get grid areas */
     .col-name {
         display: contents;
 
@@ -344,9 +365,9 @@
             border-radius: 4px;
         }
 
-        /* Handle Area */
         ::ng-deep .drag-handle {
             grid-area: handle;
+            grid-row: 1 / -1;
             display: flex !important;
             align-items: center;
             justify-content: center;
@@ -361,10 +382,11 @@
 
         .icon-wrapper {
             grid-area: icon;
+            grid-row: 1 / -1;
             width: 40px;
             height: 40px;
             margin: 0;
-            align-self: start;
+            align-self: center;
             background: rgba(var(--primary-rgb), 0.08);
             border-radius: 10px;
 
@@ -374,34 +396,48 @@
         }
 
         .workspace-title {
-            grid-area: name;
+            grid-area: title;
             font-size: 0.95rem;
             font-weight: 600;
             color: var(--text-main);
             align-self: end;
-            padding-right: 8px;
             min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 
-    /* Metadata Area (Flexed together) */
+    /* Metadata — display: contents, individual grid areas */
     .col-metadata {
-        grid-area: meta;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        align-self: start;
-        min-width: 0;
+        display: contents;
 
         .col-date {
+            grid-area: date;
             font-size: 0.75rem;
             color: var(--text-muted);
             white-space: nowrap;
+            align-self: end;
+            justify-self: end;
+        }
+
+        .col-type {
+            grid-area: type;
+            align-self: start;
+
+            .workspace-badge {
+                font-size: 0.65rem;
+                padding: 2px 8px;
+                font-weight: 700;
+                letter-spacing: 0.3px;
+            }
         }
 
         .col-status {
+            grid-area: status;
             display: flex;
             align-items: center;
+            align-self: start;
 
             .workspace-badge {
                 font-size: 0.65rem;
@@ -416,9 +452,10 @@
         }
     }
 
-    /* Actions Area */
+    /* Actions — spans both rows */
     .col-actions {
         grid-area: actions;
+        grid-row: 1 / -1;
         align-self: center;
         justify-content: flex-end;
         margin-right: -4px;
