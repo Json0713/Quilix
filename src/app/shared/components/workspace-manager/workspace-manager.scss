@@ -30,31 +30,50 @@
 
         .track-controls {
             display: flex;
-            gap: 12px;
             align-items: center;
 
-            .view-toggle {
+            .controls-pill {
                 display: flex;
-                gap: 4px;
-                background: var(--surface);
-                padding: 4px;
-                border-radius: 10px;
+                align-items: center;
+                gap: 2px;
+                background: var(--surface-main);
+                padding: 3px;
+                border-radius: 100px;
+                border: 1px solid var(--border-color);
 
-                .action-btn {
-                    padding: 6px;
-                    border-radius: 6px;
+                .pill-btn {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 32px;
+                    height: 32px;
+                    border: none;
+                    border-radius: 100px;
                     background: transparent;
                     color: var(--text-muted);
+                    cursor: pointer;
+                    transition: all 0.2s ease;
 
-                    &.active {
-                        background: var(--primary);
-                        color: #fff;
+                    i {
+                        font-size: 1.05rem;
                     }
 
                     &:hover:not(.active) {
-                        background: rgba(var(--text-main-rgb), 0.1);
                         color: var(--text-main);
                     }
+
+                    &.active {
+                        background: var(--surface);
+                        color: var(--text-main);
+                    }
+                }
+
+                .pill-divider {
+                    width: 1px;
+                    height: 18px;
+                    background: var(--border-color);
+                    margin: 0 2px;
+                    flex-shrink: 0;
                 }
             }
         }
@@ -153,15 +172,15 @@
     background: var(--surface);
     border: none;
     color: var(--text-main);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 6px 14px;
+    border-radius: 100px;
     cursor: pointer;
     transition: all 0.2s ease;
 
     i {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
 
     &:hover {
@@ -277,24 +296,26 @@
 /* Selection Toolbar */
 .selection-toolbar {
     background: var(--surface-main);
-    padding: 16px 24px;
-    border-radius: 12px;
-    margin-bottom: 20px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
 
     .toolbar-left {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 12px;
 
         .workspace-checkbox {
             cursor: pointer;
-            font-size: 24px;
+            font-size: 20px;
             color: var(--text-muted);
             transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
 
             &.checked i {
                 color: var(--primary);
@@ -303,22 +324,24 @@
 
         .selection-count {
             font-weight: 600;
+            font-size: 0.85rem;
             color: var(--text-main);
         }
     }
 
     .toolbar-actions {
         display: flex;
-        gap: 12px;
+        gap: 8px;
         align-items: center;
 
         .bulk-confirm {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
 
             .confirm-label {
                 font-weight: 500;
+                font-size: 0.82rem;
                 color: var(--text-alt);
             }
 
@@ -392,8 +415,12 @@
             width: 100%;
             justify-content: flex-end;
 
-            .view-toggle {
-                display: none !important;
+            .controls-pill {
+
+                .pill-divider,
+                .pill-view {
+                    display: none !important;
+                }
             }
         }
     }
@@ -420,14 +447,14 @@
         display: flex;
     }
 
-    /* Selection toolbar stacks */
+    /* Selection toolbar stacks on mobile */
     .selection-toolbar {
+        border-radius: 16px;
         flex-direction: column;
-        gap: 16px;
+        gap: 12px;
         align-items: flex-start;
-        padding: 16px;
-        border-radius: 12px;
-        margin-bottom: 16px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
 
         .toolbar-left {
             width: 100%;
@@ -435,7 +462,7 @@
             gap: 12px;
 
             .workspace-checkbox {
-                font-size: 22px;
+                font-size: 20px;
             }
         }
 
@@ -443,16 +470,16 @@
             width: 100%;
             flex-wrap: wrap;
             justify-content: flex-end;
-            gap: 12px;
+            gap: 8px;
 
             .bulk-confirm {
                 width: 100%;
                 justify-content: space-between;
                 flex-wrap: wrap;
-                gap: 12px;
+                gap: 8px;
 
                 .confirm-label {
-                    font-size: 0.9rem;
+                    font-size: 0.82rem;
                     width: 100%;
                 }
             }
@@ -477,8 +504,8 @@
     }
 
     .action-btn {
-        padding: 8px 14px;
-        font-size: 0.85rem;
+        padding: 6px 12px;
+        font-size: 0.8rem;
     }
 }
 

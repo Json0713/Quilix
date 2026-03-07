@@ -36,25 +36,27 @@
             <h2 class="track-title">Workspaces Track</h2>
 
             <div class="track-controls">
-                <div class="view-toggle">
-                    <button class="action-btn icon-only" [class.active]="viewMode() === 'list'"
+                <div class="controls-pill">
+                    @if (!isLoading() && otherWorkspaces().length > 0) {
+                    <button class="pill-btn pill-select" [class.active]="selectionMode()"
+                        (click)="toggleSelectionMode()" title="Select">
+                        @if (selectionMode()) {
+                        <i class="bi bi-x-lg"></i>
+                        } @else {
+                        <i class="bi bi-check2-square"></i>
+                        }
+                    </button>
+                    <span class="pill-divider"></span>
+                    }
+                    <button class="pill-btn pill-view" [class.active]="viewMode() === 'list'"
                         (click)="setViewMode('list')" title="List View">
                         <i class="bi bi-list"></i>
                     </button>
-                    <button class="action-btn icon-only" [class.active]="viewMode() === 'card'"
+                    <button class="pill-btn pill-view" [class.active]="viewMode() === 'card'"
                         (click)="setViewMode('card')" title="Grid View">
                         <i class="bi bi-grid-fill"></i>
                     </button>
                 </div>
-                @if (!isLoading() && otherWorkspaces().length > 0) {
-                <button class="action-btn" (click)="toggleSelectionMode()" [class.active]="selectionMode()">
-                    @if (selectionMode()) {
-                    <i class="bi bi-x-lg"></i><span>Cancel</span>
-                    } @else {
-                    <i class="bi bi-check2-square"></i><span>Select</span>
-                    }
-                </button>
-                }
             </div>
         </div>
 
