@@ -32,7 +32,7 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
     navItems = [
         { label: 'Home', icon: 'bi bi-house', route: './' },
         { label: 'Tasks', icon: 'bi bi-list-check', route: './tasks' },
-        { label: 'Workspaces', icon: 'bi bi-folder2-open', route: './workspaces' },
+        { label: 'Workspaces', icon: 'bi bi-archive', route: './workspaces' },
     ];
 
     // ── Spaces state ──
