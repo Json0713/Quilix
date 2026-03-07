@@ -125,8 +125,8 @@
         }
     </nav>
 
-    <!-- System section (pinned pre-footer) -->
-    <div class="system-pinned">
+    <!-- Sidebar Footer (System + Setup) -->
+    <div class="sidebar-footer">
         @if (!isCollapsed()) {
         <div class="section-title">System</div>
         } @else {
@@ -143,18 +143,6 @@
                 </a>
             </li>
         </ul>
-    </div>
-
-    <div class="sidebar-footer">
-        <div class="profile-section">
-            <i class="bi bi-person-circle profile-icon"></i>
-            @if (!isCollapsed()) {
-            <div class="profile-info">
-                <span class="profile-name">Jason O. Bayaga</span>
-                <span class="profile-role">IQA Officer</span>
-            </div>
-            }
-        </div>
 
         <app-personal-settings-kit />
     </div>
