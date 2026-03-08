@@ -1,4 +1,24 @@
 <div class="create-workspace-container">
+    <!-- Global Role Selection -->
+    <div class="global-role-section">
+        <label>Workspace Role</label>
+        <div class="role-selector" [class.is-team]="selectedRole() === 'team'">
+            <div class="selector-glider"></div>
+
+            <button type="button" class="role-option" [class.active]="selectedRole() === 'personal'"
+                (click)="selectedRole.set('personal')">
+                <i class="bi bi-mortarboard"></i>
+                <span>Personal</span>
+            </button>
+
+            <button type="button" class="role-option" [class.active]="selectedRole() === 'team'"
+                (click)="selectedRole.set('team')">
+                <i class="bi bi-person-workspace"></i>
+                <span>Team</span>
+            </button>
+        </div>
+    </div>
+
     <div class="manual-creation-section">
         <label for="workspaceName">Workspace Name</label>
         <div class="input-group">
@@ -19,22 +39,7 @@
         <span class="error-text">{{ validationError() }}</span>
         }
 
-        <!-- Role Selection Slider -->
-        <div class="role-selector" [class.is-team]="selectedRole() === 'team'">
-            <div class="selector-glider"></div>
 
-            <button type="button" class="role-option" [class.active]="selectedRole() === 'personal'"
-                (click)="selectedRole.set('personal')">
-                <i class="bi bi-mortarboard"></i>
-                <span>Personal</span>
-            </button>
-
-            <button type="button" class="role-option" [class.active]="selectedRole() === 'team'"
-                (click)="selectedRole.set('team')">
-                <i class="bi bi-person-workspace"></i>
-                <span>Team</span>
-            </button>
-        </div>
     </div>
 
     <div class="divider">
