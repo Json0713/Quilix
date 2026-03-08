@@ -23,8 +23,8 @@ export interface ModalConfig {
   confirmText?: string;
   cancelText?: string;
 
-  resolve?: (result: boolean) => void;
+  resolve?: (result: boolean | any) => void;
 
-  view?: 'import' | 'task';
+  view?: 'import' | 'task' | 'create-workspace';
   taskData?: Task;
 }

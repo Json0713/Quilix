@@ -15,6 +15,7 @@ import { WorkspaceMetricsComponent } from './workspace-metrics/workspace-metrics
 import { WorkspaceCardComponent } from './workspace-card/workspace-card';
 import { StorageHealthBannerComponent } from '../storage-health-banner/storage-health-banner';
 import { SnackbarService } from '../../../services/ui/common/snackbar/snackbar.service';
+import { ModalService } from '../../../services/ui/common/modal/modal';
 
 export interface ManagedWorkspace extends Workspace {
     isMissingOnDisk?: boolean;
@@ -38,6 +39,7 @@ export class WorkspaceManagerComponent implements OnInit {
     private breadcrumbService = inject(BreadcrumbService);
     private snackbarService = inject(SnackbarService);
     private router = inject(Router);
+    private modalService = inject(ModalService);
 
     get totalWorkspaces() { return this.workspaces().length; }
     get syncedFolders() { return this.workspaces().filter(w => !w.isMissingOnDisk).length; }
@@ -117,6 +119,13 @@ export class WorkspaceManagerComponent implements OnInit {
     setViewMode(mode: 'list' | 'card') {
         this.viewMode.set(mode);
         localStorage.setItem('workspaceViewMode', mode);
+    }
+
+    async openCreateWorkspace() {
+        const needsRefresh = await this.modalService.openCreateWorkspace();
+        if (needsRefresh) {
+            await this.quietLoadWorkspaces();
+        }
     }
 
     @HostListener('window:focus')

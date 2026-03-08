@@ -2,12 +2,13 @@ import { Component, inject, HostListener, effect } from '@angular/core';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
 import { Import } from '../../../components/import/import';
 import { TaskDetailComponent } from '../../tasks/task-detail/task-detail';
+import { CreateWorkspaceComponent } from '../../../components/workspace-manager/create-workspace/create-workspace';
 import { Router, NavigationStart } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-modal',
-  imports: [CommonModule, Import, TaskDetailComponent],
+  imports: [CommonModule, Import, TaskDetailComponent, CreateWorkspaceComponent],
   templateUrl: './modal.html',
   styleUrl: './modal.scss',
 })

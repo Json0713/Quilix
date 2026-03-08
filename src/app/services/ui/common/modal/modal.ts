@@ -51,9 +51,9 @@ export class ModalService {
   }
 
   /** Called by Cancel, backdrop, ESC */
-  cancelResult(): void {
+  cancelResult(payload: any = false): void {
     const modal = this._modal();
-    modal?.resolve?.(false);
+    modal?.resolve?.(payload);
     this._modal.set(null);
   }
 
@@ -73,6 +73,18 @@ export class ModalService {
       title: `Task-${task.id.substring(0, 4).toUpperCase()} Details`,
       view: 'task',
       taskData: task
+    });
+  }
+
+  openCreateWorkspace(): Promise<boolean> {
+    return new Promise(resolve => {
+      this._modal.set({
+        id: ++this.id,
+        type: 'custom',
+        title: 'Create Workspace',
+        view: 'create-workspace',
+        resolve
+      });
     });
   }
 

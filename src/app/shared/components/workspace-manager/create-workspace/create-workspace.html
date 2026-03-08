@@ -1,0 +1,33 @@
+<div class="create-workspace-container">
+    <div class="manual-creation-section">
+        <label for="workspaceName">Workspace Name</label>
+        <div class="input-group">
+            <input id="workspaceName" type="text" [(ngModel)]="workspaceName" placeholder="E.g., Personal Projects"
+                (keyup.enter)="createManual()" [disabled]="isSubmitting()" class="quilix-input" />
+            <button class="action-btn primary" [disabled]="isSubmitting() || !workspaceName().trim()"
+                (click)="createManual()">
+                @if (isSubmitting()) {
+                <i class="bi bi-arrow-repeat spin"></i>
+                } @else {
+                Create
+                }
+            </button>
+        </div>
+    </div>
+
+    <div class="divider">
+        <span>OR</span>
+    </div>
+
+    <div class="import-dropzone-section" [class.drag-over]="isDragging()" (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="onClickImportFolder()" role="button"
+        tabindex="0" (keyup.enter)="onClickImportFolder()">
+
+        <div class="dropzone-content">
+            <i class="bi bi-folder-plus drop-icon"></i>
+            <span class="drop-title">Import from Folder</span>
+            <span class="drop-desc">Drag & Drop an existing folder here to automatically create a Workspace and its
+                Spaces.</span>
+        </div>
+    </div>
+</div>
