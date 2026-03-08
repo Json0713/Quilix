@@ -6,6 +6,7 @@ import { SpaceService } from '../../../../core/services/space.service';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
 import { ToastService } from '../../../../services/ui/common/toast/toast';
 import { FileSystemService } from '../../../../core/services/file-system.service';
+import { WorkspaceRole } from '../../../../core/interfaces/workspace';
 
 @Component({
     selector: 'app-create-workspace',
@@ -22,6 +23,7 @@ export class CreateWorkspaceComponent {
     private fileSystem = inject(FileSystemService);
 
     workspaceName = signal('');
+    selectedRole = signal<WorkspaceRole>('personal');
     isSubmitting = signal(false);
     isDragging = signal(false);
     selectedFolderHandle = signal<FileSystemDirectoryHandle | null>(null);
@@ -59,7 +61,7 @@ export class CreateWorkspaceComponent {
                 return;
             }
 
-            await this.workspaceService.create(name, 'personal');
+            await this.workspaceService.create(name, this.selectedRole());
             this.toastService.success(`Workspace "${name}" created.`);
             this.modalService.cancelResult(true); // close modal and trigger refresh
         } catch (error: any) {
@@ -198,7 +200,7 @@ export class CreateWorkspaceComponent {
         this.isSubmitting.set(true);
         try {
             const workspaceName = handle.name;
-            const workspace = await this.workspaceService.create(workspaceName, 'personal');
+            const workspace = await this.workspaceService.create(workspaceName, this.selectedRole());
 
             let spaceCount = 0;
             for await (const entry of (handle as any).values()) {
