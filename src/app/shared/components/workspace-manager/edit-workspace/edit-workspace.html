@@ -1,0 +1,21 @@
+<div class="edit-workspace-container">
+    <div class="form-section">
+        <label for="editWorkspaceName">Workspace Name</label>
+        <div class="input-group">
+            <input id="editWorkspaceName" type="text" [ngModel]="workspaceName()" (ngModelChange)="onNameChange($event)"
+                (keyup.enter)="save()" [disabled]="isSubmitting()" class="quilix-input"
+                [class.has-error]="validationError() !== null" />
+            <button class="action-btn primary"
+                [disabled]="isSubmitting() || !workspaceName().trim() || validationError() !== null" (click)="save()">
+                @if (isSubmitting()) {
+                <i class="bi bi-arrow-repeat spin"></i>
+                } @else {
+                Save
+                }
+            </button>
+        </div>
+        @if (validationError()) {
+        <span class="error-text">{{ validationError() }}</span>
+        }
+    </div>
+</div>

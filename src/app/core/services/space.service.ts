@@ -104,14 +104,16 @@ export class SpaceService {
             ? Math.max(...existing.map(s => s.order)) + 1
             : 0;
 
+        const spaceId = crypto.randomUUID();
+
         // Create folder on filesystem if applicable
         const storageMode = await this.fileSystem.getStorageMode();
         if (storageMode === 'filesystem') {
-            await this.createSpaceFolder(workspaceName, folderName);
+            await this.createSpaceFolder(workspaceName, folderName, spaceId);
         }
 
         const space: Space = {
-            id: crypto.randomUUID(),
+            id: spaceId,
             workspaceId,
             name,
             folderName,
@@ -137,11 +139,14 @@ export class SpaceService {
         const newFolderName = this.toFolderName(sanitized);
         const oldFolderName = space.folderName;
 
-        // Rename folder on filesystem: create new → delete old
+        // Rename folder on filesystem: rename physically using robust copy/move hybrid
         const storageMode = await this.fileSystem.getStorageMode();
         if (storageMode === 'filesystem' && newFolderName !== oldFolderName) {
-            await this.createSpaceFolder(workspaceName, newFolderName);
-            await this.deleteSpaceFolder(workspaceName, oldFolderName);
+            const wsHandle = await this.fileSystem.getOrCreateWorkspaceFolder(workspaceName);
+            if (wsHandle) {
+                const renamed = await this.fileSystem.safeRenameFolder(wsHandle, oldFolderName, newFolderName);
+                if (!renamed) return false;
+            }
         }
 
         await db.spaces.update(spaceId, { name: sanitized, folderName: newFolderName });
@@ -288,20 +293,21 @@ export class SpaceService {
     /**
      * Restore a missing space folder on disk.
      */
-    async restoreSpaceFolder(workspaceName: string, folderName: string): Promise<boolean> {
+    async restoreSpaceFolder(workspaceName: string, folderName: string, spaceId: string): Promise<boolean> {
         try {
-            await this.createSpaceFolder(workspaceName, folderName);
+            await this.createSpaceFolder(workspaceName, folderName, spaceId);
             return true;
         } catch {
             return false;
         }
     }
 
-    private async createSpaceFolder(workspaceName: string, folderName: string): Promise<void> {
+    private async createSpaceFolder(workspaceName: string, folderName: string, spaceId: string): Promise<void> {
         try {
             const wsHandle = await this.fileSystem.getOrCreateWorkspaceFolder(workspaceName);
             if (wsHandle) {
-                await wsHandle.getDirectoryHandle(folderName, { create: true });
+                const spaceHandle = await wsHandle.getDirectoryHandle(folderName, { create: true });
+                await this.fileSystem.writeDirectoryId(spaceHandle, spaceId);
             }
         } catch (err) {
             console.error(`[SpaceService] Failed to create space folder: ${folderName}`, err);
@@ -317,6 +323,37 @@ export class SpaceService {
         } catch (err: any) {
             if (err.name !== 'NotFoundError') {
                 console.error(`[SpaceService] Failed to delete space folder: ${folderName}`, err);
+            }
+        }
+    }
+
+    /**
+     * Scans all subdirectories of a workspace folder to detect OS-level renames.
+     * Uses the inner `.quilix-id` file.
+     */
+    async syncExternalRenames(workspaceId: string, workspaceName: string): Promise<void> {
+        const storageMode = await this.fileSystem.getStorageMode();
+        if (storageMode !== 'filesystem') return;
+
+        const folders = await this.fileSystem.getAllSpaceFolders(workspaceName);
+        for (const handle of folders) {
+            const diskName = handle.name;
+            const spaceId = await this.fileSystem.readDirectoryId(handle);
+
+            if (spaceId) {
+                const space = await db.spaces.get(spaceId);
+                // Validate it actually belongs to this workspace and its disk name represents its folderName.
+                if (space && space.workspaceId === workspaceId && !space.trashedAt && space.folderName !== diskName) {
+                    console.log(`[SpaceService] Detected external space rename: Re-linking ID ${spaceId} to new folder name "${diskName}"`);
+
+                    // Note: We only update folderName logic to link the disk identity.
+                    // The display 'name' will be derived from the folderName for simplicity, or 
+                    // we could reverse-parse it but simple assignment works best here.
+                    await db.spaces.update(spaceId, {
+                        name: diskName, // Fallback display name
+                        folderName: diskName
+                    });
+                }
             }
         }
     }

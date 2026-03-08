@@ -23,6 +23,8 @@
     <app-task-detail [task]="modal.modal()!.taskData!"></app-task-detail>
     } @else if (modal.modal()?.view === 'create-workspace') {
     <app-create-workspace></app-create-workspace>
+    } @else if (modal.modal()?.view === 'edit-workspace') {
+    <app-edit-workspace></app-edit-workspace>
     }
     }
 

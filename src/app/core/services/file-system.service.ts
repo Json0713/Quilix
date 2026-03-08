@@ -6,6 +6,7 @@ import { db } from '../db/app-db';
 })
 export class FileSystemService {
     private readonly QUILIX_ROOT = 'Quilix';
+    private readonly ID_FILENAME = '.quilix-id';
 
     /**
      * Reactive permission state.
@@ -207,6 +208,152 @@ export class FileSystemService {
      */
     private async getOrCreateDirectory(parent: FileSystemDirectoryHandle, name: string): Promise<FileSystemDirectoryHandle> {
         return await parent.getDirectoryHandle(name, { create: true });
+    }
+
+    /**
+     * Write a permanent ID marker file to a directory to track it even if renamed externally.
+     */
+    async writeDirectoryId(dirHandle: FileSystemDirectoryHandle, id: string): Promise<boolean> {
+        try {
+            const fileHandle = await dirHandle.getFileHandle(this.ID_FILENAME, { create: true });
+            const writable = await (fileHandle as any).createWritable();
+            await writable.write(id);
+            await writable.close();
+            return true;
+        } catch (err) {
+            console.error(`[FileSystem] Failed to write ID to directory: ${dirHandle.name}`, err);
+            return false;
+        }
+    }
+
+    /**
+     * Read the permanent ID marker from a directory.
+     */
+    async readDirectoryId(dirHandle: FileSystemDirectoryHandle): Promise<string | null> {
+        try {
+            const fileHandle = await dirHandle.getFileHandle(this.ID_FILENAME, { create: false });
+            const file = await fileHandle.getFile();
+            return (await file.text()).trim();
+        } catch (err: any) {
+            if (err.name !== 'NotFoundError') {
+                console.warn(`[FileSystem] Could not read ID from ${dirHandle.name}:`, err);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves the Quilix root directory handle.
+     */
+    async getQuilixRootHandle(): Promise<FileSystemDirectoryHandle | null> {
+        const rootHandle = await this.ensurePermittedHandle();
+        if (!rootHandle) return null;
+        try {
+            return await rootHandle.getDirectoryHandle(this.QUILIX_ROOT, { create: false });
+        } catch {
+            return null;
+        }
+    }
+
+    /**
+     * Safely rename a folder using the modern FileSystemHandle.move() API.
+     * If .move() is not supported or fails, gracefully falls back to a full recursive copy and delete.
+     */
+    async safeRenameFolder(parentHandle: FileSystemDirectoryHandle, oldName: string, newName: string): Promise<boolean> {
+        try {
+            let oldHandle: FileSystemDirectoryHandle;
+            try {
+                oldHandle = await parentHandle.getDirectoryHandle(oldName, { create: false });
+            } catch (err: any) {
+                if (err.name === 'NotFoundError') return false;
+                throw err;
+            }
+
+            // 1. Try modern fast move()
+            if ('move' in oldHandle) {
+                try {
+                    await (oldHandle as any).move(newName);
+                    return true;
+                } catch (moveErr) {
+                    console.warn(`[FileSystem] .move() failed for ${oldName}, attempting recursive fallback.`, moveErr);
+                }
+            }
+
+            // 2. Fallback: Recursive Copy and Delete
+            console.log(`[FileSystem] Triggering recursive copy fallback from ${oldName} to ${newName}`);
+            const newHandle = await parentHandle.getDirectoryHandle(newName, { create: true });
+
+            await this.copyDirectoryContents(oldHandle, newHandle);
+
+            // Delete old
+            await (parentHandle as any).removeEntry(oldName, { recursive: true });
+            return true;
+        } catch (err) {
+            console.error(`[FileSystem] Failed to rename folder from ${oldName} to ${newName}:`, err);
+            return false;
+        }
+    }
+
+    private async copyDirectoryContents(src: FileSystemDirectoryHandle, dest: FileSystemDirectoryHandle): Promise<void> {
+        for await (const entry of (src as any).values()) {
+            if (entry.kind === 'file') {
+                const fileHandle = entry as FileSystemFileHandle;
+                const file = await fileHandle.getFile();
+                const destFileHandle = await dest.getFileHandle(entry.name, { create: true });
+                const writable = await (destFileHandle as any).createWritable();
+                await writable.write(file);
+                await writable.close();
+            } else if (entry.kind === 'directory') {
+                const destDirHandle = await dest.getDirectoryHandle(entry.name, { create: true });
+                await this.copyDirectoryContents(entry as FileSystemDirectoryHandle, destDirHandle);
+            }
+        }
+    }
+
+    /**
+     * Retrieves all workspace folders currently existing in the Quilix root.
+     * Used for scanning external renames.
+     */
+    async getAllWorkspaceFolders(): Promise<FileSystemDirectoryHandle[]> {
+        const rootHandle = await this.ensurePermittedHandle();
+        if (!rootHandle) return [];
+
+        try {
+            const quilixRoot = await rootHandle.getDirectoryHandle(this.QUILIX_ROOT, { create: false });
+            const folders: FileSystemDirectoryHandle[] = [];
+            for await (const entry of (quilixRoot as any).values()) {
+                if (entry.kind === 'directory') {
+                    folders.push(entry);
+                }
+            }
+            return folders;
+        } catch (err) {
+            console.error('[FileSystem] Could not iterate Quilix root for workspaces:', err);
+            return [];
+        }
+    }
+
+    /**
+     * Retrieves all subfolders (spaces) within a specific workspace folder.
+     */
+    async getAllSpaceFolders(workspaceFolderName: string): Promise<FileSystemDirectoryHandle[]> {
+        const rootHandle = await this.ensurePermittedHandle();
+        if (!rootHandle) return [];
+
+        try {
+            const quilixRoot = await rootHandle.getDirectoryHandle(this.QUILIX_ROOT, { create: false });
+            const wsHandle = await quilixRoot.getDirectoryHandle(workspaceFolderName, { create: false });
+            const folders: FileSystemDirectoryHandle[] = [];
+            for await (const entry of (wsHandle as any).values()) {
+                if (entry.kind === 'directory') {
+                    folders.push(entry);
+                }
+            }
+            return folders;
+        } catch (err) {
+            // If it can't find the workspace, just return empty
+            return [];
+        }
     }
 
     /**

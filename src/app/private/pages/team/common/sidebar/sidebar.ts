@@ -100,6 +100,15 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
         }
     }
 
+    // Refresh Spaces when returning to the app window
+    @HostListener('window:focus')
+    async onWindowFocus() {
+        const workspace = this.activeWorkspace();
+        if (workspace) {
+            await this.spaceService.syncExternalRenames(workspace.id, workspace.name);
+        }
+    }
+
     toggleSidebar() {
         if (this.isMobileOpen()) {
             this.sidebarService.closeMobile();

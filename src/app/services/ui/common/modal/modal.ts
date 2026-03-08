@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { ModalConfig } from '../../../../shared/ui/common/modal/modal.model';
 import { Task } from '../../../../core/interfaces/task';
+import { Workspace } from '../../../../core/interfaces/workspace';
 
 @Injectable({
   providedIn: 'root',
@@ -83,6 +84,19 @@ export class ModalService {
         type: 'custom',
         title: 'Create Workspace',
         view: 'create-workspace',
+        resolve
+      });
+    });
+  }
+
+  openEditWorkspace(workspace: Workspace): Promise<boolean> {
+    return new Promise(resolve => {
+      this._modal.set({
+        id: ++this.id,
+        type: 'custom',
+        title: 'Edit Workspace',
+        view: 'edit-workspace',
+        workspaceData: workspace,
         resolve
       });
     });

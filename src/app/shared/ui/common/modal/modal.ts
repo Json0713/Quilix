@@ -3,12 +3,13 @@ import { ModalService } from '../../../../services/ui/common/modal/modal';
 import { Import } from '../../../components/import/import';
 import { TaskDetailComponent } from '../../tasks/task-detail/task-detail';
 import { CreateWorkspaceComponent } from '../../../components/workspace-manager/create-workspace/create-workspace';
+import { EditWorkspaceComponent } from '../../../components/workspace-manager/edit-workspace/edit-workspace';
 import { Router, NavigationStart } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-modal',
-  imports: [CommonModule, Import, TaskDetailComponent, CreateWorkspaceComponent],
+  imports: [CommonModule, Import, TaskDetailComponent, CreateWorkspaceComponent, EditWorkspaceComponent],
   templateUrl: './modal.html',
   styleUrl: './modal.scss',
 })

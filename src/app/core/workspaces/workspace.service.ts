@@ -58,10 +58,13 @@ export class WorkspaceService {
         const storageMode = await this.fileSystem.getStorageMode();
         let folderPath: string | undefined = undefined;
 
+        const workspaceId = crypto.randomUUID();
+
         if (storageMode === 'filesystem') {
             const handle = await this.fileSystem.getOrCreateWorkspaceFolder(name.trim());
             if (handle) {
                 folderPath = `Quilix/${name.trim()}`;
+                await this.fileSystem.writeDirectoryId(handle, workspaceId);
                 console.log(`[WorkspaceService] Local folder created at: ${folderPath}`);
             } else {
                 console.warn('[WorkspaceService] Failed to create local folder, falling back to metadata only.');
@@ -69,7 +72,7 @@ export class WorkspaceService {
         }
 
         const workspace: Workspace = {
-            id: crypto.randomUUID(),
+            id: workspaceId,
             name: name.trim(),
             role,
             createdAt: now,
@@ -79,6 +82,37 @@ export class WorkspaceService {
 
         await db.workspaces.add(workspace);
         return workspace;
+    }
+
+    /**
+     * Rename a workspace, coordinating DB mapping and FileSystem physical rename
+     */
+    async rename(workspaceId: string, newName: string): Promise<boolean> {
+        const workspace = await this.getById(workspaceId);
+        if (!workspace) return false;
+
+        const sanitized = newName.trim();
+        if (!sanitized) return false;
+
+        let newFolderPath = workspace.folderPath;
+        const storageMode = await this.fileSystem.getStorageMode();
+
+        if (storageMode === 'filesystem' && workspace.folderPath) {
+            const quilixHandle = await this.fileSystem.getQuilixRootHandle();
+            if (quilixHandle) {
+                const renamed = await this.fileSystem.safeRenameFolder(quilixHandle, workspace.name, sanitized);
+                if (renamed) {
+                    newFolderPath = `Quilix/${sanitized}`;
+                } else {
+                    return false; // Abort if OS physical rename fails
+                }
+            } else {
+                return false;
+            }
+        }
+
+        await db.workspaces.update(workspaceId, { name: sanitized, folderPath: newFolderPath });
+        return true;
     }
 
     async updateLastActive(workspaceId: string): Promise<void> {
@@ -143,10 +177,38 @@ export class WorkspaceService {
                 const folderHandle = await this.fileSystem.getOrCreateWorkspaceFolder(w.name);
                 if (folderHandle) {
                     const newPath = `Quilix/${w.name}`;
+                    await this.fileSystem.writeDirectoryId(folderHandle, w.id);
                     await db.workspaces.update(w.id, { folderPath: newPath });
                     console.log(`[WorkspaceService] Migrated workspace ${w.name} to ${newPath}`);
                 } else {
                     console.error(`[WorkspaceService] Failed to create folder for ${w.name} during migration.`);
+                }
+            }
+        }
+    }
+
+    /**
+     * Scans the file system Quilix/ root to catch missing folders that were renamed through the OS File Manager.
+     * Re-links them based by matching their inner `.quilix-id`.
+     */
+    async syncExternalRenames(): Promise<void> {
+        const storageMode = await this.fileSystem.getStorageMode();
+        if (storageMode !== 'filesystem') return;
+
+        const folders = await this.fileSystem.getAllWorkspaceFolders();
+        for (const handle of folders) {
+            const diskName = handle.name;
+            const folderId = await this.fileSystem.readDirectoryId(handle);
+
+            if (folderId) {
+                const ws = await this.getById(folderId);
+                // If the folder name on disk doesn't match the DB name, it was physically renamed
+                if (ws && !ws.trashedAt && ws.name !== diskName) {
+                    console.log(`[WorkspaceService] Detected external rename: Re-linking Workspace ID ${folderId} to new name "${diskName}"`);
+                    await db.workspaces.update(folderId, {
+                        name: diskName,
+                        folderPath: `Quilix/${diskName}`
+                    });
                 }
             }
         }

@@ -1,0 +1,96 @@
+.edit-workspace-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem 0;
+
+    .form-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+
+            .quilix-input {
+                flex: 1;
+                padding: 0.6rem 1rem;
+                border-radius: 8px;
+                border: 1px solid var(--border-color);
+                background: var(--surface-main);
+                color: var(--text-main);
+                font-size: 0.95rem;
+                transition: all 0.2s ease;
+
+                &:focus {
+                    outline: none;
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+                }
+
+                &.has-error {
+                    border-color: #e74c3c;
+                    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.15);
+                }
+
+                &:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+            }
+
+            .action-btn {
+                padding: 0 1.25rem;
+                border-radius: 8px;
+                font-size: 0.95rem;
+                font-weight: 500;
+                border: none;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &.primary {
+                    background: var(--action);
+                    color: white;
+
+                    &:hover:not(:disabled) {
+                        background: var(--action-hover);
+                        transform: translateY(-1px);
+                    }
+
+                    &:disabled {
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+        }
+
+        .error-text {
+            font-size: 0.75rem;
+            color: #e74c3c;
+            padding-left: 0.25rem;
+        }
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

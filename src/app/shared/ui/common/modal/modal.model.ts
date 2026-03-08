@@ -3,6 +3,7 @@ export type ModalType = 'confirm' | 'alert' | 'custom';
 export type ModalNoticeScope = 'once' | 'always';
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
 import { Task } from '../../../../core/interfaces/task';
+import { Workspace } from '../../../../core/interfaces/workspace';
 
 export interface ModalNotice {
   type: ModalNoticeType;
@@ -25,6 +26,7 @@ export interface ModalConfig {
 
   resolve?: (result: boolean | any) => void;
 
-  view?: 'import' | 'task' | 'create-workspace';
+  view?: 'import' | 'task' | 'create-workspace' | 'edit-workspace';
   taskData?: Task;
+  workspaceData?: Workspace;
 }

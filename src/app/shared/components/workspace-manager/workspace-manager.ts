@@ -128,6 +128,14 @@ export class WorkspaceManagerComponent implements OnInit {
         }
     }
 
+    async renameWorkspace(workspace: ManagedWorkspace) {
+        const needsRefresh = await this.modalService.openEditWorkspace(workspace);
+        if (needsRefresh) {
+            await this.quietLoadWorkspaces();
+            this.snackbarService.success(`Workspace renamed successfully.`);
+        }
+    }
+
     @HostListener('window:focus')
     async onWindowFocus() {
         await this.quietLoadWorkspaces();
@@ -143,9 +151,15 @@ export class WorkspaceManagerComponent implements OnInit {
     }
 
     private async quietLoadWorkspaces() {
-        const rawWorkspaces = await this.workspaceService.getAll();
         const mode = await this.fileSystem.getStorageMode();
         this.isFileSystemMode.set(mode === 'filesystem');
+
+        // Sync OS-level renames first if applicable
+        if (this.isFileSystemMode()) {
+            await this.workspaceService.syncExternalRenames();
+        }
+
+        const rawWorkspaces = await this.workspaceService.getAll();
 
         const managed: ManagedWorkspace[] = [];
         const currentMap = new Map(this.workspaces().map(w => [w.id, w]));
