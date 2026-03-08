@@ -24,6 +24,8 @@ export class CreateWorkspaceComponent {
     workspaceName = signal('');
     isSubmitting = signal(false);
     isDragging = signal(false);
+    selectedFolderHandle = signal<FileSystemDirectoryHandle | null>(null);
+    spaceCountPreview = signal<number>(0);
 
     async createManual() {
         const name = this.workspaceName().trim();
@@ -71,7 +73,7 @@ export class CreateWorkspaceComponent {
         event.preventDefault();
         this.isDragging.set(false);
 
-        if (this.isSubmitting()) return;
+        if (this.isSubmitting() || this.selectedFolderHandle()) return;
 
         // Check if drops are supported in the File System API by checking dataTransfer items
         const items = event.dataTransfer?.items;
@@ -101,72 +103,77 @@ export class CreateWorkspaceComponent {
                 return;
             }
 
-            this.isSubmitting.set(true);
-            const workspaceName = dirHandle.name;
-
-            if (await this.workspaceService.existsByName(workspaceName)) {
-                this.toastService.error(`Workspace "${workspaceName}" already exists.`);
-                this.isSubmitting.set(false);
-                return;
-            }
-
-            // 1. Create the Workspace (this creates the root folder in Quilix/)
-            const workspace = await this.workspaceService.create(workspaceName, 'personal');
-
-            // 2. We now iterate the dropped directory to see if there are subfolders to make as Spaces
-            let spaceCount = 0;
-            for await (const entry of (dirHandle as any).values()) {
-                if (entry.kind === 'directory') {
-                    // It's a subfolder, so we create a Space
-                    await this.spaceService.create(workspace.id, workspaceName, entry.name);
-                    spaceCount++;
-                }
-            }
-
-            let successMsg = `Workspace "${workspaceName}" created.`;
-            if (spaceCount > 0) {
-                successMsg = `Workspace "${workspaceName}" created with ${spaceCount} space(s).`;
-            }
-
-            this.toastService.success(successMsg);
-            this.modalService.cancelResult();
-
+            await this.handleFolderSelection(dirHandle);
         } catch (error: any) {
             console.error('Error importing folder workspace:', error);
-            this.toastService.error('Failed to import folder as workspace.');
-        } finally {
-            this.isSubmitting.set(false);
+            this.toastService.error('Failed to select folder.');
         }
     }
 
     async onClickImportFolder() {
-        if (this.isSubmitting()) return;
+        if (this.isSubmitting() || this.selectedFolderHandle()) return;
 
         try {
             // Use the native File System Access API directory picker
             const dirHandle = await (window as any).showDirectoryPicker({ mode: 'read' });
             if (!dirHandle) return;
 
-            this.isSubmitting.set(true);
-            const workspaceName = dirHandle.name;
+            await this.handleFolderSelection(dirHandle);
+        } catch (error: any) {
+            // showDirectoryPicker throws an AbortError if the user cancels the picker, we can ignore it
+            if (error.name !== 'AbortError') {
+                console.error('Error picking folder:', error);
+                this.toastService.error('Failed to select folder.');
+            }
+        }
+    }
 
+    private async handleFolderSelection(dirHandle: any) {
+        this.isSubmitting.set(true);
+        try {
+            const workspaceName = dirHandle.name;
             const validationError = this.spaceService.validateName(workspaceName);
             if (validationError) {
                 this.toastService.error(`Invalid folder name: ${validationError}`);
-                this.isSubmitting.set(false);
                 return;
             }
 
             if (await this.workspaceService.existsByName(workspaceName)) {
                 this.toastService.error(`Workspace "${workspaceName}" already exists.`);
-                this.isSubmitting.set(false);
                 return;
             }
 
+            let spaceCount = 0;
+            for await (const entry of dirHandle.values()) {
+                if (entry.kind === 'directory') {
+                    spaceCount++;
+                }
+            }
+
+            this.selectedFolderHandle.set(dirHandle);
+            this.spaceCountPreview.set(spaceCount);
+        } finally {
+            this.isSubmitting.set(false);
+        }
+    }
+
+    removeSelection(event?: Event) {
+        if (event) event.stopPropagation();
+        this.selectedFolderHandle.set(null);
+        this.spaceCountPreview.set(0);
+    }
+
+    async confirmImport() {
+        const handle = this.selectedFolderHandle();
+        if (!handle || this.isSubmitting()) return;
+
+        this.isSubmitting.set(true);
+        try {
+            const workspaceName = handle.name;
             const workspace = await this.workspaceService.create(workspaceName, 'personal');
 
             let spaceCount = 0;
-            for await (const entry of (dirHandle as any).values()) {
+            for await (const entry of (handle as any).values()) {
                 if (entry.kind === 'directory') {
                     await this.spaceService.create(workspace.id, workspaceName, entry.name);
                     spaceCount++;
@@ -179,14 +186,10 @@ export class CreateWorkspaceComponent {
             }
 
             this.toastService.success(successMsg);
-            this.modalService.cancelResult(true); // pass true to indicate a refresh might be needed by the caller
-
+            this.modalService.cancelResult(true);
         } catch (error: any) {
-            // showDirectoryPicker throws an AbortError if the user cancels the picker, we can ignore it
-            if (error.name !== 'AbortError') {
-                console.error('Error picking folder:', error);
-                this.toastService.error('Failed to import folder.');
-            }
+            console.error('Error importing folder workspace:', error);
+            this.toastService.error('Failed to import folder as workspace.');
         } finally {
             this.isSubmitting.set(false);
         }

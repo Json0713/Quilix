@@ -19,15 +19,39 @@
         <span>OR</span>
     </div>
 
-    <div class="import-dropzone-section" [class.drag-over]="isDragging()" (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="onClickImportFolder()" role="button"
-        tabindex="0" (keyup.enter)="onClickImportFolder()">
+    <div class="import-dropzone-section" [class.drag-over]="isDragging()"
+        [class.has-selection]="selectedFolderHandle() !== null" (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
+        (click)="!selectedFolderHandle() && onClickImportFolder()"
+        [attr.role]="!selectedFolderHandle() ? 'button' : null" [attr.tabindex]="!selectedFolderHandle() ? '0' : null"
+        (keyup.enter)="!selectedFolderHandle() && onClickImportFolder()">
 
-        <div class="dropzone-content">
-            <i class="bi bi-folder-plus drop-icon"></i>
-            <span class="drop-title">Import from Folder</span>
-            <span class="drop-desc">Drag & Drop an existing folder here to automatically create a Workspace and its
-                Spaces.</span>
-        </div>
+        @if (!selectedFolderHandle()) {
+        <i class="bi bi-folder-plus drop-icon"></i>
+        <strong class="drop-title">Import from Folder</strong>
+        <span class="drop-desc">Drag & Drop an existing folder here or click to browse</span>
+        } @else {
+        <i class="bi bi-folder-check preview-icon"></i>
+        <strong class="file-name" [title]="selectedFolderHandle()?.name">
+            {{ selectedFolderHandle()?.name }}
+        </strong>
+        <span>{{ spaceCountPreview() }} Subfolder(s) inside</span>
+        }
+    </div>
+
+    <!-- ACTIONS (Only visible when folder is selected) -->
+    <div class="actions">
+        <button type="button" class="btn secondary" (click)="removeSelection()"
+            [disabled]="!selectedFolderHandle() || isSubmitting()">
+            Remove
+        </button>
+        <button type="button" class="btn primary" (click)="confirmImport()"
+            [disabled]="!selectedFolderHandle() || isSubmitting()">
+            @if (isSubmitting()) {
+            <i class="bi bi-arrow-repeat spin"></i> Importing...
+            } @else {
+            Import
+            }
+        </button>
     </div>
 </div>
