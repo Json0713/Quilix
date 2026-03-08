@@ -217,6 +217,7 @@
 /* Drag & Drop Utility Classes */
 .cdk-drag-preview {
     box-sizing: border-box;
+    overflow: hidden;
     cursor: grabbing !important;
 
     app-workspace-card {
