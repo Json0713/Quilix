@@ -39,8 +39,9 @@
         </div>
 
         <!-- Col: File Size -->
-        <div class="col-size">
-            <span class="text-muted">--</span>
+        <div class="col-size"
+            [title]="workspace.sizeBytes !== undefined ? workspace.sizeBytes + ' bytes' : 'Calculating...'">
+            <span class="size">{{ formatBytes(workspace.sizeBytes) }}</span>
         </div>
 
         <!-- Col: Status -->

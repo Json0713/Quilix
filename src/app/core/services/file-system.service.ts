@@ -422,4 +422,40 @@ export class FileSystemService {
             return false;
         }
     }
+
+    /**
+     * Recursively calculate the size of a directory in bytes.
+     */
+    async calculateDirectorySize(dirHandle: FileSystemDirectoryHandle): Promise<number> {
+        let size = 0;
+        try {
+            for await (const entry of (dirHandle as any).values()) {
+                if (entry.kind === 'file') {
+                    const file = await (entry as FileSystemFileHandle).getFile();
+                    size += file.size;
+                } else if (entry.kind === 'directory') {
+                    size += await this.calculateDirectorySize(entry as FileSystemDirectoryHandle);
+                }
+            }
+        } catch (err) {
+            console.warn(`[FileSystem] Could not calculate size for ${dirHandle.name}`, err);
+        }
+        return size;
+    }
+
+    /**
+     * Get the total physical byte size of a workspace directory.
+     */
+    async getWorkspaceFolderSize(workspaceName: string): Promise<number> {
+        const rootHandle = await this.ensurePermittedHandle();
+        if (!rootHandle) return 0;
+
+        try {
+            const quilixRoot = await rootHandle.getDirectoryHandle(this.QUILIX_ROOT, { create: false });
+            const wsHandle = await quilixRoot.getDirectoryHandle(workspaceName, { create: false });
+            return await this.calculateDirectorySize(wsHandle);
+        } catch {
+            return 0; // Folder missing, return 0
+        }
+    }
 }

@@ -21,6 +21,7 @@ export interface ManagedWorkspace extends Workspace {
     isMissingOnDisk?: boolean;
     isRestoring?: boolean;
     isTrashing?: boolean;
+    sizeBytes?: number;
 }
 
 @Component({
@@ -184,11 +185,17 @@ export class WorkspaceManagerComponent implements OnInit {
                 ...ws,
                 isMissingOnDisk,
                 isRestoring: existing?.isRestoring || false,
-                isTrashing: existing?.isTrashing || false
+                isTrashing: existing?.isTrashing || false,
+                sizeBytes: existing?.sizeBytes
             });
         }
 
         this.workspaces.set(managed);
+
+        // Kick off async size calculation
+        if (this.isFileSystemMode() && !this.needsReauth()) {
+            this.calculateWorkspaceSizes(managed);
+        }
 
         // Clean up stale selections after reload
         if (this.selectionMode()) {
@@ -364,10 +371,27 @@ export class WorkspaceManagerComponent implements OnInit {
     }
 
     private updateWorkspaceState(id: string, updates: Partial<ManagedWorkspace>) {
-        this.workspaces.update(list =>
-            list.map(w => w.id === id ? { ...w, ...updates } : w)
-        );
+        this.workspaces.update(list => list.map(w => w.id === id ? { ...w, ...updates } : w));
     }
+
+    private async calculateWorkspaceSizes(workspaces: ManagedWorkspace[]) {
+        for (const ws of workspaces) {
+            // Skip missing ones or those without physical bound limits
+            if (ws.isMissingOnDisk || ws.role === 'team' || !this.isFileSystemMode()) continue;
+            try {
+                const size = await this.fileSystem.getWorkspaceFolderSize(ws.name);
+                // Update only if size changed or wasn't set to prevent unnecessary trigger renders
+                const current = this.workspaces().find(w => w.id === ws.id);
+                if (current && current.sizeBytes !== size) {
+                    this.updateWorkspaceState(ws.id, { sizeBytes: size });
+                }
+            } catch (err) {
+                console.warn(`[WorkspaceManager] Could not compute size for ${ws.name}`, err);
+            }
+        }
+    }
+
+    // ── Actions ──
 
     async switchToWorkspace(workspace: ManagedWorkspace) {
         if (workspace.id === this.currentWorkspaceId()) return;
