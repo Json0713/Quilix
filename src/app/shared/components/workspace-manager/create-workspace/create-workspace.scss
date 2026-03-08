@@ -95,7 +95,7 @@
         &::after {
             content: '';
             flex: 1;
-            border-bottom: 1px solid var(--text-alt);
+            border-bottom: 1px solid rgba(145, 147, 147, 0.26);
         }
 
         &::before {
