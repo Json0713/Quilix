@@ -346,14 +346,33 @@ export class SpaceService {
                 if (space && space.workspaceId === workspaceId && !space.trashedAt && space.folderName !== diskName) {
                     console.log(`[SpaceService] Detected external space rename: Re-linking ID ${spaceId} to new folder name "${diskName}"`);
 
-                    // Note: We only update folderName logic to link the disk identity.
-                    // The display 'name' will be derived from the folderName for simplicity, or 
-                    // we could reverse-parse it but simple assignment works best here.
                     await db.spaces.update(spaceId, {
                         name: diskName, // Fallback display name
                         folderName: diskName
                     });
                 }
+            } else {
+                // AUTO-DISCOVERY: No .quilix-id means this folder was created manually inside the Workspace via OS
+                console.log(`[SpaceService] NATIVE DISCOVERY: Found untracked OS space "${diskName}" inside "${workspaceName}". Ingesting...`);
+                const newSpaceId = crypto.randomUUID();
+
+                // Write anchor so it's permanently tracked natively going forward
+                await this.fileSystem.writeDirectoryId(handle, newSpaceId);
+
+                // Determine order (append to end)
+                const existing = await this.getByWorkspace(workspaceId);
+                const order = existing.length > 0 ? Math.max(...existing.map(s => s.order)) + 1 : 0;
+
+                const newSpace: Space = {
+                    id: newSpaceId,
+                    workspaceId,
+                    name: diskName,
+                    folderName: diskName,
+                    createdAt: Date.now(),
+                    order,
+                };
+
+                await db.spaces.add(newSpace);
             }
         }
     }

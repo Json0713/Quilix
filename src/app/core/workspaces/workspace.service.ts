@@ -210,6 +210,25 @@ export class WorkspaceService {
                         folderPath: `Quilix/${diskName}`
                     });
                 }
+            } else {
+                // AUTO-DISCOVERY: No .quilix-id means this folder was created manually via OS
+                console.log(`[WorkspaceService] NATIVE DISCOVERY: Found untracked OS folder "${diskName}". Ingesting as new Workspace...`);
+                const newWorkspaceId = crypto.randomUUID();
+                const now = Date.now();
+
+                // Write our anchor ID into it so we own it moving forward
+                await this.fileSystem.writeDirectoryId(handle, newWorkspaceId);
+
+                const newWorkspace: Workspace = {
+                    id: newWorkspaceId,
+                    name: diskName,
+                    role: 'personal', // Default to personal for natively discovered folders
+                    createdAt: now,
+                    lastActiveAt: now,
+                    folderPath: `Quilix/${diskName}`
+                };
+
+                await db.workspaces.add(newWorkspace);
             }
         }
     }
