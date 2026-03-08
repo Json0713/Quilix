@@ -2,9 +2,11 @@
     <div class="manual-creation-section">
         <label for="workspaceName">Workspace Name</label>
         <div class="input-group">
-            <input id="workspaceName" type="text" [(ngModel)]="workspaceName" placeholder="E.g., Personal Projects"
-                (keyup.enter)="createManual()" [disabled]="isSubmitting()" class="quilix-input" />
-            <button class="action-btn primary" [disabled]="isSubmitting() || !workspaceName().trim()"
+            <input id="workspaceName" type="text" [ngModel]="workspaceName()" (ngModelChange)="onNameChange($event)"
+                placeholder="E.g., Personal Projects" (keyup.enter)="createManual()" [disabled]="isSubmitting()"
+                class="quilix-input" [class.has-error]="validationError() !== null" />
+            <button class="action-btn primary"
+                [disabled]="isSubmitting() || !workspaceName().trim() || validationError() !== null"
                 (click)="createManual()">
                 @if (isSubmitting()) {
                 <i class="bi bi-arrow-repeat spin"></i>
@@ -13,6 +15,9 @@
                 }
             </button>
         </div>
+        @if (validationError()) {
+        <span class="error-text">{{ validationError() }}</span>
+        }
     </div>
 
     <div class="divider">
@@ -35,7 +40,7 @@
         <strong class="file-name" [title]="selectedFolderHandle()?.name">
             {{ selectedFolderHandle()?.name }}
         </strong>
-        <span>{{ spaceCountPreview() }} Subfolder(s) inside</span>
+        <span>{{ folderSizePreview() }}</span>
         }
     </div>
 

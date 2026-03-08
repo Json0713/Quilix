@@ -25,25 +25,36 @@ export class CreateWorkspaceComponent {
     isSubmitting = signal(false);
     isDragging = signal(false);
     selectedFolderHandle = signal<FileSystemDirectoryHandle | null>(null);
-    spaceCountPreview = signal<number>(0);
+    folderSizePreview = signal<string>('0 B');
+    validationError = signal<string | null>(null);
+
+    onNameChange(newName: string) {
+        this.workspaceName.set(newName);
+        if (!newName.trim()) {
+            this.validationError.set(null);
+            return;
+        }
+        const error = this.spaceService.validateName(newName);
+        this.validationError.set(error);
+    }
 
     async createManual() {
         const name = this.workspaceName().trim();
         if (!name) return;
 
+        // Run validation one last time
+        const error = this.spaceService.validateName(name);
+        if (error) {
+            this.validationError.set(error);
+            return;
+        }
+
         if (this.isSubmitting()) return;
         this.isSubmitting.set(true);
 
         try {
-            const validationError = this.spaceService.validateName(name);
-            if (validationError) {
-                this.toastService.error(validationError);
-                this.isSubmitting.set(false);
-                return;
-            }
-
             if (await this.workspaceService.existsByName(name)) {
-                this.toastService.error('Workspace name already exists.');
+                this.validationError.set('Workspace name already exists.');
                 this.isSubmitting.set(false);
                 return;
             }
@@ -128,6 +139,27 @@ export class CreateWorkspaceComponent {
         }
     }
 
+    private async calculateFolderSize(dirHandle: any): Promise<number> {
+        let size = 0;
+        for await (const entry of dirHandle.values()) {
+            if (entry.kind === 'file') {
+                const file = await entry.getFile();
+                size += file.size;
+            } else if (entry.kind === 'directory') {
+                size += await this.calculateFolderSize(entry);
+            }
+        }
+        return size;
+    }
+
+    private formatSize(bytes: number): string {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
     private async handleFolderSelection(dirHandle: any) {
         this.isSubmitting.set(true);
         try {
@@ -143,15 +175,11 @@ export class CreateWorkspaceComponent {
                 return;
             }
 
-            let spaceCount = 0;
-            for await (const entry of dirHandle.values()) {
-                if (entry.kind === 'directory') {
-                    spaceCount++;
-                }
-            }
+            // Calculate recursive size for preview
+            const totalBytes = await this.calculateFolderSize(dirHandle);
 
             this.selectedFolderHandle.set(dirHandle);
-            this.spaceCountPreview.set(spaceCount);
+            this.folderSizePreview.set(this.formatSize(totalBytes));
         } finally {
             this.isSubmitting.set(false);
         }
@@ -160,7 +188,7 @@ export class CreateWorkspaceComponent {
     removeSelection(event?: Event) {
         if (event) event.stopPropagation();
         this.selectedFolderHandle.set(null);
-        this.spaceCountPreview.set(0);
+        this.folderSizePreview.set('0 B');
     }
 
     async confirmImport() {

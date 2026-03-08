@@ -6,7 +6,7 @@ import { FileSystemService } from './file-system.service';
 
 /** Characters not allowed in space names (filesystem-safe) */
 const INVALID_CHARS = /[\/\\:*?"<>|.@#$%^&!+=~`{}\[\]();,]/g;
-const MAX_NAME_LENGTH = 50;
+const MAX_NAME_LENGTH = 206;
 
 @Injectable({
     providedIn: 'root',
