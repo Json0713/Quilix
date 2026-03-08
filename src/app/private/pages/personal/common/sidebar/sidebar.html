@@ -24,6 +24,11 @@
                     <i [class]="item.icon" class="nav-icon"></i>
                     @if (!isCollapsed()) {
                     <span class="nav-label">{{ item.label }}</span>
+                    @if (item.label === 'Workspaces' && hasMissingWorkspaces()) {
+                    <i class="bi bi-exclamation-circle-fill text-warning ms-auto"
+                        title="Some workspaces are missing from disk"
+                        style="font-size: 0.85rem; margin-right: 8px;"></i>
+                    }
                     }
                 </a>
             </li>
@@ -96,6 +101,10 @@
                         <i class="bi bi-folder nav-icon"></i>
                         @if (!isCollapsed()) {
                         <span class="nav-label">{{ space.name }}</span>
+                        @if (space.isMissingOnDisk) {
+                        <i class="bi bi-exclamation-circle-fill text-warning ms-auto" title="Folder missing from disk"
+                            style="font-size: 0.85rem; margin-right: 18px;"></i>
+                        }
                         }
                     </a>
 
@@ -110,6 +119,12 @@
                             <i class="bi bi-pencil"></i>
                             <span>Rename</span>
                         </button>
+                        @if (space.isMissingOnDisk) {
+                        <button class="dropdown-item" (click)="restoreSpace(space.id, $event)">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            <span>Restore</span>
+                        </button>
+                        }
                         <button class="dropdown-item trash-item" (click)="trashSpace(space.id, $event)">
                             <i class="bi bi-trash3"></i>
                             <span>Move to Trash</span>

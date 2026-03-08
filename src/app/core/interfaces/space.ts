@@ -6,4 +6,5 @@ export interface Space {
     createdAt: number;
     order: number;
     trashedAt?: number;
+    isMissingOnDisk?: boolean;
 }

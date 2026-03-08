@@ -307,7 +307,7 @@ export class WorkspaceManagerComponent implements OnInit {
             selected.forEach(ws => this.updateWorkspaceState(ws.id, { isRestoring: true }));
 
             for (const ws of selected) {
-                const success = await this.fileSystem.restoreFolder(ws.name);
+                const success = await this.workspaceService.restoreWorkspace(ws.id, ws.name);
                 if (success) {
                     this.updateWorkspaceState(ws.id, { isRestoring: false, isMissingOnDisk: false });
                 } else {
@@ -329,7 +329,7 @@ export class WorkspaceManagerComponent implements OnInit {
         this.updateWorkspaceState(workspace.id, { isRestoring: true });
 
         try {
-            const success = await this.fileSystem.restoreFolder(workspace.name);
+            const success = await this.workspaceService.restoreWorkspace(workspace.id, workspace.name);
             if (success) {
                 this.updateWorkspaceState(workspace.id, {
                     isRestoring: false,

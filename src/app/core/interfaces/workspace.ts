@@ -9,4 +9,5 @@ export interface Workspace {
     order?: number;
     trashedAt?: number;
     folderPath?: string; // Optional reference to local folder
+    isMissingOnDisk?: boolean; // Flagged when OS folder vanishes
 }

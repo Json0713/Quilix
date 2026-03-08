@@ -396,10 +396,30 @@ export class FileSystemService {
     }
 
     /**
-     * Restore a missing workspace folder on disk.
+     * Restore a missing workspace folder on disk and write back its ID so it isn't orphaned.
      */
-    async restoreFolder(workspaceName: string): Promise<boolean> {
+    async restoreWorkspaceFolder(workspaceName: string, id: string): Promise<boolean> {
         const handle = await this.getOrCreateWorkspaceFolder(workspaceName);
-        return handle !== null;
+        if (handle) {
+            await this.writeDirectoryId(handle, id);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Restore a missing space folder inside a workspace.
+     */
+    async restoreSpaceFolder(workspaceName: string, spaceFolderName: string, id: string): Promise<boolean> {
+        const wsHandle = await this.getOrCreateWorkspaceFolder(workspaceName);
+        if (!wsHandle) return false;
+
+        try {
+            const spaceHandle = await wsHandle.getDirectoryHandle(spaceFolderName, { create: true });
+            await this.writeDirectoryId(spaceHandle, id);
+            return true;
+        } catch {
+            return false;
+        }
     }
 }

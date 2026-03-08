@@ -9,6 +9,7 @@ import { SpaceService } from '../../../../../core/services/space.service';
 import { TabService } from '../../../../../core/services/tab.service';
 import { Space } from '../../../../../core/interfaces/space';
 import { Workspace } from '../../../../../core/interfaces/workspace';
+import { WorkspaceService } from '../../../../../core/workspaces/workspace.service';
 import { SettingsKitComponent } from '../settings-kit/settings-kit';
 
 @Component({
@@ -22,6 +23,7 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
     private sidebarService = inject(SidebarService);
     private authService = inject(AuthService);
     private spaceService = inject(SpaceService);
+    private workspaceService = inject(WorkspaceService);
     private tabService = inject(TabService);
     private router = inject(Router);
     private route = inject(ActivatedRoute);
@@ -41,6 +43,7 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
     isCreating = signal<boolean>(false);
     newSpaceName = signal<string>('');
     inputError = signal<string | null>(null);
+    hasMissingWorkspaces = signal<boolean>(false);
     private isSubmitting = false;
 
     // ── Context menu state ──
@@ -55,10 +58,15 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
     @ViewChildren('renameInput') renameInputRefs!: QueryList<ElementRef<HTMLInputElement>>;
 
     private spaceSub: any;
+    private workspaceSub: any;
     private authSub: any;
 
     async ngOnInit() {
         await this.loadWorkspace();
+
+        this.workspaceSub = this.workspaceService.workspaces$.subscribe(ws => {
+            this.hasMissingWorkspaces.set(ws.some(w => w.isMissingOnDisk && w.role === 'personal'));
+        });
 
         this.authSub = this.authService.authEvents$.subscribe(async (event) => {
             if (event === 'LOGIN') {
@@ -80,6 +88,7 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.spaceSub?.unsubscribe();
+        this.workspaceSub?.unsubscribe();
         this.authSub?.unsubscribe();
     }
 
@@ -247,6 +256,16 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
         if (!workspace) return;
 
         await this.spaceService.moveToTrash(spaceId, workspace.name);
+    }
+
+    async restoreSpace(spaceId: string, event: Event) {
+        event.stopPropagation();
+        this.openMenuId.set(null);
+
+        const workspace = this.activeWorkspace();
+        if (!workspace) return;
+
+        await this.spaceService.restoreSpace(spaceId, workspace.name);
     }
 
     // ── Rename ──

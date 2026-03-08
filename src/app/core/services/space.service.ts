@@ -336,11 +336,16 @@ export class SpaceService {
         if (storageMode !== 'filesystem') return;
 
         const folders = await this.fileSystem.getAllSpaceFolders(workspaceName);
+        if (!this.fileSystem.hasPermission()) return; // Bail if permission lost to avoid marking all as missing
+
+        const foundSpaceIds = new Set<string>();
+
         for (const handle of folders) {
             const diskName = handle.name;
             const spaceId = await this.fileSystem.readDirectoryId(handle);
 
             if (spaceId) {
+                foundSpaceIds.add(spaceId);
                 const space = await db.spaces.get(spaceId);
                 // Validate it actually belongs to this workspace and its disk name represents its folderName.
                 if (space && space.workspaceId === workspaceId && !space.trashedAt && space.folderName !== diskName) {
@@ -373,7 +378,35 @@ export class SpaceService {
                 };
 
                 await db.spaces.add(newSpace);
+                foundSpaceIds.add(newSpaceId);
             }
         }
+
+        // Phase 1: Missing Folder Detection
+        const allSpaces = await db.spaces.where('workspaceId').equals(workspaceId).toArray();
+        for (const space of allSpaces) {
+            if (!space.trashedAt && !foundSpaceIds.has(space.id)) {
+                if (!space.isMissingOnDisk) {
+                    await db.spaces.update(space.id, { isMissingOnDisk: true });
+                }
+            } else if (space.isMissingOnDisk && foundSpaceIds.has(space.id)) {
+                await db.spaces.update(space.id, { isMissingOnDisk: false });
+            }
+        }
+    }
+
+    /**
+     * Restore a missing space physical folder.
+     */
+    async restoreSpace(spaceId: string, workspaceName: string): Promise<boolean> {
+        const space = await db.spaces.get(spaceId);
+        if (!space || !space.folderName) return false;
+
+        const success = await this.fileSystem.restoreSpaceFolder(workspaceName, space.folderName, space.id);
+        if (success) {
+            await db.spaces.update(spaceId, { isMissingOnDisk: false });
+            return true;
+        }
+        return false;
     }
 }

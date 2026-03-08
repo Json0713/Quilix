@@ -145,6 +145,18 @@ export class WorkspaceService {
     }
 
     /**
+     * Restore a missing workspace physical folder.
+     */
+    async restoreWorkspace(workspaceId: string, workspaceName: string): Promise<boolean> {
+        const success = await this.fileSystem.restoreWorkspaceFolder(workspaceName, workspaceId);
+        if (success) {
+            await db.workspaces.update(workspaceId, { isMissingOnDisk: false });
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Permanently delete a workspace from the database and disk if applicable.
      */
     async permanentlyDelete(workspaceId: string): Promise<void> {
@@ -196,11 +208,16 @@ export class WorkspaceService {
         if (storageMode !== 'filesystem') return;
 
         const folders = await this.fileSystem.getAllWorkspaceFolders();
+        if (!this.fileSystem.hasPermission()) return; // Bail if permission lost to avoid marking all as missing
+
+        const foundWorkspaceIds = new Set<string>();
+
         for (const handle of folders) {
             const diskName = handle.name;
             const folderId = await this.fileSystem.readDirectoryId(handle);
 
             if (folderId) {
+                foundWorkspaceIds.add(folderId);
                 const ws = await this.getById(folderId);
                 // If the folder name on disk doesn't match the DB name, it was physically renamed
                 if (ws && !ws.trashedAt && ws.name !== diskName) {
@@ -229,6 +246,19 @@ export class WorkspaceService {
                 };
 
                 await db.workspaces.add(newWorkspace);
+                foundWorkspaceIds.add(newWorkspaceId);
+            }
+        }
+
+        // Phase 1: Missing Folder Detection
+        const allWorkspaces = await db.workspaces.toArray();
+        for (const ws of allWorkspaces) {
+            if (!ws.trashedAt && ws.folderPath && !foundWorkspaceIds.has(ws.id)) {
+                if (!ws.isMissingOnDisk) {
+                    await db.workspaces.update(ws.id, { isMissingOnDisk: true });
+                }
+            } else if (ws.isMissingOnDisk && foundWorkspaceIds.has(ws.id)) {
+                await db.workspaces.update(ws.id, { isMissingOnDisk: false });
             }
         }
     }
