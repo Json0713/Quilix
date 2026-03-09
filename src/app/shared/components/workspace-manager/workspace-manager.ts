@@ -139,6 +139,9 @@ export class WorkspaceManagerComponent implements OnInit {
 
     @HostListener('window:focus')
     async onWindowFocus() {
+        // PREVENTION: Don't trigger background load if we are currently re-authenticating 
+        // to prevent race conditions between sync and permission grant.
+        if (this.isReauthing() || this.isLoading()) return;
         await this.quietLoadWorkspaces();
     }
 
@@ -218,13 +221,27 @@ export class WorkspaceManagerComponent implements OnInit {
             const granted = await this.fileSystem.requestPermissionWithGesture();
             if (granted) {
                 this.needsReauth.set(false);
+
+                // 1. First, import any backed up state from disk
                 await this.systemSync.importStateFromDisk();
-                // Re-create workspace folders in the (possibly re-picked) directory
+
+                // 2. Re-create workspace folders if they were missing (e.g. fresh device or re-picked dir)
+                // This will also write the .quilix-id markers.
                 await this.workspaceService.migrateToFileSystem();
+
+                // 3. Finally, perform the internal sync and local reload.
+                // Sync locking in workspaceService will ensure this doesn't race with background observers.
+                await this.workspaceService.syncExternalRenames();
                 await this.quietLoadWorkspaces();
+
+                this.snackbarService.success('Storage reconnected and synced successfully.');
             }
+        } catch (error) {
+            console.error('[WorkspaceManager] Reconnection failed:', error);
+            this.snackbarService.error('Failed to reconnect storage.');
         } finally {
-            this.isReauthing.set(false);
+            this.isReauthing.set(true); // Keep state true for a micro-second to let window:focus clear
+            setTimeout(() => this.isReauthing.set(false), 300);
         }
     }
 

@@ -219,6 +219,14 @@ export class FileSystemService {
             const writable = await (fileHandle as any).createWritable();
             await writable.write(id);
             await writable.close();
+
+            // VERIFICATION: Read it back to ensure it was written correctly
+            const verifiedId = await this.readDirectoryId(dirHandle);
+            if (verifiedId !== id) {
+                console.error(`[FileSystem] ID verification failed for ${dirHandle.name}. Expected ${id}, got ${verifiedId}`);
+                return false;
+            }
+
             return true;
         } catch (err) {
             console.error(`[FileSystem] Failed to write ID to directory: ${dirHandle.name}`, err);

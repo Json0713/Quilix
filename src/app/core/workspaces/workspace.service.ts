@@ -199,6 +199,8 @@ export class WorkspaceService {
         }
     }
 
+    private isSyncing = false;
+
     /**
      * Scans the file system Quilix/ root to catch missing folders that were renamed through the OS File Manager.
      * Re-links them based by matching their inner `.quilix-id`.
@@ -207,59 +209,96 @@ export class WorkspaceService {
         const storageMode = await this.fileSystem.getStorageMode();
         if (storageMode !== 'filesystem') return;
 
-        const folders = await this.fileSystem.getAllWorkspaceFolders();
-        if (!this.fileSystem.hasPermission()) return; // Bail if permission lost to avoid marking all as missing
-
-        const foundWorkspaceIds = new Set<string>();
-
-        for (const handle of folders) {
-            const diskName = handle.name;
-            const folderId = await this.fileSystem.readDirectoryId(handle);
-
-            if (folderId) {
-                foundWorkspaceIds.add(folderId);
-                const ws = await this.getById(folderId);
-                // If the folder name on disk doesn't match the DB name, it was physically renamed
-                if (ws && !ws.trashedAt && ws.name !== diskName) {
-                    console.log(`[WorkspaceService] Detected external rename: Re-linking Workspace ID ${folderId} to new name "${diskName}"`);
-                    await db.workspaces.update(folderId, {
-                        name: diskName,
-                        folderPath: `Quilix/${diskName}`
-                    });
-                }
-            } else {
-                // AUTO-DISCOVERY: No .quilix-id means this folder was created manually via OS
-                console.log(`[WorkspaceService] NATIVE DISCOVERY: Found untracked OS folder "${diskName}". Ingesting as new Workspace...`);
-                const newWorkspaceId = crypto.randomUUID();
-                const now = Date.now();
-
-                // Write our anchor ID into it so we own it moving forward
-                await this.fileSystem.writeDirectoryId(handle, newWorkspaceId);
-
-                const newWorkspace: Workspace = {
-                    id: newWorkspaceId,
-                    name: diskName,
-                    role: 'personal', // Default to personal for natively discovered folders
-                    createdAt: now,
-                    lastActiveAt: now,
-                    folderPath: `Quilix/${diskName}`
-                };
-
-                await db.workspaces.add(newWorkspace);
-                foundWorkspaceIds.add(newWorkspaceId);
-            }
+        // PREVENTION: Ensure only one sync runs at a time to prevent race conditions
+        if (this.isSyncing) {
+            console.log('[WorkspaceService] Sync already in progress, skipping concurrent run.');
+            return;
         }
 
-        // Phase 1: Missing Folder Detection
-        const allWorkspaces = await db.workspaces.toArray();
-        for (const ws of allWorkspaces) {
-            if (!ws.trashedAt && ws.folderPath && !foundWorkspaceIds.has(ws.id)) {
-                if (!ws.isMissingOnDisk) {
-                    await db.workspaces.update(ws.id, { isMissingOnDisk: true });
+        if (!this.fileSystem.hasPermission()) return; // Bail if permission lost to avoid marking all as missing
+
+        this.isSyncing = true;
+        try {
+            const folders = await this.fileSystem.getAllWorkspaceFolders();
+            const foundWorkspaceIds = new Set<string>();
+
+            // Phase 1: Identify existing workspaces by ID or Name (Heuristic)
+            for (const handle of folders) {
+                const diskName = handle.name;
+                let folderId = await this.fileSystem.readDirectoryId(handle);
+
+                // HEURISTIC: If folder has no ID, check if it matches an existing missing workspace by name
+                if (!folderId) {
+                    const existingByName = await db.workspaces
+                        .filter(w => w.name === diskName && !!w.isMissingOnDisk && !w.trashedAt)
+                        .first();
+
+                    if (existingByName) {
+                        console.log(`[WorkspaceService] HEURISTIC MATCH: Linking orphaned folder "${diskName}" to existing Workspace ID ${existingByName.id}`);
+                        folderId = existingByName.id;
+                        // Write back the ID to the folder so it becomes "tracked"
+                        await this.fileSystem.writeDirectoryId(handle, folderId);
+                    }
                 }
-            } else if (ws.isMissingOnDisk && foundWorkspaceIds.has(ws.id)) {
-                await db.workspaces.update(ws.id, { isMissingOnDisk: false });
+
+                if (folderId) {
+                    foundWorkspaceIds.add(folderId);
+                    const ws = await this.getById(folderId);
+
+                    if (ws && !ws.trashedAt) {
+                        // If the folder name on disk doesn't match the DB name, it was physically renamed
+                        if (ws.name !== diskName) {
+                            console.log(`[WorkspaceService] Detected external rename: Re-linking Workspace ID ${folderId} to new name "${diskName}"`);
+                            await db.workspaces.update(folderId, {
+                                name: diskName,
+                                folderPath: `Quilix/${diskName}`,
+                                isMissingOnDisk: false // Ensure it's marked as present
+                            });
+                        } else if (ws.isMissingOnDisk) {
+                            // If it was marked as missing but we found it now
+                            await db.workspaces.update(folderId, { isMissingOnDisk: false });
+                        }
+                    }
+                } else {
+                    // AUTO-DISCOVERY: No .quilix-id and no name clash = brand new folder from OS
+                    console.log(`[WorkspaceService] NATIVE DISCOVERY: Found untracked OS folder "${diskName}". Ingesting as new Workspace...`);
+                    const newWorkspaceId = crypto.randomUUID();
+                    const now = Date.now();
+
+                    // Write our anchor ID into it so we own it moving forward
+                    await this.fileSystem.writeDirectoryId(handle, newWorkspaceId);
+
+                    const newWorkspace: Workspace = {
+                        id: newWorkspaceId,
+                        name: diskName,
+                        role: 'personal',
+                        createdAt: now,
+                        lastActiveAt: now,
+                        folderPath: `Quilix/${diskName}`,
+                        isMissingOnDisk: false
+                    };
+
+                    await db.workspaces.add(newWorkspace);
+                    foundWorkspaceIds.add(newWorkspaceId);
+                }
             }
+
+            // Phase 2: Missing Folder Detection
+            const allWorkspaces = await db.workspaces.toArray();
+            for (const ws of allWorkspaces) {
+                // Only track missing status for workspaces that have a physical folder record
+                if (!ws.trashedAt && ws.folderPath) {
+                    const isNowFound = foundWorkspaceIds.has(ws.id);
+
+                    if (!isNowFound && !ws.isMissingOnDisk) {
+                        await db.workspaces.update(ws.id, { isMissingOnDisk: true });
+                    } else if (isNowFound && ws.isMissingOnDisk) {
+                        await db.workspaces.update(ws.id, { isMissingOnDisk: false });
+                    }
+                }
+            }
+        } finally {
+            this.isSyncing = false;
         }
     }
 }

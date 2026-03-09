@@ -327,6 +327,8 @@ export class SpaceService {
         }
     }
 
+    private isSyncing = false;
+
     /**
      * Scans all subdirectories of a workspace folder to detect OS-level renames.
      * Uses the inner `.quilix-id` file.
@@ -335,63 +337,92 @@ export class SpaceService {
         const storageMode = await this.fileSystem.getStorageMode();
         if (storageMode !== 'filesystem') return;
 
-        const folders = await this.fileSystem.getAllSpaceFolders(workspaceName);
+        // PREVENTION: Ensure only one sync runs at a time for this space set
+        if (this.isSyncing) return;
+
         if (!this.fileSystem.hasPermission()) return; // Bail if permission lost to avoid marking all as missing
 
-        const foundSpaceIds = new Set<string>();
+        this.isSyncing = true;
+        try {
+            const folders = await this.fileSystem.getAllSpaceFolders(workspaceName);
+            const foundSpaceIds = new Set<string>();
 
-        for (const handle of folders) {
-            const diskName = handle.name;
-            const spaceId = await this.fileSystem.readDirectoryId(handle);
+            for (const handle of folders) {
+                const diskName = handle.name;
+                let spaceId = await this.fileSystem.readDirectoryId(handle);
 
-            if (spaceId) {
-                foundSpaceIds.add(spaceId);
-                const space = await db.spaces.get(spaceId);
-                // Validate it actually belongs to this workspace and its disk name represents its folderName.
-                if (space && space.workspaceId === workspaceId && !space.trashedAt && space.folderName !== diskName) {
-                    console.log(`[SpaceService] Detected external space rename: Re-linking ID ${spaceId} to new folder name "${diskName}"`);
+                // HEURISTIC: If folder has no ID, check if it matches an existing missing space by name
+                if (!spaceId) {
+                    const existingByName = await db.spaces
+                        .filter(s => s.workspaceId === workspaceId && s.folderName === diskName && !!s.isMissingOnDisk && !s.trashedAt)
+                        .first();
 
-                    await db.spaces.update(spaceId, {
-                        name: diskName, // Fallback display name
-                        folderName: diskName
-                    });
+                    if (existingByName) {
+                        console.log(`[SpaceService] HEURISTIC MATCH: Linking orphaned space folder "${diskName}" to existing Space ID ${existingByName.id}`);
+                        spaceId = existingByName.id;
+                        await this.fileSystem.writeDirectoryId(handle, spaceId);
+                    }
                 }
-            } else {
-                // AUTO-DISCOVERY: No .quilix-id means this folder was created manually inside the Workspace via OS
-                console.log(`[SpaceService] NATIVE DISCOVERY: Found untracked OS space "${diskName}" inside "${workspaceName}". Ingesting...`);
-                const newSpaceId = crypto.randomUUID();
 
-                // Write anchor so it's permanently tracked natively going forward
-                await this.fileSystem.writeDirectoryId(handle, newSpaceId);
+                if (spaceId) {
+                    foundSpaceIds.add(spaceId);
+                    const space = await db.spaces.get(spaceId);
 
-                // Determine order (append to end)
-                const existing = await this.getByWorkspace(workspaceId);
-                const order = existing.length > 0 ? Math.max(...existing.map(s => s.order)) + 1 : 0;
+                    // Validate it actually belongs to this workspace
+                    if (space && space.workspaceId === workspaceId && !space.trashedAt) {
+                        // If the folder name on disk doesn't match the DB record, it was physically renamed
+                        if (space.folderName !== diskName) {
+                            console.log(`[SpaceService] Detected external space rename: Re-linking ID ${spaceId} to new folder name "${diskName}"`);
+                            await db.spaces.update(spaceId, {
+                                name: diskName, // Fallback display name
+                                folderName: diskName,
+                                isMissingOnDisk: false
+                            });
+                        } else if (space.isMissingOnDisk) {
+                            await db.spaces.update(spaceId, { isMissingOnDisk: false });
+                        }
+                    }
+                } else {
+                    // AUTO-DISCOVERY: No .quilix-id means this folder was created manually inside the Workspace via OS
+                    console.log(`[SpaceService] NATIVE DISCOVERY: Found untracked OS space "${diskName}" inside "${workspaceName}". Ingesting...`);
+                    const newSpaceId = crypto.randomUUID();
 
-                const newSpace: Space = {
-                    id: newSpaceId,
-                    workspaceId,
-                    name: diskName,
-                    folderName: diskName,
-                    createdAt: Date.now(),
-                    order,
-                };
+                    // Write anchor so it's permanently tracked natively going forward
+                    await this.fileSystem.writeDirectoryId(handle, newSpaceId);
 
-                await db.spaces.add(newSpace);
-                foundSpaceIds.add(newSpaceId);
-            }
-        }
+                    // Determine order (append to end)
+                    const existing = await this.getByWorkspace(workspaceId);
+                    const order = existing.length > 0 ? Math.max(...existing.map(s => s.order)) + 1 : 0;
 
-        // Phase 1: Missing Folder Detection
-        const allSpaces = await db.spaces.where('workspaceId').equals(workspaceId).toArray();
-        for (const space of allSpaces) {
-            if (!space.trashedAt && !foundSpaceIds.has(space.id)) {
-                if (!space.isMissingOnDisk) {
-                    await db.spaces.update(space.id, { isMissingOnDisk: true });
+                    const newSpace: Space = {
+                        id: newSpaceId,
+                        workspaceId,
+                        name: diskName,
+                        folderName: diskName,
+                        createdAt: Date.now(),
+                        order,
+                        isMissingOnDisk: false
+                    };
+
+                    await db.spaces.add(newSpace);
+                    foundSpaceIds.add(newSpaceId);
                 }
-            } else if (space.isMissingOnDisk && foundSpaceIds.has(space.id)) {
-                await db.spaces.update(space.id, { isMissingOnDisk: false });
             }
+
+            // Phase 2: Missing Folder Detection
+            const allSpaces = await db.spaces.where('workspaceId').equals(workspaceId).toArray();
+            for (const space of allSpaces) {
+                if (!space.trashedAt) {
+                    const isNowFound = foundSpaceIds.has(space.id);
+                    if (!isNowFound && !space.isMissingOnDisk) {
+                        await db.spaces.update(space.id, { isMissingOnDisk: true });
+                    } else if (isNowFound && space.isMissingOnDisk) {
+                        await db.spaces.update(space.id, { isMissingOnDisk: false });
+                    }
+                }
+            }
+        } finally {
+            this.isSyncing = false;
         }
     }
 

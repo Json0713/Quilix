@@ -20,6 +20,8 @@ export class SystemSyncService {
     private exportTrigger$ = new Subject<void>();
     private readonly SYNC_FILENAME = '.quilix-data.json';
 
+    private isImporting = false;
+
     constructor() {
         // Debounce export triggers to avoid spamming disk I/O
         this.exportTrigger$.pipe(
@@ -37,7 +39,12 @@ export class SystemSyncService {
                 await db.tabs.count();
                 return Date.now();
             }).subscribe(() => {
-                this.exportTrigger$.next();
+                // PREVENTION: Do not trigger an export if we are currently 
+                // importing state from disk to avoid overwriting the backup 
+                // with incomplete intermediate local data.
+                if (!this.isImporting) {
+                    this.exportTrigger$.next();
+                }
             });
         });
     }
@@ -122,7 +129,10 @@ export class SystemSyncService {
      * Read the .quilix-data.json file and populate the DB if it is empty.
      */
     async importStateFromDisk(): Promise<boolean> {
+        if (this.isImporting) return false;
+
         try {
+            this.isImporting = true;
             const rootHandle = await this.fileSystem.getStoredHandle();
             if (!rootHandle) return false;
 
@@ -178,11 +188,18 @@ export class SystemSyncService {
             });
 
             console.log('[SystemSync] Import successful. Data restored and merged.');
+
+            // Now that we've imported, we can trigger an export of the NEW merged state
+            this.isImporting = false;
+            this.exportTrigger$.next();
+
             return true;
 
         } catch (err) {
             console.error('[SystemSync] Failed to import state from disk:', err);
             return false;
+        } finally {
+            this.isImporting = false;
         }
     }
 }
