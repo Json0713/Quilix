@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnDestroy, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FileSystemService } from '../../../core/services/file-system.service';
 import { WorkspaceService } from '../../../core/workspaces/workspace.service';
@@ -30,6 +30,13 @@ export class StorageHealthComponent implements OnDestroy {
     lastScanTime = signal<number | null>(null);
 
     issues = signal<HealthIssue[]>([]);
+    selectedIds = signal<Set<string>>(new Set());
+
+    isAllSelected = computed(() => {
+        const issues = this.issues();
+        const selected = this.selectedIds();
+        return issues.length > 0 && issues.every(i => selected.has(i.id));
+    });
 
     private sub?: any;
 
@@ -60,6 +67,16 @@ export class StorageHealthComponent implements OnDestroy {
             return issues;
         }).subscribe(issues => {
             this.issues.set(issues);
+            // Cleanup selectedIds if items no longer exist
+            const ids = new Set(issues.map(i => i.id));
+            const currentSelected = this.selectedIds();
+            const nextSelected = new Set<string>();
+            currentSelected.forEach(id => {
+                if (ids.has(id)) nextSelected.add(id);
+            });
+            if (nextSelected.size !== currentSelected.size) {
+                this.selectedIds.set(nextSelected);
+            }
         });
     }
 
@@ -80,6 +97,56 @@ export class StorageHealthComponent implements OnDestroy {
         } finally {
             this.isScanning.set(false);
         }
+    }
+
+    toggleSelection(id: string) {
+        const selected = new Set(this.selectedIds());
+        if (selected.has(id)) {
+            selected.delete(id);
+        } else {
+            selected.add(id);
+        }
+        this.selectedIds.set(selected);
+    }
+
+    toggleSelectAll() {
+        if (this.isAllSelected()) {
+            this.selectedIds.set(new Set());
+        } else {
+            this.selectedIds.set(new Set(this.issues().map(i => i.id)));
+        }
+    }
+
+    async resolveAll() {
+        const list = this.issues();
+        for (const issue of list) {
+            await this.recreateFolder(issue);
+        }
+    }
+
+    async cleanAll() {
+        const list = this.issues();
+        for (const issue of list) {
+            await this.trashRecord(issue);
+        }
+    }
+
+    async resolveSelected() {
+        const selected = this.selectedIds();
+        const list = this.issues().filter(i => selected.has(i.id));
+        for (const issue of list) {
+            await this.recreateFolder(issue);
+        }
+        this.selectedIds.set(new Set());
+    }
+
+    async cleanSelected() {
+        const selected = this.selectedIds();
+        const list = this.issues().filter(i => selected.has(i.id));
+        for (const issue of list) {
+            await this.trashRecord(issue);
+        }
+        this.selectedIds.set(new Set());
     }
 
     async recreateFolder(issue: HealthIssue) {

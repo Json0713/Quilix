@@ -21,18 +21,69 @@
     </div>
 
     @if (issues().length > 0) {
+    <div class="batch-actions-bar">
+        <div class="selection-toggle">
+            <label class="checkbox-container">
+                <input type="checkbox" id="selectAll" [checked]="isAllSelected()" (change)="toggleSelectAll()">
+                <span class="checkmark"></span>
+            </label>
+            <label for="selectAll">SELECT ALL</label>
+        </div>
+
+        <div class="batch-buttons">
+            @if (selectedIds().size > 0) {
+            <button class="btn batch-clean" (click)="cleanSelected()">
+                CLEAN SELECTED ({{ selectedIds().size }})
+            </button>
+            <button class="btn batch-resolve" (click)="resolveSelected()">
+                RESOLVE SELECTED ({{ selectedIds().size }})
+            </button>
+            } @else {
+            <button class="btn batch-clean" (click)="cleanAll()">
+                CLEAN ALL
+            </button>
+            <button class="btn batch-resolve" (click)="resolveAll()">
+                RESOLVE ALL
+            </button>
+            }
+        </div>
+    </div>
+
     <div class="issues-list">
         @for (issue of issues(); track issue.id) {
-        <div class="issue-card">
+        <div class="issue-card" [class.selected]="selectedIds().has(issue.id)">
+            <!-- Group for mobile layout -->
+            <div class="selection-icon-group">
+                <div class="issue-selection-mobile">
+                    <label class="checkbox-container">
+                        <input type="checkbox" [checked]="selectedIds().has(issue.id)"
+                            (change)="toggleSelection(issue.id)">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="issue-icon-mobile">
+                    <i class="bi" [class.bi-archive]="issue.type === 'workspace'"
+                        [class.bi-folder]="issue.type === 'space'"></i>
+                </div>
+            </div>
+
+            <!-- Desktop original positions -->
+            <div class="issue-selection">
+                <label class="checkbox-container">
+                    <input type="checkbox" [checked]="selectedIds().has(issue.id)" (change)="toggleSelection(issue.id)">
+                    <span class="checkmark"></span>
+                </label>
+            </div>
             <div class="issue-icon">
-                <i class="bi" [class.bi-diagram-3]="issue.type === 'workspace'"
+                <i class="bi" [class.bi-archive]="issue.type === 'workspace'"
                     [class.bi-folder]="issue.type === 'space'"></i>
             </div>
             <div class="issue-details">
-                <h4>{{ issue.name }} <span class="badge">{{ issue.type }}</span></h4>
-                <p>{{ issue.description }}</p>
+                <h4 class="text-truncate" title="{{ issue.name }}">{{ issue.name }} <span class="badge">{{ issue.type
+                        }}</span></h4>
+                <p class="text-truncate" title="{{ issue.description }}">{{ issue.description }}</p>
                 @if (issue.parentWorkspaceName) {
-                <small>Parent logic branch: {{ issue.parentWorkspaceName }}</small>
+                <small class="text-truncate">Parent logic branch: {{ issue.parentWorkspaceName }}</small>
                 }
             </div>
             <div class="issue-actions">
@@ -40,7 +91,7 @@
                     <i class="bi bi-trash3"></i>
                 </button>
                 <button class="btn fix-btn" (click)="recreateFolder(issue)">
-                    <i class="bi bi-wrench"></i> Recreate
+                    <i class="bi bi-wrench"></i> Resolve
                 </button>
             </div>
         </div>
