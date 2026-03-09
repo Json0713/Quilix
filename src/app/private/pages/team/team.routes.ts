@@ -18,6 +18,10 @@ export const TEAM_ROUTES: Routes = [
         loadComponent: () => import('./settings/settings').then(m => m.TeamSettings)
       },
       {
+        path: 'settings/data-management',
+        loadComponent: () => import('./settings/data-management/data-management').then(m => m.TeamDataManagement)
+      },
+      {
         path: 'workspaces',
         loadComponent: () => import('./workspaces/workspaces').then(m => m.TeamWorkspaces)
       },

@@ -1,0 +1,31 @@
+@if (isFileSystemMode) {
+<div class="storage-backup-container">
+    <div class="backup-info">
+        <i class="bi bi-shield-check icon"></i>
+        <div class="info-text">
+            <h3>Automated State Backup</h3>
+            <p>Your workspace metadata and configurations are saved to <code>.quilix-data.json</code>.</p>
+            @if (lastBackupTime()) {
+            <small class="last-sync text-muted">Last manual backup: {{ lastBackupTime() | date:'shortTime' }}</small>
+            }
+        </div>
+    </div>
+
+    <div class="backup-actions">
+        <button class="btn secondary" (click)="performRestore()" [disabled]="isRestoring() || isBackingUp()">
+            @if (isRestoring()) {
+            <i class="bi bi-arrow-repeat spin"></i> Restoring...
+            } @else {
+            <i class="bi bi-cloud-arrow-down"></i> Restore State
+            }
+        </button>
+        <button class="btn primary" (click)="performBackup()" [disabled]="isBackingUp() || isRestoring()">
+            @if (isBackingUp()) {
+            <i class="bi bi-arrow-repeat spin"></i> Backing up...
+            } @else {
+            <i class="bi bi-cloud-arrow-up"></i> Backup Now
+            }
+        </button>
+    </div>
+</div>
+}

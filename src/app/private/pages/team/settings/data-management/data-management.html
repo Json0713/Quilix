@@ -1,0 +1,38 @@
+<app-breadcrumb></app-breadcrumb>
+
+<div class="settings-page animate-fade-in" style="margin-top: 1.5rem;">
+
+    <div class="metrics-grid">
+        <!-- Export Section -->
+        <div class="metric-card">
+            <div class="card-header">
+                <i class="bi bi-cloud-download"></i>
+                <h2>Export Team Data</h2>
+            </div>
+            <div class="card-content">
+                <p>Export team workspace data and shared task history for backup or external use. Keep a portable copy
+                    of your metadata.</p>
+                <div class="content-wrapper">
+                    <app-export />
+                </div>
+            </div>
+        </div>
+
+        <!-- Automated System Backup Section -->
+        @if (isFileSystemMode()) {
+        <div class="metric-card">
+            <div class="card-header">
+                <i class="bi bi-shield-check"></i>
+                <h2>System State Backup</h2>
+            </div>
+            <div class="card-content">
+                <p>Manage automated system state backups. Sync your shared metadata to your physical OS storage safely.
+                </p>
+                <div class="content-wrapper">
+                    <app-storage-backup [isFileSystemMode]="true" />
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</div>

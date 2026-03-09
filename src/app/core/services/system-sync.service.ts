@@ -94,6 +94,31 @@ export class SystemSyncService {
     }
 
     /**
+     * Reads just the metadata portion of the sync file to get the last exported timestamp.
+     */
+    async getLastExportTime(): Promise<number | null> {
+        try {
+            const rootHandle = await this.fileSystem.getStoredHandle();
+            if (!rootHandle) return null;
+
+            const quilixHandle = await rootHandle.getDirectoryHandle('Quilix', { create: false }).catch(() => null);
+            if (!quilixHandle) return null;
+
+            const fileHandle = await quilixHandle.getFileHandle(this.SYNC_FILENAME, { create: false }).catch(() => null);
+            if (!fileHandle) return null;
+
+            const file = await fileHandle.getFile();
+            const text = await file.text();
+            if (!text.trim()) return null;
+
+            const state = JSON.parse(text);
+            return state.exportedAt || null;
+        } catch {
+            return null;
+        }
+    }
+
+    /**
      * Read the .quilix-data.json file and populate the DB if it is empty.
      */
     async importStateFromDisk(): Promise<boolean> {
@@ -125,9 +150,30 @@ export class SystemSyncService {
             console.log('[SystemSync] Sync file found. Merging data from disk to local DB...');
 
             await db.transaction('rw', db.workspaces, db.spaces, db.tabs, async () => {
-                // Use bulkPut to update existing and add missing, merging gracefully
-                if (state.workspaces.length) await db.workspaces.bulkPut(state.workspaces);
-                if (state.spaces?.length) await db.spaces.bulkPut(state.spaces);
+                // Merge Workspaces: If backup has older lastActiveAt than local, keep local. Else take backup.
+                if (state.workspaces.length) {
+                    const localWs = await db.workspaces.toArray();
+                    const localMap = new Map(localWs.map((w: any) => [w.id, w]));
+                    const toPutWs = state.workspaces.map((backupWs: any) => {
+                        const l = localMap.get(backupWs.id);
+                        if (l && l.lastActiveAt > backupWs.lastActiveAt) return l;
+                        return backupWs;
+                    });
+                    await db.workspaces.bulkPut(toPutWs);
+                }
+
+                // Spaces
+                if (state.spaces?.length) {
+                    const localSp = await db.spaces.toArray();
+                    const localMap = new Map(localSp.map((s: any) => [s.id, s]));
+                    const toPutSp = state.spaces.map((backupSp: any) => {
+                        const l = localMap.get(backupSp.id);
+                        if (l && l.updatedAt && backupSp.updatedAt && l.updatedAt > backupSp.updatedAt) return l;
+                        return backupSp;
+                    });
+                    await db.spaces.bulkPut(toPutSp);
+                }
+
                 if (state.tabs?.length) await db.tabs.bulkPut(state.tabs);
             });
 
