@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Export } from '../../../../../shared/components/export/export';
 import { StorageBackupComponent } from '../../../../../shared/components/storage-backup/storage-backup';
+import { StorageHealthComponent } from '../../../../../shared/components/storage-health/storage-health';
 import { Breadcrumb } from '../../../../../shared/ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { TabService } from '../../../../../core/services/tab.service';
@@ -11,7 +12,7 @@ import { FileSystemService } from '../../../../../core/services/file-system.serv
 @Component({
     selector: 'app-team-data-management',
     standalone: true,
-    imports: [CommonModule, RouterModule, Export, StorageBackupComponent, Breadcrumb],
+    imports: [CommonModule, RouterModule, Export, StorageBackupComponent, StorageHealthComponent, Breadcrumb],
     templateUrl: './data-management.html',
     styleUrl: './data-management.scss',
 })

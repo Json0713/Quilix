@@ -1,0 +1,56 @@
+<div class="health-container">
+    <div class="health-header">
+        <div class="status-indicator" [class.healthy]="issues().length === 0" [class.error]="issues().length > 0">
+            <i class="bi" [class.bi-check-circle-fill]="issues().length === 0"
+                [class.bi-exclamation-triangle-fill]="issues().length > 0"></i>
+            <span>{{ issues().length === 0 ? 'System Healthy' : (issues().length + ' Issues Detected') }}</span>
+        </div>
+
+        <div class="scan-actions">
+            @if (lastScanTime()) {
+            <small class="last-scan">Scan: {{ lastScanTime() | date:'shortTime' }}</small>
+            }
+            <button class="btn scan-btn" (click)="forceRescan()" [disabled]="isScanning()">
+                @if (isScanning()) {
+                <i class="bi bi-arrow-repeat spin"></i> Scanning...
+                } @else {
+                <i class="bi bi-search"></i> Rescan File System
+                }
+            </button>
+        </div>
+    </div>
+
+    @if (issues().length > 0) {
+    <div class="issues-list">
+        @for (issue of issues(); track issue.id) {
+        <div class="issue-card">
+            <div class="issue-icon">
+                <i class="bi" [class.bi-diagram-3]="issue.type === 'workspace'"
+                    [class.bi-folder]="issue.type === 'space'"></i>
+            </div>
+            <div class="issue-details">
+                <h4>{{ issue.name }} <span class="badge">{{ issue.type }}</span></h4>
+                <p>{{ issue.description }}</p>
+                @if (issue.parentWorkspaceName) {
+                <small>Parent logic branch: {{ issue.parentWorkspaceName }}</small>
+                }
+            </div>
+            <div class="issue-actions">
+                <button class="btn ghost-btn" (click)="trashRecord(issue)" title="Discard Metadata (Trash DB Record)">
+                    <i class="bi bi-trash3"></i>
+                </button>
+                <button class="btn fix-btn" (click)="recreateFolder(issue)">
+                    <i class="bi bi-wrench"></i> Recreate
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+    } @else {
+    <div class="empty-state">
+        <div class="empty-icon"><i class="bi bi-shield-check"></i></div>
+        <h4>No anomalies found</h4>
+        <p>Database perfectly synced with the physical file system.</p>
+    </div>
+    }
+</div>

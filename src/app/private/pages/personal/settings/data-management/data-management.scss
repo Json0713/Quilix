@@ -28,6 +28,10 @@
         flex-direction: column;
         transition: background-color 0.2s ease;
 
+        &.primary-card {
+            grid-column: 1 / -1;
+        }
+
         .card-header {
             display: flex;
             align-items: center;

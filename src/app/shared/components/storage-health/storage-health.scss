@@ -1,0 +1,228 @@
+.health-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: 100%;
+}
+
+.health-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface-main, var(--surface));
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+
+    &.healthy {
+        color: #10b981;
+    }
+
+    &.error {
+        color: #f59e0b;
+    }
+}
+
+.scan-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .last-scan {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .spin {
+        animation: spin 1s linear infinite;
+    }
+
+    &.scan-btn {
+        background: var(--surface-alt);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+
+        &:hover:not(:disabled) {
+            background: var(--bg-hover);
+            border-color: var(--text-muted);
+        }
+    }
+}
+
+.issues-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.issue-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(244, 63, 94, 0.05); // Standard Danger Fallback
+    border: 1px solid rgba(244, 63, 94, 0.2);
+    padding: 1rem;
+    border-radius: 10px;
+
+    .issue-icon {
+        font-size: 1.5rem;
+        color: #f43f5e;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(244, 63, 94, 0.1);
+        border-radius: 8px;
+    }
+
+    .issue-details {
+        flex: 1;
+
+        h4 {
+            margin: 0 0 0.25rem 0;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            .badge {
+                font-size: 0.65rem;
+                padding: 2px 6px;
+                background: var(--surface-alt);
+                border-radius: 4px;
+                text-transform: uppercase;
+                color: var(--text-muted);
+            }
+        }
+
+        p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        small {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    }
+
+    .issue-actions {
+        display: flex;
+        gap: 0.5rem;
+
+        .ghost-btn {
+            background: transparent;
+            color: var(--text-muted);
+
+            &:hover {
+                color: #f43f5e;
+                background: rgba(244, 63, 94, 0.1);
+            }
+        }
+
+        .fix-btn {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+
+            &:hover {
+                background: rgba(16, 185, 129, 0.2);
+            }
+        }
+    }
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+    background: var(--surface-main, var(--surface));
+    border: 1px dashed var(--border-color);
+    border-radius: 12px;
+
+    .empty-icon {
+        font-size: 3rem;
+        color: #10b981;
+        opacity: 0.5;
+        margin-bottom: 1rem;
+    }
+
+    h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+        color: var(--text-main);
+    }
+
+    p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 600px) {
+    .health-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+
+        .scan-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+
+    .issue-card {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .issue-actions {
+            width: 100%;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+    }
+}
