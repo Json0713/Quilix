@@ -202,17 +202,25 @@ export class CreateWorkspaceComponent {
             const workspaceName = handle.name;
             const workspace = await this.workspaceService.create(workspaceName, this.selectedRole());
 
-            let spaceCount = 0;
-            for await (const entry of (handle as any).values()) {
-                if (entry.kind === 'directory') {
-                    await this.spaceService.create(workspace.id, workspaceName, entry.name);
-                    spaceCount++;
-                }
+            // 1. Ingest: If we have a physical handle (External folder picked), 
+            // we must recursively copy its contents into our newly created managed folder.
+            const managedWsHandle = await this.fileSystem.getOrCreateWorkspaceFolder(workspaceName);
+            if (managedWsHandle && handle) {
+                console.log(`[Import] Ingesting external contents from ${handle.name} to managed storage...`);
+                await this.fileSystem.copyDirectoryContents(handle as any, managedWsHandle);
             }
+
+            // 2. Discover: Now that the managed folder contains the "True" names of spaces,
+            // we let the sync engine discover them natively.
+            await this.spaceService.syncExternalRenames(workspace.id, workspace.name);
+
+            // Re-fetch to get the count of discovered spaces for the toast
+            const discoveredSpaces = await this.spaceService.getByWorkspace(workspace.id);
+            const spaceCount = discoveredSpaces.length;
 
             let successMsg = `Workspace "${workspaceName}" created.`;
             if (spaceCount > 0) {
-                successMsg = `Workspace "${workspaceName}" created with ${spaceCount} space(s).`;
+                successMsg = `Workspace "${workspaceName}" imported with ${spaceCount} space(s).`;
             }
 
             this.toastService.success(successMsg);

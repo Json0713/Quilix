@@ -302,7 +302,10 @@ export class FileSystemService {
         }
     }
 
-    private async copyDirectoryContents(src: FileSystemDirectoryHandle, dest: FileSystemDirectoryHandle): Promise<void> {
+    /**
+     * Recursively copies all entries from one directory handle to another.
+     */
+    async copyDirectoryContents(src: FileSystemDirectoryHandle, dest: FileSystemDirectoryHandle): Promise<void> {
         for await (const entry of (src as any).values()) {
             if (entry.kind === 'file') {
                 const fileHandle = entry as FileSystemFileHandle;

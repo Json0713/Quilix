@@ -4,8 +4,8 @@ import { db } from '../db/app-db';
 import { Space } from '../interfaces/space';
 import { FileSystemService } from './file-system.service';
 
-/** Characters not allowed in space names (filesystem-safe) */
-const INVALID_CHARS = /[\/\\:*?"<>|.@#$%^&!+=~`{}\[\]();,]/g;
+/** Characters not allowed in space names (filesystem-safe for major OSs) */
+const INVALID_CHARS = /[\/\\:*?"<>|]/g;
 const MAX_NAME_LENGTH = 206;
 
 @Injectable({
@@ -263,12 +263,12 @@ export class SpaceService {
 
     /**
      * Convert display name to a filesystem-safe folder name.
+     * We preserve casing and spaces to match Workspace naming conventions.
      */
     private toFolderName(name: string): string {
         return name
-            .replace(/\s+/g, '-')
-            .replace(/[^a-zA-Z0-9\-_()]/g, '')
-            .toLowerCase()
+            .trim()
+            .replace(INVALID_CHARS, '')
             || 'space';
     }
 
