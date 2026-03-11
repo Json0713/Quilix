@@ -71,6 +71,12 @@
             }
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .toggle-btn {
             background: var(--bg-muted);
             border: none;

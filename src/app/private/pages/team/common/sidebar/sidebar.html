@@ -6,11 +6,16 @@
             <span class="logo-text">Quilix</span>
         </a>
         }
-        <button class="toggle-btn" (click)="toggleSidebar()" [class.centered]="isCollapsed()"
-            [title]="isCollapsed() ? 'Expand' : 'Close'">
-            <i class="bi" [class.bi-layout-sidebar-inset]="!isCollapsed()"
-                [class.bi-layout-sidebar]="isCollapsed()"></i>
-        </button>
+        <div class="header-actions" [class.centered]="isCollapsed()">
+            @if (!isCollapsed()) {
+            <app-team-profile-menu></app-team-profile-menu>
+            }
+            <button class="toggle-btn" (click)="toggleSidebar()" [class.centered]="isCollapsed()"
+                [title]="isCollapsed() ? 'Expand' : 'Close'">
+                <i class="bi" [class.bi-layout-sidebar-inset]="!isCollapsed()"
+                    [class.bi-layout-sidebar]="isCollapsed()"></i>
+            </button>
+        </div>
     </div>
 
     <!-- Main nav (pinned, never scrolls) -->

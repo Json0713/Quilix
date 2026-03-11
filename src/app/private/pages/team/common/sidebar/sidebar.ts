@@ -11,11 +11,12 @@ import { Space } from '../../../../../core/interfaces/space';
 import { Workspace } from '../../../../../core/interfaces/workspace';
 import { WorkspaceService } from '../../../../../core/workspaces/workspace.service';
 import { SettingsKitComponent } from '../settings-kit/settings-kit';
+import { TeamProfileMenuComponent } from '../profile-menu/profile-menu';
 
 @Component({
     selector: 'app-team-sidebar',
     standalone: true,
-    imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, DragDropModule, SettingsKitComponent],
+    imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, DragDropModule, SettingsKitComponent, TeamProfileMenuComponent],
     templateUrl: './sidebar.html',
     styleUrl: './sidebar.scss',
 })

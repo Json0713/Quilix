@@ -1,0 +1,23 @@
+<div class="profile-menu-container">
+  <button class="profile-toggle-btn" (click)="toggleMenu($event)" title="Profile Menu">
+    <i class="bi bi-person-fill"></i>
+  </button>
+
+  @if (isOpen()) {
+  <div class="profile-dropdown-menu">
+    <button class="dropdown-item placeholder-item">
+      <i class="bi bi-person-badge"></i>
+      <span>Profile</span>
+    </button>
+    <button class="dropdown-item placeholder-item">
+      <i class="bi bi-circle-fill status-icon"></i>
+      <span>Status</span>
+    </button>
+    <div class="dropdown-divider"></div>
+    <button class="dropdown-item logout-item" (click)="logout()">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Logout</span>
+    </button>
+  </div>
+  }
+</div>
