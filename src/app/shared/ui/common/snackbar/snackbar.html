@@ -1,27 +1,29 @@
-@if (isVisible()) {
-<div class="snackbar-container" [class.show]="isVisible()" [ngClass]="type()">
-    <div class="snackbar-content">
-        @if (type() === 'success') {
-        <div class="icon-bubble success-bubble">
-            <i class="bi bi-check2"></i>
+<div class="snackbar-list">
+    @for (notification of notifications(); track notification.id) {
+    <div class="snackbar-container" [ngClass]="notification.type">
+        <div class="snackbar-content">
+            @if (notification.type === 'success') {
+            <div class="icon-bubble success-bubble">
+                <i class="bi bi-check2"></i>
+            </div>
+            } @else if (notification.type === 'error') {
+            <div class="icon-bubble error-bubble">
+                <i class="bi bi-exclamation-lg"></i>
+            </div>
+            } @else if (notification.type === 'info') {
+            <div class="icon-bubble info-bubble">
+                <i class="bi bi-info-lg"></i>
+            </div>
+            } @else if (notification.type === 'warning') {
+            <div class="icon-bubble warning-bubble">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            }
+            <span class="message">{{ notification.message }}</span>
         </div>
-        } @else if (type() === 'error') {
-        <div class="icon-bubble error-bubble">
-            <i class="bi bi-exclamation-lg"></i>
-        </div>
-        } @else if (type() === 'info') {
-        <div class="icon-bubble info-bubble">
-            <i class="bi bi-info-lg"></i>
-        </div>
-        } @else if (type() === 'warning') {
-        <div class="icon-bubble warning-bubble">
-            <i class="bi bi-exclamation-triangle"></i>
-        </div>
-        }
-        <span class="message">{{ message() }}</span>
+        <button class="close-btn" (click)="hide(notification.id)" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
-    <button class="close-btn" (click)="hide()" aria-label="Close">
-        <i class="bi bi-x-lg"></i>
-    </button>
+    }
 </div>
-}

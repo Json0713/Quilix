@@ -1,6 +1,12 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+interface Notification {
+    id: number;
+    message: string;
+    type: 'success' | 'error' | 'info' | 'warning';
+}
+
 @Component({
     selector: 'app-snackbar',
     standalone: true,
@@ -9,26 +15,27 @@ import { CommonModule } from '@angular/common';
     styleUrls: ['./snackbar.scss']
 })
 export class SnackbarComponent {
-    isVisible = signal<boolean>(false);
-    message = signal<string>('');
-    type = signal<'success' | 'error' | 'info' | 'warning'>('info');
-    private timeoutId: any;
+    notifications = signal<Notification[]>([]);
+    private nextId = 0;
 
-    show(msg: string, messageType: 'success' | 'error' | 'info' | 'warning' = 'info', duration: number = 3000) {
-        this.message.set(msg);
-        this.type.set(messageType);
-        this.isVisible.set(true);
+    show(msg: string, messageType: 'success' | 'error' | 'info' | 'warning' = 'info', duration: number = 12000) {
+        const id = this.nextId++;
+        const newNotification: Notification = {
+            id,
+            message: msg,
+            type: messageType
+        };
 
-        if (this.timeoutId) clearTimeout(this.timeoutId);
+        this.notifications.update(prev => [...prev, newNotification]);
 
         if (duration > 0) {
-            this.timeoutId = setTimeout(() => {
-                this.hide();
+            setTimeout(() => {
+                this.hide(id);
             }, duration);
         }
     }
 
-    hide() {
-        this.isVisible.set(false);
+    hide(id: number) {
+        this.notifications.update(prev => prev.filter(n => n.id !== id));
     }
 }

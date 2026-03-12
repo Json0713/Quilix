@@ -1,29 +1,44 @@
-.snackbar-container {
+.snackbar-list {
     position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
+    bottom: 8px;
+    right: 8px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 12px;
+    z-index: 10000;
+    pointer-events: none;
+    max-width: 450px;
+    width: auto;
+
+    @media (max-width: 768px) {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        max-width: none;
+    }
+}
+
+.snackbar-container {
     background: var(--surface-main);
     color: var(--text-main);
-    padding: 12px 16px;
+    padding: 14px 18px;
     border-radius: 12px;
-    border: 1px solid var(--bg);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    min-width: 320px;
-    max-width: 90vw;
-    z-index: 9999;
-    opacity: 0;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
-    pointer-events: none;
-
-    &.show {
-        transform: translateX(-50%) translateY(0);
-        opacity: 1;
-        pointer-events: all;
+    width: 100%;
+    pointer-events: all;
+    backdrop-filter: blur(12px);
+    
+    /* Improved Animation: Slide and Fade */
+    animation: slideInLeft 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    
+    @media (max-width: 768px) {
+        animation: slideInBottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        padding: 12px 14px;
     }
 
     .snackbar-content {
@@ -31,6 +46,7 @@
         align-items: center;
         gap: 12px;
         flex: 1;
+        min-width: 0; /* Enable text truncation/wrapping in flex */
 
         .icon-bubble {
             width: 32px;
@@ -66,8 +82,14 @@
         .message {
             font-size: 14px;
             font-weight: 500;
-            line-height: 1.4;
+            line-height: 1.5;
             color: var(--text-main);
+            overflow: hidden;
+            word-break: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
         }
     }
 
@@ -90,5 +112,27 @@
             background: var(--bg-hover);
             color: var(--text-main);
         }
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-40px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes slideInBottom {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
