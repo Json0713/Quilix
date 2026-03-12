@@ -1,5 +1,5 @@
 import { Injectable, ApplicationRef, ComponentFactoryResolver, Injector, EmbeddedViewRef, ComponentRef } from '@angular/core';
-import { SnackbarComponent } from './snackbar';
+import { SnackbarComponent } from '../../../../shared/ui/common/snackbar/snackbar';
 
 @Injectable({
     providedIn: 'root'
