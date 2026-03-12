@@ -24,7 +24,7 @@ export class SnackbarService {
         return this.snackbarRef!.instance;
     }
 
-    show(message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info', duration: number = 12000) {
+    show(message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info', duration: number = 18000) {
         const snackbar = this.getSnackbar();
         snackbar.show(message, type, duration);
     }

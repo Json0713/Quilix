@@ -11,7 +11,7 @@ export class ToastService {
 
   readonly toasts = this._toasts.asReadonly();
 
-  show(type: ToastType, message: string, duration = 4000): void {
+  show(type: ToastType, message: string, duration = 12000): void {
     const toast: Toast = {
       id: ++this.id,
       type,
