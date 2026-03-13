@@ -16,8 +16,8 @@
     cursor: pointer;
 
     &:hover {
-        background: var(--surface-alt);
-        border-color: var(--border-color);
+        background: var(--surface);
+        border-color: var(--border);
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     }
 
@@ -26,9 +26,9 @@
     }
 
     &.selected {
-        border-color: var(--primary);
+        border-color: var(--border);
         background: var(--surface-alt);
-        box-shadow: 0 0 0 1px var(--primary), 0 4px 12px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 0 0 1px var(--border), 0 4px 12px rgba(0, 0, 0, 0.06);
     }
 
     &.missing {
@@ -52,7 +52,7 @@
                 transition: color 0.2s ease;
 
                 &.bi-check-square-fill {
-                    color: var(--primary);
+                    color: var(--action);
                 }
             }
 
@@ -343,13 +343,13 @@
 
     &:hover {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-        border-color: var(--primary-light);
+        border-color: var(--border);
     }
 
     &.selected {
-        border-color: var(--primary);
+        border-color: var(--border);
         background: var(--surface-alt);
-        box-shadow: 0 0 0 1px var(--primary), 0 4px 12px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 0 0 1px var(--border), 0 4px 12px rgba(0, 0, 0, 0.06);
     }
 
     /* Name section — display: contents so children get grid areas */
@@ -387,7 +387,7 @@
             height: 40px;
             margin: 0;
             align-self: center;
-            background: rgba(var(--primary-rgb), 0.08);
+            background: rgba(0, 0, 0, 0.015);
             border-radius: 10px;
 
             i {
