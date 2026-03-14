@@ -23,33 +23,38 @@
         </div>
 
         <!-- Toolbar Actions -->
-        <div class="explorer-nav-controls d-flex align-items-center gap-1">
-            <!-- View ModeToggle -->
-            <button class="nav-btn" (click)="toggleViewMode()" [title]="viewMode() === 'grid' ? 'List View' : 'Grid View'">
-                <i class="bi" [class.bi-list-ul]="viewMode() === 'grid'" [class.bi-grid-fill]="viewMode() === 'list'"></i>
-            </button>
+        <div class="explorer-nav-controls">
             
-            <div class="dropdown">
-                <button class="nav-btn" type="button" data-bs-toggle="dropdown" title="Sort by">
-                    <i class="bi bi-sort-down"></i>
+            <div class="controls-pill">
+                <button class="nav-btn" [class.active]="viewMode() === 'list'" (click)="toggleViewMode()" title="List View">
+                    <i class="bi bi-list-ul"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 glass-panel fs-7">
-                    <li><h6 class="dropdown-header text-uppercase fs-8 text-muted">Sort By</h6></li>
-                    <li><a class="dropdown-item d-flex justify-content-between align-items-center" (click)="setSort('name')">Name <i class="bi" [class.bi-check2]="sortBy() === 'name'"></i></a></li>
-                    <li><a class="dropdown-item d-flex justify-content-between align-items-center" (click)="setSort('date')">Date Modified <i class="bi" [class.bi-check2]="sortBy() === 'date'"></i></a></li>
-                    <li><a class="dropdown-item d-flex justify-content-between align-items-center" (click)="setSort('size')">Size <i class="bi" [class.bi-check2]="sortBy() === 'size'"></i></a></li>
-                </ul>
+                <button class="nav-btn" [class.active]="viewMode() === 'grid'" (click)="toggleViewMode()" title="Grid View">
+                    <i class="bi bi-grid-fill"></i>
+                </button>
+                
+                <div class="pill-divider"></div>
+                
+                <div class="dropdown">
+                    <button class="nav-btn" type="button" data-bs-toggle="dropdown" title="Sort by">
+                        <i class="bi bi-sort-down"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 glass-panel fs-7">
+                        <li><h6 class="dropdown-header text-uppercase fs-8 text-muted">Sort By</h6></li>
+                        <li><a class="dropdown-item d-flex justify-content-between align-items-center" (click)="setSort('name')">Name <i class="bi" [class.bi-check2]="sortBy() === 'name'"></i></a></li>
+                        <li><a class="dropdown-item d-flex justify-content-between align-items-center" (click)="setSort('date')">Date Modified <i class="bi" [class.bi-check2]="sortBy() === 'date'"></i></a></li>
+                        <li><a class="dropdown-item d-flex justify-content-between align-items-center" (click)="setSort('size')">Size <i class="bi" [class.bi-check2]="sortBy() === 'size'"></i></a></li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="v-divider mx-1"></div>
-            
-            <button class="nav-btn" (click)="paste()" [class.disabled]="!clipboardHasItem()" title="Paste">
+            <button class="action-btn-icon" (click)="paste()" [disabled]="!clipboardHasItem()" title="Paste">
                 <i class="bi bi-clipboard"></i>
             </button>
 
             <!-- New Button -->
-            <div class="dropdown ms-1">
-                <button class="btn btn-sm btn-primary rounded-pill px-3 text-white dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="New">
+            <div class="dropdown">
+                <button class="btn btn-sm text-white ms-2 px-3" style="background: var(--action); border-radius: 50px; font-weight: 500;" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="New">
                    <i class="bi bi-plus-lg"></i> <span class="ms-1 d-none d-sm-inline">New</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 glass-panel fs-7">
@@ -91,33 +96,27 @@
         <!-- Empty State -->
         <div class="empty-state d-flex flex-column align-items-center justify-content-center text-center h-100" *ngIf="!isLoading() && sortedEntries().length === 0">
             <i class="bi bi-folder2-open display-4 text-muted opacity-50 mb-3"></i>
-            <h6 class="text-body fw-medium mb-1">This folder is empty</h6>
+            <h6 class="fw-medium mb-1" style="color: var(--text-main)">This folder is empty</h6>
             <p class="text-muted fs-7 mb-0">Drag and drop files here to add them.</p>
         </div>
 
         <!-- Contents -->
         <div [class]="viewMode() === 'grid' ? 'file-grid' : 'file-list'" *ngIf="!isLoading() && sortedEntries().length > 0">
-            <div class="file-card p-2 rounded transition-all user-select-none"
-                 [class.d-flex]="true"
-                 [class.flex-column]="viewMode() === 'grid'"
-                 [class.align-items-center]="true"
-                 [class.text-center]="viewMode() === 'grid'"
-                 [class.flex-row]="viewMode() === 'list'"
-                 [class.text-start]="viewMode() === 'list'"
+            <div class="file-card"
                  *ngFor="let entry of sortedEntries()"
                  [class.selected]="selectedEntry()?.name === entry.name"
                  (click)="toggleSelection(entry, $event)"
                  (dblclick)="navigateInto(entry)"
                  (contextmenu)="openContextMenu(entry, $event)">
                 
-                <div class="icon-wrapper position-relative" [class.mb-2]="viewMode() === 'grid'" [class.me-3]="viewMode() === 'list'">
-                    <i class="bi bi-folder-fill file-icon text-warning" [class.display-6]="viewMode() === 'grid'" [class.fs-4]="viewMode() === 'list'" *ngIf="entry.kind === 'directory'"></i>
-                    <i class="bi bi-file-earmark-text file-icon text-secondary" [class.display-6]="viewMode() === 'grid'" [class.fs-4]="viewMode() === 'list'" *ngIf="entry.kind === 'file'"></i>
+                <div class="icon-wrapper">
+                    <i class="bi bi-folder-fill text-warning" *ngIf="entry.kind === 'directory'"></i>
+                    <i class="bi bi-file-earmark-text text-secondary" *ngIf="entry.kind === 'file'"></i>
                 </div>
                 
-                <div class="file-details d-flex flex-column flex-grow-1 min-w-0">
-                    <span class="file-name fs-7 text-truncate w-100 fw-medium" [title]="entry.name">{{ entry.name }}</span>
-                    <span class="file-meta fs-8 text-muted mt-1" *ngIf="viewMode() === 'list' && entry.kind === 'file'">
+                <div class="file-details d-flex flex-column">
+                    <span class="file-name" [title]="entry.name">{{ entry.name }}</span>
+                    <span class="file-meta mt-1" *ngIf="viewMode() === 'list' && entry.kind === 'file'">
                         {{ formatBytes(entry.sizeBytes) }} &bull; {{ entry.lastModified | date:'medium' }}
                     </span>
                 </div>
