@@ -71,14 +71,16 @@ export class FileManagerService {
      * Creates a physical sub-folder
      */
     async createFolder(parentHandle: FileSystemDirectoryHandle, folderName: string): Promise<FileSystemDirectoryHandle> {
-        return await parentHandle.getDirectoryHandle(folderName, { create: true });
+        const uniqueName = await this.resolveUniqueName(parentHandle, folderName, true);
+        return await parentHandle.getDirectoryHandle(uniqueName, { create: true });
     }
 
     /**
      * Creates a physical empty file
      */
     async createFile(parentHandle: FileSystemDirectoryHandle, fileName: string): Promise<FileSystemFileHandle> {
-        return await parentHandle.getFileHandle(fileName, { create: true });
+        const uniqueName = await this.resolveUniqueName(parentHandle, fileName, false);
+        return await parentHandle.getFileHandle(uniqueName, { create: true });
     }
 
     /**
@@ -143,6 +145,49 @@ export class FileManagerService {
     }
 
     /**
+     * Core resolution logic for duplicating names cleanly like "New folder (2)"
+     */
+    private async resolveUniqueName(parentHandle: FileSystemDirectoryHandle, baseName: string, isDirectory: boolean): Promise<string> {
+        const nameExists = async (testName: string) => {
+            try {
+                if (isDirectory) {
+                    await parentHandle.getDirectoryHandle(testName, { create: false });
+                } else {
+                    await parentHandle.getFileHandle(testName, { create: false });
+                }
+                return true;
+            } catch (e: any) {
+                if (e.name === 'NotFoundError') return false;
+                // TypeMismatchError means a file exists with the directory name, or vice versa. It still collides!
+                return true; 
+            }
+        };
+
+        if (!(await nameExists(baseName))) {
+            return baseName;
+        }
+
+        let name = baseName;
+        let ext = '';
+        if (!isDirectory) {
+            const lastDot = baseName.lastIndexOf('.');
+            if (lastDot > 0 && lastDot < baseName.length - 1) {
+                name = baseName.substring(0, lastDot);
+                ext = baseName.substring(lastDot);
+            }
+        }
+
+        let counter = 2;
+        while (true) {
+            const testName = `${name} (${counter})${ext}`;
+            if (!(await nameExists(testName))) {
+                return testName;
+            }
+            counter++;
+        }
+    }
+
+    /**
      * Execute a paste operation into a target directory
      */
     async paste(targetDirHandle: FileSystemDirectoryHandle): Promise<boolean> {
@@ -164,15 +209,8 @@ export class FileManagerService {
                         await this.copyFileStream(fHandle, targetDirHandle);
                     }
                 } else {
-                    // Standard copy stream
-                    let targetName = fHandle.name;
-                    // Auto-increment name if exists? Let's just try to be safe:
-                    try {
-                         await targetDirHandle.getFileHandle(targetName);
-                         // Exists!
-                         targetName = `Copy of ${targetName}`;
-                    } catch (e) { /* Doesn't exist, fine */ }
-
+                    // Standard copy stream using robust name incrementing to avoid collision exceptions
+                    const targetName = await this.resolveUniqueName(targetDirHandle, fHandle.name, false);
                     await this.copyFileStream(fHandle, targetDirHandle, targetName);
                 }
             } else {

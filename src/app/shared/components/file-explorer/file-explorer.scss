@@ -1,8 +1,7 @@
 .file-explorer-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    min-height: 340px;
+    height: auto;
     width: 100%;
     background-color: var(--surface-main);
     border-radius: 12px;
@@ -22,6 +21,18 @@
     &::-webkit-scrollbar-thumb {
         background-color: var(--border);
         border-radius: 4px;
+    }
+}
+
+.explorer-action-btn {
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    background: var(--surface-main);
+    border-radius: 8px;
+    transition: background-color 0.15s;
+
+    &:hover {
+        background: var(--surface-alt);
     }
 }
 
@@ -233,6 +244,11 @@
     .ctx-header {
         border-bottom-color: var(--border) !important;
     }
+
+    .ctx-title {
+        max-width: 150px;
+        color: var(--text-muted);
+    }
     
     .btn-text {
         color: var(--text-main);
@@ -307,6 +323,10 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     border: 1px solid var(--border);
     z-index: 10;
+
+    .text-loader {
+        color: var(--text-muted);
+    }
 }
 
 @keyframes fadeInScale {
@@ -318,4 +338,8 @@
         opacity: 1;
         transform: scale(1);
     }
+}
+
+.title-color {
+    color: var(--text-main);
 }
