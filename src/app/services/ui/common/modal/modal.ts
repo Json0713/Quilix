@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { ModalConfig } from '../../../../shared/ui/common/modal/modal.model';
 import { Task } from '../../../../core/interfaces/task';
 import { Workspace } from '../../../../core/interfaces/workspace';
+import { FileExplorerEntry } from '../../../../core/services/file-manager.service';
 
 @Injectable({
   providedIn: 'root',
@@ -102,4 +103,13 @@ export class ModalService {
     });
   }
 
+  openFileDetails(entry: FileExplorerEntry): void {
+    this._modal.set({
+      id: ++this.id,
+      type: 'custom',
+      title: 'Item Details',
+      view: 'details',
+      explorerEntryData: entry
+    });
+  }
 }

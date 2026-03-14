@@ -4,6 +4,7 @@ export type ModalNoticeScope = 'once' | 'always';
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
 import { Task } from '../../../../core/interfaces/task';
 import { Workspace } from '../../../../core/interfaces/workspace';
+import { FileExplorerEntry } from '../../../../core/services/file-manager.service';
 
 export interface ModalNotice {
   type: ModalNoticeType;
@@ -26,7 +27,8 @@ export interface ModalConfig {
 
   resolve?: (result: boolean | any) => void;
 
-  view?: 'import' | 'task' | 'create-workspace' | 'edit-workspace';
+  view?: 'import' | 'task' | 'create-workspace' | 'edit-workspace' | 'details';
   taskData?: Task;
   workspaceData?: Workspace;
+  explorerEntryData?: FileExplorerEntry;
 }

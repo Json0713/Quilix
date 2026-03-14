@@ -102,7 +102,7 @@ export class FileManagerService {
 
         if (mode === 'filesystem' && context.parentHandle) {
             const handle = await context.parentHandle.getDirectoryHandle(uniqueName, { create: true });
-            return { name: uniqueName, kind: 'directory', handle };
+            return { name: uniqueName, kind: 'directory', handle, lastModified: Date.now() };
         } else {
             const id = crypto.randomUUID();
             const entry = {
@@ -128,7 +128,7 @@ export class FileManagerService {
 
         if (mode === 'filesystem' && context.parentHandle) {
             const handle = await context.parentHandle.getFileHandle(uniqueName, { create: true });
-            return { name: uniqueName, kind: 'file', handle };
+            return { name: uniqueName, kind: 'file', handle, lastModified: Date.now(), sizeBytes: 0 };
         } else {
             const id = crypto.randomUUID();
             const entry = {

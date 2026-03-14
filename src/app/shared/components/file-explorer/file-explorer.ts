@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { FileExplorerEntry, FileManagerService } from '../../../core/services/file-manager.service';
 import { FileSystemService } from '../../../core/services/file-system.service';
 import { SnackbarService } from '../../../services/ui/common/snackbar/snackbar.service';
+import { ModalService } from '../../../services/ui/common/modal/modal';
 import { ToolbarService, ToolbarConfig } from '../../../core/services/toolbar.service';
 import { db } from '../../../core/db/app-db';
 import { Space } from '../../../core/interfaces/space';
@@ -22,6 +23,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   private snackbar = inject(SnackbarService);
   private toolbar = inject(ToolbarService);
   private router = inject(Router);
+  readonly modals = inject(ModalService);
 
   @Input({ required: true }) spaceId!: string;
   @Input({ required: true }) workspaceId!: string;
@@ -598,5 +600,10 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       }
 
       return false;
+  }
+
+  viewDetails(entry: FileExplorerEntry) {
+      this.openMenuId.set(null);
+      this.modals.openFileDetails(entry);
   }
 }

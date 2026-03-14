@@ -25,6 +25,8 @@
     <app-create-workspace></app-create-workspace>
     } @else if (modal.modal()?.view === 'edit-workspace') {
     <app-edit-workspace></app-edit-workspace>
+    } @else if (modal.modal()?.view === 'details') {
+    <app-details-view [entry]="modal.modal()!.explorerEntryData!"></app-details-view>
     }
     }
 

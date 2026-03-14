@@ -4,12 +4,14 @@ import { Import } from '../../../components/import/import';
 import { TaskDetailComponent } from '../../tasks/task-detail/task-detail';
 import { CreateWorkspaceComponent } from '../../../components/workspace-manager/create-workspace/create-workspace';
 import { EditWorkspaceComponent } from '../../../components/workspace-manager/edit-workspace/edit-workspace';
+import { DetailsView } from '../../../components/file-explorer/details-view/details-view';
 import { Router, NavigationStart } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-modal',
-  imports: [CommonModule, Import, TaskDetailComponent, CreateWorkspaceComponent, EditWorkspaceComponent],
+  standalone: true,
+  imports: [CommonModule, Import, TaskDetailComponent, CreateWorkspaceComponent, EditWorkspaceComponent, DetailsView],
   templateUrl: './modal.html',
   styleUrl: './modal.scss',
 })

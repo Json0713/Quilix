@@ -78,6 +78,18 @@
         .col-header {
             display: flex;
             align-items: center;
+
+            @media (max-width: 600px) {
+                &:not(:first-child):not(:last-child) {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    @media (max-width: 600px) {
+        .list-header {
+            grid-template-columns: 1fr 50px;
         }
     }
 }
@@ -161,6 +173,15 @@
     gap: 16px;
     align-items: center;
     padding: 10px 20px;
+
+    @media (max-width: 600px) {
+        grid-template-columns: 1fr 50px;
+        padding: 10px 16px;
+
+        .col-date, .col-size {
+            display: none;
+        }
+    }
     
     .col-name {
         display: flex;
