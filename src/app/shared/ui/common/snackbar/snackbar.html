@@ -21,9 +21,16 @@
             }
             <span class="message">{{ notification.message }}</span>
         </div>
-        <button class="close-btn" (click)="hide(notification.id)" aria-label="Close">
-            <i class="bi bi-x-lg"></i>
-        </button>
+        <div class="snackbar-actions">
+            @if (notification.action) {
+                <button class="action-btn" (click)="onActionClick(notification)">
+                    {{ notification.action.label }}
+                </button>
+            }
+            <button class="close-btn" (click)="hide(notification.id)" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
     </div>
     }
 </div>

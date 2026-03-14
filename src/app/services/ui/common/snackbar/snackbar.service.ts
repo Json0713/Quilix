@@ -24,24 +24,24 @@ export class SnackbarService {
         return this.snackbarRef!.instance;
     }
 
-    show(message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info', duration: number = 18000) {
+    show(message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info', duration: number = 18000, action?: { label: string, callback: () => void }) {
         const snackbar = this.getSnackbar();
-        snackbar.show(message, type, duration);
+        snackbar.show(message, type, duration, action);
     }
 
-    success(message: string, duration?: number) {
-        this.show(message, 'success', duration);
+    success(message: string, duration?: number, action?: { label: string, callback: () => void }) {
+        this.show(message, 'success', duration, action);
     }
 
-    error(message: string, duration?: number) {
-        this.show(message, 'error', duration);
+    error(message: string, duration?: number, action?: { label: string, callback: () => void }) {
+        this.show(message, 'error', duration, action);
     }
 
-    info(message: string, duration?: number) {
-        this.show(message, 'info', duration);
+    info(message: string, duration?: number, action?: { label: string, callback: () => void }) {
+        this.show(message, 'info', duration, action);
     }
 
-    warning(message: string, duration?: number) {
-        this.show(message, 'warning', duration);
+    warning(message: string, duration?: number, action?: { label: string, callback: () => void }) {
+        this.show(message, 'warning', duration, action);
     }
 }

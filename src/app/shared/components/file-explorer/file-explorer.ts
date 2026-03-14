@@ -260,7 +260,10 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
           }
       }
       console.error('[FileExplorer] Failed to load directory:', err);
-      this.snackbar.error('Could not read folder contents.');
+      this.snackbar.error('Could not read folder contents.', undefined, {
+          label: 'Refresh',
+          callback: () => window.location.reload()
+      });
     } finally {
       this.isLoading.set(false);
     }
