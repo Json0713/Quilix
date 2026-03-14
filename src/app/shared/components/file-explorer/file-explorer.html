@@ -39,8 +39,8 @@
                     <button class="nav-btn" type="button" data-bs-toggle="dropdown" title="Sort by">
                         <i class="bi bi-sort-down"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 glass-panel fs-7">
-                        <li><h6 class="dropdown-header text-uppercase fs-8 text-muted">Sort By</h6></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li><h6 class="dropdown-header text-uppercase fs-8">Sort By</h6></li>
                         <li><a class="dropdown-item d-flex justify-content-between align-items-center" (click)="setSort('name')">Name <i class="bi" [class.bi-check2]="sortBy() === 'name'"></i></a></li>
                         <li><a class="dropdown-item d-flex justify-content-between align-items-center" (click)="setSort('date')">Date Modified <i class="bi" [class.bi-check2]="sortBy() === 'date'"></i></a></li>
                         <li><a class="dropdown-item d-flex justify-content-between align-items-center" (click)="setSort('size')">Size <i class="bi" [class.bi-check2]="sortBy() === 'size'"></i></a></li>
@@ -54,12 +54,12 @@
 
             <!-- New Button -->
             <div class="dropdown">
-                <button class="btn btn-sm text-white ms-2 px-3" style="background: var(--action); border-radius: 50px; font-weight: 500;" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="New">
-                   <i class="bi bi-plus-lg"></i> <span class="ms-1 d-none d-sm-inline">New</span>
+                <button class="new-btn ms-2 px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="New">
+                   <i class="bi bi-plus-lg"></i> <span class="d-none d-sm-inline">New</span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 glass-panel fs-7">
-                    <li><button class="dropdown-item d-flex align-items-center" (click)="startCreateFolder()"><i class="bi bi-folder-plus text-warning me-2"></i> Folder</button></li>
-                    <li><button class="dropdown-item d-flex align-items-center" (click)="startCreateFile()"><i class="bi bi-file-earmark-plus text-secondary me-2"></i> File</button></li>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li><button class="dropdown-item d-flex align-items-center" (click)="startCreateFolder()"><i class="bi bi-folder-plus me-2 folder-icon"></i> Folder</button></li>
+                    <li><button class="dropdown-item d-flex align-items-center" (click)="startCreateFile()"><i class="bi bi-file-earmark-plus me-2 file-icon"></i> File</button></li>
                 </ul>
             </div>
         </div>
@@ -70,17 +70,17 @@
         
         <!-- Loading State -->
         <div class="loading-overlay" *ngIf="isLoading()">
-            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-            <span class="ms-2 fs-7 text-muted">Loading contents...</span>
+            <div class="spinner-border spinner-border-sm" style="color: var(--text-muted);" role="status"></div>
+            <span class="ms-2 fs-7" style="color: var(--text-muted);">Loading contents...</span>
         </div>
 
         <!-- Rename/Create Overlay -->
-        <div class="rename-inline-input glass-panel p-2 shadow-sm rounded d-flex align-items-center gap-2 mb-3" *ngIf="renamingEntry() || isCreatingFolder() || isCreatingFile()">
-            <i class="bi bi-folder-fill text-warning" *ngIf="isCreatingFolder()"></i>
-            <i class="bi bi-file-earmark-text text-secondary" *ngIf="isCreatingFile()"></i>
+        <div class="rename-inline-input glass-panel p-2 rounded d-flex align-items-center gap-2 mb-3" *ngIf="renamingEntry() || isCreatingFolder() || isCreatingFile()">
+            <i class="bi bi-folder-fill folder-icon" *ngIf="isCreatingFolder()"></i>
+            <i class="bi bi-file-earmark-text file-icon" *ngIf="isCreatingFile()"></i>
             
-            <i class="bi bi-file-earmark-text text-secondary" *ngIf="renamingEntry() && renamingEntry()?.kind === 'file'"></i>
-            <i class="bi bi-folder-fill text-warning" *ngIf="renamingEntry() && renamingEntry()?.kind === 'directory'"></i>
+            <i class="bi bi-file-earmark-text file-icon" *ngIf="renamingEntry() && renamingEntry()?.kind === 'file'"></i>
+            <i class="bi bi-folder-fill folder-icon" *ngIf="renamingEntry() && renamingEntry()?.kind === 'directory'"></i>
             
             <input type="text" class="form-control form-control-sm border-0 shadow-none bg-transparent" 
                    [value]="(isCreatingFolder() || isCreatingFile()) ? newItemName() : renameValue()" 
@@ -89,8 +89,8 @@
                    (keyup.escape)="(isCreatingFolder() || isCreatingFile()) ? cancelCreateItem() : cancelRename()"
                    autofocus placeholder="Name...">
                    
-            <button class="btn btn-sm btn-text text-success" (click)="(isCreatingFolder() || isCreatingFile()) ? confirmCreateItem() : confirmRename()"><i class="bi bi-check-lg"></i></button>
-            <button class="btn btn-sm btn-text text-danger" (click)="(isCreatingFolder() || isCreatingFile()) ? cancelCreateItem() : cancelRename()"><i class="bi bi-x-lg"></i></button>
+            <button class="btn btn-sm btn-text success-btn" (click)="(isCreatingFolder() || isCreatingFile()) ? confirmCreateItem() : confirmRename()"><i class="bi bi-check-lg"></i></button>
+            <button class="btn btn-sm btn-text cancel-btn" (click)="(isCreatingFolder() || isCreatingFile()) ? cancelCreateItem() : cancelRename()"><i class="bi bi-x-lg"></i></button>
         </div>
 
         <!-- Empty State -->
@@ -102,6 +102,14 @@
 
         <!-- Contents -->
         <div [class]="viewMode() === 'grid' ? 'file-grid' : 'file-list'" *ngIf="!isLoading() && sortedEntries().length > 0">
+            <!-- List View Custom Header -->
+            <div class="list-header" *ngIf="viewMode() === 'list'">
+                <div class="col-header">Name</div>
+                <div class="col-header">Date Modified</div>
+                <div class="col-header">Size</div>
+                <div class="col-header"></div> <!-- Actions padding -->
+            </div>
+
             <div class="file-card"
                  *ngFor="let entry of sortedEntries()"
                  [class.selected]="selectedEntry()?.name === entry.name"
@@ -109,17 +117,38 @@
                  (dblclick)="navigateInto(entry)"
                  (contextmenu)="openContextMenu(entry, $event)">
                 
-                <div class="icon-wrapper">
-                    <i class="bi bi-folder-fill text-warning" *ngIf="entry.kind === 'directory'"></i>
-                    <i class="bi bi-file-earmark-text text-secondary" *ngIf="entry.kind === 'file'"></i>
-                </div>
-                
-                <div class="file-details d-flex flex-column">
-                    <span class="file-name" [title]="entry.name">{{ entry.name }}</span>
-                    <span class="file-meta mt-1" *ngIf="viewMode() === 'list' && entry.kind === 'file'">
-                        {{ formatBytes(entry.sizeBytes) }} &bull; {{ entry.lastModified | date:'medium' }}
-                    </span>
-                </div>
+                <!-- GRID VIEW METADATA -->
+                <ng-container *ngIf="viewMode() === 'grid'">
+                    <div class="icon-wrapper">
+                        <i class="bi bi-folder-fill folder-icon" *ngIf="entry.kind === 'directory'"></i>
+                        <i class="bi bi-file-earmark-text file-icon" *ngIf="entry.kind === 'file'"></i>
+                    </div>
+                    <div class="file-details">
+                        <span class="file-name" [title]="entry.name">{{ entry.name }}</span>
+                    </div>
+                </ng-container>
+
+                <!-- LIST VIEW METADATA -->
+                <ng-container *ngIf="viewMode() === 'list'">
+                    <div class="col-name">
+                        <div class="icon-wrapper">
+                            <i class="bi bi-folder-fill folder-icon" *ngIf="entry.kind === 'directory'"></i>
+                            <i class="bi bi-file-earmark-text file-icon" *ngIf="entry.kind === 'file'"></i>
+                        </div>
+                        <span class="file-name" [title]="entry.name">{{ entry.name }}</span>
+                    </div>
+                    <div class="col-date">
+                        {{ entry.lastModified | date:'mediumDate' }}
+                    </div>
+                    <div class="col-size">
+                        {{ entry.kind === 'file' ? formatBytes(entry.sizeBytes) : '--' }}
+                    </div>
+                    <div class="col-actions">
+                        <button class="action-icon" (click)="openContextMenu(entry, $event); $event.stopPropagation();">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                    </div>
+                </ng-container>
             </div>
         </div>
 
@@ -131,16 +160,16 @@
          [style.left.px]="contextMenuX()" [style.top.px]="contextMenuY()">
         
         <ng-container *ngIf="selectedEntry() as entry">
-            <div class="ctx-header px-3 py-1 mb-1 border-bottom">
-                 <small class="text-muted fs-8 text-truncate d-block" style="max-width: 150px;">{{entry.name}}</small>
+            <div class="ctx-header px-3 py-1 mb-1">
+                 <small class="fs-8 text-truncate d-block" style="max-width: 150px; color: var(--text-muted);">{{entry.name}}</small>
             </div>
-            <button class="btn btn-sm btn-text text-start px-3 py-1 rounded-0" (click)="navigateInto(entry)"><i class="bi bi-box-arrow-in-right me-2 text-muted"></i> Open</button>
-            <button class="btn btn-sm btn-text text-start px-3 py-1 rounded-0" (click)="startRename(entry)"><i class="bi bi-cursor-text me-2 text-muted"></i> Rename</button>
+            <button class="btn btn-sm btn-text text-start px-3 py-1" (click)="navigateInto(entry)"><i class="bi bi-box-arrow-in-right me-2"></i> Open</button>
+            <button class="btn btn-sm btn-text text-start px-3 py-1" (click)="startRename(entry)"><i class="bi bi-cursor-text me-2"></i> Rename</button>
             <div class="dropdown-divider my-1"></div>
-            <button class="btn btn-sm btn-text text-start px-3 py-1 rounded-0" (click)="copy(entry)"><i class="bi bi-files me-2 text-muted"></i> Copy</button>
-            <button class="btn btn-sm btn-text text-start px-3 py-1 rounded-0" (click)="cut(entry)"><i class="bi bi-scissors me-2 text-muted"></i> Cut</button>
+            <button class="btn btn-sm btn-text text-start px-3 py-1" (click)="copy(entry)"><i class="bi bi-files me-2"></i> Copy</button>
+            <button class="btn btn-sm btn-text text-start px-3 py-1" (click)="cut(entry)"><i class="bi bi-scissors me-2"></i> Cut</button>
             <div class="dropdown-divider my-1"></div>
-            <button class="btn btn-sm btn-text text-start px-3 py-1 rounded-0 text-danger" (click)="deleteSelected(entry)"><i class="bi bi-trash3 me-2"></i> Delete</button>
+            <button class="btn btn-sm btn-text text-start px-3 py-1 text-danger" (click)="deleteSelected(entry)"><i class="bi bi-trash3 me-2"></i> Delete</button>
         </ng-container>
 
     </div>
