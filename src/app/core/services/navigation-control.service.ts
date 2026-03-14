@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, effect } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { TabService } from './tab.service';
@@ -39,6 +39,25 @@ export class NavigationControlService {
 
         // Expose to window for tear-off payload injections during application boot sequence
         (window as any)._quilix_nav_service_bootstrapper = this;
+
+        // SELF-CLEANING MECHANISM:
+        // Automatically purge tab histories from memory and sessionStorage when their corresponding Tab object is deleted.
+        effect(() => {
+            const currentTabIds = new Set(this.tabService.tabs().map(t => t.id));
+            let hasOrphans = false;
+
+            for (const existingId of this.tabHistories.keys()) {
+                // If a tab ID exists in history but no longer exists in the active workspace's tabs...
+                if (!currentTabIds.has(existingId)) {
+                    this.tabHistories.delete(existingId);
+                    hasOrphans = true;
+                }
+            }
+
+            if (hasOrphans) {
+                this.saveHistories();
+            }
+        });
 
         // Listen to router events and build history naturally
         this.router.events.pipe(

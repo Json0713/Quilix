@@ -35,7 +35,7 @@
         <div class="breadcrumbs">
             @if (toolbarService.config()?.breadcrumbs; as customCrumbs) {
                 <!-- DYNAMIC BREADCRUMBS INJECTED FROM ACTIVE COMPONENT -->
-                @for (crumb of customCrumbs; track crumb.label; let i = $index) {
+                @for (crumb of customCrumbs; track i; let i = $index) {
                     <a class="breadcrumb-item custom" [class.last]="crumb.isLast" 
                        [class.deleted-space]="crumb.isDeleted" (click)="triggerBreadcrumb(crumb)">
                         @if (crumb.icon) { <i [class]="crumb.icon" style="margin-right: 4px;"></i> }
@@ -47,7 +47,7 @@
                 }
             } @else {
                 <!-- NATIVE ROUTER BREADCRUMBS (DEFAULT) -->
-                @for (crumb of defaultBreadcrumbs; track crumb.url; let i = $index) {
+                @for (crumb of defaultBreadcrumbs; track i; let i = $index) {
                     <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast"
                         [class.deleted-space]="crumb.isDeleted" (click)="onBreadcrumbClick(crumb)">
                         {{ crumb.label }}

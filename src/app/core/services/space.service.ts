@@ -344,42 +344,60 @@ export class SpaceService {
 
         this.isSyncing = true;
         try {
+            // 1. BATCH FETCH: Grab all spaces for this workspace once to avoid N+1 queries in the loop
+            const allSpaces = await db.spaces.where('workspaceId').equals(workspaceId).toArray();
+            const spaceMap = new Map(allSpaces.map(s => [s.id, s]));
+            
             const folders = await this.fileSystem.getAllSpaceFolders(workspaceName);
             const foundSpaceIds = new Set<string>();
+            const spacesToUpdate: Space[] = [];
+            const newSpaces: Space[] = [];
+            
+            // Track the current max order to correctly append newly discovered spaces
+            let maxOrder = allSpaces.length > 0 ? Math.max(...allSpaces.map(s => s.order)) : -1;
 
             for (const handle of folders) {
                 const diskName = handle.name;
+                const diskNameLower = diskName.toLowerCase();
                 let spaceId = await this.fileSystem.readDirectoryId(handle);
 
                 // HEURISTIC: If folder has no ID, check if it matches an existing missing space by name
                 if (!spaceId) {
-                    const existingByName = await db.spaces
-                        .filter(s => s.workspaceId === workspaceId && s.folderName === diskName && !!s.isMissingOnDisk && !s.trashedAt)
-                        .first();
+                    const existingByName = allSpaces.find(s => 
+                        s.folderName.toLowerCase() === diskNameLower && 
+                        !!s.isMissingOnDisk && 
+                        !s.trashedAt
+                    );
 
                     if (existingByName) {
                         console.log(`[SpaceService] HEURISTIC MATCH: Linking orphaned space folder "${diskName}" to existing Space ID ${existingByName.id}`);
                         spaceId = existingByName.id;
+                        // Write anchor so it's permanently tracked natively going forward
                         await this.fileSystem.writeDirectoryId(handle, spaceId);
                     }
                 }
 
                 if (spaceId) {
                     foundSpaceIds.add(spaceId);
-                    const space = await db.spaces.get(spaceId);
+                    const space = spaceMap.get(spaceId);
 
                     // Validate it actually belongs to this workspace
                     if (space && space.workspaceId === workspaceId && !space.trashedAt) {
+                        let changed = false;
                         // If the folder name on disk doesn't match the DB record, it was physically renamed
                         if (space.folderName !== diskName) {
                             console.log(`[SpaceService] Detected external space rename: Re-linking ID ${spaceId} to new folder name "${diskName}"`);
-                            await db.spaces.update(spaceId, {
-                                name: diskName, // Fallback display name
-                                folderName: diskName,
-                                isMissingOnDisk: false
-                            });
+                            space.name = diskName; // Fallback display name
+                            space.folderName = diskName;
+                            space.isMissingOnDisk = false;
+                            changed = true;
                         } else if (space.isMissingOnDisk) {
-                            await db.spaces.update(spaceId, { isMissingOnDisk: false });
+                            space.isMissingOnDisk = false;
+                            changed = true;
+                        }
+                        
+                        if (changed) {
+                            spacesToUpdate.push(space);
                         }
                     }
                 } else {
@@ -390,36 +408,51 @@ export class SpaceService {
                     // Write anchor so it's permanently tracked natively going forward
                     await this.fileSystem.writeDirectoryId(handle, newSpaceId);
 
-                    // Determine order (append to end)
-                    const existing = await this.getByWorkspace(workspaceId);
-                    const order = existing.length > 0 ? Math.max(...existing.map(s => s.order)) + 1 : 0;
-
+                    maxOrder++;
                     const newSpace: Space = {
                         id: newSpaceId,
                         workspaceId,
                         name: diskName,
                         folderName: diskName,
                         createdAt: Date.now(),
-                        order,
+                        order: maxOrder,
                         isMissingOnDisk: false
                     };
 
-                    await db.spaces.add(newSpace);
+                    newSpaces.push(newSpace);
                     foundSpaceIds.add(newSpaceId);
                 }
             }
 
             // Phase 2: Missing Folder Detection
-            const allSpaces = await db.spaces.where('workspaceId').equals(workspaceId).toArray();
             for (const space of allSpaces) {
                 if (!space.trashedAt) {
                     const isNowFound = foundSpaceIds.has(space.id);
+                    let changed = false;
+                    
                     if (!isNowFound && !space.isMissingOnDisk) {
-                        await db.spaces.update(space.id, { isMissingOnDisk: true });
+                        space.isMissingOnDisk = true;
+                        changed = true;
                     } else if (isNowFound && space.isMissingOnDisk) {
-                        await db.spaces.update(space.id, { isMissingOnDisk: false });
+                        space.isMissingOnDisk = false;
+                        changed = true;
+                    }
+                    
+                    if (changed && !newSpaces.some(ns => ns.id === space.id)) {
+                        // Only add if not already in the update list
+                        if (!spacesToUpdate.some(us => us.id === space.id)) {
+                            spacesToUpdate.push(space);
+                        }
                     }
                 }
+            }
+
+            // Phase 3: BATCH SAVE: Commit all changes in two bulk operations
+            if (newSpaces.length > 0) {
+                await db.spaces.bulkAdd(newSpaces);
+            }
+            if (spacesToUpdate.length > 0) {
+                await db.spaces.bulkPut(spacesToUpdate);
             }
         } finally {
             this.isSyncing = false;

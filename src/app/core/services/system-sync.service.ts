@@ -184,7 +184,22 @@ export class SystemSyncService {
                     await db.spaces.bulkPut(toPutSp);
                 }
 
-                if (state.tabs?.length) await db.tabs.bulkPut(state.tabs);
+                if (state.tabs?.length) {
+                    const currentWindowId = sessionStorage.getItem('quilix_windowId');
+                    const localTabs = await db.tabs.toArray();
+                    const localTabMap = new Map(localTabs.map((t: any) => [t.id, t]));
+
+                    const toPutTabs = state.tabs.map((backupTab: any) => {
+                        // PROTECTION: If this tab belongs to the current window sessions, the local state is ALWAYS the source of truth.
+                        // Overwriting it would cause active UI glitches, lost back-stacks, or "teleporting" routes.
+                        if (backupTab.windowId === currentWindowId) {
+                            const l = localTabMap.get(backupTab.id);
+                            return l || backupTab; // Keep local if exists, else it's a new tab for this window from the backup
+                        }
+                        return backupTab;
+                    });
+                    await db.tabs.bulkPut(toPutTabs);
+                }
             });
 
             console.log('[SystemSync] Import successful. Data restored and merged.');
