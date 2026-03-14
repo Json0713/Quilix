@@ -26,6 +26,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
 
   // Navigation History (Breadcrumbs map to Handles)
   history = signal<{ name: string, handle: FileSystemDirectoryHandle }[]>([]);
+  forwardHistory = signal<{ name: string, handle: FileSystemDirectoryHandle }[]>([]);
   
   currentDirHandle = computed(() => {
     const hist = this.history();
@@ -116,6 +117,13 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       // 2. Build Config Object
       const config: ToolbarConfig = {
           breadcrumbs: breadcrumbs,
+          navControls: {
+              canGoBack: hist.length > 1,
+              canGoForward: this.forwardHistory().length > 0,
+              onBack: () => this.navigateBack(),
+              onForward: () => this.navigateForward(),
+              onRefresh: () => this.loadCurrentDirectory(true)
+          },
           pillGroups: [
               {
                   id: 'view-toggles',
@@ -162,26 +170,6 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
               action: () => this.paste()
           });
       }
-
-      // Add Up Action 
-      if (hist.length > 1) {
-           config.actions!.push({
-              id: 'up',
-              label: 'Go Up',
-              icon: 'bi-arrow-up-short',
-              isPrimary: false,
-              action: () => this.navigateUp()
-          });
-      }
-
-      // Add New Button (Primary)
-      config.actions!.push({
-          id: 'new',
-          label: 'New',
-          icon: 'bi-plus-lg',
-          isPrimary: true,
-          action: () => this.startCreateFolder()
-      });
 
       // Push to global context
       this.toolbar.setConfig(config);
@@ -257,6 +245,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   async navigateInto(entry: FileExplorerEntry) {
     if (entry.kind === 'directory') {
       this.history.update(h => [...h, { name: entry.name, handle: entry.handle as FileSystemDirectoryHandle }]);
+      this.forwardHistory.set([]); // Clear forward stack on new branching path
       this.selectedEntry.set(null);
       this.openMenuId.set(null);
       await this.loadCurrentDirectory();
@@ -266,11 +255,24 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     }
   }
 
-  async navigateUp() {
+  async navigateBack() {
     const hist = [...this.history()];
     if (hist.length > 1) {
-      hist.pop();
+      const popped = hist.pop()!;
       this.history.set(hist);
+      this.forwardHistory.update(f => [...f, popped]);
+      this.selectedEntry.set(null);
+      this.openMenuId.set(null);
+      await this.loadCurrentDirectory();
+    }
+  }
+
+  async navigateForward() {
+    const fHist = [...this.forwardHistory()];
+    if (fHist.length > 0) {
+      const popped = fHist.pop()!;
+      this.forwardHistory.set(fHist);
+      this.history.update(h => [...h, popped]);
       this.selectedEntry.set(null);
       this.openMenuId.set(null);
       await this.loadCurrentDirectory();
@@ -280,7 +282,9 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   async navigateToCrumb(index: number) {
     const hist = [...this.history()];
     if (index >= 0 && index < hist.length - 1) {
-      this.history.set(hist.slice(0, index + 1));
+      const removed = hist.splice(index + 1); // Everything after the chosen crumb index
+      this.history.set(hist);
+      this.forwardHistory.set(removed.reverse()); // Flip order so the immediate next folder is top of forward stack
       this.selectedEntry.set(null);
       this.openMenuId.set(null);
       await this.loadCurrentDirectory();

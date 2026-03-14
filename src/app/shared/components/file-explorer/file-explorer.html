@@ -3,6 +3,16 @@
     <!-- Main Content Area -->
     <main class="explorer-body p-3 h-100 position-relative overflow-y-auto">
         
+        <!-- Local Explorer Toolbar (New Actions) -->
+        <div class="explorer-local-toolbar d-flex gap-2 mb-3">
+            <button class="btn btn-sm btn-primary d-flex align-items-center gap-2" (click)="startCreateFolder()" style="border-radius: 8px;">
+                <i class="bi bi-folder-plus"></i> New Folder
+            </button>
+            <button class="btn btn-sm" style="border: 1px solid var(--border); color: var(--text-main); background: var(--surface-main); border-radius: 8px;" (click)="startCreateFile()">
+                <i class="bi bi-file-earmark-plus"></i> New File
+            </button>
+        </div>
+
         <!-- Loading State -->
         <div class="loading-overlay" *ngIf="isLoading()">
             <div class="spinner-border spinner-border-sm" style="color: var(--text-muted);" role="status"></div>

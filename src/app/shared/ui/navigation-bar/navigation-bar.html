@@ -7,15 +7,27 @@
 
     <!-- Left: Window Controls (File Manager style) -->
     <div class="nav-controls">
-        <button class="nav-btn" [class.disabled]="!canGoBack" (click)="goBack()" title="Back">
-            <i class="bi bi-arrow-left"></i>
-        </button>
-        <button class="nav-btn" [class.disabled]="!canGoForward" (click)="goForward()" title="Forward">
-            <i class="bi bi-arrow-right"></i>
-        </button>
-        <button class="nav-btn" (click)="refresh()" title="Refresh">
-            <i class="bi bi-arrow-clockwise"></i>
-        </button>
+        @if (toolbarService.config()?.navControls; as customNav) {
+            <button class="nav-btn" [class.disabled]="!customNav.canGoBack" (click)="customNav.onBack()" title="Back">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+            <button class="nav-btn" [class.disabled]="!customNav.canGoForward" (click)="customNav.onForward()" title="Forward">
+                <i class="bi bi-arrow-right"></i>
+            </button>
+            <button class="nav-btn" (click)="customNav.onRefresh()" title="Refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+        } @else {
+            <button class="nav-btn" [class.disabled]="!canGoBack" (click)="goBack()" title="Back">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+            <button class="nav-btn" [class.disabled]="!canGoForward" (click)="goForward()" title="Forward">
+                <i class="bi bi-arrow-right"></i>
+            </button>
+            <button class="nav-btn" (click)="refresh()" title="Refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+        }
     </div>
 
     <!-- Center: Address Bar / Breadcrumbs / Toolbar Actions -->

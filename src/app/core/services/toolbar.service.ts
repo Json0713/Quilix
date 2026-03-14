@@ -50,6 +50,13 @@ export interface ToolbarConfig {
     pillGroups?: ToolbarPillGroup[];
     dropdowns?: ToolbarDropdown[];
     actions?: ToolbarAction[];
+    navControls?: {
+        canGoBack: boolean;
+        canGoForward: boolean;
+        onBack: () => void;
+        onForward: () => void;
+        onRefresh: () => void;
+    };
 }
 
 @Injectable({
