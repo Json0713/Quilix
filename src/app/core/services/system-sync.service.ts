@@ -42,7 +42,7 @@ export class SystemSyncService {
                 // PREVENTION: Do not trigger an export if we are currently 
                 // importing state from disk to avoid overwriting the backup 
                 // with incomplete intermediate local data.
-                if (!this.isImporting) {
+                if (!this.isImporting && !this.fileSystem.isSyncLocked()) {
                     this.exportTrigger$.next();
                 }
             });

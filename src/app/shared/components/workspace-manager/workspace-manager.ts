@@ -11,6 +11,7 @@ import { SystemSyncService } from '../../../core/services/system-sync.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Breadcrumb } from '../../ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
+import { FileSyncService } from '../../../core/services/file-sync.service';
 import { WorkspaceMetricsComponent } from './workspace-metrics/workspace-metrics';
 import { WorkspaceCardComponent } from './workspace-card/workspace-card';
 import { StorageHealthBannerComponent } from '../storage-health-banner/storage-health-banner';
@@ -41,6 +42,7 @@ export class WorkspaceManagerComponent implements OnInit {
     private snackbarService = inject(SnackbarService);
     private router = inject(Router);
     private modalService = inject(ModalService);
+    private fileSync = inject(FileSyncService);
 
     get totalWorkspaces() { return this.workspaces().length; }
     get syncedFolders() { return this.workspaces().filter(w => !w.isMissingOnDisk).length; }
@@ -222,17 +224,25 @@ export class WorkspaceManagerComponent implements OnInit {
             if (granted) {
                 this.needsReauth.set(false);
 
-                // 1. First, import any backed up state from disk
-                await this.systemSync.importStateFromDisk();
+                try {
+                    this.fileSystem.acquireSyncLock();
+                    
+                    // 1. First, import any backed up state from disk
+                    await this.systemSync.importStateFromDisk();
 
-                // 2. Re-create workspace folders if they were missing (e.g. fresh device or re-picked dir)
-                // This will also write the .quilix-id markers.
-                await this.workspaceService.migrateToFileSystem();
+                    // 2. Re-create workspace folders if they were missing (e.g. fresh device or re-picked dir)
+                    // This will also write the .quilix-id markers.
+                    await this.workspaceService.migrateToFileSystem();
 
-                // 3. Finally, perform the internal sync and local reload.
-                // Sync locking in workspaceService will ensure this doesn't race with background observers.
-                await this.workspaceService.syncExternalRenames();
-                await this.quietLoadWorkspaces();
+                    // 3. Hydrate file-level virtual entries to disk
+                    await this.fileSync.hydrateNativeStorage();
+
+                    // 4. Finally, perform the internal sync and local reload.
+                    await this.workspaceService.syncExternalRenames();
+                    await this.quietLoadWorkspaces();
+                } finally {
+                    this.fileSystem.releaseSyncLock();
+                }
 
                 this.snackbarService.success('Storage reconnected and synced successfully.');
             }

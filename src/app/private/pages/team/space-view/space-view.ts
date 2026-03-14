@@ -30,6 +30,7 @@ export class SpaceView implements OnInit, OnDestroy {
 
     isFileSystemMode = signal<boolean>(false);
     spaceHandle = signal<FileSystemDirectoryHandle | null>(null);
+    workspaceId = signal<string | null>(null);
 
     private paramSub!: Subscription;
     private spaceSub: any;
@@ -51,6 +52,10 @@ export class SpaceView implements OnInit, OnDestroy {
                         this.space.set(space);
                         if (space) {
                             this.breadcrumbService.setTitle(space.name);
+                            
+                            const workspace = await this.authService.getCurrentWorkspace();
+                            this.workspaceId.set(workspace?.id || null);
+
                             if (this.isFileSystemMode()) {
                                 await this.resolveSpaceHandle(space);
                             } else {

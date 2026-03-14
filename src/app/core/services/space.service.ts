@@ -338,7 +338,7 @@ export class SpaceService {
         if (storageMode !== 'filesystem') return;
 
         // PREVENTION: Ensure only one sync runs at a time for this space set
-        if (this.isSyncing) return;
+        if (this.isSyncing || this.fileSystem.isSyncLocked()) return;
 
         if (!this.fileSystem.hasPermission()) return; // Bail if permission lost to avoid marking all as missing
 

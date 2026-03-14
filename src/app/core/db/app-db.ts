@@ -26,6 +26,7 @@ export class AppDatabase extends Dexie {
     spaces!: Table<Space, string>;
     tabs!: Table<Tab, string>;
     tasks!: Table<Task, string>;
+    virtual_entries!: Table<any, string>;
 
     constructor() {
         super('QuilixGlobalDB');
@@ -71,6 +72,11 @@ export class AppDatabase extends Dexie {
         // Scaffold Tasks Native Storage Engine
         this.version(8).stores({
             tasks: 'id, workspaceId, status, [workspaceId+status], order'
+        });
+
+        // Phase 8: Virtual Filesystem Storage for IndexedDB Mode
+        this.version(10).stores({
+            virtual_entries: 'id, workspaceId, spaceId, parentId, name, kind, [spaceId+parentId], [spaceId+parentId+name]'
         });
 
         // Open database connection early to optimize initial load

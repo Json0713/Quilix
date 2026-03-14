@@ -13,6 +13,22 @@ export class FileSystemService {
      * Components can read this to show re-auth UI when permission is lost.
      */
     readonly hasPermission = signal<boolean>(false);
+    readonly isSyncLocked = signal<boolean>(false);
+
+    /**
+     * Acquire a global synchronization lock to prevent background scanners 
+     * and auto-exporters from conflicting with mass migrations or hydration.
+     */
+    acquireSyncLock() {
+        this.isSyncLocked.set(true);
+    }
+
+    /**
+     * Release the global synchronization lock.
+     */
+    releaseSyncLock() {
+        this.isSyncLocked.set(false);
+    }
 
     /**
      * Check if the File System Access API is supported in the current environment.

@@ -21,16 +21,18 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   private toolbar = inject(ToolbarService);
   private router = inject(Router);
 
-  @Input({ required: true }) rootHandle!: FileSystemDirectoryHandle;
+  @Input({ required: true }) spaceId!: string;
+  @Input({ required: true }) workspaceId!: string;
+  @Input() rootHandle: FileSystemDirectoryHandle | null = null;
   @Input() spaceName: string = 'Space';
 
-  // Navigation History (Breadcrumbs map to Handles)
-  history = signal<{ name: string, handle: FileSystemDirectoryHandle }[]>([]);
-  forwardHistory = signal<{ name: string, handle: FileSystemDirectoryHandle }[]>([]);
+  // Navigation History (Breadcrumbs map to polymorphic Nodes)
+  history = signal<{ name: string, handle?: FileSystemDirectoryHandle, id?: string }[]>([]);
+  forwardHistory = signal<{ name: string, handle?: FileSystemDirectoryHandle, id?: string }[]>([]);
   
-  currentDirHandle = computed(() => {
+  currentNode = computed(() => {
     const hist = this.history();
-    return hist.length > 0 ? hist[hist.length - 1].handle : this.rootHandle;
+    return hist.length > 0 ? hist[hist.length - 1] : { name: this.spaceName, handle: this.rootHandle || undefined, id: undefined };
   });
 
   entries = signal<FileExplorerEntry[]>([]);
@@ -69,8 +71,12 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Initialize history with root
-    this.history.set([{ name: this.spaceName, handle: this.rootHandle }]);
+    // Initialize history with space root (handles either native or virtual)
+    this.history.set([{ 
+        name: this.spaceName, 
+        handle: this.rootHandle || undefined, 
+        id: undefined // Space root is always 'root' in virtual engine
+    }]);
     this.loadCurrentDirectory();
   }
 
@@ -218,13 +224,23 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   async loadCurrentDirectory(showLoader = true) {
     if (showLoader) this.isLoading.set(true);
     try {
-      // Verify permission just in case
-      const hasPerm = await this.fileSystem.verifyPermission(this.currentDirHandle(), true, false);
-      if (!hasPerm) {
-          console.warn('[FileExplorer] Permission lost for current directory');
-          return;
+      const node = this.currentNode();
+      
+      // If we are in filesystem mode and have a handle, verify it
+      if (node.handle) {
+          const hasPerm = await this.fileSystem.verifyPermission(node.handle, true, false);
+          if (!hasPerm) {
+              console.warn('[FileExplorer] Permission lost for current directory');
+              return;
+          }
       }
-      const newEntries = await this.fileManager.readDirectory(this.currentDirHandle());
+
+      const newEntries = await this.fileManager.readDirectory({
+          handle: node.handle,
+          spaceId: this.spaceId,
+          parentId: node.id || null
+      });
+      
       this.entries.set(newEntries);
       
       // Clear selection if it doesn't exist anymore
@@ -244,7 +260,11 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
 
   async navigateInto(entry: FileExplorerEntry) {
     if (entry.kind === 'directory') {
-      this.history.update(h => [...h, { name: entry.name, handle: entry.handle as FileSystemDirectoryHandle }]);
+      this.history.update(h => [...h, { 
+          name: entry.name, 
+          handle: entry.handle as FileSystemDirectoryHandle,
+          id: entry.id
+      }]);
       this.forwardHistory.set([]); // Clear forward stack on new branching path
       this.selectedEntry.set(null);
       this.openMenuId.set(null);
@@ -341,16 +361,11 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     }
 
     try {
-        if (entry.kind === 'file') {
-            const success = await this.fileManager.renameFile(entry.handle as FileSystemFileHandle, newName);
-            if (success) {
-                this.snackbar.success('File renamed.');
-            } else {
-                this.snackbar.error('Instant file rename not supported in this browser.');
-            }
+        const success = await this.fileManager.renameEntry(entry, newName);
+        if (success) {
+            this.snackbar.success('Item renamed.');
         } else {
-            // Folder rename is forbidden by W3C API. We could implement recursive stream copy here.
-            this.snackbar.error('Folders cannot be instantly renamed due to Browser Sandbox Security constraints.');
+            this.snackbar.error('Rename failed.');
         }
     } catch (err: any) {
         console.error(err);
@@ -363,10 +378,11 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
 
   async deleteSelected(entry: FileExplorerEntry) {
     this.openMenuId.set(null);
-    if (!confirm(`Are you sure you want to permanently delete "${entry.name}"? This bypasses the trash.`)) return;
+    if (!confirm(`Are you sure you want to permanently delete "${entry.name}"?`)) return;
 
     try {
-        await this.fileManager.deleteEntry(this.currentDirHandle(), entry);
+        const node = this.currentNode();
+        await this.fileManager.deleteEntry({ parentHandle: node.handle }, entry);
         this.snackbar.info('Item permanently deleted.');
         if (this.selectedEntry()?.name === entry.name) this.selectedEntry.set(null);
         await this.loadCurrentDirectory(false);
@@ -404,11 +420,19 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       }
       
       try {
+          const node = this.currentNode();
+          const context = {
+              parentHandle: node.handle,
+              workspaceId: this.workspaceId,
+              spaceId: this.spaceId,
+              parentId: node.id || null
+          };
+
           if (this.isCreatingFolder()) {
-              await this.fileManager.createFolder(this.currentDirHandle(), name);
+              await this.fileManager.createFolder(context, name);
               this.snackbar.success('Folder created.');
           } else if (this.isCreatingFile()) {
-              await this.fileManager.createFile(this.currentDirHandle(), name);
+              await this.fileManager.createFile(context, name);
               this.snackbar.success('File created.');
           }
       } catch (err) {
@@ -423,13 +447,13 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   // --- Clipboard ---
 
   copy(entry: FileExplorerEntry) {
-      this.fileManager.setClipboard(entry.handle, 'copy');
+      this.fileManager.setClipboard(entry, 'copy');
       this.openMenuId.set(null);
       this.snackbar.info(`Copied ${entry.name}`);
   }
 
   cut(entry: FileExplorerEntry) {
-      this.fileManager.setClipboard(entry.handle, 'cut');
+      this.fileManager.setClipboard(entry, 'cut');
       this.openMenuId.set(null);
       this.snackbar.info(`Cut ${entry.name}`);
   }
@@ -439,12 +463,20 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       
       this.isLoading.set(true);
       try {
-          const success = await this.fileManager.paste(this.currentDirHandle());
+          const node = this.currentNode();
+          const context = {
+            handle: node.handle,
+            workspaceId: this.workspaceId,
+            spaceId: this.spaceId,
+            parentId: node.id || null
+          };
+
+          const success = await this.fileManager.paste(context);
           if (success) {
               this.snackbar.success('Pasted successfully.');
               await this.loadCurrentDirectory(false);
           } else {
-              this.snackbar.error('Paste failed. (Note: Folders cannot be pasted yet)');
+              this.snackbar.error('Paste failed. (Note: Directory copying is coming soon)');
           }
       } finally {
           this.isLoading.set(false);

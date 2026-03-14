@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FileSystemService } from '../../../../core/services/file-system.service';
 import { SystemSyncService } from '../../../../core/services/system-sync.service';
+import { FileSyncService } from '../../../../core/services/file-sync.service';
 
 import { WorkspaceService } from '../../../../core/workspaces/workspace.service';
 
@@ -16,6 +17,7 @@ export class StorageToggleComponent implements OnInit {
     private fileSystem = inject(FileSystemService);
     private workspaceService = inject(WorkspaceService);
     private systemSync = inject(SystemSyncService);
+    private fileSync = inject(FileSyncService);
 
     isSupported = signal<boolean>(false);
     storageMode = signal<'indexeddb' | 'filesystem'>('indexeddb');
@@ -37,9 +39,15 @@ export class StorageToggleComponent implements OnInit {
             if (this.storageMode() === 'indexeddb') {
                 const success = await this.fileSystem.requestDirectoryAccess();
                 if (success) {
-                    this.storageMode.set('filesystem');
-                    await this.systemSync.importStateFromDisk();
-                    await this.workspaceService.migrateToFileSystem();
+                    try {
+                        this.fileSystem.acquireSyncLock();
+                        this.storageMode.set('filesystem');
+                        await this.systemSync.importStateFromDisk();
+                        await this.workspaceService.migrateToFileSystem();
+                        await this.fileSync.hydrateNativeStorage();
+                    } finally {
+                        this.fileSystem.releaseSyncLock();
+                    }
                 }
             } else {
                 await this.fileSystem.disableFileSystem();

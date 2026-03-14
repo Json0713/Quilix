@@ -210,8 +210,8 @@ export class WorkspaceService {
         if (storageMode !== 'filesystem') return;
 
         // PREVENTION: Ensure only one sync runs at a time to prevent race conditions
-        if (this.isSyncing) {
-            console.log('[WorkspaceService] Sync already in progress, skipping concurrent run.');
+        // and pause during active migrations/hydration.
+        if (this.isSyncing || this.fileSystem.isSyncLocked()) {
             return;
         }
 
