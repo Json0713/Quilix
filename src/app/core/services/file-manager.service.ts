@@ -45,14 +45,27 @@ export class FileManagerService {
             if (entry.name.startsWith('.quilix')) continue;
             let sizeBytes = undefined;
             let lastModified = undefined;
+            let id = undefined;
+
             if (entry.kind === 'file') {
                 try {
                     const file = await (entry as FileSystemFileHandle).getFile();
                     sizeBytes = file.size;
                     lastModified = file.lastModified;
                 } catch (e) {}
+            } else if (entry.kind === 'directory') {
+                // Proactively read ID for directories to support reactive re-linking
+                id = await this.fileSystem.readDirectoryId(entry as FileSystemDirectoryHandle) || undefined;
             }
-            entries.push({ name: entry.name, kind: entry.kind, handle: entry, sizeBytes, lastModified });
+
+            entries.push({ 
+                name: entry.name, 
+                kind: entry.kind, 
+                handle: entry, 
+                id, 
+                sizeBytes, 
+                lastModified 
+            });
         }
         return this.sortEntries(entries);
     }
@@ -165,16 +178,14 @@ export class FileManagerService {
     /**
      * Polymorphic Rename
      */
-    async renameEntry(entry: FileExplorerEntry, newName: string): Promise<boolean> {
+    async renameEntry(entry: FileExplorerEntry, newName: string, parentHandle?: FileSystemDirectoryHandle): Promise<boolean> {
         if (!newName || newName === entry.name) return false;
         const mode = await this.fileSystem.getStorageMode();
 
         if (mode === 'filesystem' && entry.handle) {
-            if ('move' in entry.handle) {
-                await (entry.handle as any).move(newName);
-                return true;
-            }
-            return false;
+            if (!parentHandle) return false;
+            const renamed = await this.fileSystem.safeRenameFolder(parentHandle, entry.name, newName);
+            return renamed;
         } else if (entry.id) {
             await db.virtual_entries.update(entry.id, { name: newName, lastModified: Date.now() });
             return true;

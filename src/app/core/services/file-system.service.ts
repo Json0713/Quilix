@@ -145,7 +145,7 @@ export class FileSystemService {
      * Test if a handle is truly functional by performing a real operation.
      * On mobile Chrome, handles can report 'granted' but still fail on actual use.
      */
-    private async testHandleAccess(handle: FileSystemDirectoryHandle): Promise<boolean> {
+    async testHandleAccess(handle: FileSystemDirectoryHandle): Promise<boolean> {
         try {
             // Try to iterate entries — this reveals stale handles
             const iter = (handle as any).entries();
@@ -298,12 +298,20 @@ export class FileSystemService {
                 try {
                     await (oldHandle as any).move(newName);
                     return true;
-                } catch (moveErr) {
-                    console.warn(`[FileSystem] .move() failed for ${oldName}, attempting recursive fallback.`, moveErr);
+                } catch (moveErr: any) {
+                    // Optimized: If it's a conflict or lock error, don't immediately do a 1GB copy.
+                    // Instead, report failure so the UI can "Reset" and try again.
+                    console.warn(`[FileSystem] .move() failed for ${oldName}:`, moveErr);
+                    
+                    // Specific handling for common "locked" or "busy" errors
+                    if (moveErr.name === 'InvalidStateError' || moveErr.name === 'NoModificationAllowedError') {
+                        return false; 
+                    }
                 }
             }
 
-            // 2. Fallback: Recursive Copy and Delete
+            // 2. Fallback: Recursive Copy and Delete (Only if .move truly isn't supported)
+            // But first, verify if we just need to re-fetch the parent handle (stale handle fix)
             console.log(`[FileSystem] Triggering recursive copy fallback from ${oldName} to ${newName}`);
             const newHandle = await parentHandle.getDirectoryHandle(newName, { create: true });
 
@@ -483,6 +491,56 @@ export class FileSystemService {
             return await this.calculateDirectorySize(wsHandle);
         } catch {
             return 0; // Folder missing, return 0
+        }
+    }
+
+    /**
+     * LASER SYNC: Find a directory handle by its internal ID marker.
+     * This only scans immediate children, making it extremely fast O(N) where N is folder count,
+     * not total files size.
+     */
+    async findHandleByInternalId(parentHandle: FileSystemDirectoryHandle, targetId: string): Promise<FileSystemDirectoryHandle | null> {
+        try {
+            for await (const entry of (parentHandle as any).values()) {
+                if (entry.kind === 'directory') {
+                    const id = await this.readDirectoryId(entry as FileSystemDirectoryHandle);
+                    if (id === targetId) return entry as FileSystemDirectoryHandle;
+                }
+            }
+        } catch (err) {
+            console.warn('[FileSystem] Laser discovery failed:', err);
+        }
+        return null;
+    }
+
+    /**
+     * Re-resolve a space handle by searching for its ID inside the workspace folder.
+     */
+    async resolveSpaceHandle(workspaceName: string, spaceId: string): Promise<FileSystemDirectoryHandle | null> {
+        const rootHandle = await this.ensurePermittedHandle();
+        if (!rootHandle) return null;
+
+        try {
+            const quilixRoot = await rootHandle.getDirectoryHandle(this.QUILIX_ROOT, { create: false });
+            const wsHandle = await quilixRoot.getDirectoryHandle(workspaceName, { create: false });
+            return await this.findHandleByInternalId(wsHandle, spaceId);
+        } catch {
+            return null;
+        }
+    }
+
+    /**
+     * Re-resolve a workspace handle by searching for its ID in the Quilix root.
+     */
+    async resolveWorkspaceHandle(workspaceId: string): Promise<FileSystemDirectoryHandle | null> {
+        const rootHandle = await this.ensurePermittedHandle();
+        if (!rootHandle) return null;
+
+        try {
+            const quilixRoot = await rootHandle.getDirectoryHandle(this.QUILIX_ROOT, { create: false });
+            return await this.findHandleByInternalId(quilixRoot, workspaceId);
+        } catch {
+            return null;
         }
     }
 }

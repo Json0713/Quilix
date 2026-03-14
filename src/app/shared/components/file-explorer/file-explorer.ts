@@ -6,6 +6,8 @@ import { FileExplorerEntry, FileManagerService } from '../../../core/services/fi
 import { FileSystemService } from '../../../core/services/file-system.service';
 import { SnackbarService } from '../../../services/ui/common/snackbar/snackbar.service';
 import { ToolbarService, ToolbarConfig } from '../../../core/services/toolbar.service';
+import { db } from '../../../core/db/app-db';
+import { Space } from '../../../core/interfaces/space';
 
 @Component({
   selector: 'app-file-explorer',
@@ -27,8 +29,8 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   @Input() spaceName: string = 'Space';
 
   // Navigation History (Breadcrumbs map to polymorphic Nodes)
-  history = signal<{ name: string, handle?: FileSystemDirectoryHandle, id?: string }[]>([]);
-  forwardHistory = signal<{ name: string, handle?: FileSystemDirectoryHandle, id?: string }[]>([]);
+  history = signal<{ name: string, handle?: FileSystemDirectoryHandle, id?: string, parentHandle?: FileSystemDirectoryHandle }[]>([]);
+  forwardHistory = signal<{ name: string, handle?: FileSystemDirectoryHandle, id?: string, parentHandle?: FileSystemDirectoryHandle }[]>([]);
   
   currentNode = computed(() => {
     const hist = this.history();
@@ -221,7 +223,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     }
   }
 
-  async loadCurrentDirectory(showLoader = true) {
+  async loadCurrentDirectory(showLoader = true): Promise<void> {
     if (showLoader) this.isLoading.set(true);
     try {
       const node = this.currentNode();
@@ -248,7 +250,15 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       if (currentSelected && !newEntries.find(e => e.name === currentSelected.name)) {
           this.selectedEntry.set(null);
       }
-    } catch (err) {
+    } catch (err: any) {
+      if (err.name === 'NotFoundError') {
+          console.warn('[FileExplorer] Handle lost, attempting reactive re-link...');
+          const recovered = await this.reResolveStaleHandle();
+          if (recovered) {
+              // Try loading again with the new handle
+              return this.loadCurrentDirectory(false);
+          }
+      }
       console.error('[FileExplorer] Failed to load directory:', err);
       this.snackbar.error('Could not read folder contents.');
     } finally {
@@ -263,7 +273,8 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       this.history.update(h => [...h, { 
           name: entry.name, 
           handle: entry.handle as FileSystemDirectoryHandle,
-          id: entry.id
+          id: entry.id, // Now captured in native mode as well
+          parentHandle: this.currentNode().handle // Track parent for faster re-linking
       }]);
       this.forwardHistory.set([]); // Clear forward stack on new branching path
       this.selectedEntry.set(null);
@@ -361,7 +372,24 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     }
 
     try {
-        const success = await this.fileManager.renameEntry(entry, newName);
+        const node = this.currentNode();
+        // Determine parent handle context (Breadcrumbs track this naturally)
+        const parentNode = this.history().length > 1 ? this.history()[this.history().length - 2] : null;
+        const parentHandle = parentNode?.handle || this.rootHandle;
+
+        if (!parentHandle) {
+            this.snackbar.error('Rename failed: Parent context lost.');
+            return;
+        }
+
+        // OPTIMIZATION: Release active selection/focus before rename to release OS file locks
+        this.selectedEntry.set(null);
+
+        const success = await this.fileManager.renameEntry({ 
+            ...entry, 
+            handle: entry.handle // In native mode, we need both handle and name
+        } as any, newName, parentHandle);
+
         if (success) {
             this.snackbar.success('Item renamed.');
         } else {
@@ -506,5 +534,66 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+
+  /**
+   * RECURSIVE SELF-HEALING HISTORY
+   * Iterates through the entire breadcrumb stack and re-resolves handles
+   * that have become stale due to parent/workspace renames.
+   */
+  private async reResolveStaleHandle(): Promise<boolean> {
+      const hist = [...this.history()];
+      let changed = false;
+
+      // 1. Resolve Root Node (Space)
+      const root = hist[0];
+      const rootValid = await this.fileSystem.verifyPermission(root.handle!, true, false)
+                       .then(v => v && this.fileSystem.testHandleAccess(root.handle!))
+                       .catch(() => false);
+
+      if (!rootValid) {
+          const workspace = await db.workspaces.get(this.workspaceId);
+          if (!workspace) return false;
+
+          const freshRoot = await this.fileSystem.resolveSpaceHandle(workspace.name, this.spaceId);
+          if (freshRoot) {
+              hist[0] = { ...hist[0], handle: freshRoot, name: freshRoot.name };
+              changed = true;
+          } else {
+              // Even the root is truly gone or un-discoverable
+              return false;
+          }
+      }
+
+      // 2. Resolve Child Nodes Recursively
+      for (let i = 1; i < hist.length; i++) {
+          const parent = hist[i-1];
+          const current = hist[i];
+          
+          // Verify if current handle is still valid relative to its parent
+          const currentValid = await this.fileSystem.testHandleAccess(current.handle!).catch(() => false);
+
+          if (!currentValid && parent.handle && current.id) {
+              // Targeted discovery: find this folder inside its (now fixed) parent
+              const freshHandle = await this.fileSystem.findHandleByInternalId(parent.handle, current.id);
+              if (freshHandle) {
+              hist[i] = { ...hist[i], handle: freshHandle, name: freshHandle.name, parentHandle: parent.handle };
+              changed = true;
+          } else {
+              // Chain broken - we cannot find this subfolder anymore.
+              // Truncate history here as we can't restore the path.
+              const recoveredPart = hist.slice(0, i);
+              this.history.set(recoveredPart);
+              return true; // We recovered what we could
+          }
+          }
+      }
+
+      if (changed) {
+          this.history.set(hist);
+          return true;
+      }
+
+      return false;
   }
 }
