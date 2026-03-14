@@ -8,6 +8,7 @@ import { TabService } from '../../../core/services/tab.service';
 import { SpaceService } from '../../../core/services/space.service';
 import { Space } from '../../../core/interfaces/space';
 import { Subscription } from 'dexie';
+import { ToolbarService } from '../../../core/services/toolbar.service';
 
 interface Breadcrumb {
     label: string;
@@ -30,11 +31,13 @@ export class NavigationBar implements OnInit, OnDestroy {
     private tabService = inject(TabService);
     private spaceService = inject(SpaceService);
     private router = inject(Router);
+    public toolbarService = inject(ToolbarService); // <-- Inject Dynamic Toolbar Context
 
     @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
     @ViewChild('navSearch') navSearch!: ElementRef<HTMLDivElement>;
 
-    breadcrumbs: Breadcrumb[] = [];
+    // Keep default breadcrumbs logic as fallback
+    defaultBreadcrumbs: Breadcrumb[] = [];
     isMobileOpen = this.sidebarService.isMobileOpen;
     isMobileSearchActive = false;
 
@@ -122,12 +125,12 @@ export class NavigationBar implements OnInit, OnDestroy {
         const url = this.router.url.split('?')[0];
         const parts = url.split('/').filter(p => p);
 
-        this.breadcrumbs = [];
+        this.defaultBreadcrumbs = [];
         this.clearSpaceSub();
 
         if (parts.length > 0) {
             const root = parts[0]; // personal or team
-            this.breadcrumbs.push({
+            this.defaultBreadcrumbs.push({
                 label: 'Home',
                 url: `/${root}`,
                 isLast: parts.length === 1
@@ -138,7 +141,7 @@ export class NavigationBar implements OnInit, OnDestroy {
                     const spaceId = parts[2];
 
                     // Pre-fill with placeholder until subscription resolves
-                    this.breadcrumbs.push({
+                    this.defaultBreadcrumbs.push({
                         label: 'Space ' + spaceId.substring(0, 4),
                         url: `/${root}/spaces/${spaceId}`,
                         isLast: true,
@@ -154,7 +157,7 @@ export class NavigationBar implements OnInit, OnDestroy {
                     for (let i = 1; i < parts.length; i++) {
                         currentUrl += `/${parts[i]}`;
                         const label = parts[i].charAt(0).toUpperCase() + parts[i].slice(1);
-                        this.breadcrumbs.push({
+                        this.defaultBreadcrumbs.push({
                             label: label,
                             url: currentUrl,
                             isLast: i === parts.length - 1
@@ -186,7 +189,7 @@ export class NavigationBar implements OnInit, OnDestroy {
         // Observe the exact space for renames or trash status
         this.spaceSub = this.spaceService.liveSpaceAnyStatus$(spaceId).subscribe((space: Space | null) => {
             if (space) {
-                const spaceCrumb = this.breadcrumbs.find(b => b.isSpace && b.url.includes(spaceId));
+                const spaceCrumb = this.defaultBreadcrumbs.find(b => b.isSpace && b.url && b.url.includes(spaceId));
                 if (spaceCrumb) {
                     spaceCrumb.label = space.name;
                     spaceCrumb.isDeleted = !!space.trashedAt;
@@ -208,6 +211,15 @@ export class NavigationBar implements OnInit, OnDestroy {
         if (this.spaceSub) {
             this.spaceSub.unsubscribe();
             this.spaceSub = undefined;
+        }
+    }
+
+    // New helper: Execute Toolbar Custom Action or Router Link
+    triggerBreadcrumb(crumb: any) {
+        if (crumb.action) {
+            crumb.action();
+        } else if (crumb.url) {
+            this.onBreadcrumbClick(crumb as Breadcrumb);
         }
     }
 
