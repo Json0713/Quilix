@@ -5,12 +5,11 @@ import { Subscription } from 'rxjs';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { Breadcrumb } from '../../../../shared/ui/common/breadcrumb/breadcrumb';
 import { StorageAnalyticsService, StorageMetrics } from '../../../../core/services/storage-analytics.service';
-import { Loader } from '../../../../shared/ui/common/loader/loader';
 
 @Component({
   selector: 'app-team-index',
   standalone: true,
-  imports: [CommonModule, Breadcrumb, Loader],
+  imports: [CommonModule, Breadcrumb],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
@@ -20,15 +19,14 @@ export class TeamIndex implements OnInit, OnDestroy {
 
   private metricsSub?: Subscription;
 
-  isLoading = signal<boolean>(true);
-  metrics = signal<StorageMetrics | null>(null);
+  isLoading = signal<boolean>(!this.analytics.lastMetrics());
+  metrics = this.analytics.lastMetrics;
 
   ngOnInit() {
     this.breadcrumbService.setTitle('Team Home');
 
-    // Subscribe natively to the generic Storage Dexie liveQuery feed
-    this.metricsSub = this.analytics.watchMetrics().subscribe(payload => {
-      this.metrics.set(payload);
+    // Subscribe to liveQuery revalidations
+    this.metricsSub = this.analytics.watchMetrics().subscribe(() => {
       this.isLoading.set(false);
     });
   }

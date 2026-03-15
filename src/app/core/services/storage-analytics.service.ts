@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { liveQuery } from 'dexie';
 import { Observable, from } from 'rxjs';
 import { FileSystemService } from './file-system.service';
@@ -22,6 +22,27 @@ export interface StorageMetrics {
 export class StorageAnalyticsService {
     private fileSystem = inject(FileSystemService);
     private auth = inject(AuthService);
+
+    // ── Persistent State Store ──
+    private CACHE_KEY = 'quilix_dashboard_metrics';
+    public lastMetrics = signal<StorageMetrics | null>(this.loadCache());
+
+    private loadCache(): StorageMetrics | null {
+        try {
+            const data = localStorage.getItem(this.CACHE_KEY);
+            return data ? JSON.parse(data) : null;
+        } catch {
+            return null;
+        }
+    }
+
+    private saveCache(metrics: StorageMetrics) {
+        try {
+            localStorage.setItem(this.CACHE_KEY, JSON.stringify(metrics));
+        } catch (e) {
+            console.warn('StorageAnalyticsService: Failed to save cache', e);
+        }
+    }
 
     /**
      * Exposes a real-time reactive feed of Dashboard metrics driven by Dexie liveQuery.
@@ -89,7 +110,7 @@ export class StorageAnalyticsService {
             color = '#f59e0b'; // Amber
         }
 
-        return {
+        const metrics: StorageMetrics = {
             totalSpaces,
             totalEntities,
             mode,
@@ -99,6 +120,12 @@ export class StorageAnalyticsService {
             percentageDisplay,
             color
         };
+
+        // Update caches
+        this.lastMetrics.set(metrics);
+        this.saveCache(metrics);
+
+        return metrics;
     }
 
     /**
