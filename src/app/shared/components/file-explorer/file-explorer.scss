@@ -3,7 +3,6 @@
     flex-direction: column;
     height: auto;
     width: 100%;
-    background-color: var(--surface-main);
     border-radius: 12px;
     position: relative;
     user-select: none;
@@ -41,7 +40,7 @@
     color: var(--text-main);
     background: var(--surface-main);
     border-radius: 8px;
-    padding: 0.25rem 0.5rem; // btn-sm approx
+    padding: 0.25rem 1.5rem; // btn-sm approx
     font-size: 0.875rem; 
     transition: background-color 0.15s;
 
@@ -390,7 +389,7 @@
     }
 }
 
-.folder-icon { color: var(--text-main); }
+.folder-icon { color: var(--action); }
 .file-icon { color: var(--text-muted); }
 
 .loading-overlay {
