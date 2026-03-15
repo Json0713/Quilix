@@ -191,16 +191,26 @@ export class FileManagerService {
     /**
      * Polymorphic Rename
      */
-    async renameEntry(entry: FileExplorerEntry, newName: string, parentHandle?: FileSystemDirectoryHandle): Promise<boolean> {
+    async renameEntry(context: { spaceId: string, parentId: string | null, parentHandle?: FileSystemDirectoryHandle }, entry: FileExplorerEntry, newName: string): Promise<boolean> {
         if (!newName || newName === entry.name) return false;
+        
+        // RESOLVE CONFLICTS: If the target name exists, auto-number it (e.g., "Folder (2)")
+        // This ensures a "Standard" experience and prevents collision errors on physical disk
+        const resolvedName = await this.resolveUniqueName(
+            { handle: context.parentHandle, spaceId: context.spaceId, parentId: context.parentId }, 
+            newName, 
+            entry.kind === 'directory'
+        );
+
         const mode = await this.fileSystem.getStorageMode();
 
         if (mode === 'filesystem' && entry.handle) {
-            if (!parentHandle) return false;
-            const renamed = await this.fileSystem.safeRenameFolder(parentHandle, entry.name, newName);
+            if (!context.parentHandle) return false;
+            // Native Move (Internal move() or fallback copy-delete)
+            const renamed = await this.fileSystem.safeRenameFolder(context.parentHandle, entry.name, resolvedName);
             return renamed;
         } else if (entry.id) {
-            await db.virtual_entries.update(entry.id, { name: newName, lastModified: Date.now() });
+            await db.virtual_entries.update(entry.id, { name: resolvedName, lastModified: Date.now() });
             return true;
         }
         return false;

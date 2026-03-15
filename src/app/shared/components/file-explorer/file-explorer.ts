@@ -391,10 +391,18 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
         // OPTIMIZATION: Release active selection/focus before rename to release OS file locks
         this.selectedEntry.set(null);
 
-        const success = await this.fileManager.renameEntry({ 
-            ...entry, 
-            handle: entry.handle // In native mode, we need both handle and name
-        } as any, newName, parentHandle);
+        const success = await this.fileManager.renameEntry(
+            { 
+                spaceId: this.spaceId, 
+                parentId: node.id || null, 
+                parentHandle 
+            }, 
+            { 
+                ...entry, 
+                handle: entry.handle 
+            } as any, 
+            newName
+        );
 
         if (success) {
             this.snackbar.success('Item renamed.');

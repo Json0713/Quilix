@@ -293,17 +293,22 @@ export class FileSystemService {
                 throw err;
             }
 
-            // 1. Try modern fast move()
+            // COLLISION GUARD: Verify target doesn't exist (Manager should handle this, but Service is the final gate)
+            try {
+                await parentHandle.getDirectoryHandle(newName, { create: false });
+                console.error(`[FileSystem] Collision detected: Target "${newName}" already exists.`);
+                return false; 
+            } catch {}
+
+            // 1. Try modern fast move() - STANDARD DIRECT RENAME
             if ('move' in oldHandle) {
                 try {
                     await (oldHandle as any).move(newName);
+                    console.log(`[FileSystem] Direct rename successful: "${oldName}" -> "${newName}"`);
                     return true;
                 } catch (moveErr: any) {
-                    // Optimized: If it's a conflict or lock error, don't immediately do a 1GB copy.
-                    // Instead, report failure so the UI can "Reset" and try again.
                     console.warn(`[FileSystem] .move() failed for ${oldName}:`, moveErr);
                     
-                    // Specific handling for common "locked" or "busy" errors
                     if (moveErr.name === 'InvalidStateError' || moveErr.name === 'NoModificationAllowedError') {
                         return false; 
                     }
@@ -311,14 +316,14 @@ export class FileSystemService {
             }
 
             // 2. Fallback: Recursive Copy and Delete (Only if .move truly isn't supported)
-            // But first, verify if we just need to re-fetch the parent handle (stale handle fix)
-            console.log(`[FileSystem] Triggering recursive copy fallback from ${oldName} to ${newName}`);
+            console.log(`[FileSystem] Fallback: Copying contents from "${oldName}" to "${newName}"...`);
             const newHandle = await parentHandle.getDirectoryHandle(newName, { create: true });
 
             await this.copyDirectoryContents(oldHandle, newHandle);
 
             // Delete old
             await (parentHandle as any).removeEntry(oldName, { recursive: true });
+            console.log(`[FileSystem] Fallback rename complete.`);
             return true;
         } catch (err) {
             console.error(`[FileSystem] Failed to rename folder from ${oldName} to ${newName}:`, err);
