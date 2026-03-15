@@ -99,7 +99,7 @@
                                 {{ entry.lastModified | date:'mediumDate' }}
                             </div>
                             <div class="col-size">
-                                {{ entry.kind === 'file' ? formatBytes(entry.sizeBytes) : '' }}
+                                {{ formatBytes(entry.sizeBytes) }}
                             </div>
                             <div class="col-actions">
                                 <button class="action-icon" (click)="openContextMenu(entry, $event); $event.stopPropagation();">
