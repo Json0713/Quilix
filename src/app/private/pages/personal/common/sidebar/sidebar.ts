@@ -47,6 +47,14 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
     hasMissingWorkspaces = signal<boolean>(false);
     private isSubmitting = false;
 
+    // ── Loading state access ──
+    isSyncing = this.spaceService.isSyncing;
+    activeOperations = this.spaceService.activeOperations;
+
+    isSpaceLoading(spaceId: string): boolean {
+        return this.activeOperations().has(spaceId);
+    }
+
     // ── Context menu state ──
     openMenuId = signal<string | null>(null);
 

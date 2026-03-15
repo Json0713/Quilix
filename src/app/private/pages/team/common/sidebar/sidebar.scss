@@ -621,6 +621,68 @@
     border-radius: 12px;
 }
 
+// ── Skeleton Loader & Loading States ──
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton-space {
+    pointer-events: none;
+    opacity: 0.6;
+
+    .skeleton-icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        background: linear-gradient(90deg, 
+            var(--bg-hover) 25%, 
+            var(--bg-active) 50%, 
+            var(--bg-hover) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite linear;
+    }
+
+    .skeleton-text {
+        width: 60%;
+        height: 12px;
+        border-radius: 4px;
+        background: linear-gradient(90deg, 
+            var(--bg-hover) 25%, 
+            var(--bg-active) 50%, 
+            var(--bg-hover) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite linear;
+    }
+}
+
+.loading-state {
+    cursor: default;
+    
+    .nav-icon {
+        color: var(--action);
+    }
+
+    .loading-text {
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 0.82rem;
+        opacity: 0.8;
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
 .cdk-drag-animating {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }

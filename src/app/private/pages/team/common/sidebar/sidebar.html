@@ -84,6 +84,21 @@
             <!-- Space list -->
             <ul class="nav-list space-list" cdkDropList [cdkDropListData]="spaces()"
                 (cdkDropListDropped)="onSpaceDrop($event)">
+                
+                <!-- Skeleton Loader -->
+                @if (isSyncing() && spaces().length === 0) {
+                    @for (i of [1,2,3]; track i) {
+                        <li class="nav-item skeleton-space">
+                            <div class="nav-link">
+                                <div class="skeleton-icon"></div>
+                                @if (!isCollapsed()) {
+                                    <div class="skeleton-text"></div>
+                                }
+                            </div>
+                        </li>
+                    }
+                }
+
                 @for (space of spaces(); track space.id) {
                 <li class="nav-item space-item" [class.menu-open]="openMenuId() === space.id" cdkDrag
                     [cdkDragStartDelay]="{ touch: 250, mouse: 0 }">
@@ -92,7 +107,15 @@
                         <span class="nav-label">{{ space.name }}</span>
                     </div>
 
-                    @if (renamingSpaceId() === space.id) {
+                    @if (isSpaceLoading(space.id)) {
+                        <!-- Working / Loading state -->
+                        <div class="nav-link loading-state">
+                            <i class="bi bi-arrow-repeat spin nav-icon"></i>
+                            @if (!isCollapsed()) {
+                                <span class="nav-label loading-text">Working on it...</span>
+                            }
+                        </div>
+                    } @else if (renamingSpaceId() === space.id) {
                     <!-- Inline rename input -->
                     <div class="space-rename-inline" [class.has-error]="renameError()">
                         <i class="bi bi-folder nav-icon rename-icon"></i>

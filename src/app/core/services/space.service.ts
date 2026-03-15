@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { liveQuery } from 'dexie';
 import { db } from '../db/app-db';
 import { Space } from '../interfaces/space';
@@ -13,6 +13,26 @@ const MAX_NAME_LENGTH = 206;
 })
 export class SpaceService {
     private fileSystem = inject(FileSystemService);
+
+    // ── Loading States (Reactive) ──
+    readonly isSyncing = signal<boolean>(false);
+    readonly activeOperations = signal<Set<string>>(new Set());
+
+    private startOperation(id: string) {
+        this.activeOperations.update(ops => {
+            const next = new Set(ops);
+            next.add(id);
+            return next;
+        });
+    }
+
+    private stopOperation(id: string) {
+        this.activeOperations.update(ops => {
+            const next = new Set(ops);
+            next.delete(id);
+            return next;
+        });
+    }
 
     /**
      * Live-query observable of spaces for a workspace, ordered by creation.
@@ -105,24 +125,29 @@ export class SpaceService {
             : 0;
 
         const spaceId = crypto.randomUUID();
+        this.startOperation(spaceId);
 
-        // Create folder on filesystem if applicable
-        const storageMode = await this.fileSystem.getStorageMode();
-        if (storageMode === 'filesystem') {
-            await this.createSpaceFolder(workspaceName, folderName, spaceId);
+        try {
+            // Create folder on filesystem if applicable
+            const storageMode = await this.fileSystem.getStorageMode();
+            if (storageMode === 'filesystem') {
+                await this.createSpaceFolder(workspaceName, folderName, spaceId);
+            }
+
+            const space: Space = {
+                id: spaceId,
+                workspaceId,
+                name,
+                folderName,
+                createdAt: Date.now(),
+                order,
+            };
+
+            await db.spaces.add(space);
+            return space;
+        } finally {
+            this.stopOperation(spaceId);
         }
-
-        const space: Space = {
-            id: spaceId,
-            workspaceId,
-            name,
-            folderName,
-            createdAt: Date.now(),
-            order,
-        };
-
-        await db.spaces.add(space);
-        return space;
     }
 
     /**
@@ -133,24 +158,29 @@ export class SpaceService {
         const space = await db.spaces.get(spaceId);
         if (!space) return false;
 
-        const sanitized = this.sanitizeName(newName);
-        if (!sanitized) return false;
+        this.startOperation(spaceId);
+        try {
+            const sanitized = this.sanitizeName(newName);
+            if (!sanitized) return false;
 
-        const newFolderName = this.toFolderName(sanitized);
-        const oldFolderName = space.folderName;
+            const newFolderName = this.toFolderName(sanitized);
+            const oldFolderName = space.folderName;
 
-        // Rename folder on filesystem: rename physically using robust copy/move hybrid
-        const storageMode = await this.fileSystem.getStorageMode();
-        if (storageMode === 'filesystem' && newFolderName !== oldFolderName) {
-            const wsHandle = await this.fileSystem.getOrCreateWorkspaceFolder(workspaceName);
-            if (wsHandle) {
-                const renamed = await this.fileSystem.safeRenameFolder(wsHandle, oldFolderName, newFolderName);
-                if (!renamed) return false;
+            // Rename folder on filesystem: rename physically using robust copy/move hybrid
+            const storageMode = await this.fileSystem.getStorageMode();
+            if (storageMode === 'filesystem' && newFolderName !== oldFolderName) {
+                const wsHandle = await this.fileSystem.getOrCreateWorkspaceFolder(workspaceName);
+                if (wsHandle) {
+                    const renamed = await this.fileSystem.safeRenameFolder(wsHandle, oldFolderName, newFolderName);
+                    if (!renamed) return false;
+                }
             }
-        }
 
-        await db.spaces.update(spaceId, { name: sanitized, folderName: newFolderName });
-        return true;
+            await db.spaces.update(spaceId, { name: sanitized, folderName: newFolderName });
+            return true;
+        } finally {
+            this.stopOperation(spaceId);
+        }
     }
 
     /**
@@ -172,8 +202,13 @@ export class SpaceService {
         const space = await db.spaces.get(spaceId);
         if (!space) return false;
 
-        await db.spaces.update(spaceId, { trashedAt: Date.now() });
-        return true;
+        this.startOperation(spaceId);
+        try {
+            await db.spaces.update(spaceId, { trashedAt: Date.now() });
+            return true;
+        } finally {
+            this.stopOperation(spaceId);
+        }
     }
 
     /**
@@ -327,7 +362,6 @@ export class SpaceService {
         }
     }
 
-    private isSyncing = false;
 
     /**
      * Scans all subdirectories of a workspace folder to detect OS-level renames.
@@ -338,11 +372,11 @@ export class SpaceService {
         if (storageMode !== 'filesystem') return;
 
         // PREVENTION: Ensure only one sync runs at a time for this space set
-        if (this.isSyncing || this.fileSystem.isSyncLocked()) return;
+        if (this.isSyncing() || this.fileSystem.isSyncLocked()) return;
 
         if (!this.fileSystem.hasPermission()) return; // Bail if permission lost to avoid marking all as missing
 
-        this.isSyncing = true;
+        this.isSyncing.set(true);
         try {
             // 1. BATCH FETCH: Grab all spaces for this workspace once to avoid N+1 queries in the loop
             const allSpaces = await db.spaces.where('workspaceId').equals(workspaceId).toArray();
@@ -456,7 +490,7 @@ export class SpaceService {
                 await db.spaces.bulkPut(spacesToUpdate);
             }
         } finally {
-            this.isSyncing = false;
+            this.isSyncing.set(false);
         }
     }
 
