@@ -188,7 +188,7 @@
       gap: 1rem;
 
       .value {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         font-weight: 700;
         color: var(--text-main);
         line-height: 1;
@@ -316,7 +316,7 @@
         justify-content: space-between;
         
         .line-value {
-          height: 34px;
+          height: 32px;
           width: 120px;
           border-radius: 6px;
           @extend .skeleton-shimmer;
