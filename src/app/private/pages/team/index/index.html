@@ -59,6 +59,37 @@
 
 @if (isLoading()) {
 <div class="loading-state">
-  <app-loader></app-loader>
+  <div class="metric-skeleton-grid">
+    <!-- Primary Skeleton -->
+    <div class="skeleton-card primary-skeleton">
+      <div class="skeleton-donut-wrapper"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-badge"></div>
+      </div>
+    </div>
+    <!-- Stat 1 -->
+    <div class="skeleton-card stat-skeleton">
+      <div class="skeleton-icon-block"></div>
+      <div class="skeleton-stat-lines">
+        <div class="line-label"></div>
+        <div class="line-value-row">
+          <div class="line-value"></div>
+          <div class="line-limit"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Stat 2 -->
+    <div class="skeleton-card stat-skeleton">
+      <div class="skeleton-icon-block"></div>
+      <div class="skeleton-stat-lines">
+        <div class="line-label"></div>
+        <div class="line-value-row">
+          <div class="line-value"></div>
+          <div class="line-limit"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 }
