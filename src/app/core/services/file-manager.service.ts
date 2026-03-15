@@ -22,7 +22,7 @@ export interface ClipboardItem {
 })
 export class FileManagerService {
     private fileSystem = inject(FileSystemService);
-    
+
     // Global clipboard state for files
     clipboard = signal<ClipboardItem | null>(null);
 
@@ -52,11 +52,11 @@ export class FileManagerService {
                     const file = await (entry as FileSystemFileHandle).getFile();
                     sizeBytes = file.size;
                     lastModified = file.lastModified;
-                } catch (e) {}
+                } catch (e) { }
             } else if (entry.kind === 'directory') {
                 // Proactively read ID for directories to support reactive re-linking
                 id = await this.fileSystem.readDirectoryId(entry as FileSystemDirectoryHandle) || undefined;
-                
+
                 // SELF-HEALING: If a directory lacks an ID, it was likely created via OS. 
                 // Assign one now so it becomes a tracked "Space" or Sub-space.
                 if (!id) {
@@ -66,13 +66,13 @@ export class FileManagerService {
                 }
             }
 
-            entries.push({ 
-                name: entry.name, 
-                kind: entry.kind, 
-                handle: entry, 
-                id, 
-                sizeBytes, 
-                lastModified 
+            entries.push({
+                name: entry.name,
+                kind: entry.kind,
+                handle: entry,
+                id,
+                sizeBytes,
+                lastModified
             });
         }
         return this.sortEntries(entries);
@@ -83,7 +83,7 @@ export class FileManagerService {
             .where('[spaceId+parentId]')
             .equals([spaceId, parentId || 'root'])
             .toArray();
-        
+
         return this.sortEntries(items.map(i => ({
             id: i.id,
             name: i.name,
@@ -110,11 +110,11 @@ export class FileManagerService {
 
         if (mode === 'filesystem' && context.parentHandle) {
             const handle = await context.parentHandle.getDirectoryHandle(uniqueName, { create: true });
-            
+
             // ANCHOR: Assign a permanent unique ID so this folder is tracked even if moved/renamed via OS
             const id = crypto.randomUUID();
             await this.fileSystem.writeDirectoryId(handle, id);
-            
+
             return { id, name: uniqueName, kind: 'directory', handle, lastModified: Date.now() };
         } else {
             const id = crypto.randomUUID();
@@ -193,12 +193,12 @@ export class FileManagerService {
      */
     async renameEntry(context: { spaceId: string, parentId: string | null, parentHandle?: FileSystemDirectoryHandle }, entry: FileExplorerEntry, newName: string): Promise<boolean> {
         if (!newName || newName === entry.name) return false;
-        
+
         // RESOLVE CONFLICTS: If the target name exists, auto-number it (e.g., "Folder (2)")
         // This ensures a "Standard" experience and prevents collision errors on physical disk
         const resolvedName = await this.resolveUniqueName(
-            { handle: context.parentHandle, spaceId: context.spaceId, parentId: context.parentId }, 
-            newName, 
+            { parentHandle: context.parentHandle, spaceId: context.spaceId, parentId: context.parentId },
+            newName,
             entry.kind === 'directory'
         );
 
@@ -229,7 +229,7 @@ export class FileManagerService {
         if (!item) return false;
 
         const mode = await this.fileSystem.getStorageMode();
-        
+
         try {
             if (mode === 'filesystem' && context.handle && item.entry.handle) {
                 // Native Paste Logic (truncated for brevity, similar to existing)
@@ -250,8 +250,8 @@ export class FileManagerService {
                 // Virtual Paste Logic
                 const uniqueName = await this.resolveUniqueName(context, item.entry.name, item.entry.kind === 'directory');
                 if (item.action === 'cut') {
-                    await db.virtual_entries.update(item.entry.id, { 
-                        parentId: context.parentId || 'root', 
+                    await db.virtual_entries.update(item.entry.id, {
+                        parentId: context.parentId || 'root',
                         name: uniqueName,
                         lastModified: Date.now()
                     });
@@ -284,14 +284,14 @@ export class FileManagerService {
         }
     }
 
-    private async resolveUniqueName(context: { handle?: FileSystemDirectoryHandle, spaceId: string, parentId: string | null }, baseName: string, isDirectory: boolean): Promise<string> {
+    private async resolveUniqueName(context: { parentHandle?: FileSystemDirectoryHandle, spaceId: string, parentId: string | null }, baseName: string, isDirectory: boolean): Promise<string> {
         const mode = await this.fileSystem.getStorageMode();
 
         const nameExists = async (testName: string) => {
-            if (mode === 'filesystem' && context.handle) {
+            if (mode === 'filesystem' && context.parentHandle) {
                 try {
-                    if (isDirectory) await context.handle.getDirectoryHandle(testName, { create: false });
-                    else await context.handle.getFileHandle(testName, { create: false });
+                    if (isDirectory) await context.parentHandle.getDirectoryHandle(testName, { create: false });
+                    else await context.parentHandle.getFileHandle(testName, { create: false });
                     return true;
                 } catch { return false; }
             } else {
