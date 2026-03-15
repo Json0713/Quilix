@@ -252,6 +252,9 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       if (currentSelected && !newEntries.find(e => e.name === currentSelected.name)) {
           this.selectedEntry.set(null);
       }
+
+      // BACKGROUND: Trigger a size sweep for subfolders to populate the List View columns asynchronously
+      this.triggerSizeSweep();
     } catch (err: any) {
       if (err.name === 'NotFoundError') {
           console.warn('[FileExplorer] Handle lost, attempting reactive re-link...');
@@ -268,6 +271,34 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       });
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  private currentSweepId = 0;
+  /**
+   * Iterate through all directory entries and asynchronously calculate their recursive sizes.
+   * This ensures the List View "Size" column populates without blocking the main directory load.
+   */
+  private async triggerSizeSweep() {
+    this.currentSweepId++;
+    const sweepId = this.currentSweepId;
+    const folders = this.entries().filter(e => e.kind === 'directory' && e.handle);
+
+    for (const folder of folders) {
+        // Run calculations in parallel-ish (using .then to not block the loop)
+        this.fileSystem.calculateDirectorySize(folder.handle as FileSystemDirectoryHandle).then(size => {
+            // Check if context is still valid (user hasn't navigated)
+            if (this.currentSweepId !== sweepId) return;
+
+            this.entries.update(entries => {
+                const updated = [...entries];
+                const target = updated.find(e => e.name === folder.name && e.kind === 'directory');
+                if (target) {
+                    target.sizeBytes = size;
+                }
+                return updated;
+            });
+        });
     }
   }
 
