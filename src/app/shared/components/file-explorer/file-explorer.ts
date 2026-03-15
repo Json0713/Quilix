@@ -379,8 +379,9 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     try {
         const node = this.currentNode();
         // Determine parent handle context (Breadcrumbs track this naturally)
-        const parentNode = this.history().length > 1 ? this.history()[this.history().length - 2] : null;
-        const parentHandle = parentNode?.handle || this.rootHandle;
+        // CRITICAL FIX: The parent of the entry being renamed is EVERY TIME the currentNode's handle, 
+        // because we are currently INSIDE that folder viewing its entries.
+        const parentHandle = node.handle || this.rootHandle;
 
         if (!parentHandle) {
             this.snackbar.error('Rename failed: Parent context lost.');

@@ -56,6 +56,14 @@ export class FileManagerService {
             } else if (entry.kind === 'directory') {
                 // Proactively read ID for directories to support reactive re-linking
                 id = await this.fileSystem.readDirectoryId(entry as FileSystemDirectoryHandle) || undefined;
+                
+                // SELF-HEALING: If a directory lacks an ID, it was likely created via OS. 
+                // Assign one now so it becomes a tracked "Space" or Sub-space.
+                if (!id) {
+                    id = crypto.randomUUID();
+                    console.log(`[FileManager] Self-healing directory: Anchoring ID ${id} to "${entry.name}"`);
+                    await this.fileSystem.writeDirectoryId(entry as FileSystemDirectoryHandle, id);
+                }
             }
 
             entries.push({ 
@@ -102,7 +110,12 @@ export class FileManagerService {
 
         if (mode === 'filesystem' && context.parentHandle) {
             const handle = await context.parentHandle.getDirectoryHandle(uniqueName, { create: true });
-            return { name: uniqueName, kind: 'directory', handle, lastModified: Date.now() };
+            
+            // ANCHOR: Assign a permanent unique ID so this folder is tracked even if moved/renamed via OS
+            const id = crypto.randomUUID();
+            await this.fileSystem.writeDirectoryId(handle, id);
+            
+            return { id, name: uniqueName, kind: 'directory', handle, lastModified: Date.now() };
         } else {
             const id = crypto.randomUUID();
             const entry = {
