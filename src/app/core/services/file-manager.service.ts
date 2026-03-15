@@ -55,7 +55,10 @@ export class FileManagerService {
                 } catch (e) { }
             } else if (entry.kind === 'directory') {
                 // Proactively read ID for directories to support reactive re-linking
-                id = await this.fileSystem.readDirectoryId(entry as FileSystemDirectoryHandle) || undefined;
+                // Also fetch the .quilix-id file's metadata to use as a proxy for the folder's mod date
+                const res = await this.fileSystem.readDirectoryId(entry as FileSystemDirectoryHandle);
+                id = res?.id || undefined;
+                if (res) lastModified = res.lastModified;
 
                 // SELF-HEALING: If a directory lacks an ID, it was likely created via OS. 
                 // Assign one now so it becomes a tracked "Space" or Sub-space.
@@ -63,6 +66,7 @@ export class FileManagerService {
                     id = crypto.randomUUID();
                     console.log(`[FileManager] Self-healing directory: Anchoring ID ${id} to "${entry.name}"`);
                     await this.fileSystem.writeDirectoryId(entry as FileSystemDirectoryHandle, id);
+                    lastModified = Date.now(); // Newly self-healed, use current time
                 }
             }
 

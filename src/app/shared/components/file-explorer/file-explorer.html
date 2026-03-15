@@ -58,6 +58,7 @@
                 @if (viewMode() === 'list') {
                     <div class="list-header">
                         <div class="col-header">Name</div>
+                        <div class="col-header">Type</div>
                         <div class="col-header">Date Modified</div>
                         <div class="col-header">Size</div>
                         <div class="col-header"></div> <!-- Actions padding -->
@@ -91,11 +92,14 @@
                                 </div>
                                 <span class="file-name" [title]="entry.name">{{ entry.name }}</span>
                             </div>
+                            <div class="col-type">
+                                {{ getDetailedType(entry) }}
+                            </div>
                             <div class="col-date">
                                 {{ entry.lastModified | date:'mediumDate' }}
                             </div>
                             <div class="col-size">
-                                {{ entry.kind === 'file' ? formatBytes(entry.sizeBytes) : '--' }}
+                                {{ entry.kind === 'file' ? formatBytes(entry.sizeBytes) : '' }}
                             </div>
                             <div class="col-actions">
                                 <button class="action-icon" (click)="openContextMenu(entry, $event); $event.stopPropagation();">

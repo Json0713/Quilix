@@ -1,6 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FileExplorerEntry } from '../../../../core/services/file-manager.service';
+import { FileSystemService } from '../../../../core/services/file-system.service';
 
 @Component({
   selector: 'app-details-view',
@@ -14,7 +15,7 @@ import { FileExplorerEntry } from '../../../../core/services/file-manager.servic
         </div>
         <div class="title-group">
           <h4 class="entry-name">{{ entry.name }}</h4>
-          <span class="entry-type">{{ entry.kind === 'directory' ? 'Folder' : 'File' }}</span>
+          <span class="entry-type">{{ getDisplayType() }}</span>
         </div>
       </div>
 
@@ -23,25 +24,23 @@ import { FileExplorerEntry } from '../../../../core/services/file-manager.servic
           <label>Location</label>
           <span class="value">{{ entry.handle?.name || 'Current Space' }}</span>
         </div>
+
+        <div class="detail-item">
+          <label>Type</label>
+          <span class="value">{{ getDetailedType() }}</span>
+        </div>
         
         <div class="detail-item">
           <label>Last Modified</label>
           <span class="value">{{ entry.lastModified ? (entry.lastModified | date:'medium') : 'Unknown' }}</span>
         </div>
 
-        @if (entry.kind === 'file') {
-          <div class="detail-item">
-            <label>Size</label>
-            <span class="value">{{ formatBytes(entry.sizeBytes) }}</span>
-          </div>
-        } @else {
-          <div class="detail-item">
-            <label>Contents</label>
-            <span class="value italic">Direct size restricted by browser</span>
-          </div>
-        }
-
         <div class="detail-item">
+          <label>Size</label>
+          <span class="value">{{ calculatedSize !== null ? formatBytes(calculatedSize) : (entry.kind === 'file' ? formatBytes(entry.sizeBytes) : 'Calculating...') }}</span>
+        </div>
+
+        <div class="detail-item full-width">
           <label>Internal ID</label>
           <span class="value mono">{{ entry.id || 'Native Link' }}</span>
         </div>
@@ -101,6 +100,10 @@ import { FileExplorerEntry } from '../../../../core/services/file-manager.servic
       @media (max-width: 480px) {
         grid-template-columns: 1fr;
       }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
     }
 
     .detail-item {
@@ -132,7 +135,56 @@ import { FileExplorerEntry } from '../../../../core/services/file-manager.servic
   `]
 })
 export class DetailsView {
-  @Input({ required: true }) entry!: FileExplorerEntry;
+  private fileSystem = inject(FileSystemService);
+
+  @Input({ required: true }) set entry(val: FileExplorerEntry) {
+    this._entry = val;
+    this.calculatedSize = null;
+    if (val.kind === 'directory' && val.handle) {
+      this.startSizeCalculation(val.handle as FileSystemDirectoryHandle);
+    }
+  }
+  get entry() { return this._entry; }
+  private _entry!: FileExplorerEntry;
+
+  calculatedSize: number | null = null;
+
+  private async startSizeCalculation(handle: FileSystemDirectoryHandle): Promise<void> {
+    const size = await this.fileSystem.calculateDirectorySize(handle);
+    this.calculatedSize = size;
+  }
+
+  getDisplayType(): string {
+    return this.entry.kind === 'directory' ? 'Folder' : 'File';
+  }
+
+  getDetailedType(): string {
+    if (this.entry.kind === 'directory') return 'File Folder';
+    
+    const name = this.entry.name;
+    const ext = name.split('.').pop()?.toLowerCase();
+    
+    const typeMap: Record<string, string> = {
+      'txt': 'Text Document',
+      'pdf': 'PDF Document',
+      'png': 'PNG Image',
+      'jpg': 'JPEG Image',
+      'jpeg': 'JPEG Image',
+      'gif': 'GIF Image',
+      'svg': 'Scalable Vector Graphics',
+      'json': 'JSON Configuration',
+      'ts': 'TypeScript Source',
+      'js': 'JavaScript Source',
+      'html': 'HTML Document',
+      'css': 'CSS Stylesheet',
+      'scss': 'Sass Stylesheet',
+      'md': 'Markdown Documentation',
+      'zip': 'Compressed Archive',
+      'exe': 'Windows Executable',
+    };
+
+    return (ext && typeMap[ext]) || (ext ? `${ext.toUpperCase()} File` : 'File');
+  }
 
   formatBytes(bytes: number | undefined): string {
     if (bytes === undefined || bytes === null || Number.isNaN(bytes)) return '--';

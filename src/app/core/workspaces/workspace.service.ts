@@ -225,7 +225,8 @@ export class WorkspaceService {
             // Phase 1: Identify existing workspaces by ID or Name (Heuristic)
             for (const handle of folders) {
                 const diskName = handle.name;
-                let folderId = await this.fileSystem.readDirectoryId(handle);
+                const res = await this.fileSystem.readDirectoryId(handle);
+                let folderId = res?.id || null;
 
                 // HEURISTIC: If folder has no ID, check if it matches an existing missing workspace by name
                 if (!folderId) {

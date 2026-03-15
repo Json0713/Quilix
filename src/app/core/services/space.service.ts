@@ -359,7 +359,8 @@ export class SpaceService {
             for (const handle of folders) {
                 const diskName = handle.name;
                 const diskNameLower = diskName.toLowerCase();
-                let spaceId = await this.fileSystem.readDirectoryId(handle);
+                const res = await this.fileSystem.readDirectoryId(handle);
+                let spaceId = res?.id || null;
 
                 // HEURISTIC: If folder has no ID, check if it matches an existing missing space by name
                 if (!spaceId) {

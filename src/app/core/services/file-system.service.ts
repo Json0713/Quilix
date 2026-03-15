@@ -237,9 +237,9 @@ export class FileSystemService {
             await writable.close();
 
             // VERIFICATION: Read it back to ensure it was written correctly
-            const verifiedId = await this.readDirectoryId(dirHandle);
-            if (verifiedId !== id) {
-                console.error(`[FileSystem] ID verification failed for ${dirHandle.name}. Expected ${id}, got ${verifiedId}`);
+            const res = await this.readDirectoryId(dirHandle);
+            if (!res || res.id !== id) {
+                console.error(`[FileSystem] ID verification failed for ${dirHandle.name}. Expected ${id}, got ${res?.id}`);
                 return false;
             }
 
@@ -251,13 +251,14 @@ export class FileSystemService {
     }
 
     /**
-     * Read the permanent ID marker from a directory.
+     * Read the permanent ID marker from a directory and its metadata.
      */
-    async readDirectoryId(dirHandle: FileSystemDirectoryHandle): Promise<string | null> {
+    async readDirectoryId(dirHandle: FileSystemDirectoryHandle): Promise<{ id: string; lastModified: number } | null> {
         try {
             const fileHandle = await dirHandle.getFileHandle(this.ID_FILENAME, { create: false });
             const file = await fileHandle.getFile();
-            return (await file.text()).trim();
+            const id = (await file.text()).trim();
+            return { id, lastModified: file.lastModified };
         } catch (err: any) {
             if (err.name !== 'NotFoundError') {
                 console.warn(`[FileSystem] Could not read ID from ${dirHandle.name}:`, err);
@@ -508,8 +509,8 @@ export class FileSystemService {
         try {
             for await (const entry of (parentHandle as any).values()) {
                 if (entry.kind === 'directory') {
-                    const id = await this.readDirectoryId(entry as FileSystemDirectoryHandle);
-                    if (id === targetId) return entry as FileSystemDirectoryHandle;
+                    const res = await this.readDirectoryId(entry as FileSystemDirectoryHandle);
+                    if (res?.id === targetId) return entry as FileSystemDirectoryHandle;
                 }
             }
         } catch (err) {

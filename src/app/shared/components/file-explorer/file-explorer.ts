@@ -540,6 +540,34 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       }
   }
 
+  getDetailedType(entry: FileExplorerEntry): string {
+    if (entry.kind === 'directory') return 'File folder';
+    
+    const name = entry.name;
+    const ext = name.split('.').pop()?.toLowerCase();
+    
+    const typeMap: Record<string, string> = {
+      'txt': 'Text Document',
+      'pdf': 'PDF Document',
+      'png': 'PNG Image',
+      'jpg': 'JPEG Image',
+      'jpeg': 'JPEG Image',
+      'gif': 'GIF Image',
+      'svg': 'Scalable Vector Graphics',
+      'json': 'JSON Configuration',
+      'ts': 'TypeScript Source',
+      'js': 'JavaScript Source',
+      'html': 'HTML Document',
+      'css': 'CSS Stylesheet',
+      'scss': 'Sass Stylesheet',
+      'md': 'Markdown Documentation',
+      'zip': 'Compressed Archive',
+      'exe': 'Windows Executable',
+    };
+
+    return (ext && typeMap[ext]) || (ext ? `${ext.toUpperCase()} File` : 'File');
+  }
+
   formatBytes(bytes: number | undefined): string {
     if (bytes === undefined || bytes === null || Number.isNaN(bytes)) return '--';
     if (bytes === 0) return '0 B';
