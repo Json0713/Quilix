@@ -436,22 +436,30 @@
 
     .conn-path {
         fill: none;
-        stroke: rgba(255, 255, 255, 0.05);
-        stroke-width: 1;
+        stroke: rgba(99, 102, 241, 0.2);
+        stroke-width: 1.5;
+        stroke-dasharray: 6 10;
+        animation: activeFlow 20s linear infinite;
+        filter: drop-shadow(0 0 2px rgba(99, 102, 241, 0.15));
         
         html.light-theme & {
-            stroke: rgba(0, 0, 0, 0.05);
+            stroke: rgba(0, 0, 0, 0.08);
+            filter: none;
         }
     }
 
     .data-packet {
         fill: #6366f1;
-        filter: blur(1px) drop-shadow(0 0 5px #6366f1);
-        opacity: 0.8;
+        filter: blur(1.5px) drop-shadow(0 0 8px #6366f1);
+        opacity: 0.9;
         
-        &.p2 { fill: #8b5cf6; filter: blur(1px) drop-shadow(0 0 5px #8b5cf6); }
-        &.p4 { fill: #10b981; filter: blur(1px) drop-shadow(0 0 5px #10b981); }
+        &.p2 { fill: #8b5cf6; filter: blur(1.5px) drop-shadow(0 0 8px #8b5cf6); }
+        &.p4 { fill: #10b981; filter: blur(1.5px) drop-shadow(0 0 8px #10b981); }
     }
+}
+
+@keyframes activeFlow {
+    to { stroke-dashoffset: -500; }
 }
 
 /* HISTORY AREA (File history track) */
