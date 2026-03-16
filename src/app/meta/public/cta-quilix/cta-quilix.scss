@@ -55,10 +55,10 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: rgba(var(--primary-rgb, 26, 58, 63), 0.515);
+    background: rgba(61, 216, 185, 0.185);
     /* Sleek primary base */
-    color: rgba(12, 181, 147, 0.811);
-    border: 1px solid rgba(var(--primary-rgb, 26, 58, 63), 0.815);
+    color: rgba(18, 95, 80, 0.759);
+    border: 1px solid rgba(61, 216, 185, 0.393);
 }
 
 .cq-title {
@@ -192,7 +192,7 @@
 /* SYSTEM HEADER (Terminal Style) */
 .system-header {
     height: 44px;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.832);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
@@ -365,13 +365,13 @@
     position: absolute;
     width: 40px;
     height: 40px;
-    background: rgba(var(--surface-rgb, 20, 20, 20), 0.4);
+    background: rgba(var(--surface-rgb, 20, 20, 20), 0.215);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-muted);
+    color: var(--text-white);
     z-index: 4;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     backdrop-filter: blur(4px);
@@ -595,11 +595,11 @@
 
 /* TERMINAL OVERLAY */
 .terminal-overlay {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.689);
     padding: 0.75rem 1.25rem;
     font-family: 'JetBrains Mono', 'Courier New', monospace;
     font-size: 0.7rem;
-    color: #10b981;
+    color: var(--action);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 
     .term-line {
@@ -611,7 +611,7 @@
         &:nth-child(2) { animation-delay: 2s; }
         &:nth-child(3) { 
             animation-delay: 3s;
-            color: var(--text-main);
+            color: var(--text-white);
         }
     }
 
@@ -655,7 +655,7 @@
             border-radius: 12px;
             font-family: monospace;
             font-weight: 700;
-            color: #6366f1;
+            color: var(--text-white);
             font-size: 1.1rem;
             transform: rotate(-10deg);
         }
