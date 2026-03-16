@@ -227,9 +227,14 @@
 .visual-grid {
     flex: 1;
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
-    padding: 1.5rem;
+    padding: 1rem;
+
+    @media (min-width: 768px) {
+        grid-template-columns: 1.2fr 0.8fr;
+        padding: 1.5rem;
+    }
 }
 
 /* GRAPH AREA (Core & Modules) */
@@ -464,10 +469,15 @@
 
 /* HISTORY AREA (File history track) */
 .history-area {
+    display: none;
     background: rgba(0, 0, 0, 0.1);
     border-radius: 16px;
     padding: 1.25rem;
     border: 1px solid rgba(255, 255, 255, 0.03);
+
+    @media (min-width: 768px) {
+        display: block;
+    }
 }
 
 .history-track {
