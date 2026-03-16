@@ -1,53 +1,94 @@
 <section class="cta-quilix-section" aria-label="Quilix Local App Introduction">
     <div class="cta-quilix-grid">
 
-        <!-- Left: Visual Mockup (Kanban/Offline) -->
+        <!-- Left: Visual Mockup (Framework/System Control) -->
         <div class="quilix-visual" aria-hidden="true" data-scroll="fade-up">
-            <div class="glass-board">
+            <div class="framework-container">
+                
+                <!-- System Header (Terminal Style) -->
+                <div class="system-header">
+                    <div class="header-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <div class="system-path">~/quilix/core/version-control</div>
+                </div>
 
-                <!-- Board Header -->
-                <div class="board-header">
-                    <div class="board-title"><i class="bi bi-hdd-fill"></i> Local Storage</div>
-                    <div class="board-actions">
-                        <span class="offline-badge"><i class="bi bi-hdd-network"></i> File System Version Control</span>
+                <div class="visual-grid">
+                    <!-- Framework Core Graph -->
+                    <div class="graph-area">
+                        <div class="core-node">
+                            <i class="bi bi-cpu-fill"></i>
+                            <div class="node-label">Quilix Core</div>
+                        </div>
+                        <div class="nodes-wrapper">
+                            <div class="module-node m1">
+                                <i class="bi bi-hdd-network"></i>
+                                <div class="node-pulse"></div>
+                            </div>
+                            <div class="module-node m2">
+                                <i class="bi bi-shield-lock"></i>
+                                <div class="node-pulse"></div>
+                            </div>
+                            <div class="module-node m3">
+                                <i class="bi bi-diagram-3"></i>
+                                <div class="node-pulse"></div>
+                            </div>
+                            <div class="module-node m4">
+                                <i class="bi bi-terminal"></i>
+                                <div class="node-pulse"></div>
+                            </div>
+                        </div>
+                        <!-- Connecting Lines (Stylized via CSS) -->
+                        <div class="svg-connections">
+                            <svg viewBox="0 0 400 300">
+                                <path d="M200,150 L100,80" class="conn-path" />
+                                <path d="M200,150 L300,80" class="conn-path" />
+                                <path d="M200,150 L100,220" class="conn-path" />
+                                <path d="M200,150 L300,220" class="conn-path" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- File System Control / History -->
+                    <div class="history-area">
+                        <div class="history-track">
+                            <div class="commit-item">
+                                <div class="commit-dot main"></div>
+                                <div class="commit-info">
+                                    <div class="commit-title">Initial Core Init</div>
+                                    <div class="commit-meta">v1.2.0 • 2m ago</div>
+                                </div>
+                            </div>
+                            <div class="commit-item active">
+                                <div class="commit-dot pulse"></div>
+                                <div class="commit-info">
+                                    <div class="commit-title">System Sync...</div>
+                                    <div class="commit-meta">Processing</div>
+                                </div>
+                            </div>
+                            <div class="commit-item">
+                                <div class="commit-dot"></div>
+                                <div class="commit-info">
+                                    <div class="commit-line"></div>
+                                    <div class="commit-line short"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Board Body (Columns) -->
-                <div class="board-body">
-                    <!-- Column 1 -->
-                    <div class="board-col">
-                        <div class="col-head">To Do</div>
-                        <div class="task-card card-1">
-                            <div class="skel-line"></div>
-                            <div class="skel-line short"></div>
-                        </div>
-                        <div class="task-card card-2">
-                            <div class="skel-line"></div>
-                        </div>
-                    </div>
-
-                    <!-- Column 2 -->
-                    <div class="board-col">
-                        <div class="col-head">In Progress</div>
-                        <div class="task-card card-3 active">
-                            <div class="skel-line"></div>
-                            <div class="skel-line short"></div>
-                            <div class="skel-badge"></div>
-                        </div>
-                    </div>
-
-                    <!-- Column 3 -->
-                    <div class="board-col">
-                        <div class="col-head">Done</div>
-                        <div class="task-card card-4 done"><i class="bi bi-check-circle-fill"></i></div>
-                    </div>
+                <!-- Terminal Overlay (Bottom) -->
+                <div class="terminal-overlay">
+                    <div class="term-line">> Initializing framework engine...</div>
+                    <div class="term-line">> Version control system: ACTIVE</div>
+                    <div class="term-line typing">> Syncing local file nodes... <span class="cursor">_</span></div>
                 </div>
             </div>
 
             <!-- Decorative Ornaments -->
             <div class="cq-ornament orb left"></div>
-            <div class="cq-ornament float doc-icon"><i class="bi bi-journal-text"></i></div>
+            <div class="cq-ornament float code-tag">&lt;/&gt;</div>
+            <div class="cq-ornament float gear-icon"><i class="bi bi-gear-wide-connected"></i></div>
         </div>
 
         <!-- Right: Content Story -->
@@ -56,10 +97,10 @@
                 <span class="cq-badge">Quilix Framework</span>
             </div>
 
-            <h2 class="cq-title">Quilix Workspace. <br><span>Start your Local Workspace</span></h2>
+            <h2 class="cq-title">Quilix Core. <br><span>Architect Your Local System</span></h2>
             <p class="cq-description">
-                Experience the power of Quilix directly on your device. Manage kanban boards, write detailed notes, and
-                organize your life with complete offline capabilities. No cloud required.
+                Unlock high-performance local development with the Quilix Framework. Take full control of your system files, 
+                manage versioned workspaces, and build secure, offline-first environments with enterprise-grade stability.
             </p>
 
             <ul class="cq-features">
