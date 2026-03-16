@@ -55,16 +55,10 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: rgba(var(--primary-rgb, 26, 58, 63), 0.15);
+    background: rgba(var(--primary-rgb, 26, 58, 63), 0.515);
     /* Sleek primary base */
-    color: var(--primary);
-    border: 1px solid rgba(var(--primary-rgb, 26, 58, 63), 0.3);
-
-    html.dark-theme & {
-        background: rgba(var(--accent-rgb, 79, 163, 168), 0.15);
-        color: var(--accent);
-        border-color: rgba(var(--accent-rgb, 79, 163, 168), 0.3);
-    }
+    color: rgba(12, 181, 147, 0.811);
+    border: 1px solid rgba(var(--primary-rgb, 26, 58, 63), 0.815);
 }
 
 .cq-title {
