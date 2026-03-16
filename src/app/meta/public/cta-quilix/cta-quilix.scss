@@ -55,10 +55,10 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: rgba(61, 216, 185, 0.185);
+    background: rgba(59, 238, 202, 0.16);
     /* Sleek primary base */
-    color: rgba(18, 95, 80, 0.759);
-    border: 1px solid rgba(61, 216, 185, 0.393);
+    color: rgba(11, 156, 127, 0.936);
+    border: 1px solid rgba(61, 216, 185, 0.418);
 }
 
 .cq-title {
@@ -349,7 +349,7 @@
         text-transform: uppercase;
         margin-top: 2px;
         letter-spacing: 0.1em;
-        color: var(--text-muted);
+        color: #8059d4;
     }
 }
 
@@ -574,7 +574,7 @@
         }
         .commit-meta {
             font-size: 0.65rem;
-            color: var(--text-muted);
+            color: var(--text-alt);
         }
 
         .commit-line {
