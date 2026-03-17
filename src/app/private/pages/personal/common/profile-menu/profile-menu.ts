@@ -1,6 +1,7 @@
 import { Component, HostListener, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../../core/auth/auth.service';
+import { SidebarService } from '../../../../../core/sidebar/sidebar.service';
 
 @Component({
   selector: 'app-personal-profile-menu',
@@ -11,6 +12,7 @@ import { AuthService } from '../../../../../core/auth/auth.service';
 })
 export class PersonalProfileMenuComponent {
   private authService = inject(AuthService);
+  private sidebarService = inject(SidebarService);
   
   isOpen = signal<boolean>(false);
 
@@ -28,6 +30,7 @@ export class PersonalProfileMenuComponent {
 
   async logout() {
     this.isOpen.set(false);
+    this.sidebarService.closeMobile();
     await this.authService.logout();
   }
 }

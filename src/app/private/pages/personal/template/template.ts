@@ -85,6 +85,7 @@ export class PersonalTemplate implements OnDestroy {
 
   ngOnDestroy(): void {
     this.authSub?.unsubscribe();
+    this.sidebarService.closeMobile();
   }
 
   private async loadWorkspaceTabs(): Promise<void> {
