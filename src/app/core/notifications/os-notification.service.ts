@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { filter } from 'rxjs/operators';
 
@@ -20,6 +20,10 @@ export class OsNotificationService {
   private readonly defaultIcon = '/assets/icons/web-app-manifest-192x192.png';
   private readonly defaultBadge = '/assets/icons/notification-icon.png';
 
+  readonly permission = signal<NotificationPermission>(
+    'Notification' in window ? Notification.permission : 'denied'
+  );
+
   constructor(private swUpdate: SwUpdate) {
     this.checkForUpdates();
   }
@@ -36,6 +40,21 @@ export class OsNotificationService {
           requireInteraction: true,
         });
       });
+  }
+
+  async requestPermissionAndTest(context: 'Personal' | 'Team' = 'Personal'): Promise<void> {
+    if (!('Notification' in window)) return;
+
+    const permission = await Notification.requestPermission();
+    this.permission.set(permission);
+
+    if (permission === 'granted') {
+      this.notify({
+        title: 'Notifications Enabled',
+        body: `You will now receive updates from Quilix${context === 'Team' ? ' (Team)' : ''}.`,
+        tag: `notif-enabled-${context.toLowerCase()}`,
+      });
+    }
   }
 
   async notify(options: OsNotificationOptions): Promise<void> {

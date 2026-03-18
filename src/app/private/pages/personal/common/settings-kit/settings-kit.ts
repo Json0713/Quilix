@@ -15,7 +15,7 @@ import { TabService } from '../../../../../core/services/tab.service';
 export class SettingsKitComponent {
   private sidebarService = inject(SidebarService);
   private themeService = inject(AppThemeService);
-  private osNotify = inject(OsNotificationService);
+  protected osNotify = inject(OsNotificationService);
   private tabService = inject(TabService);
 
   isCollapsed = this.sidebarService.isCollapsed;
@@ -23,10 +23,6 @@ export class SettingsKitComponent {
 
   private readonly TOOLS_KEY = 'quilix_show_quick_tools';
   showTools = signal(localStorage.getItem(this.TOOLS_KEY) === 'true');
-
-  notificationPermission = signal<NotificationPermission>(
-    'Notification' in window ? Notification.permission : 'denied'
-  );
 
   handleSettingsClick(event: Event) {
     this.tabService.updateActiveTabRoute('./settings', 'Settings', 'bi bi-gear');
@@ -51,20 +47,5 @@ export class SettingsKitComponent {
 
   setTheme(mode: 'light' | 'dark' | 'system') {
     this.themeService.apply(mode);
-  }
-
-  async enableNotifications() {
-    if (!('Notification' in window)) return;
-
-    const permission = await Notification.requestPermission();
-    this.notificationPermission.set(permission);
-
-    if (permission === 'granted') {
-      this.osNotify.notify({
-        title: 'Notifications Enabled',
-        body: 'You will now receive updates from Quilix.',
-        tag: 'notif-enabled',
-      });
-    }
   }
 }

@@ -3,3 +3,7 @@
 -- git reset --hard f97deaeac74c0044f23c178804a97a56d389fb87
 -- git push origin main --force
 
+
+## Testing Environment
+npm run build
+npx http-server -p 8080 dist/Quilix/browser

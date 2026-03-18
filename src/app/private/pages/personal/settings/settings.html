@@ -61,12 +61,12 @@
                 <div class="notification-status">
                     <div class="status-info">
                         <span class="label">System Notifications</span>
-                        <span class="value" [class.granted]="notificationPermission() === 'granted'">
-                            {{ notificationPermission() === 'granted' ? 'Enabled' : 'Disabled' }}
+                        <span class="value" [class.granted]="osNotify.permission() === 'granted'">
+                            {{ osNotify.permission() === 'granted' ? 'Enabled' : 'Disabled' }}
                         </span>
                     </div>
-                    @if (notificationPermission() !== 'granted') {
-                    <button class="btn-primary" (click)="enableNotifications()">
+                    @if (osNotify.permission() !== 'granted') {
+                    <button class="btn-primary" (click)="osNotify.requestPermissionAndTest('Personal')">
                         Enable Notifications
                     </button>
                     }
