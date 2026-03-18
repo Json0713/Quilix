@@ -32,6 +32,17 @@ export class QuilixUpdateService implements OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(() => this.handleVersionReady());
+
+    // FAIL-SAFE: Handle "Clear Site Data" or Cache Desyncs
+    this.swUpdate.unrecoverable
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((event) => {
+        console.error('[SW] Unrecoverable state detected (Cache likely deleted manually):', event.reason);
+        // The service worker cache is completely broken. 
+        // Force a hard reload from the server to bypass the broken SW and instantly restore the app.
+        window.location.reload();
+      });
+
   }
 
   private handleVersionReady(): void {
