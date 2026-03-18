@@ -51,7 +51,8 @@ export class RecentWorkspacesComponent implements OnInit, OnDestroy {
 
         setTimeout(async () => {
             await this.auth.loginExisting(workspace);
-            localStorage.setItem('justLoggedIn', 'true');
+            localStorage.setItem('quilix_entry_type', 'return');
+            localStorage.setItem('quilix_entry_name', workspace.name);
             this.router.navigate([workspace.role === 'personal' ? '/personal' : '/team']);
             this.loadingWorkspaceId = null;
         }, 1500);

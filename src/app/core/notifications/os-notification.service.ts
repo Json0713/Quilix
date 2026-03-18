@@ -97,5 +97,35 @@ export class OsNotificationService {
     }
     return true;
   }
-  
+
+  showWorkspaceWelcomeIfNeeded(): void {
+    const entryType = localStorage.getItem('quilix_entry_type');
+    const entryName = localStorage.getItem('quilix_entry_name');
+
+    if (entryType && entryName) {
+      if (Notification.permission === 'granted') {
+        const isNew = entryType === 'new';
+        
+        const title = isNew 
+          ? `Workspace ${entryName} Successfully Created!`
+          : `Workspace ${entryName} is ready!`;
+          
+        const body = isNew
+          ? `You can now manage your own Workspaces and Spaces!`
+          : `Welcome Back!`;
+
+        setTimeout(() => {
+          this.notify({
+            title,
+            body,
+            tag: 'workspace-welcome',
+          });
+        }, 800);
+      }
+
+      localStorage.removeItem('quilix_entry_type');
+      localStorage.removeItem('quilix_entry_name');
+    }
+
+  }
 }

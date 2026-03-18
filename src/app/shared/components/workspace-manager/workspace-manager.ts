@@ -427,7 +427,8 @@ export class WorkspaceManagerComponent implements OnInit {
         try {
             this.snackbarService.info(`Switching to "${workspace.name}"...`);
             await this.authService.loginExisting(workspace);
-            localStorage.setItem('justLoggedIn', 'true');
+            localStorage.setItem('quilix_entry_type', 'return');
+            localStorage.setItem('quilix_entry_name', workspace.name);
             this.router.navigate([workspace.role === 'personal' ? '/personal' : '/team']);
         } catch (error) {
             console.error(`Failed to switch workspace: ${workspace.name}`, error);

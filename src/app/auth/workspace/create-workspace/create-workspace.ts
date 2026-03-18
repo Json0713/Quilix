@@ -52,7 +52,8 @@ export class CreateWorkspaceComponent {
 
         // UX Delay for "Preparing Workspace" feel
         setTimeout(() => {
-            localStorage.setItem('justLoggedIn', 'true');
+            localStorage.setItem('quilix_entry_type', 'new');
+            localStorage.setItem('quilix_entry_name', this.name);
             this.router.navigate([result.workspace!.role === 'personal' ? '/personal' : '/team']);
             this.isSubmitting = false;
         }, 1800);
