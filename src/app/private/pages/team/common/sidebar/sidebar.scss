@@ -5,7 +5,7 @@
     width: 260px;
     background-color: var(--surface-main);
     color: var(--text-main);
-    border-right: none;
+    border-right: 1px solid var(--border);
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
         transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
