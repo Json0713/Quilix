@@ -322,10 +322,25 @@ export class FileSystemService {
 
             await this.copyDirectoryContents(oldHandle, newHandle);
 
-            // Delete old
-            await (parentHandle as any).removeEntry(oldName, { recursive: true });
-            console.log(`[FileSystem] Fallback rename complete.`);
-            return true;
+            // 3. Delete old (Safely)
+            try {
+                await (parentHandle as any).removeEntry(oldName, { recursive: true });
+                console.log(`[FileSystem] Fallback rename complete.`);
+                return true;
+            } catch (deleteOldErr) {
+                console.warn(`[FileSystem] Fallback rename failed to delete original "${oldName}". Rolling back duplicate "${newName}"...`, deleteOldErr);
+                
+                // SAFETY NET: If we can't delete the old folder (e.g., file lock by OS), 
+                // we must rollback the newly created copy so it doesn't linger as a ghost.
+                try {
+                    await (parentHandle as any).removeEntry(newName, { recursive: true });
+                    console.log(`[FileSystem] Rollback successful. Ghost folder "${newName}" removed.`);
+                } catch (rollbackErr) {
+                    console.error(`[FileSystem] CRITICAL: Rollback failed! Ghost folder "${newName}" may now exist alongside "${oldName}".`, rollbackErr);
+                }
+                
+                return false; // Crucial: tell parent components the rename failed so they don't update IndexedDB state
+            }
         } catch (err) {
             console.error(`[FileSystem] Failed to rename folder from ${oldName} to ${newName}:`, err);
             return false;
