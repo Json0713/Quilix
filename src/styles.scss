@@ -152,13 +152,13 @@ body {
 /* ============================================================
    Global Custom Scrollbar
    ============================================================ */
-/* Using modern scrollbar-color keeps the default OS styling 
-   (like the up/down arrows) while customizing the colors to fit the theme. */
 html {
-  /* Thumb is a stronger color (text-muted), Track matches the background (--bg) */
-  scrollbar-color: var(--action);
+  scrollbar-color: #acacac var(--surface);
   scrollbar-width: thin;
-  /* slightly thinner for a modern, clean look */
+}
+
+html.dark-theme {
+  scrollbar-color: #6b6b6b var(--surface-main);
 }
 
 /* ============================================================
