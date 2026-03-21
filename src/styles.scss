@@ -56,7 +56,6 @@
   --theme-transition: 300ms;
 }
 
-
 /* =====================================================
    DARK THEME OVERRIDES
    ===================================================== */
@@ -150,78 +149,16 @@ body {
   }
 }
 
-/* =============== OVERLAY SCROLLBAR =============== */
-/* Firefox */
-html,
-body,
-* {
-
-  /* Custom Scrollbar */
-  .main::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .main::-webkit-scrollbar-thumb {
-    background-color: rgba(22, 81, 93, 0.834);
-    border-radius: 3px;
-  }
-}
-
-/* WebKit (Chrome, Edge, Safari) */
-html::-webkit-scrollbar,
-body::-webkit-scrollbar,
-*::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-/* Back of Scrollbar */
-html::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track,
-*::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.351);
-}
-
-/* Scrollbar */
-html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb,
-*::-webkit-scrollbar-thumb {
-  background-color: rgba(12, 117, 138, 0.568);
-  border-radius: 999px;
-}
-
-/* Hover (still subtle) */
-html::-webkit-scrollbar-thumb:hover,
-body::-webkit-scrollbar-thumb:hover,
-*::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(12, 117, 138);
-}
-
-/* Custom Scrollbar */
-.main::-webkit-scrollbar {
-  width: 6px;
-}
-
-.main::-webkit-scrollbar-thumb {
-  background-color: rgba(9, 91, 108, 0.834);
-  border-radius: 3px;
-}
-
-/* Mobile / small screens */
-@media (max-width: 768px) {
-
-  html::-webkit-scrollbar,
-  body::-webkit-scrollbar,
-  *::-webkit-scrollbar {
-    width: 2px;
-    height: 2px;
-  }
-
-  html::-webkit-scrollbar-thumb,
-  body::-webkit-scrollbar-thumb,
-  *::-webkit-scrollbar-thumb {
-    background-color: rgba(9, 91, 108, 0.834);
-  }
+/* ============================================================
+   Global Custom Scrollbar
+   ============================================================ */
+/* Using modern scrollbar-color keeps the default OS styling 
+   (like the up/down arrows) while customizing the colors to fit the theme. */
+html {
+  /* Thumb is a stronger color (text-muted), Track matches the background (--bg) */
+  scrollbar-color: var(--action);
+  scrollbar-width: thin;
+  /* slightly thinner for a modern, clean look */
 }
 
 /* ============================================================
