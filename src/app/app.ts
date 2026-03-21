@@ -14,7 +14,7 @@ import { Toast } from './shared/ui/common/toast/toast';
 
 import { GlobalSyncService } from './core/sync/global-sync.service';
 import { Tooltip } from './shared/ui/common/tooltip/tooltip';
-import { TooltipManagerService } from './core/services/tooltip-manager.service';
+import { TooltipService } from './services/ui/common/tooltip/tooltip.service';
 import { FileSystemService } from './core/services/file-system.service';
 import { SystemSyncService } from './core/services/system-sync.service';
 import { PwaNavigationService } from './core/services/pwa-navigation.service';
@@ -36,7 +36,7 @@ export class App {
   private updates = inject(QuilixUpdateService);
   private theme = inject(AppThemeService);
   private sync: GlobalSyncService = inject(GlobalSyncService);
-  private tooltipManager = inject(TooltipManagerService);
+  private tooltipManager = inject(TooltipService);
   private fileSystem = inject(FileSystemService);
   private systemSync = inject(SystemSyncService);
   private pwaNav = inject(PwaNavigationService);
