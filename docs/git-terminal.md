@@ -7,3 +7,5 @@
 ## Testing Environment
 npm run build
 npx http-server -p 8080 dist/Quilix/browser
+
+# Running Test Files...
