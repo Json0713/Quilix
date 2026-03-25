@@ -85,20 +85,6 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-
-    .suggestions-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 4px;
-
-        .track-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 0;
-            padding-left: 4px;
-        }
-    }
 }
 
 .suggestions-grid {
@@ -426,7 +412,7 @@
         }
     }
 
-    .workspace-suggestions-section .suggestions-header .track-title {
+    .workspace-suggestions-section .track-title {
         font-size: 1.1rem;
         padding-left: 0;
     }
