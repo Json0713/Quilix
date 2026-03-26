@@ -2,14 +2,14 @@
     <app-breadcrumb></app-breadcrumb>
 
     <!-- Metrics Grid -->
-    <app-workspace-metrics [totalWorkspaces]="totalWorkspaces" [syncedFolders]="syncedFolders"
+    <!-- <app-workspace-metrics [totalWorkspaces]="totalWorkspaces" [syncedFolders]="syncedFolders"
         [missingFolders]="missingFolders" [totalSpaces]="totalSpaces()" [isFileSystemMode]="isFileSystemMode()">
-    </app-workspace-metrics>
+    </app-workspace-metrics> -->
 
     <!-- Storage Health Banner -->
-    <app-storage-health-banner [isFileSystemMode]="isFileSystemMode()" [needsReauth]="needsReauth()"
+    <!-- <app-storage-health-banner [isFileSystemMode]="isFileSystemMode()" [needsReauth]="needsReauth()"
         [missingCount]="missingFolders" [isReauthing]="isReauthing()" (reconnectStorage)="reconnectStorage()">
-    </app-storage-health-banner>
+    </app-storage-health-banner> -->
 
     <!-- Recent Section -->
     @if (suggestionWorkspaces().length > 0) {

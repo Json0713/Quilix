@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
     templateUrl: './storage-health-banner.html',
     styleUrls: ['./storage-health-banner.scss']
 })
-export class StorageHealthBannerComponent {
+export class StorageHealthBanner {
     @Input() isFileSystemMode = false;
     @Input() needsReauth = false;
     @Input() isReauthing = false;

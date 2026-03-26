@@ -6,7 +6,7 @@ import { Component, Input } from '@angular/core';
     templateUrl: './workspace-metrics.html',
     styleUrls: ['./workspace-metrics.scss']
 })
-export class WorkspaceMetricsComponent {
+export class WorkspaceMetrics {
     @Input({ required: true }) totalWorkspaces!: number;
     @Input({ required: true }) syncedFolders!: number;
     @Input({ required: true }) missingFolders!: number;

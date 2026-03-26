@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 import { Workspace } from '../../../core/interfaces/workspace';
-import { Space } from '../../../core/interfaces/space';
 import { WorkspaceService } from '../../../core/workspaces/workspace.service';
 import { FileSystemService } from '../../../core/services/file-system.service';
 import { SpaceService } from '../../../core/services/space.service';
@@ -12,9 +11,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { Breadcrumb } from '../../ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { FileSyncService } from '../../../core/services/file-sync.service';
-import { WorkspaceMetricsComponent } from './workspace-metrics/workspace-metrics';
 import { WorkspaceCardComponent } from './workspace-card/workspace-card';
-import { StorageHealthBannerComponent } from '../storage-health-banner/storage-health-banner';
 import { SnackbarService } from '../../../services/ui/common/snackbar/snackbar.service';
 import { ModalService } from '../../../services/ui/common/modal/modal';
 
@@ -28,7 +25,7 @@ export interface ManagedWorkspace extends Workspace {
 @Component({
     selector: 'app-workspace-manager',
     standalone: true,
-    imports: [CommonModule, DragDropModule, Breadcrumb, WorkspaceMetricsComponent, WorkspaceCardComponent, StorageHealthBannerComponent],
+    imports: [CommonModule, DragDropModule, Breadcrumb, WorkspaceCardComponent],
     templateUrl: './workspace-manager.html',
     styleUrl: './workspace-manager.scss',
 })
