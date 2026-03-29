@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, ElementRef, inject, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ManagedWorkspace } from '../workspace-manager';
@@ -10,15 +10,17 @@ import { ManagedWorkspace } from '../workspace-manager';
     templateUrl: './workspace-card.html',
     styleUrls: ['./workspace-card.scss']
 })
-export class WorkspaceCardComponent {
+export class WorkspaceCardComponent implements OnChanges {
     @Input({ required: true }) workspace!: ManagedWorkspace;
     @Input() isCurrentWorkspace = false;
     @Input() isFileSystemMode = false;
     @Input() isSelectionMode = false;
     @Input() isSelected = false;
     @Input() isMenuOpen = false;
-    @Input() isLast = false;
     @Input() viewMode: 'list' | 'card' = 'list';
+
+    private el = inject(ElementRef);
+    isDropdownUp = false;
 
     @Output() restoreWorkspace = new EventEmitter<ManagedWorkspace>();
     @Output() trashWorkspace = new EventEmitter<ManagedWorkspace>();
@@ -26,6 +28,20 @@ export class WorkspaceCardComponent {
     @Output() toggleSelect = new EventEmitter<string>();
     @Output() renameWorkspace = new EventEmitter<ManagedWorkspace>();
     @Output() toggleMenu = new EventEmitter<Event>();
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['isMenuOpen'] && changes['isMenuOpen'].currentValue) {
+            // Coordinate check must run purely SYNCHRONOUSLY before the dropdown DOM visually mounts!
+            const triggerEl = this.el.nativeElement.querySelector('.menu-trigger');
+            if (triggerEl) {
+                const rect = triggerEl.getBoundingClientRect();
+                this.isDropdownUp = (window.innerHeight - rect.bottom) < 220;
+            }
+        } else if (changes['isMenuOpen'] && !changes['isMenuOpen'].currentValue) {
+            // reset state when closed so it cleanly mounts fresh next time
+            this.isDropdownUp = false;
+        }
+    }
 
     formatBytes(bytes: number | undefined): string {
         if (bytes === undefined || bytes === null || Number.isNaN(bytes)) return '--';

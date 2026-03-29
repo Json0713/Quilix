@@ -73,7 +73,7 @@
             </button>
 
             @if (isMenuOpen) {
-            <div class="workspace-dropdown" [class.dropdown-up]="isLast">
+            <div class="workspace-dropdown" [class.dropdown-up]="isDropdownUp">
                 @if (!isCurrentWorkspace && !workspace.isMissingOnDisk) {
                 <button class="dropdown-item switch-item" (click)="switchWorkspace.emit(workspace)">
                     <i class="bi bi-box-arrow-in-right"></i>

@@ -18,12 +18,9 @@
             @for (ws of suggestionWorkspaces(); track ws.id) {
             <app-workspace-card [workspace]="ws" [isCurrentWorkspace]="ws.id === currentWorkspaceId()"
                 [isFileSystemMode]="isFileSystemMode()" [isMenuOpen]="openMenuId() === 'suggestion-' + ws.id"
-                [viewMode]="'card'" 
-                (restoreWorkspace)="restoreWorkspace($event)"
-                (trashWorkspace)="trashWorkspace($event)" 
-                (switchWorkspace)="switchToWorkspace($event)"
-                (renameWorkspace)="renameWorkspace($event)" 
-                (toggleMenu)="toggleMenu('suggestion-' + ws.id, $event)">
+                [viewMode]="'card'" (restoreWorkspace)="restoreWorkspace($event)"
+                (trashWorkspace)="trashWorkspace($event)" (switchWorkspace)="switchToWorkspace($event)"
+                (renameWorkspace)="renameWorkspace($event)" (toggleMenu)="toggleMenu('suggestion-' + ws.id, $event)">
             </app-workspace-card>
             }
         </div>
@@ -135,14 +132,13 @@
                 <div class="col-size">File Size</div>
                 <div class="col-status">Status</div>
             </div>
-            @for (ws of otherWorkspaces(); track ws.id; let last = $last) {
+            @for (ws of otherWorkspaces(); track ws.id) {
             <app-workspace-card cdkDrag [workspace]="ws" [isCurrentWorkspace]="false"
                 [isFileSystemMode]="isFileSystemMode()" [isSelectionMode]="selectionMode()"
-                [isSelected]="isSelected(ws.id)" [isMenuOpen]="openMenuId() === 'track-' + ws.id" [isLast]="last"
+                [isSelected]="isSelected(ws.id)" [isMenuOpen]="openMenuId() === 'track-' + ws.id"
                 [viewMode]="viewMode()" (restoreWorkspace)="restoreWorkspace($event)"
                 (trashWorkspace)="trashWorkspace($event)" (switchWorkspace)="switchToWorkspace($event)"
-                (renameWorkspace)="renameWorkspace($event)" 
-                (toggleSelect)="toggleSelect($event)"
+                (renameWorkspace)="renameWorkspace($event)" (toggleSelect)="toggleSelect($event)"
                 (toggleMenu)="toggleMenu('track-' + ws.id, $event)">
                 <div class="drag-handle" dragHandle cdkDragHandle>
                     <i class="bi bi-grip-vertical"></i>
