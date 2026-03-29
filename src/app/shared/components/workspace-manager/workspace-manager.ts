@@ -101,6 +101,13 @@ export class WorkspaceManagerComponent implements OnInit {
 
     async ngOnInit() {
         this.breadcrumbService.setTitle('Manage Workspaces');
+
+        // Prevent major DOM jerks by querying and establishing structural views instantly
+        const savedView = localStorage.getItem('workspaceViewMode');
+        if (savedView === 'list' || savedView === 'card') {
+            this.viewMode.set(savedView);
+        }
+
         await this.loadWorkspaces();
 
         // Load independent metrics
@@ -108,11 +115,6 @@ export class WorkspaceManagerComponent implements OnInit {
         const currentWs = await this.authService.getCurrentWorkspace();
         if (currentWs) {
             this.currentWorkspaceId.set(currentWs.id);
-        }
-
-        const savedView = localStorage.getItem('workspaceViewMode');
-        if (savedView === 'list' || savedView === 'card') {
-            this.viewMode.set(savedView);
         }
     }
 
@@ -223,7 +225,7 @@ export class WorkspaceManagerComponent implements OnInit {
 
                 try {
                     this.fileSystem.acquireSyncLock();
-                    
+
                     // 1. First, import any backed up state from disk
                     await this.systemSync.importStateFromDisk();
 
