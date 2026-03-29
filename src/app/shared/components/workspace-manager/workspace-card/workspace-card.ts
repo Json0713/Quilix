@@ -35,7 +35,8 @@ export class WorkspaceCardComponent implements OnChanges {
             const triggerEl = this.el.nativeElement.querySelector('.menu-trigger');
             if (triggerEl) {
                 const rect = triggerEl.getBoundingClientRect();
-                this.isDropdownUp = (window.innerHeight - rect.bottom) < 220;
+                // Guaranteed CSS !important now allows this calculation to correctly visually manifest in Grid view!
+                this.isDropdownUp = (window.innerHeight - rect.bottom) < 120;
             }
         } else if (changes['isMenuOpen'] && !changes['isMenuOpen'].currentValue) {
             // reset state when closed so it cleanly mounts fresh next time
