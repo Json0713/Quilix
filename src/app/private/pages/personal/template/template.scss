@@ -6,8 +6,8 @@
 .layout-wrapper {
   display: flex;
   flex: 1;
-  padding-top: 90px;
-
+  padding-top: 90px !important; // 42px (tab) + 48px (nav)
+  
   min-height: 100vh;
   min-width: 0;
 
@@ -22,6 +22,14 @@
   right: 0;
   width: 100%;
   z-index: 1200;
+  height: 42px !important;
+
+  @media (display-mode: window-controls-overlay) {
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 42px !important;
+  }
 }
 
 .mobile-toggle {

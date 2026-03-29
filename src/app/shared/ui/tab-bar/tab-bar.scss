@@ -1,15 +1,38 @@
 .tab-bar {
     display: flex;
     align-items: center;
-    height: 42px;
-    min-height: 42px;
+    height: 42px !important;
+    min-height: 42px !important;
     background: var(--surface-main);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     flex-shrink: 0;
     padding: 0 0.5rem;
     gap: 4px;
 
+    /* --- Window Controls Overlay (WCO) Support --- */
+    -webkit-app-region: drag;
+
+    @media (display-mode: window-controls-overlay) {
+        // Force strict 42px to avoid design shrinking/gaps
+        height: 42px !important;
+        min-height: 42px !important;
+
+        // Full width background to flow safely under OS controls
+        left: 0;
+        right: 0;
+        width: 100%;
+        box-sizing: border-box;
+
+        // Custom WCO safe zones to protect content from overlapping with system buttons
+        padding-left: env(titlebar-area-x, 0.5rem);
+        padding-right: calc(100% - env(titlebar-area-width, 100%) - env(titlebar-area-x, 0));
+
+        // Ensure content remains vertically centered
+        align-items: center;
+    }
+
     .tab-list {
+        // Removed no-drag from list to allow background dragging between tabs
         display: flex;
         align-items: center;
         gap: 4px;
@@ -39,6 +62,7 @@
     }
 
     .tab-item {
+        -webkit-app-region: no-drag;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -141,6 +165,7 @@
     }
 
     .tab-new {
+        -webkit-app-region: no-drag;
         display: flex;
         align-items: center;
         justify-content: center;
