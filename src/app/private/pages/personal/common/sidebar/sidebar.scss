@@ -106,6 +106,8 @@
     .main-nav-pinned {
         flex-shrink: 0;
         padding: 0.25rem 0.75rem 0.5rem;
+        overflow: hidden;
+        white-space: nowrap;
 
         .nav-list {
             list-style: none;
@@ -126,6 +128,7 @@
             text-decoration: none;
             transition: all 0.2s ease;
             white-space: nowrap;
+            overflow: hidden;
 
             &:hover {
                 background: var(--bg-hover);
@@ -480,6 +483,8 @@
         padding: 0.5rem 0.75rem;
         border-top: 1px solid rgba(255, 255, 255, 0.06);
         flex-shrink: 0;
+        overflow: hidden;
+        white-space: nowrap;
 
         .section-title {
             font-size: 0.65rem;

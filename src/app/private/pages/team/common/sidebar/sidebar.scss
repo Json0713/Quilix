@@ -103,6 +103,8 @@
     .main-nav-pinned {
         flex-shrink: 0;
         padding: 0.25rem 0.75rem 0.5rem;
+        overflow: hidden;
+        white-space: nowrap;
 
         .nav-list {
             list-style: none;
@@ -123,6 +125,7 @@
             text-decoration: none;
             transition: all 0.2s ease;
             white-space: nowrap;
+            overflow: hidden;
 
             &:hover {
                 background: var(--bg-hover);
@@ -477,6 +480,8 @@
         padding: 0.5rem 0.75rem;
         border-top: 1px solid rgba(255, 255, 255, 0.06);
         flex-shrink: 0;
+        overflow: hidden;
+        white-space: nowrap;
 
         .section-title {
             font-size: 0.65rem;
@@ -623,8 +628,13 @@
 
 // ── Skeleton Loader & Loading States ──
 @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
 }
 
 .skeleton-space {
@@ -635,11 +645,10 @@
         width: 18px;
         height: 18px;
         border-radius: 4px;
-        background: linear-gradient(90deg, 
-            var(--bg-hover) 25%, 
-            var(--bg-active) 50%, 
-            var(--bg-hover) 75%
-        );
+        background: linear-gradient(90deg,
+                var(--bg-hover) 25%,
+                var(--bg-active) 50%,
+                var(--bg-hover) 75%);
         background-size: 200% 100%;
         animation: shimmer 1.5s infinite linear;
     }
@@ -648,11 +657,10 @@
         width: 90%;
         height: 22px;
         border-radius: 4px;
-        background: linear-gradient(90deg, 
-            var(--bg-hover) 25%, 
-            var(--bg-active) 50%, 
-            var(--bg-hover) 75%
-        );
+        background: linear-gradient(90deg,
+                var(--bg-hover) 25%,
+                var(--bg-active) 50%,
+                var(--bg-hover) 75%);
         background-size: 200% 100%;
         animation: shimmer 1.5s infinite linear;
     }
@@ -660,7 +668,7 @@
 
 .loading-state {
     cursor: default;
-    
+
     .nav-icon {
         color: var(--action);
     }
@@ -674,8 +682,13 @@
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .spin {
