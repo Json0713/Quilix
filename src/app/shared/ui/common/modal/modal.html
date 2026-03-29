@@ -17,17 +17,17 @@
     @switch (modal.modal()?.type) {
 
     @case ('custom') {
-    @if (modal.modal()?.view === 'import') {
-    <app-import />
-    } @else if (modal.modal()?.view === 'task') {
-    <app-task-detail [task]="modal.modal()!.taskData!"></app-task-detail>
-    } @else if (modal.modal()?.view === 'create-workspace') {
-    <app-create-workspace></app-create-workspace>
-    } @else if (modal.modal()?.view === 'edit-workspace') {
-    <app-edit-workspace></app-edit-workspace>
-    } @else if (modal.modal()?.view === 'details') {
-    <app-details-view [entry]="modal.modal()!.explorerEntryData!"></app-details-view>
-    }
+      @if (modal.modal()?.view === 'import') {
+        <app-import />
+      } @else if (modal.modal()?.view === 'task') {
+        <app-task-detail [task]="modal.modal()!.taskData!"></app-task-detail>
+      } @else if (modal.modal()?.view === 'create-workspace') {
+        <app-create-workspace></app-create-workspace>
+      } @else if (modal.modal()?.view === 'edit-workspace') {
+        <app-edit-workspace></app-edit-workspace>
+      } @else if (modal.modal()?.view === 'details') {
+        <app-details-view [entry]="modal.modal()!.explorerEntryData!"></app-details-view>
+      }
     }
 
     @default {

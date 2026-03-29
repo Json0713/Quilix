@@ -14,11 +14,20 @@ export class ModalService {
 
   readonly modal = this._modal.asReadonly();
 
+  /** Prevent memory leaks by cleanly resolving any dangling open promise before overwriting */
+  private _closeExistingGracefully(): void {
+    const current = this._modal();
+    if (current && current.resolve) {
+      current.resolve(false);
+    }
+  }
+
   confirm(
     message: string,
     options?: Partial<Omit<ModalConfig, 'id' | 'message' | 'type'>>
   ): Promise<boolean> {
     return new Promise(resolve => {
+      this._closeExistingGracefully();
       this._modal.set({
         id: ++this.id,
         type: 'confirm',
@@ -36,6 +45,7 @@ export class ModalService {
     message: string,
     options?: Partial<Omit<ModalConfig, 'id' | 'message' | 'type'>>
   ): void {
+    this._closeExistingGracefully();
     this._modal.set({
       id: ++this.id,
       type: 'alert',
@@ -60,6 +70,7 @@ export class ModalService {
   }
 
   openImport(): void {
+    this._closeExistingGracefully();
     this._modal.set({
       id: ++this.id,
       type: 'custom',
@@ -69,6 +80,7 @@ export class ModalService {
   }
 
   openTaskDetail(task: Task): void {
+    this._closeExistingGracefully();
     this._modal.set({
       id: ++this.id,
       type: 'custom',
@@ -80,6 +92,7 @@ export class ModalService {
 
   openCreateWorkspace(): Promise<boolean> {
     return new Promise(resolve => {
+      this._closeExistingGracefully();
       this._modal.set({
         id: ++this.id,
         type: 'custom',
@@ -92,6 +105,7 @@ export class ModalService {
 
   openEditWorkspace(workspace: Workspace): Promise<boolean> {
     return new Promise(resolve => {
+      this._closeExistingGracefully();
       this._modal.set({
         id: ++this.id,
         type: 'custom',
@@ -104,6 +118,7 @@ export class ModalService {
   }
 
   openFileDetails(entry: FileExplorerEntry): void {
+    this._closeExistingGracefully();
     this._modal.set({
       id: ++this.id,
       type: 'custom',
