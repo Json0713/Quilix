@@ -6,7 +6,7 @@ import { Import } from '../../../components/import/import';
 import { TaskDetailComponent } from '../../tasks/task-detail/task-detail';
 import { CreateWorkspaceComponent } from '../../../components/workspace-manager/create-workspace/create-workspace';
 import { EditWorkspaceComponent } from '../../../components/workspace-manager/edit-workspace/edit-workspace';
-import { DetailsView } from '../../../components/file-explorer/details-view/details-view';
+import { DetailsView } from '../../../components/space-manager/file-explorer/details-view/details-view';
 import { Router, NavigationStart } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
