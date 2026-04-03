@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { liveQuery } from 'dexie';
-import { db } from '../db/app-db';
-import { Task, TaskStatus } from '../interfaces/task';
-import { FileSystemService } from './file-system.service';
+import { db } from '../../db/app-db';
+import { Task, TaskStatus } from '../../interfaces/task';
+import { FileSystemService } from '../data/file-system.service';
 
 @Injectable({
     providedIn: 'root',

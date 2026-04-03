@@ -1,0 +1,81 @@
+import { Injectable, inject, OnDestroy } from '@angular/core';
+import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
+import { Subject, filter, takeUntil } from 'rxjs';
+
+import { ToastRelayService } from '../../../../services/ui/common/toast/toast-relay';
+import { OsNotificationService } from '../../../services/ui/os-notification.service';
+
+
+@Injectable({ providedIn: 'root' 
+})
+export class QuilixUpdateService implements OnDestroy {
+
+  private readonly swUpdate = inject(SwUpdate);
+  private readonly toastRelay = inject(ToastRelayService);
+  private readonly osNotify = inject(OsNotificationService);
+
+  private readonly destroy$ = new Subject<void>();
+
+  // UX Duration Constants
+  private static readonly RELOAD_DELAY_MS = 1500;
+  private static readonly TOAST_DURATION_MS = 12000;
+
+  init(): void {
+    if (!this.swUpdate.isEnabled) return;
+
+    this.swUpdate.versionUpdates
+      .pipe(
+        filter(
+          (event): event is VersionReadyEvent =>
+            event.type === 'VERSION_READY'
+        ),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => this.handleVersionReady());
+
+    // FAIL-SAFE: Handle "Clear Site Data" or Cache Desyncs
+    this.swUpdate.unrecoverable
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((event) => {
+        console.error('[SW] Unrecoverable state detected (Cache likely deleted manually):', event.reason);
+        // The service worker cache is completely broken. 
+        // Force a hard reload from the server to bypass the broken SW and instantly restore the app.
+        window.location.reload();
+      });
+
+  }
+
+  private handleVersionReady(): void {
+    // In-app Feedback
+    this.toastRelay.set(
+      'info',
+      'New Version Detected.\n Your App is now Updated.',
+      QuilixUpdateService.TOAST_DURATION_MS
+    );
+
+    // OS-level Notification
+    this.osNotify.notify({
+      title: 'Quilix Updated',
+      body: 'A New Version Detected. Your App is Updated!',
+      tag: 'quilix-update',
+      requireInteraction: false,
+    });
+
+    setTimeout(
+      () => this.activateAndReload(),
+      QuilixUpdateService.RELOAD_DELAY_MS
+    );
+  }
+
+  private activateAndReload(): void {
+    this.swUpdate.activateUpdate().then(() => {
+      location.reload();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+}

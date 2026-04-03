@@ -5,11 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { SidebarService } from '../../../../../services/ui/common/sidebar/sidebar.service';
 import { AuthService } from '../../../../../core/auth/auth.service';
-import { SpaceService } from '../../../../../core/services/space.service';
-import { TabService } from '../../../../../core/services/tab.service';
+import { SpaceService } from '../../../../../core/services/components/space.service';
+import { TabService } from '../../../../../core/services/ui/tab.service';
 import { Space } from '../../../../../core/interfaces/space';
 import { Workspace } from '../../../../../core/interfaces/workspace';
-import { WorkspaceService } from '../../../../../core/workspaces/workspace.service';
+import { WorkspaceService } from '../../../../../core/services/components/workspace.service';
 import { SettingsKitComponent } from '../settings-kit/settings-kit';
 import { TeamProfileMenuComponent } from '../profile-menu/profile-menu';
 

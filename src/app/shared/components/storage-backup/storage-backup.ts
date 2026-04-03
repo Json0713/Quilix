@@ -1,8 +1,8 @@
 import { Component, inject, signal, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SystemSyncService } from '../../../core/services/system-sync.service';
+import { SystemSyncService } from '../../../core/services/sync/system-sync.service';
 import { ToastService } from '../../../services/ui/common/toast/toast';
-import { FileSystemService } from '../../../core/services/file-system.service';
+import { FileSystemService } from '../../../core/services/data/file-system.service';
 
 @Component({
     selector: 'app-storage-backup',

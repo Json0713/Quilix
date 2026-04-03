@@ -6,8 +6,8 @@ import { StorageBackupComponent } from '../../../../../shared/components/storage
 import { StorageHealthComponent } from '../../../../../shared/components/storage-health/storage-health';
 import { Breadcrumb } from '../../../../../shared/ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../../../services/ui/common/breadcrumb/breadcrumb.service';
-import { TabService } from '../../../../../core/services/tab.service';
-import { FileSystemService } from '../../../../../core/services/file-system.service';
+import { TabService } from '../../../../../core/services/ui/tab.service';
+import { FileSystemService } from '../../../../../core/services/data/file-system.service';
 
 @Component({
     selector: 'app-team-data-management',

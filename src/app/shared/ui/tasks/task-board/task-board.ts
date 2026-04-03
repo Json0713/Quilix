@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Task, TaskStatus } from '../../../../core/interfaces/task';
 import { TaskColumnComponent } from '../task-column/task-column';
-import { TaskService } from '../../../../core/services/task.service';
+import { TaskService } from '../../../../core/services/components/task.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({

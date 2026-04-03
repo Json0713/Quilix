@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Header } from '../common/header/header';
 import { Footer } from '../common/footer/footer';
-import { QuilixVersionService } from '../../core/quilix-installer/version/quilix-version.service';
+import { QuilixVersionService } from '../../core/pwa/installer/version/quilix-version.service';
 import { Feature } from "../feature/feature";
 import { CtaStack } from "../cta-stack/cta-stack";
 import { ImgStack } from "../img-stack/img-stack";

@@ -1,12 +1,12 @@
 import { Component, inject, OnDestroy } from '@angular/core';
 import { RouterOutlet, Router, ActivatedRoute } from '@angular/router';
 
-import { OsNotificationService } from '../../../../core/notifications/os-notification.service';
+import { OsNotificationService } from '../../../../core/services/ui/os-notification.service';
 import { PersonalSidebarComponent } from '../common/sidebar/sidebar';
 import { SidebarService } from '../../../../services/ui/common/sidebar/sidebar.service';
 import { TabBarComponent } from '../../../../shared/ui/tab-bar/tab-bar';
 import { NavigationBar } from '../../../../shared/ui/navigation-bar/navigation-bar';
-import { TabService } from '../../../../core/services/tab.service';
+import { TabService } from '../../../../core/services/ui/tab.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({

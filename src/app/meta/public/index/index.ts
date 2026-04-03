@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { QuilixVersionService } from '../../../core/quilix-installer/version/quilix-version.service';
+import { QuilixVersionService } from '../../../core/pwa/installer/version/quilix-version.service';
 import { CtaQuilix } from '../cta-quilix/cta-quilix';
 import { CtaDownload } from '../cta-download/cta-download';
 import { CtaTech } from '../cta-tech/cta-tech';

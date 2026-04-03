@@ -1,5 +1,5 @@
-import { Workspace } from '../interfaces/workspace';
-import { Session } from '../interfaces/session';
+import { Workspace } from '../../interfaces/workspace';
+import { Session } from '../../interfaces/session';
 
 /* ───────────────────────── VERSIONING ───────────────────────── */
 /** Current supported backup version */
@@ -14,8 +14,8 @@ export type AnyBackupVersion = BackupVersion | LegacyBackupVersion;
 /* ───────────────────────── SCOPE ───────────────────────── */
 /**
  * Defines what kind of backup this is.
- * - appspace: full app snapshot (all workspaces)
- * - workspace: single-workspace snapshot
+ * - appspace: full app snapshot (all workspaces + session)
+ * - workspace: single workspace snapshot
  */
 export type BackupScope = 'appspace' | 'workspace';
 
@@ -40,7 +40,7 @@ export interface QuilixBackup {
  */
 export interface BackupData {
   workspaces?: Workspace[];
-  session?: Session | null;
+  session?: Session | undefined;
 
   // Future IndexedDB entities
   tasks?: unknown[];

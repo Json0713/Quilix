@@ -1,8 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { liveQuery } from 'dexie';
-import { db } from '../db/app-db';
-import { Space } from '../interfaces/space';
-import { FileSystemService } from './file-system.service';
+import { db } from '../../db/app-db';
+import { Space } from '../../interfaces/space';
+import { FileSystemService } from '../data/file-system.service';
 
 /** Characters not allowed in space names (filesystem-safe for major OSs) */
 const INVALID_CHARS = /[\/\\:*?"<>|]/g;

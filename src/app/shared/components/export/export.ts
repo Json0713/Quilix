@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { BackupService } from '../../../core/backup/backup.service';
-import { BackupFileFormat } from '../../../core/backup/backup.share';
+import { BackupService } from '../../../core/services/data/backup.service';
+import { BackupFileFormat } from '../../../core/services/data/backup.share';
 import { ToastService } from '../../../services/ui/common/toast/toast';
 import { ModalService } from '../../../services/ui/common/modal/modal';
 

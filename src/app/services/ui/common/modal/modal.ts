@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { ModalConfig } from '../../../../shared/ui/common/modal/modal.model';
 import { Task } from '../../../../core/interfaces/task';
 import { Workspace } from '../../../../core/interfaces/workspace';
-import { FileExplorerEntry } from '../../../../core/services/file-manager.service';
+import { FileExplorerEntry } from '../../../../core/services/components/file-manager.service';
 
 @Injectable({
   providedIn: 'root',

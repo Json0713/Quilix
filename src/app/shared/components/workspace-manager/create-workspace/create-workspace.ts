@@ -1,11 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { WorkspaceService } from '../../../../core/workspaces/workspace.service';
-import { SpaceService } from '../../../../core/services/space.service';
+import { WorkspaceService } from '../../../../core/services/components/workspace.service';
+import { SpaceService } from '../../../../core/services/components/space.service';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
 import { ToastService } from '../../../../services/ui/common/toast/toast';
-import { FileSystemService } from '../../../../core/services/file-system.service';
+import { FileSystemService } from '../../../../core/services/data/file-system.service';
 import { WorkspaceRole } from '../../../../core/interfaces/workspace';
 
 @Component({

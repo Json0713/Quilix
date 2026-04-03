@@ -5,7 +5,7 @@ import {
   effect,
   OnDestroy
 } from '@angular/core';
-import { NetworkService } from '../../../../core/quilix-installer/network/network.service';
+import { NetworkService } from '../../../../core/pwa/installer/network/network.service';
 
 const IDLE_ACK_KEY = 'network-idle-acknowledged';
 

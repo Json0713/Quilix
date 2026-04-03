@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { Breadcrumb } from '../../../../shared/ui/common/breadcrumb/breadcrumb';
-import { StorageAnalyticsService, StorageMetrics } from '../../../../core/services/storage-analytics.service';
+import { StorageAnalyticsService, StorageMetrics } from '../../../../core/services/data/storage-analytics.service';
 
 @Component({
   selector: 'app-personal-index',

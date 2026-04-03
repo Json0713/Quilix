@@ -1,7 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { FileExplorerEntry } from '../../../../../core/services/file-manager.service';
-import { FileSystemService } from '../../../../../core/services/file-system.service';
+import { FileExplorerEntry } from '../../../../../core/services/components/file-manager.service';
+import { FileSystemService } from '../../../../../core/services/data/file-system.service';
 
 @Component({
   selector: 'app-details-view',

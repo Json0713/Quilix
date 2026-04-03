@@ -1,10 +1,10 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FileSystemService } from '../../../../core/services/file-system.service';
-import { SystemSyncService } from '../../../../core/services/system-sync.service';
-import { FileSyncService } from '../../../../core/services/file-sync.service';
+import { FileSystemService } from '../../../../core/services/data/file-system.service';
+import { SystemSyncService } from '../../../../core/services/sync/system-sync.service';
+import { FileSyncService } from '../../../../core/services/sync/file-sync.service';
 
-import { WorkspaceService } from '../../../../core/workspaces/workspace.service';
+import { WorkspaceService } from '../../../../core/services/components/workspace.service';
 
 @Component({
     selector: 'app-storage-toggle',

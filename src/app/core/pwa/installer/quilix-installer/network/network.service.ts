@@ -1,5 +1,5 @@
 import { Injectable, signal, OnDestroy } from '@angular/core';
-import { ToastService } from '../../../services/ui/common/toast/toast';
+import { ToastService } from '../../../../../services/ui/common/toast/toast';
 
 export type NetworkPhase = 'offline' | 'connecting' | 'online';
 

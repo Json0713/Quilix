@@ -4,7 +4,7 @@ import { from, Subscription } from 'rxjs';
 import { Breadcrumb } from '../../../../shared/ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { TaskBoardComponent } from '../../../../shared/ui/tasks/task-board/task-board';
-import { TaskService } from '../../../../core/services/task.service';
+import { TaskService } from '../../../../core/services/components/task.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { Task } from '../../../../core/interfaces/task';
 

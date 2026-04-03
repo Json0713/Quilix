@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { db } from '../db/app-db';
-import { FileSystemService } from './file-system.service';
+import { db } from '../../db/app-db';
+import { FileSystemService } from '../data/file-system.service';
 
 export interface SystemState {
     version: number;

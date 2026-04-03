@@ -1,10 +1,10 @@
 import { Component, signal, inject, HostListener } from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
-import { AppThemeService } from './core/theme/app-theme/app-theme.service';
+import { AppThemeService } from './core/services/ui/app-theme.service';
 
 import { NetworkStatus } from './shared/ui/system/network-status/network-status';
-import { NetworkService } from './core/quilix-installer/network/network.service';
-import { QuilixUpdateService } from './core/quilix-installer/quilix-update.service';
+import { NetworkService } from './core/pwa/installer/network/network.service';
+import { QuilixUpdateService } from './core/pwa/installer/quilix-update.service';
 import { ToastRelayService } from './services/ui/common/toast/toast-relay';
 
 import { Loader } from './shared/ui/common/loader/loader';
@@ -15,9 +15,9 @@ import { Toast } from './shared/ui/common/toast/toast';
 import { GlobalSyncService } from './core/sync/global-sync.service';
 import { Tooltip } from './shared/ui/common/tooltip/tooltip';
 import { TooltipService } from './services/ui/common/tooltip/tooltip.service';
-import { FileSystemService } from './core/services/file-system.service';
-import { SystemSyncService } from './core/services/system-sync.service';
-import { PwaNavigationService } from './core/services/pwa-navigation.service';
+import { FileSystemService } from './core/services/data/file-system.service';
+import { SystemSyncService } from './core/services/sync/system-sync.service';
+import { PwaNavigationService } from './core/pwa/pwa-navigation.service';
 
 @Component({
   selector: 'app-root',

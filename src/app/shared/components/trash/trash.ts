@@ -2,10 +2,10 @@ import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { Workspace } from '../../../core/interfaces/workspace';
 import { Space } from '../../../core/interfaces/space';
-import { WorkspaceService } from '../../../core/workspaces/workspace.service';
-import { SpaceService } from '../../../core/services/space.service';
+import { WorkspaceService } from '../../../core/services/components/workspace.service';
+import { SpaceService } from '../../../core/services/components/space.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { FileSystemService } from '../../../core/services/file-system.service';
+import { FileSystemService } from '../../../core/services/data/file-system.service';
 import { TimeAgoPipe } from '../../ui/common/time-ago/time-ago-pipe';
 import { StorageHealthBanner } from '../storage-health-banner/storage-health-banner';
 import { SnackbarService } from '../../../services/ui/common/snackbar/snackbar.service';

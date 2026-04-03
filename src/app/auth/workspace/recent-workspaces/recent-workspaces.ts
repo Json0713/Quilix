@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
-import { WorkspaceService } from '../../../core/workspaces/workspace.service';
+import { WorkspaceService } from '../../../core/services/components/workspace.service';
 import { Workspace, WorkspaceRole } from '../../../core/interfaces/workspace';
 import { Spinner } from '../../../shared/ui/common/spinner/spinner';
 import { TimeAgoPipe } from '../../../shared/ui/common/time-ago/time-ago-pipe';

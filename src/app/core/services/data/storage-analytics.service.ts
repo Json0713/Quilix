@@ -2,8 +2,8 @@ import { Injectable, inject, signal } from '@angular/core';
 import { liveQuery } from 'dexie';
 import { Observable, from } from 'rxjs';
 import { FileSystemService } from './file-system.service';
-import { AuthService } from '../auth/auth.service';
-import { db } from '../db/app-db';
+import { AuthService } from '../../auth/auth.service';
+import { db } from '../../db/app-db';
 
 export interface StorageMetrics {
     totalSpaces: number;

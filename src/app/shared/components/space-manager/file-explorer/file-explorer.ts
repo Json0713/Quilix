@@ -2,11 +2,11 @@ import { Component, Input, Output, EventEmitter, OnInit, signal, computed, HostL
 import { Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FileExplorerEntry, FileManagerService } from '../../../../core/services/file-manager.service';
-import { FileSystemService } from '../../../../core/services/file-system.service';
+import { FileExplorerEntry, FileManagerService } from '../../../../core/services/components/file-manager.service';
+import { FileSystemService } from '../../../../core/services/data/file-system.service';
 import { SnackbarService } from '../../../../services/ui/common/snackbar/snackbar.service';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
-import { ToolbarService, ToolbarConfig } from '../../../../core/services/toolbar.service';
+import { ToolbarService, ToolbarConfig } from '../../../../core/services/ui/toolbar.service';
 import { db } from '../../../../core/db/app-db';
 import { Space } from '../../../../core/interfaces/space';
 

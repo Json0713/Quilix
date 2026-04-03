@@ -2,8 +2,8 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
-import { WorkspaceService } from '../../../../core/workspaces/workspace.service';
-import { SpaceService } from '../../../../core/services/space.service';
+import { WorkspaceService } from '../../../../core/services/components/workspace.service';
+import { SpaceService } from '../../../../core/services/components/space.service';
 import { Workspace } from '../../../../core/interfaces/workspace';
 
 @Component({

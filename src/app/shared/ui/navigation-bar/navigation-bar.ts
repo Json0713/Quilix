@@ -2,13 +2,13 @@ import { Component, inject, OnInit, HostListener, ViewChild, ElementRef, OnDestr
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
-import { NavigationControlService } from '../../../core/services/navigation-control.service';
+import { NavigationControlService } from '../../../core/services/ui/navigation-control.service';
 import { SidebarService } from '../../../services/ui/common/sidebar/sidebar.service';
-import { TabService } from '../../../core/services/tab.service';
-import { SpaceService } from '../../../core/services/space.service';
+import { TabService } from '../../../core/services/ui/tab.service';
+import { SpaceService } from '../../../core/services/components/space.service';
 import { Space } from '../../../core/interfaces/space';
 import { Subscription } from 'dexie';
-import { ToolbarService } from '../../../core/services/toolbar.service';
+import { ToolbarService } from '../../../core/services/ui/toolbar.service';
 
 interface Breadcrumb {
     label: string;

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { db } from '../db/app-db';
-import { FileSystemService } from './file-system.service';
+import { db } from '../../db/app-db';
+import { FileSystemService } from '../data/file-system.service';
 
 @Injectable({
     providedIn: 'root'

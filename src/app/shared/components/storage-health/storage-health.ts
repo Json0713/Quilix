@@ -1,8 +1,8 @@
 import { Component, inject, signal, OnDestroy, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { FileSystemService } from '../../../core/services/file-system.service';
-import { WorkspaceService } from '../../../core/workspaces/workspace.service';
-import { SpaceService } from '../../../core/services/space.service';
+import { FileSystemService } from '../../../core/services/data/file-system.service';
+import { WorkspaceService } from '../../../core/services/components/workspace.service';
+import { SpaceService } from '../../../core/services/components/space.service';
 import { db } from '../../../core/db/app-db';
 import { liveQuery } from 'dexie';
 

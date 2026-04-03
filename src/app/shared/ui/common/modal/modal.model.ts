@@ -4,7 +4,7 @@ export type ModalNoticeScope = 'once' | 'always';
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
 import { Task } from '../../../../core/interfaces/task';
 import { Workspace } from '../../../../core/interfaces/workspace';
-import { FileExplorerEntry } from '../../../../core/services/file-manager.service';
+import { FileExplorerEntry } from '../../../../core/services/components/file-manager.service';
 
 export interface ModalNotice {
   type: ModalNoticeType;

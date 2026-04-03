@@ -1,10 +1,10 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { AppThemeService } from '../../../../core/theme/app-theme/app-theme.service';
-import { OsNotificationService } from '../../../../core/notifications/os-notification.service';
-import { TabService } from '../../../../core/services/tab.service';
+import { AppThemeService } from '../../../../core/services/ui/app-theme.service';
+import { OsNotificationService } from '../../../../core/services/ui/os-notification.service';
+import { TabService } from '../../../../core/services/ui/tab.service';
 import { StorageToggleComponent } from '../../../../shared/ui/system/storage-toggle/storage-toggle';
-import { FileSystemService } from '../../../../core/services/file-system.service';
+import { FileSystemService } from '../../../../core/services/data/file-system.service';
 
 @Component({
     selector: 'app-team-settings',

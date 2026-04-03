@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
-import { db } from '../db/app-db';
-import { Tab } from '../interfaces/tab';
+import { db } from '../../db/app-db';
+import { Tab } from '../../interfaces/tab';
 
 @Injectable({ providedIn: 'root' })
 export class TabService {

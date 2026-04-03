@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { Workspace, WorkspaceRole } from '../interfaces/workspace';
-import { WorkspaceService } from '../workspaces/workspace.service';
+import { WorkspaceService } from '../services/components/workspace.service';
 import { db } from '../db/app-db';
 
 

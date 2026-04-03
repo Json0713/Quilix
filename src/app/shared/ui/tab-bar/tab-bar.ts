@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router, ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { TabService } from '../../../core/services/tab.service';
+import { TabService } from '../../../core/services/ui/tab.service';
 import { Tab } from '../../../core/interfaces/tab';
 
 @Component({

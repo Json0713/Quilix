@@ -1,9 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SidebarService } from '../../../../../services/ui/common/sidebar/sidebar.service';
-import { AppThemeService } from '../../../../../core/theme/app-theme/app-theme.service';
-import { OsNotificationService } from '../../../../../core/notifications/os-notification.service';
-import { TabService } from '../../../../../core/services/tab.service';
+import { AppThemeService } from '../../../../../core/services/ui/app-theme.service';
+import { OsNotificationService } from '../../../../../core/services/ui/os-notification.service';
+import { TabService } from '../../../../../core/services/ui/tab.service';
 
 @Component({
     selector: 'app-team-settings-kit',

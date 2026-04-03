@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { QuilixInstallerService } from '../../../core/quilix-installer/quilix-installer.service';
-import { QuilixInstallerState } from '../../../core/quilix-installer/quilix-installer.state';
+import { QuilixInstallerService } from '../../../core/pwa/installer/quilix-installer.service';
+import { QuilixInstallerState } from '../../../core/pwa/installer/quilix-installer.state';
 
 @Component({
     selector: 'app-cta-download',

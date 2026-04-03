@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { STORAGE_KEYS } from '../storage/storage.key';
+import { STORAGE_KEYS } from './storage.key';
 import { Workspace } from '../interfaces/workspace';
 import { Session } from '../interfaces/session';
 

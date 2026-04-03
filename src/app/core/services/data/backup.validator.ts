@@ -66,14 +66,6 @@ export class BackupValidator {
     if (!data || typeof data !== 'object') {
       throw new Error('Backup data is invalid.');
     }
-
-    if (backup.scope === 'workspace') {
-      if (!Array.isArray(data.workspaces) || data.workspaces.length !== 1) {
-        throw new Error(
-          'Workspace backup must contain exactly one workspace.'
-        );
-      }
-    }
   }
 
   /* ───────────────────────── VERSION ───────────────────────── */

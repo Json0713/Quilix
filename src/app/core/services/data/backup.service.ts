@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import { db } from '../db/app-db';
-import { Workspace } from '../interfaces/workspace';
-import { Session } from '../interfaces/session';
+import { db } from '../../db/app-db';
+import { Workspace } from '../../interfaces/workspace';
+import { Session } from '../../interfaces/session';
 
 import {
   BackupShareService,

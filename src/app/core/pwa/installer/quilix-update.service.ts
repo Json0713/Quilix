@@ -2,8 +2,8 @@ import { Injectable, inject, OnDestroy } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { Subject, filter, takeUntil } from 'rxjs';
 
-import { ToastRelayService } from '../../services/ui/common/toast/toast-relay';
-import { OsNotificationService } from '../notifications/os-notification.service';
+import { ToastRelayService } from '../../../services/ui/common/toast/toast-relay';
+import { OsNotificationService } from '../../services/ui/os-notification.service';
 
 
 @Injectable({ providedIn: 'root' 
