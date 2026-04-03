@@ -39,7 +39,7 @@ export class DexieService extends Dexie {
     virtual_entries!: Table<any, string>;
 
     constructor() {
-        super('QuilixGlobalDB');
+        super('QuilixDB');
 
         // ── Schema versions ───────────────────────────────────────────────────
         // IMPORTANT: Never modify a past version's store definition.
