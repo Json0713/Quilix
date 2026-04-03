@@ -32,6 +32,13 @@ export class SpaceView implements OnInit, OnDestroy {
     spaceHandle = signal<FileSystemDirectoryHandle | null>(null);
     workspaceId = signal<string | null>(null);
 
+    // App Window Management
+    explorerVisible = signal<boolean>(false);
+    isMaximized = signal<boolean>(false);
+    windowPosition = signal<{ x: number, y: number }>({ x: 20, y: 20 });
+    isDragging = false;
+    private dragOffset = { x: 0, y: 0 };
+
     private paramSub!: Subscription;
     private spaceSub: any;
 
@@ -100,6 +107,45 @@ export class SpaceView implements OnInit, OnDestroy {
         } finally {
             this.loading.set(false);
         }
+    }
+
+    // Window Actions
+    toggleExplorer() {
+        this.explorerVisible.update(v => !v);
+        // Reset to windowed mode if opening
+        if (!this.explorerVisible()) this.isMaximized.set(false);
+    }
+
+    toggleMaximize() {
+        this.isMaximized.update(v => !v);
+    }
+
+    // Dragging Logic
+    onDragStart(event: MouseEvent) {
+        if (this.isMaximized()) return;
+        this.isDragging = true;
+        this.dragOffset = {
+            x: event.clientX - this.windowPosition().x,
+            y: event.clientY - this.windowPosition().y
+        };
+        
+        // Add global listeners
+        window.addEventListener('mousemove', this.onDragMove);
+        window.addEventListener('mouseup', this.onDragEnd);
+    }
+
+    onDragMove = (event: MouseEvent) => {
+        if (!this.isDragging) return;
+        this.windowPosition.set({
+            x: event.clientX - this.dragOffset.x,
+            y: event.clientY - this.dragOffset.y
+        });
+    }
+
+    onDragEnd = () => {
+        this.isDragging = false;
+        window.removeEventListener('mousemove', this.onDragMove);
+        window.removeEventListener('mouseup', this.onDragEnd);
     }
 
     ngOnDestroy() {

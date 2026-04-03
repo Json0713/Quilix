@@ -3,19 +3,83 @@
 @if (!loading()) {
 <div class="dashboard-container">
     @if (space()) {
-        <main class="page-content p-0 m-0 w-100 position-relative">
-            @if (workspaceId()) {
-                <app-file-explorer 
-                    [spaceId]="space()!.id"
-                    [workspaceId]="workspaceId()!"
-                    [rootHandle]="spaceHandle()"
-                    [spaceName]="space()?.name || 'Space'"
-                    class="w-100 h-100 d-block">
-                </app-file-explorer>
-            } @else {
-                <div class="p-4 text-center">
-                    <i class="bi bi-hourglass-split display-4 opacity-50"></i>
-                    <p class="mt-2 text-muted">Awaiting workspace context...</p>
+        <main class="page-content">
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- File Manager App Card -->
+                <div class="dashboard-card app-card" (click)="toggleExplorer()">
+                    <div class="card-icon">
+                        <i class="bi bi-folder2-open"></i>
+                    </div>
+                    <div class="card-details">
+                        <h3>File Manager</h3>
+                        <p>Manage, organize, and upload your space files.</p>
+                    </div>
+                    <div class="card-action">
+                        <i class="bi bi-arrow-up-right"></i>
+                    </div>
+                </div>
+
+                <!-- Placeholder Cards for other features -->
+                <div class="dashboard-card placeholder-card">
+                    <div class="card-icon opacity-50"><i class="bi bi-calendar3"></i></div>
+                    <div class="card-details">
+                        <h3 class="opacity-50">Calendar</h3>
+                        <p class="opacity-50">Coming soon: Team schedules and deadlines.</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-card placeholder-card">
+                    <div class="card-icon opacity-50"><i class="bi bi-chat-dots"></i></div>
+                    <div class="card-details">
+                        <h3 class="opacity-50">Discussions</h3>
+                        <p class="opacity-50">Coming soon: Real-time team collaboration.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating App Window (File Explorer) -->
+            @if (explorerVisible()) {
+                <div class="app-window-overlay" [class.maximized]="isMaximized()">
+                    <div class="app-window" 
+                         [class.maximized]="isMaximized()"
+                         [style.left.px]="isMaximized() ? null : windowPosition().x"
+                         [style.top.px]="isMaximized() ? null : windowPosition().y">
+                        
+                        <!-- Window Title Bar (Draggable) -->
+                        <div class="window-title-bar" (mousedown)="onDragStart($event)">
+                            <div class="title-group">
+                                <i class="bi bi-folder2-open"></i>
+                                <span>File Explorer - {{ space()?.name }}</span>
+                            </div>
+                            <div class="window-controls">
+                                <button class="control-btn maximize-btn" (click)="toggleMaximize()" [title]="isMaximized() ? 'Restore' : 'Maximize'">
+                                    <i class="bi" [class.bi-fullscreen-exit]="isMaximized()" [class.bi-fullscreen]="!isMaximized()"></i>
+                                </button>
+                                <button class="control-btn close-btn" (click)="toggleExplorer()" title="Close">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Window Content -->
+                        <div class="window-content">
+                            @if (workspaceId()) {
+                                <app-file-explorer 
+                                    [spaceId]="space()!.id"
+                                    [workspaceId]="workspaceId()!"
+                                    [rootHandle]="spaceHandle()"
+                                    [spaceName]="space()?.name || 'Space'"
+                                    class="w-100 h-100 d-block">
+                                </app-file-explorer>
+                            } @else {
+                                <div class="p-4 text-center">
+                                    <i class="bi bi-hourglass-split display-4 opacity-50"></i>
+                                    <p class="mt-2 text-muted">Awaiting workspace context...</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
             }
         </main>
