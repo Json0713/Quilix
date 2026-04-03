@@ -32,20 +32,11 @@ export class Modal implements OnDestroy {
 
   constructor() {
     // Observe modal changes
-    effect((onCleanup) => {
+    effect(() => {
       const current = this.modal.modal();
       if (!current) {
-        this.renderer.removeStyle(this.document.body, 'overflow');
         return;
       }
-
-      // Lock body scrolling natively
-      this.renderer.setStyle(this.document.body, 'overflow', 'hidden');
-
-      // Bulletproof cleanup automatically fired by Angular before next effect run or destruction
-      onCleanup(() => {
-        this.renderer.removeStyle(this.document.body, 'overflow');
-      });
 
       if (current.id !== this.lastModalId) {
         this.lastModalId = current.id;
@@ -99,8 +90,5 @@ export class Modal implements OnDestroy {
 
   ngOnDestroy(): void {
     this.routerSub?.unsubscribe();
-
-    // Failsafe unmount cleanup
-    this.renderer.removeStyle(this.document.body, 'overflow');
   }
 }
