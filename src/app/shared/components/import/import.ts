@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { BackupService } from '../../../core/services/data/backup.service';
+import { BackupService } from '../../../core/services/backup/backup.service';
 import { ModalService } from '../../../services/ui/common/modal/modal';
 import { ToastService } from '../../../services/ui/common/toast/toast';
 import { ToastRelayService } from '../../../services/ui/common/toast/toast-relay';
