@@ -5,8 +5,12 @@
  *
  * Architecture decisions:
  *  - Extends Dexie directly (the recommended pattern for Dexie v3+).
- *  - Decorated with @Injectable so Angular's DI system is aware of it,
- *    even though consumers use the exported `db` singleton for simplicity.
+ *  - Decorated with @Injectable so Angular's DI system is aware of it.
+ *    Angular's DI will always return the same static singleton so there
+ *    is never more than one open connection to IndexedDB.
+ *  - Static Singleton Pattern: the first constructor call stores itself
+ *    on DexieService.instance; subsequent attempts (e.g. the module-level
+ *    `db` export) reuse that instance via getInstance().
  *  - Schema versions are incremental and append-only — never modify an
  *    existing version's store definition, only add new versions.
  *  - Data-model interfaces live in the co-located `dexie.models.ts`.
@@ -28,6 +32,9 @@ export type { ContactMessage, Setting };
 @Injectable({ providedIn: 'root' })
 export class DexieService extends Dexie {
 
+    // ── Static singleton reference ────────────────────────────────────────────
+    private static instance: DexieService;
+
     // ── Table declarations ────────────────────────────────────────────────────
     workspaces!: Table<Workspace, string>;
     sessions!: Table<Session, string>;
@@ -40,6 +47,10 @@ export class DexieService extends Dexie {
 
     constructor() {
         super('QuilixDB');
+
+        // Register the first-ever instance so every subsequent caller
+        // (Angular DI, the module-level `db` export, etc.) shares it.
+        DexieService.instance = this;
 
         // ── Schema versions ───────────────────────────────────────────────────
         // IMPORTANT: Never modify a past version's store definition.
@@ -103,13 +114,26 @@ export class DexieService extends Dexie {
             console.error('[DexieService] Failed to open database:', err);
         });
     }
+
+    /**
+     * Returns the shared singleton instance.
+     *
+     * Called by the module-level `db` export so it always reuses the same
+     * connection that Angular DI creates — preventing duplicate open handles.
+     */
+    static getInstance(): DexieService {
+        return DexieService.instance;
+    }
 }
 
 /**
  * Application-wide singleton database instance.
  *
- * Exported as `db` to keep all consumer call-sites concise and unchanged.
- * Using a module-level singleton (rather than pure DI) is the idiomatic
- * Dexie pattern and avoids injector-context issues in async contexts.
+ * `getInstance()` returns the instance Angular DI already created.
+ * The `|| new DexieService()` fallback handles the edge case where this
+ * module is evaluated before Angular's injector has run (e.g. unit tests
+ * or a non-Angular bootstrap path).
+ *
+ * Either way, only ONE connection to IndexedDB is ever open.
  */
-export const db = new DexieService();
+export const db = DexieService.getInstance() || new DexieService();
