@@ -71,6 +71,10 @@ export class StorageAnalyticsService {
         let quota = 0;
         let percentage = 0;
 
+        // Trigger background persistence upgrade (Silent)
+        // This is what flips the 10GB sandbox back to the real 300GB+ hardware quota
+        await this.fileSystem.requestPersistence();
+
         // Secure Chromium Native Navigator Allocations universally
         if (navigator.storage && navigator.storage.estimate) {
             const estimate = await navigator.storage.estimate();

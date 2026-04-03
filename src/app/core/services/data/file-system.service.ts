@@ -111,6 +111,21 @@ export class FileSystemService {
     }
 
     /**
+     * Silent Persistence Request: Asks the browser to upgrade the storage 
+     * from 'best-effort' to 'persistent'. This unlocks the full hardware 
+     * quota in Chrome (e.g., 360GB instead of 10GB).
+     */
+    async requestPersistence(): Promise<void> {
+        if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.persist) {
+            const persistent = await navigator.storage.persisted();
+            if (!persistent) {
+                // Browsers often auto-grant this for localhost/PWAs
+                await navigator.storage.persist();
+            }
+        }
+    }
+
+    /**
      * Ensure we have a valid handle with active permission before any file operation.
      * Returns the handle if permission is granted, null otherwise.
      * This NEVER prompts — it only checks current state.
@@ -298,8 +313,8 @@ export class FileSystemService {
             try {
                 await parentHandle.getDirectoryHandle(newName, { create: false });
                 console.error(`[FileSystem] Collision detected: Target "${newName}" already exists.`);
-                return false; 
-            } catch {}
+                return false;
+            } catch { }
 
             // 1. Try modern fast move() - STANDARD DIRECT RENAME
             if ('move' in oldHandle) {
@@ -309,9 +324,9 @@ export class FileSystemService {
                     return true;
                 } catch (moveErr: any) {
                     console.warn(`[FileSystem] .move() failed for ${oldName}:`, moveErr);
-                    
+
                     if (moveErr.name === 'InvalidStateError' || moveErr.name === 'NoModificationAllowedError') {
-                        return false; 
+                        return false;
                     }
                 }
             }
@@ -329,7 +344,7 @@ export class FileSystemService {
                 return true;
             } catch (deleteOldErr) {
                 console.warn(`[FileSystem] Fallback rename failed to delete original "${oldName}". Rolling back duplicate "${newName}"...`, deleteOldErr);
-                
+
                 // SAFETY NET: If we can't delete the old folder (e.g., file lock by OS), 
                 // we must rollback the newly created copy so it doesn't linger as a ghost.
                 try {
@@ -338,7 +353,7 @@ export class FileSystemService {
                 } catch (rollbackErr) {
                     console.error(`[FileSystem] CRITICAL: Rollback failed! Ghost folder "${newName}" may now exist alongside "${oldName}".`, rollbackErr);
                 }
-                
+
                 return false; // Crucial: tell parent components the rename failed so they don't update IndexedDB state
             }
         } catch (err) {
