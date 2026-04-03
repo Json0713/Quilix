@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from "@angular/router";
 
-import { QuilixInstaller } from '../../shared/components/quilix-installer/quilix-installer';
+import { QuilixInstaller } from '../../shared/ui/quilix-installer/quilix-installer';
 
 
 @Component({
