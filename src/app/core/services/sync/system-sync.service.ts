@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { db } from '../../db/app-db';
+import { db } from '../../database/dexie.service';
 import { FileSystemService } from '../data/file-system.service';
 
 export interface SystemState {

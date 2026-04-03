@@ -3,7 +3,7 @@ import { liveQuery } from 'dexie';
 import { Observable, from } from 'rxjs';
 import { FileSystemService } from './file-system.service';
 import { AuthService } from '../../auth/auth.service';
-import { db } from '../../db/app-db';
+import { db } from '../../database/dexie.service';
 
 export interface StorageMetrics {
     totalSpaces: number;

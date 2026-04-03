@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { db } from '../../db/app-db';
+import { db } from '../../database/dexie.service';
 import { FileSystemService } from '../data/file-system.service';
 
 export interface FileExplorerEntry {

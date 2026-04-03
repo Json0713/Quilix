@@ -3,7 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FileSystemService } from '../../../core/services/data/file-system.service';
 import { WorkspaceService } from '../../../core/services/components/workspace.service';
 import { SpaceService } from '../../../core/services/components/space.service';
-import { db } from '../../../core/db/app-db';
+import { db } from '../../../core/database/dexie.service';
 import { liveQuery } from 'dexie';
 
 export interface HealthIssue {

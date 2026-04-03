@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { db } from '../../db/app-db';
+import { db } from '../../database/dexie.service';
 import { Workspace } from '../../interfaces/workspace';
 import { Session } from '../../interfaces/session';
 

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { liveQuery } from 'dexie';
-import { db } from '../../db/app-db';
+import { db } from '../../database/dexie.service';
 import { Task, TaskStatus } from '../../interfaces/task';
 import { FileSystemService } from '../data/file-system.service';
 

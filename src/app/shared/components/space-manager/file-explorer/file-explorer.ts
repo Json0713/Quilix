@@ -7,7 +7,7 @@ import { FileSystemService } from '../../../../core/services/data/file-system.se
 import { SnackbarService } from '../../../../services/ui/common/snackbar/snackbar.service';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
 import { ToolbarService, ToolbarConfig } from '../../../../core/services/ui/toolbar.service';
-import { db } from '../../../../core/db/app-db';
+import { db } from '../../../../core/database/dexie.service';
 import { Space } from '../../../../core/interfaces/space';
 
 @Component({

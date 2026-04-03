@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { db } from '../../db/app-db';
+import { db } from '../../database/dexie.service';
 
 @Injectable({
     providedIn: 'root',
