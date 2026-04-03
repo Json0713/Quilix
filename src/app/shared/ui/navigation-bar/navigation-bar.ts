@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
 import { NavigationControlService } from '../../../core/services/navigation-control.service';
-import { SidebarService } from '../../../core/sidebar/sidebar.service';
+import { SidebarService } from '../../../services/ui/common/sidebar/sidebar.service';
 import { TabService } from '../../../core/services/tab.service';
 import { SpaceService } from '../../../core/services/space.service';
 import { Space } from '../../../core/interfaces/space';

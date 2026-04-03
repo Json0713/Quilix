@@ -3,7 +3,7 @@ import { RouterLink, RouterLinkActive, Router, ActivatedRoute } from '@angular/r
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { SidebarService } from '../../../../../core/sidebar/sidebar.service';
+import { SidebarService } from '../../../../../services/ui/common/sidebar/sidebar.service';
 import { AuthService } from '../../../../../core/auth/auth.service';
 import { SpaceService } from '../../../../../core/services/space.service';
 import { TabService } from '../../../../../core/services/tab.service';

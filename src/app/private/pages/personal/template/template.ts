@@ -3,7 +3,7 @@ import { RouterOutlet, Router, ActivatedRoute } from '@angular/router';
 
 import { OsNotificationService } from '../../../../core/notifications/os-notification.service';
 import { PersonalSidebarComponent } from '../common/sidebar/sidebar';
-import { SidebarService } from '../../../../core/sidebar/sidebar.service';
+import { SidebarService } from '../../../../services/ui/common/sidebar/sidebar.service';
 import { TabBarComponent } from '../../../../shared/ui/tab-bar/tab-bar';
 import { NavigationBar } from '../../../../shared/ui/navigation-bar/navigation-bar';
 import { TabService } from '../../../../core/services/tab.service';
