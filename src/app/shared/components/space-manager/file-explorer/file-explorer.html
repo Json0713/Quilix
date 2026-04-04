@@ -21,61 +21,22 @@
 
             <div class="toolbar-divider"></div>
 
+            <!-- New: Action Controls (Desktop only) right after nav-controls -->
             @if (!isToolbarCollapsed()) {
-                <!-- Center: Spacer for search bar alignment -->
-                <div class="toolbar-spacer shadow-none"></div>
-
-                <!-- New: Space-wide Search (Desktop) -->
-                <div class="explorer-search-container">
-                    <div class="search-input-group">
-                        <i class="bi bi-search search-icon"></i>
-                        <input type="text" 
-                               class="explorer-search-input" 
-                               placeholder="Search space..."
-                               [ngModel]="searchQuery()"
-                               (ngModelChange)="searchQuery.set($event); onSearch()"
-                               (keyup.escape)="clearSearch()">
-                        @if (searchQuery()) {
-                            <button class="clear-search-btn" (click)="clearSearch()">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        }
-                    </div>
-                </div>
-            } @else {
-                 <!-- Compact Spacer for Mobile -->
-                 <div class="toolbar-spacer compact"></div>
-            }
-
-            <!-- Mobile Search Toggle -->
-            @if (isToolbarCollapsed()) {
-                <button class="nav-btn mobile-search-toggle" 
-                        (click)="toggleSearchExpanded()" 
-                        [class.active]="isSearchExpanded()"
-                        title="Search">
-                    <i class="bi bi-search"></i>
+                <button class="btn explorer-action-btn" (click)="startCreateFolder()" title="New Folder">
+                    <i class="bi bi-folder-plus"></i>
+                </button>
+                <button class="btn explorer-action-btn" (click)="startCreateFile()" title="New File">
+                    <i class="bi bi-file-earmark-plus"></i>
                 </button>
             }
 
-            <!-- Mobile Search Overlay (Visible only when expanded) -->
-            @if (isToolbarCollapsed() && isSearchExpanded()) {
-                <div class="explorer-search-container mobile-expanded">
-                    <div class="search-input-group">
-                        <i class="bi bi-search search-icon"></i>
-                        <input type="text" 
-                               class="explorer-search-input" 
-                               placeholder="Search space..."
-                               #mobileSearch
-                               [ngModel]="searchQuery()"
-                               (ngModelChange)="searchQuery.set($event); onSearch()"
-                               (keyup.escape)="clearSearch()"
-                               autofocus>
-                        
-                        <button class="nav-btn close-search-btn" (click)="clearSearch()">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    </div>
-                </div>
+            @if (!isToolbarCollapsed()) {
+                <!-- Center: Spacer for alignment -->
+                <div class="toolbar-spacer shadow-none"></div>
+            } @else {
+                 <!-- Compact Spacer for Mobile -->
+                 <div class="toolbar-spacer compact"></div>
             }
 
             <!-- Right: View & Sort Controls -->
@@ -129,16 +90,56 @@
                         </li>
                     </ul>
                 </div>
-
-                <div class="toolbar-divider"></div>
-
-                <button class="btn explorer-action-btn" (click)="startCreateFolder()" title="New Folder">
-                    <i class="bi bi-folder-plus"></i>
-                </button>
-                <button class="btn explorer-action-btn" (click)="startCreateFile()" title="New File">
-                    <i class="bi bi-file-earmark-plus"></i>
-                </button>
             </div>
+
+            <!-- Search Bar Position (Desktop - Very Right) -->
+            @if (!isToolbarCollapsed()) {
+                <div class="explorer-search-container">
+                    <div class="search-input-group">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" 
+                               class="explorer-search-input" 
+                               placeholder="Search space..."
+                               [ngModel]="searchQuery()"
+                               (ngModelChange)="searchQuery.set($event); onSearch()"
+                               (keyup.escape)="clearSearch()">
+                        @if (searchQuery()) {
+                            <button class="clear-search-btn" (click)="clearSearch()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+            } @else {
+                <!-- Mobile Search Toggle -->
+                <button class="nav-btn mobile-search-toggle" 
+                        (click)="toggleSearchExpanded()" 
+                        [class.active]="isSearchExpanded()"
+                        title="Search">
+                    <i class="bi bi-search"></i>
+                </button>
+            }
+
+            <!-- Mobile Search Overlay (Visible only when expanded) -->
+            @if (isToolbarCollapsed() && isSearchExpanded()) {
+                <div class="explorer-search-container mobile-expanded">
+                    <div class="search-input-group">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" 
+                               class="explorer-search-input" 
+                               placeholder="Search space..."
+                               #mobileSearch
+                               [ngModel]="searchQuery()"
+                               (ngModelChange)="searchQuery.set($event); onSearch()"
+                               (keyup.escape)="clearSearch()"
+                               autofocus>
+                        
+                        <button class="nav-btn close-search-btn" (click)="clearSearch()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
 
         <!-- Loading State -->
@@ -241,6 +242,27 @@
         }
 
     </main>
+
+    <!-- Mobile FAB for actions (Outside scrolling body) -->
+    @if (isToolbarCollapsed()) {
+        <div class="mobile-action-fab dropup">
+            <button class="btn fab-main shadow-lg" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg mb-2">
+                <li>
+                    <button class="dropdown-item d-flex align-items-center gap-2" (click)="startCreateFolder()">
+                        <i class="bi bi-folder-plus text-primary"></i> New Folder
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item d-flex align-items-center gap-2" (click)="startCreateFile()">
+                        <i class="bi bi-file-earmark-plus text-primary"></i> New File
+                    </button>
+                </li>
+            </ul>
+        </div>
+    }
 
     <!-- Native Context Menu -->
     @if (openMenuId() !== null) {
