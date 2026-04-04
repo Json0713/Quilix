@@ -70,12 +70,8 @@
                                (ngModelChange)="searchQuery.set($event); onSearch()"
                                (keyup.escape)="clearSearch()"
                                autofocus>
-                        @if (searchQuery()) {
-                            <button class="clear-search-btn" (click)="clearSearch()">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        }
-                        <button class="nav-btn close-search-btn" (click)="toggleSearchExpanded()">
+                        
+                        <button class="nav-btn close-search-btn" (click)="clearSearch()">
                             <i class="bi bi-x-lg"></i>
                         </button>
                     </div>
@@ -105,7 +101,11 @@
                 </div>
 
                 <div class="dropdown">
-                    <button class="nav-btn sort-btn" data-bs-toggle="dropdown" [title]="'Sort by: ' + sortBy()">
+                    <button class="nav-btn sort-btn" 
+                            data-bs-toggle="dropdown" 
+                            data-bs-boundary="viewport"
+                            data-bs-popper-config='{"strategy":"fixed"}'
+                            [title]="'Sort by: ' + sortBy()">
                         <i class="bi bi-sort-down"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm">
