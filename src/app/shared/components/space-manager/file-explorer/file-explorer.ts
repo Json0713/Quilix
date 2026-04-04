@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal, computed, HostListener, inject, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, signal, computed, HostListener, inject, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -33,6 +33,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   @Input() rootHandle: FileSystemDirectoryHandle | null = null;
   @Input() spaceName: string = 'Space';
   reactiveSpaceName = signal<string>('Space');
+  @Output() breadcrumbsChanged = new EventEmitter<any[]>();
 
   // Navigation History (Breadcrumbs map to polymorphic Nodes)
   history = signal<{ name: string, handle?: FileSystemDirectoryHandle, id?: string, parentHandle?: FileSystemDirectoryHandle }[]>([]);
@@ -80,48 +81,18 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   // Global clipboard state exposed for UI
   clipboardHasItem = computed(() => this.fileManager.clipboard() !== null);
 
-  // Local Toolbar Breadcrumbs
-  localBreadcrumbs = computed(() => {
-      const hist = this.history();
-      const breadcrumbs = hist.map((node, index) => {
-          let label = node.name;
-          // Root name (index 0) should be reactive
-          if (index === 0) label = this.reactiveSpaceName();
-
-          return {
-              label: label,
-              isLast: index === hist.length - 1,
-              action: () => {
-                  if (index < hist.length - 1) {
-                      this.navigateToCrumb(index);
-                  }
-              }
-          };
-      });
-
-      // Find root type for home link
-      const rootType = location.pathname.split('/')[1] || 'personal';
-      breadcrumbs.unshift({
-          label: 'Home',
-          isLast: false,
-          action: () => this.router.navigate([`/${rootType}`])
-      });
-
-      return breadcrumbs;
-  });
-
   constructor() {}
 
   ngOnInit() {
     this.reactiveSpaceName.set(this.spaceName);
     this.monitorSpaceDetails();
 
-    // Initialize history with space root (handles either native or virtual)
     this.history.set([{ 
         name: this.reactiveSpaceName(), 
         handle: this.rootHandle || undefined, 
         id: undefined // Space root is always 'root' in virtual engine
     }]);
+    this.emitBreadcrumbs();
     this.loadCurrentDirectory();
     this.checkToolbarResponsive();
   }
@@ -134,10 +105,23 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       this.spaceSub = this.spaceService.liveSpaceAnyStatus$(this.spaceId).subscribe(space => {
           if (space && space.name !== this.reactiveSpaceName()) {
               this.reactiveSpaceName.set(space.name);
+              this.emitBreadcrumbs(); // Header breadcrumbs should update if space is renamed
           }
       });
   }
 
+  private emitBreadcrumbs() {
+      const hist = this.history();
+      const breadcrumbs = hist.map((node, index) => {
+          let label = node.name;
+          if (index === 0) label = this.reactiveSpaceName();
+          return {
+              label: label,
+              isLast: index === hist.length - 1
+          };
+      });
+      this.breadcrumbsChanged.emit(breadcrumbs);
+  }
 
   // Derived sorted entries
   sortedEntries = computed(() => {
@@ -177,8 +161,8 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   }
 
   private checkToolbarResponsive() {
-      // Threshold for collapsing breadcrumbs to make room for search
-      this.isToolbarCollapsed.set(window.innerWidth < 1000); // Or use a container query logic if preferred
+      // Threshold for collapsing breadcrumbs and showing mobile search toggle
+      this.isToolbarCollapsed.set(window.innerWidth < 770); 
   }
 
   @HostListener('window:focus')
@@ -318,6 +302,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       this.selectedEntry.set(null);
       this.openMenuId.set(null);
       await this.loadCurrentDirectory();
+      this.emitBreadcrumbs();
     } else {
       // It's a file, try to open it natively?
       this.snackbar.info(`File preview coming soon. (${entry.name})`);
@@ -333,6 +318,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       this.selectedEntry.set(null);
       this.openMenuId.set(null);
       await this.loadCurrentDirectory();
+      this.emitBreadcrumbs();
     }
   }
 
@@ -345,10 +331,11 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       this.selectedEntry.set(null);
       this.openMenuId.set(null);
       await this.loadCurrentDirectory();
+      this.emitBreadcrumbs();
     }
   }
 
-  async navigateToCrumb(index: number) {
+  public async navigateToCrumb(index: number) {
     const hist = [...this.history()];
     if (index >= 0 && index < hist.length - 1) {
       const removed = hist.splice(index + 1); // Everything after the chosen crumb index
@@ -357,6 +344,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       this.selectedEntry.set(null);
       this.openMenuId.set(null);
       await this.loadCurrentDirectory();
+      this.emitBreadcrumbs();
     }
   }
 

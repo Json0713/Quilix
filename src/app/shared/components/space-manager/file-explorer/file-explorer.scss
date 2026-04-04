@@ -39,59 +39,33 @@
     top: 0;
     z-index: 20;
 
+    // Mobile Ribbon Pattern: Allow horizontal scrolling on narrow screens
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+        display: none; // Hide scrollbar for a cleaner mobile ribbon look
+    }
+    scrollbar-width: none; // Firefox
+
     .nav-controls {
         display: flex;
         gap: 2px;
     }
 
-    .explorer-breadcrumbs {
-        display: flex;
-        align-items: center;
-        gap: 4px;
+    .toolbar-spacer {
         flex: 1;
         min-width: 0;
-        overflow: hidden;
-        margin: 0 0.5rem;
         transition: all 0.3s ease;
 
-        &.hidden {
-            width: 0;
-            padding: 0;
-            margin: 0;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .breadcrumb-item {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            padding: 4px 8px;
-            border-radius: 6px;
-            white-space: nowrap;
-            transition: all 0.2s;
-            cursor: pointer;
-
-            &:hover:not(.last) {
-                background: var(--surface-alt);
-                color: var(--text-main);
-            }
-
-            &.last {
-                color: var(--text-main);
-                font-weight: 600;
-                cursor: default;
-                text-overflow: ellipsis;
-                overflow: hidden;
-            }
-        }
-
-        .breadcrumb-separator {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            opacity: 0.5;
-            flex-shrink: 0;
+        &.compact {
+            flex: 0 0 1rem; // Small gap on mobile if we want everything on the left?
+            // Actually, let's keep flex: 1 but let the user decide.
+            // If the user said "huge gap" is frustrating, maybe they WANT them closer.
+            // Let's use flex: 1 but ensure no overflow.
+            flex: 1; 
         }
     }
 
@@ -162,21 +136,33 @@
             }
         }
 
-        @media (max-width: 640px) {
-            display: none !important;
+        &.mobile-expanded {
+            display: block !important;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100% !important;
+            max-width: 100%;
+            margin: 0;
+            padding: 0 0.5rem;
+            background: var(--surface-main);
+            z-index: 100;
+            display: flex !important;
+            align-items: center;
 
-            &.expanded {
-                display: block !important;
-                position: absolute;
-                top: 48px;
-                left: 0;
-                right: 0;
-                max-width: 100%;
-                margin: 0;
-                padding: 0.5rem 0.75rem;
-                background: var(--surface-main);
-                border-bottom: 1px solid var(--border);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            .search-input-group {
+                width: 100%;
+                height: 40px;
+                border: none;
+                background: transparent;
+                box-shadow: none;
+            }
+
+            .close-search-btn {
+                margin-left: 0.5rem;
+                flex-shrink: 0;
             }
         }
     }
@@ -195,7 +181,7 @@
         align-items: center;
         gap: 0.5rem;
         flex-shrink: 0;
-        margin-left: auto; // SAFETY: Force push to right if needed
+        margin-left: auto;
     }
 
     .nav-btn {

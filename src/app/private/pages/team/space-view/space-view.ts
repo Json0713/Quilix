@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SpaceService } from '../../../../core/services/components/space.service';
@@ -45,6 +45,19 @@ export class SpaceView implements OnInit, OnDestroy {
     private initialPos = { x: 0, y: 0 };
 
     private readonly STORAGE_KEY = 'quilix_explorer_state_team';
+
+    @ViewChild(FileExplorerComponent) explorer!: FileExplorerComponent;
+    explorerBreadcrumbs = signal<any[]>([]);
+
+    onBreadcrumbsChanged(crumbs: any[]) {
+        this.explorerBreadcrumbs.set(crumbs);
+    }
+
+    navigateToExplorerCrumb(index: number) {
+        if (this.explorer) {
+            this.explorer.navigateToCrumb(index);
+        }
+    }
 
     private paramSub!: Subscription;
     private spaceSub: any;

@@ -21,37 +21,33 @@
 
             <div class="toolbar-divider"></div>
 
-            <!-- Center: Breadcrumbs (Collapsible) -->
-            <div class="explorer-breadcrumbs" [class.hidden]="isToolbarCollapsed()">
-                @for (crumb of localBreadcrumbs(); track i; let i = $index) {
-                    <button class="breadcrumb-item" [class.last]="crumb.isLast" (click)="crumb.action()">
-                        {{ crumb.label }}
-                    </button>
-                    @if (!crumb.isLast) {
-                        <i class="bi bi-chevron-right breadcrumb-separator"></i>
-                    }
-                }
-            </div>
+            @if (!isToolbarCollapsed()) {
+                <!-- Center: Spacer for search bar alignment -->
+                <div class="toolbar-spacer shadow-none"></div>
 
-            <!-- New: Space-wide Search -->
-            <div class="explorer-search-container" [class.expanded]="isSearchExpanded()">
-                <div class="search-input-group">
-                    <i class="bi bi-search search-icon"></i>
-                    <input type="text" 
-                           class="explorer-search-input" 
-                           placeholder="Search space..."
-                           [ngModel]="searchQuery()"
-                           (ngModelChange)="searchQuery.set($event); onSearch()"
-                           (keyup.escape)="clearSearch()">
-                    @if (searchQuery()) {
-                        <button class="clear-search-btn" (click)="clearSearch()">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    }
+                <!-- New: Space-wide Search (Desktop) -->
+                <div class="explorer-search-container">
+                    <div class="search-input-group">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" 
+                               class="explorer-search-input" 
+                               placeholder="Search space..."
+                               [ngModel]="searchQuery()"
+                               (ngModelChange)="searchQuery.set($event); onSearch()"
+                               (keyup.escape)="clearSearch()">
+                        @if (searchQuery()) {
+                            <button class="clear-search-btn" (click)="clearSearch()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        }
+                    </div>
                 </div>
-            </div>
+            } @else {
+                 <!-- Compact Spacer for Mobile -->
+                 <div class="toolbar-spacer compact"></div>
+            }
 
-            <!-- Mobile Search Toggle (Visible on small screens) -->
+            <!-- Mobile Search Toggle -->
             @if (isToolbarCollapsed()) {
                 <button class="nav-btn mobile-search-toggle" 
                         (click)="toggleSearchExpanded()" 
@@ -59,6 +55,31 @@
                         title="Search">
                     <i class="bi bi-search"></i>
                 </button>
+            }
+
+            <!-- Mobile Search Overlay (Visible only when expanded) -->
+            @if (isToolbarCollapsed() && isSearchExpanded()) {
+                <div class="explorer-search-container mobile-expanded">
+                    <div class="search-input-group">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" 
+                               class="explorer-search-input" 
+                               placeholder="Search space..."
+                               #mobileSearch
+                               [ngModel]="searchQuery()"
+                               (ngModelChange)="searchQuery.set($event); onSearch()"
+                               (keyup.escape)="clearSearch()"
+                               autofocus>
+                        @if (searchQuery()) {
+                            <button class="clear-search-btn" (click)="clearSearch()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        }
+                        <button class="nav-btn close-search-btn" (click)="toggleSearchExpanded()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
             }
 
             <!-- Right: View & Sort Controls -->

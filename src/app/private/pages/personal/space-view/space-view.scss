@@ -166,11 +166,56 @@
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        font-weight: 600;
-        font-size: 0.9rem;
+        font-weight: 500;
+        font-size: 0.85rem;
         color: var(--text-main);
-        
-        i { color: var(--action); font-size: 1.1rem; }
+        min-width: 0; // Allow shrinking
+        flex: 1;
+
+        .window-icon { color: var(--action); font-size: 1.1rem; flex-shrink: 0; }
+
+        .window-breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            overflow: hidden;
+            white-space: nowrap;
+            mask-image: linear-gradient(to right, black 85%, transparent 100%);
+            
+            .crumb-link {
+                background: transparent;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 6px;
+                color: var(--text-muted);
+                font-size: 0.85rem;
+                cursor: pointer;
+                transition: all 0.2s;
+                white-space: nowrap;
+                max-width: 150px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                &:hover {
+                    background: var(--surface-alt-light);
+                    color: var(--text-main);
+                }
+
+                &.active {
+                    color: var(--text-main);
+                    font-weight: 600;
+                    cursor: default;
+                    pointer-events: none;
+                }
+            }
+
+            .crumb-sep {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                opacity: 0.5;
+                flex-shrink: 0;
+            }
+        }
     }
 
     .window-controls {
