@@ -380,6 +380,13 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     this.renamingEntry.set(entry);
     this.renameValue.set(entry.name);
     this.openMenuId.set(null);
+    setTimeout(() => {
+        const input = document.querySelector<HTMLInputElement>('.inline-rename-input');
+        if (input) {
+            input.focus();
+            input.select();
+        }
+    }, 10);
   }
 
   cancelRename() {
@@ -461,12 +468,29 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       this.isCreatingFolder.set(true);
       this.isCreatingFile.set(false);
       this.newItemName.set('New folder');
+      setTimeout(() => {
+          const input = document.querySelector<HTMLInputElement>('.inline-rename-input');
+          if (input) {
+              input.focus();
+              input.select();
+          }
+      }, 10);
   }
 
   startCreateFile() {
       this.isCreatingFile.set(true);
       this.isCreatingFolder.set(false);
       this.newItemName.set('New file.txt');
+      setTimeout(() => {
+          const input = document.querySelector<HTMLInputElement>('.inline-rename-input');
+          if (input) {
+              input.focus();
+              // Highlight only the filename, not the extension, for convenience
+              const lastDot = input.value.lastIndexOf('.');
+              if (lastDot > 0) input.setSelectionRange(0, lastDot);
+              else input.select();
+          }
+      }, 10);
   }
 
   cancelCreateItem() {

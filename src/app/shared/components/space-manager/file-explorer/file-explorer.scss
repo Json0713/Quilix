@@ -457,53 +457,19 @@
     }
 }
 
-.rename-inline-input {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    min-width: 250px;
-    max-width: 400px;
-    background-color: var(--surface-main);
-    border: 1px solid var(--border);
-    border-radius: 0.375rem; // rounded
-    backdrop-filter: blur(8px);
+.inline-rename-input {
+    width: 100%;
+    background: var(--surface-main);
+    color: var(--text-main);
+    border: 1px solid var(--action);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.2);
     
-    .rename-input {
-        flex: 1;
-        background: transparent;
-        border: none;
-        outline: none;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        color: var(--text-main);
-        width: 100%;
-
-        &::placeholder {
-            color: var(--text-muted);
-            opacity: 0.6;
-        }
-    }
-
-    .inline-action-btn {
-        background: transparent;
-        border: none;
-        padding: 0.25rem 0.5rem;
-        border-radius: 6px;
-        transition: all 0.15s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &.success {
-            color: var(--text-main);
-            &:hover { background: var(--surface-alt); }
-        }
-        &.cancel {
-            color: var(--text-muted);
-            &:hover { background: var(--surface-alt); }
-        }
+    &::placeholder {
+        color: var(--text-muted);
     }
 }
 
@@ -521,6 +487,11 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     padding: 4px;
     backdrop-filter: blur(12px); // glass-panel
+    
+    // Constraints for overflow prevention
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    overflow-x: hidden;
 
     .ctx-header {
         padding: 0.25rem 1rem; // px-3 py-1

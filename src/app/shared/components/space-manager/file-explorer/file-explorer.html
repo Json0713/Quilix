@@ -23,12 +23,29 @@
 
             <!-- New: Action Controls (Desktop only) right after nav-controls -->
             @if (!isToolbarCollapsed()) {
-                <button class="btn explorer-action-btn" (click)="startCreateFolder()" title="New Folder">
-                    <i class="bi bi-folder-plus"></i>
-                </button>
-                <button class="btn explorer-action-btn" (click)="startCreateFile()" title="New File">
-                    <i class="bi bi-file-earmark-plus"></i>
-                </button>
+                <div class="dropdown">
+                    <button class="btn explorer-action-btn d-flex align-items-center gap-2 px-3 dropdown-toggle" 
+                            style="width: auto;" 
+                            data-bs-toggle="dropdown" 
+                            data-bs-boundary="viewport"
+                            data-bs-popper-config='{"strategy":"fixed"}'
+                            aria-expanded="false" 
+                            title="New">
+                        <i class="bi bi-plus-lg"></i> New
+                    </button>
+                    <ul class="dropdown-menu shadow-sm">
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center gap-2" (click)="startCreateFolder()">
+                                <i class="bi bi-folder-plus text-primary"></i> Folder
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center gap-2" (click)="startCreateFile()">
+                                <i class="bi bi-file-earmark-plus text-primary"></i> File
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             }
 
             @if (!isToolbarCollapsed()) {
@@ -150,29 +167,9 @@
             </div>
         }
 
-        <!-- Rename/Create Overlay -->
-        @if (renamingEntry() || isCreatingFolder() || isCreatingFile()) {
-            <div class="rename-inline-input">
-                @if (isCreatingFolder()) { <i class="bi bi-folder-fill folder-icon"></i> }
-                @if (isCreatingFile()) { <i class="bi bi-file-earmark-text file-icon"></i> }
-                
-                @if (renamingEntry() && renamingEntry()?.kind === 'file') { <i class="bi bi-file-earmark-text file-icon"></i> }
-                @if (renamingEntry() && renamingEntry()?.kind === 'directory') { <i class="bi bi-folder-fill folder-icon"></i> }
-                
-                <input type="text" class="rename-input" 
-                       [value]="(isCreatingFolder() || isCreatingFile()) ? newItemName() : renameValue()" 
-                       (input)="(isCreatingFolder() || isCreatingFile()) ? newItemName.set($any($event.target).value) : renameValue.set($any($event.target).value)"
-                       (keyup.enter)="(isCreatingFolder() || isCreatingFile()) ? confirmCreateItem() : confirmRename()"
-                       (keyup.escape)="(isCreatingFolder() || isCreatingFile()) ? cancelCreateItem() : cancelRename()"
-                       autofocus placeholder="Name...">
-                       
-                <button class="btn btn-text inline-action-btn success" (click)="(isCreatingFolder() || isCreatingFile()) ? confirmCreateItem() : confirmRename()"><i class="bi bi-check-lg"></i></button>
-                <button class="btn btn-text inline-action-btn cancel" (click)="(isCreatingFolder() || isCreatingFile()) ? cancelCreateItem() : cancelRename()"><i class="bi bi-x-lg"></i></button>
-            </div>
-        }
 
         <!-- Empty State -->
-        @if (!isLoading() && sortedEntries().length === 0) {
+        @if (!isLoading() && sortedEntries().length === 0 && !isCreatingFolder() && !isCreatingFile()) {
             <div class="empty-state">
                 <i class="bi bi-folder2-open empty-icon"></i>
                 <h6 class="empty-state-title">This folder is empty</h6>
@@ -181,7 +178,7 @@
         }
 
         <!-- Contents -->
-        @if (!isLoading() && sortedEntries().length > 0) {
+        @if (!isLoading() && (sortedEntries().length > 0 || isCreatingFolder() || isCreatingFile())) {
             <div [class]="viewMode() === 'grid' ? 'file-grid' : 'file-list'">
                 <!-- List View Custom Header -->
                 @if (viewMode() === 'list') {
@@ -191,6 +188,53 @@
                         <div class="col-header">Date Modified</div>
                         <div class="col-header">Size</div>
                         <div class="col-header"></div> <!-- Actions padding -->
+                    </div>
+                }
+
+                <!-- MOCK NEW ITEM (If Creating) -->
+                @if (isCreatingFolder() || isCreatingFile()) {
+                    <div class="file-card selected create-dummy">
+                        <!-- GRID VIEW MOCK -->
+                        @if (viewMode() === 'grid') {
+                            <div class="icon-wrapper">
+                                @if (isCreatingFolder()) { <i class="bi bi-folder-fill folder-icon"></i> }
+                                @if (isCreatingFile()) { <i class="bi bi-file-earmark-text file-icon"></i> }
+                            </div>
+                            <div class="file-details">
+                                <div class="d-flex w-100 align-items-center gap-1">
+                                    <input type="text" class="inline-rename-input w-100"
+                                           [value]="newItemName()"
+                                           (input)="newItemName.set($any($event.target).value)"
+                                           (keyup.enter)="confirmCreateItem()"
+                                           (keyup.escape)="cancelCreateItem()"
+                                           (blur)="confirmCreateItem()"
+                                           autofocus placeholder="Name...">
+                                </div>
+                            </div>
+                        }
+                        
+                        <!-- LIST VIEW MOCK -->
+                        @if (viewMode() === 'list') {
+                            <div class="col-name">
+                                <div class="icon-wrapper">
+                                    @if (isCreatingFolder()) { <i class="bi bi-folder-fill folder-icon"></i> }
+                                    @if (isCreatingFile()) { <i class="bi bi-file-earmark-text file-icon"></i> }
+                                </div>
+                                <div class="d-flex w-100 align-items-center gap-1">
+                                    <input type="text" class="inline-rename-input w-100"
+                                           [value]="newItemName()"
+                                           (input)="newItemName.set($any($event.target).value)"
+                                           (keyup.enter)="confirmCreateItem()"
+                                           (keyup.escape)="cancelCreateItem()"
+                                           (blur)="confirmCreateItem()"
+                                           autofocus placeholder="Name...">
+                                </div>
+                            </div>
+                            <div class="col-type">...</div>
+                            <div class="col-date">Just now</div>
+                            <div class="col-size">-</div>
+                            <div class="col-actions"></div>
+                        }
                     </div>
                 }
 
@@ -208,7 +252,19 @@
                                 @if (entry.kind === 'file') { <i class="bi bi-file-earmark-text file-icon"></i> }
                             </div>
                             <div class="file-details">
-                                <span class="file-name" [title]="entry.name">{{ entry.name }}</span>
+                                @if (renamingEntry() === entry) {
+                                    <div class="d-flex w-100 align-items-center gap-1">
+                                        <input type="text" class="inline-rename-input w-100" 
+                                               [value]="renameValue()" 
+                                               (input)="renameValue.set($any($event.target).value)"
+                                               (keyup.enter)="confirmRename()"
+                                               (keyup.escape)="cancelRename()"
+                                               (blur)="confirmRename()"
+                                               autofocus>
+                                    </div>
+                                } @else {
+                                    <span class="file-name" [title]="entry.name">{{ entry.name }}</span>
+                                }
                             </div>
                         }
 
@@ -219,7 +275,19 @@
                                     @if (entry.kind === 'directory') { <i class="bi bi-folder-fill folder-icon"></i> }
                                     @if (entry.kind === 'file') { <i class="bi bi-file-earmark-text file-icon"></i> }
                                 </div>
-                                <span class="file-name" [title]="entry.name">{{ entry.name }}</span>
+                                @if (renamingEntry() === entry) {
+                                    <div class="d-flex w-100 align-items-center gap-1">
+                                        <input type="text" class="inline-rename-input w-100" 
+                                               [value]="renameValue()" 
+                                               (input)="renameValue.set($any($event.target).value)"
+                                               (keyup.enter)="confirmRename()"
+                                               (keyup.escape)="cancelRename()"
+                                               (blur)="confirmRename()"
+                                               autofocus>
+                                    </div>
+                                } @else {
+                                    <span class="file-name" [title]="entry.name">{{ entry.name }}</span>
+                                }
                             </div>
                             <div class="col-type">
                                 {{ getDetailedType(entry) }}
