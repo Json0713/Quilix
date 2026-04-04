@@ -52,12 +52,14 @@
             </div>
 
             <!-- Mobile Search Toggle (Visible on small screens) -->
-            <button class="nav-btn mobile-search-toggle" 
-                    (click)="toggleSearchExpanded()" 
-                    [class.active]="isSearchExpanded()"
-                    title="Search">
-                <i class="bi bi-search"></i>
-            </button>
+            @if (isToolbarCollapsed()) {
+                <button class="nav-btn mobile-search-toggle" 
+                        (click)="toggleSearchExpanded()" 
+                        [class.active]="isSearchExpanded()"
+                        title="Search">
+                    <i class="bi bi-search"></i>
+                </button>
+            }
 
             <!-- Right: View & Sort Controls -->
             <div class="view-sort-controls">
