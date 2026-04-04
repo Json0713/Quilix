@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, signal, computed, HostListener, inject, effect, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, signal, computed, HostListener, inject, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,7 +6,6 @@ import { FileExplorerEntry, FileManagerService } from '../../../../core/services
 import { FileSystemService } from '../../../../core/services/data/file-system.service';
 import { SnackbarService } from '../../../../services/ui/common/snackbar/snackbar.service';
 import { ModalService } from '../../../../services/ui/common/modal/modal';
-import { ToolbarService, ToolbarConfig } from '../../../../core/services/ui/toolbar.service';
 import { db } from '../../../../core/database/dexie.service';
 import { Space } from '../../../../core/interfaces/space';
 
@@ -21,7 +20,6 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   private fileManager = inject(FileManagerService);
   private fileSystem = inject(FileSystemService);
   private snackbar = inject(SnackbarService);
-  private toolbar = inject(ToolbarService);
   private router = inject(Router);
   readonly modals = inject(ModalService);
 
@@ -67,12 +65,31 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   // Global clipboard state exposed for UI
   clipboardHasItem = computed(() => this.fileManager.clipboard() !== null);
 
-  constructor() {
-      // Actively project internal Signals out to the Global Nav Bar
-      effect(() => {
-          this.updateGlobalToolbar();
+  // Local Toolbar Breadcrumbs
+  localBreadcrumbs = computed(() => {
+      const hist = this.history();
+      const breadcrumbs = hist.map((node, index) => ({
+          label: node.name,
+          isLast: index === hist.length - 1,
+          action: () => {
+              if (index < hist.length - 1) {
+                  this.navigateToCrumb(index);
+              }
+          }
+      }));
+
+      // Find root type for home link
+      const rootType = location.pathname.split('/')[1] || 'personal';
+      breadcrumbs.unshift({
+          label: 'Home',
+          isLast: false,
+          action: () => this.router.navigate([`/${rootType}`])
       });
-  }
+
+      return breadcrumbs;
+  });
+
+  constructor() {}
 
   ngOnInit() {
     // Initialize history with space root (handles either native or virtual)
@@ -84,106 +101,8 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     this.loadCurrentDirectory();
   }
 
-  ngOnDestroy() {
-      this.toolbar.clearConfig(); // Restore global nav bar when leaving the Space
-  }
+  ngOnDestroy() {}
 
-  // --- Toolbar Integration ---
-  
-  private updateGlobalToolbar() {
-      // Resolve states
-      const hist = this.history();
-      const currentMode = this.viewMode();
-      const currentSort = this.sortBy();
-      const asc = this.sortAscending();
-      const hasClipboard = this.clipboardHasItem();
-
-      // Ensure root URL is correct for Space
-      const spaceRootParts = location.pathname.split('/');
-      const rootType = spaceRootParts[1]; // 'personal' or 'team'
-      const spaceUrlRoot = `/${rootType}/spaces`;
-
-      // 1. Build Breadcrumbs mapped to the history array
-      const breadcrumbs = hist.map((node, index) => ({
-          label: node.name,
-          isLast: index === hist.length - 1,
-          action: () => {
-              if (index < hist.length - 1) {
-                  this.navigateToCrumb(index);
-              }
-          }
-      }));
-
-      // Add "Home" escape hatch to Breadcrumbs
-      breadcrumbs.unshift({
-          label: 'Home',
-          isLast: false,
-          action: () => {
-              // Now completely SPA bound, no more refreshing the page context.
-              this.router.navigate([`/${rootType}`]);
-          }
-      });
-
-      // 2. Build Config Object
-      const config: ToolbarConfig = {
-          breadcrumbs: breadcrumbs,
-          navControls: {
-              canGoBack: hist.length > 1,
-              canGoForward: this.forwardHistory().length > 0,
-              onBack: () => this.navigateBack(),
-              onForward: () => this.navigateForward(),
-              onRefresh: () => this.loadCurrentDirectory(true)
-          },
-          pillGroups: [
-              {
-                  id: 'view-toggles',
-                  pills: [
-                      {
-                          id: 'list',
-                          icon: 'bi-list',
-                          isActive: currentMode === 'list',
-                          tooltip: 'List View',
-                          action: () => this.viewMode.set('list')
-                      },
-                      {
-                          id: 'grid',
-                          icon: 'bi-grid-fill',
-                          isActive: currentMode === 'grid',
-                          tooltip: 'Grid View',
-                          action: () => this.viewMode.set('grid')
-                      }
-                  ]
-              }
-          ],
-          dropdowns: [
-              {
-                  id: 'sort',
-                  icon: 'bi-sort-down',
-                  label: `Sort by: ${currentSort}`,
-                  items: [
-                      { id: 'name', label: 'Name', icon: currentSort === 'name' ? (asc ? 'bi-chevron-up' : 'bi-chevron-down') : '', action: () => this.setSort('name') },
-                      { id: 'date', label: 'Date Modified', icon: currentSort === 'date' ? (asc ? 'bi-chevron-up' : 'bi-chevron-down') : '', action: () => this.setSort('date') },
-                      { id: 'size', label: 'Size', icon: currentSort === 'size' ? (asc ? 'bi-chevron-up' : 'bi-chevron-down') : '', action: () => this.setSort('size') }
-                  ]
-              }
-          ],
-          actions: []
-      };
-
-      // Add Paste button conditionally based on clipboard
-      if (hasClipboard) {
-          config.actions!.push({
-              id: 'paste',
-              label: 'Paste',
-              icon: 'bi-clipboard',
-              isPrimary: false,
-              action: () => this.paste()
-          });
-      }
-
-      // Push to global context
-      this.toolbar.setConfig(config);
-  }
 
   // Derived sorted entries
   sortedEntries = computed(() => {

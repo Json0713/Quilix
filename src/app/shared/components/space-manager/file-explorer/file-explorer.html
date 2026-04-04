@@ -5,12 +5,91 @@
         
         <!-- Local Explorer Toolbar (New Actions) -->
         <div class="explorer-local-toolbar">
-            <button class="btn explorer-action-btn" (click)="startCreateFolder()">
-                <i class="bi bi-folder-plus"></i> New Folder
-            </button>
-            <button class="btn explorer-action-btn" (click)="startCreateFile()">
-                <i class="bi bi-file-earmark-plus"></i> New File
-            </button>
+            
+            <!-- Left: Navigation Controls -->
+            <div class="nav-controls">
+                <button class="nav-btn" [class.disabled]="history().length <= 1" (click)="navigateBack()" title="Back">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                <button class="nav-btn" [class.disabled]="forwardHistory().length === 0" (click)="navigateForward()" title="Forward">
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+                <button class="nav-btn" (click)="loadCurrentDirectory(true)" title="Refresh">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+
+            <div class="toolbar-divider"></div>
+
+            <!-- Center: Breadcrumbs -->
+            <div class="explorer-breadcrumbs">
+                @for (crumb of localBreadcrumbs(); track i; let i = $index) {
+                    <button class="breadcrumb-item" [class.last]="crumb.isLast" (click)="crumb.action()">
+                        {{ crumb.label }}
+                    </button>
+                    @if (!crumb.isLast) {
+                        <i class="bi bi-chevron-right breadcrumb-separator"></i>
+                    }
+                }
+            </div>
+
+            <!-- Right: View & Sort Controls -->
+            <div class="view-sort-controls">
+                
+                @if (clipboardHasItem()) {
+                    <button class="nav-btn paste-btn" (click)="paste()" title="Paste">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                    <div class="toolbar-divider"></div>
+                }
+
+                <div class="controls-pill">
+                    <button class="pill-btn nav-btn" [class.active]="viewMode() === 'list'" 
+                            (click)="viewMode.set('list')" title="List View">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <span class="pill-divider"></span>
+                    <button class="pill-btn nav-btn" [class.active]="viewMode() === 'grid'" 
+                            (click)="viewMode.set('grid')" title="Grid View">
+                        <i class="bi bi-grid-fill"></i>
+                    </button>
+                </div>
+
+                <div class="dropdown">
+                    <button class="nav-btn sort-btn" data-bs-toggle="dropdown" [title]="'Sort by: ' + sortBy()">
+                        <i class="bi bi-sort-down"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center gap-2" (click)="setSort('name')">
+                                <i class="bi bi-fonts"></i> Name
+                                @if (sortBy() === 'name') { <i [class]="sortAscending() ? 'bi-chevron-up ms-auto' : 'bi-chevron-down ms-auto'"></i> }
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center gap-2" (click)="setSort('date')">
+                                <i class="bi bi-calendar-event"></i> Date Modified
+                                @if (sortBy() === 'date') { <i [class]="sortAscending() ? 'bi-chevron-up ms-auto' : 'bi-chevron-down ms-auto'"></i> }
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center gap-2" (click)="setSort('size')">
+                                <i class="bi bi-layers"></i> Size
+                                @if (sortBy() === 'size') { <i [class]="sortAscending() ? 'bi-chevron-up ms-auto' : 'bi-chevron-down ms-auto'"></i> }
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="toolbar-divider"></div>
+
+                <button class="btn explorer-action-btn" (click)="startCreateFolder()" title="New Folder">
+                    <i class="bi bi-folder-plus"></i>
+                </button>
+                <button class="btn explorer-action-btn" (click)="startCreateFile()" title="New File">
+                    <i class="bi bi-file-earmark-plus"></i>
+                </button>
+            </div>
         </div>
 
         <!-- Loading State -->
