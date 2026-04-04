@@ -220,6 +220,89 @@ export class FileManagerService {
         return false;
     }
 
+    /**
+     * Polymorphic Space-wide Search
+     */
+    async searchEntries(context: { handle?: FileSystemDirectoryHandle, spaceId: string }, query: string): Promise<FileExplorerEntry[]> {
+        const mode = await this.fileSystem.getStorageMode();
+        const searchTerms = query.toLowerCase().trim().split(' ').filter(t => t.length > 0);
+        
+        if (searchTerms.length === 0) return [];
+
+        if (mode === 'filesystem' && context.handle) {
+            return this.searchNative(context.handle, searchTerms);
+        } else {
+            return this.searchVirtual(context.spaceId, searchTerms);
+        }
+    }
+
+    private async searchNative(rootHandle: FileSystemDirectoryHandle, searchTerms: string[]): Promise<FileExplorerEntry[]> {
+        const results: FileExplorerEntry[] = [];
+        
+        const traverse = async (dirHandle: FileSystemDirectoryHandle) => {
+            for await (const entry of (dirHandle as any).values()) {
+                if (entry.name.startsWith('.quilix')) continue;
+
+                // Match against all terms (AND logic)
+                const nameLower = entry.name.toLowerCase();
+                const matches = searchTerms.every(term => nameLower.includes(term));
+
+                if (matches) {
+                    let sizeBytes = undefined;
+                    let lastModified = undefined;
+                    let id = undefined;
+
+                    if (entry.kind === 'file') {
+                        try {
+                            const file = await (entry as FileSystemFileHandle).getFile();
+                            sizeBytes = file.size;
+                            lastModified = file.lastModified;
+                        } catch (e) {}
+                    } else {
+                         const res = await this.fileSystem.readDirectoryId(entry as FileSystemDirectoryHandle);
+                         id = res?.id || undefined;
+                         if (res) lastModified = res.lastModified;
+                    }
+
+                    results.push({
+                        name: entry.name,
+                        kind: entry.kind,
+                        handle: entry,
+                        id,
+                        sizeBytes,
+                        lastModified
+                    });
+                }
+
+                if (entry.kind === 'directory') {
+                    await traverse(entry as FileSystemDirectoryHandle);
+                }
+            }
+        };
+
+        await traverse(rootHandle);
+        return this.sortEntries(results);
+    }
+
+    private async searchVirtual(spaceId: string, searchTerms: string[]): Promise<FileExplorerEntry[]> {
+        // Fetch all items in this space (since it's a flat structure in the DB usually or we can query by spaceId)
+        const allItems = await db.virtual_entries.where('spaceId').equals(spaceId).toArray();
+        
+        const filtered = allItems.filter(item => {
+            const nameLower = item.name.toLowerCase();
+            return searchTerms.every(term => nameLower.includes(term));
+        });
+
+        return this.sortEntries(filtered.map(i => ({
+            id: i.id,
+            name: i.name,
+            kind: i.kind,
+            sizeBytes: i.sizeBytes,
+            lastModified: i.lastModified,
+            parentId: i.parentId === 'root' ? null : i.parentId
+        })));
+    }
+
     setClipboard(entry: FileExplorerEntry, action: 'copy' | 'cut') {
         this.clipboard.set({ entry, action });
     }

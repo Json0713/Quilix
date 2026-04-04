@@ -8,6 +8,8 @@ import { SnackbarService } from '../../../../services/ui/common/snackbar/snackba
 import { ModalService } from '../../../../services/ui/common/modal/modal';
 import { db } from '../../../../core/database/dexie.service';
 import { Space } from '../../../../core/interfaces/space';
+import { SpaceService } from '../../../../core/services/components/space.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-file-explorer',
@@ -19,14 +21,18 @@ import { Space } from '../../../../core/interfaces/space';
 export class FileExplorerComponent implements OnInit, OnDestroy {
   private fileManager = inject(FileManagerService);
   private fileSystem = inject(FileSystemService);
+  private spaceService = inject(SpaceService);
   private snackbar = inject(SnackbarService);
   private router = inject(Router);
   readonly modals = inject(ModalService);
+
+  private spaceSub?: any;
 
   @Input({ required: true }) spaceId!: string;
   @Input({ required: true }) workspaceId!: string;
   @Input() rootHandle: FileSystemDirectoryHandle | null = null;
   @Input() spaceName: string = 'Space';
+  reactiveSpaceName = signal<string>('Space');
 
   // Navigation History (Breadcrumbs map to polymorphic Nodes)
   history = signal<{ name: string, handle?: FileSystemDirectoryHandle, id?: string, parentHandle?: FileSystemDirectoryHandle }[]>([]);
@@ -34,11 +40,20 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   
   currentNode = computed(() => {
     const hist = this.history();
-    return hist.length > 0 ? hist[hist.length - 1] : { name: this.spaceName, handle: this.rootHandle || undefined, id: undefined };
+    return hist.length > 0 ? hist[hist.length - 1] : { name: this.reactiveSpaceName(), handle: this.rootHandle || undefined, id: undefined };
   });
 
   entries = signal<FileExplorerEntry[]>([]);
   isLoading = signal<boolean>(true);
+
+  // Search State
+  searchQuery = signal<string>('');
+  searchResults = signal<FileExplorerEntry[]>([]);
+  isSearching = signal<boolean>(false);
+  isSearchExpanded = signal<boolean>(false); // Mobile toggle
+  
+  // Responsive State
+  isToolbarCollapsed = signal<boolean>(false);
 
   // View and Sorting state
   viewMode = signal<'grid' | 'list'>('grid');
@@ -68,15 +83,21 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   // Local Toolbar Breadcrumbs
   localBreadcrumbs = computed(() => {
       const hist = this.history();
-      const breadcrumbs = hist.map((node, index) => ({
-          label: node.name,
-          isLast: index === hist.length - 1,
-          action: () => {
-              if (index < hist.length - 1) {
-                  this.navigateToCrumb(index);
+      const breadcrumbs = hist.map((node, index) => {
+          let label = node.name;
+          // Root name (index 0) should be reactive
+          if (index === 0) label = this.reactiveSpaceName();
+
+          return {
+              label: label,
+              isLast: index === hist.length - 1,
+              action: () => {
+                  if (index < hist.length - 1) {
+                      this.navigateToCrumb(index);
+                  }
               }
-          }
-      }));
+          };
+      });
 
       // Find root type for home link
       const rootType = location.pathname.split('/')[1] || 'personal';
@@ -92,21 +113,35 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   constructor() {}
 
   ngOnInit() {
+    this.reactiveSpaceName.set(this.spaceName);
+    this.monitorSpaceDetails();
+
     // Initialize history with space root (handles either native or virtual)
     this.history.set([{ 
-        name: this.spaceName, 
+        name: this.reactiveSpaceName(), 
         handle: this.rootHandle || undefined, 
         id: undefined // Space root is always 'root' in virtual engine
     }]);
     this.loadCurrentDirectory();
+    this.checkToolbarResponsive();
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+      if (this.spaceSub) this.spaceSub.unsubscribe();
+  }
+
+  private monitorSpaceDetails() {
+      this.spaceSub = this.spaceService.liveSpaceAnyStatus$(this.spaceId).subscribe(space => {
+          if (space && space.name !== this.reactiveSpaceName()) {
+              this.reactiveSpaceName.set(space.name);
+          }
+      });
+  }
 
 
   // Derived sorted entries
   sortedEntries = computed(() => {
-    const raw = this.entries();
+    const raw = this.searchQuery() ? this.searchResults() : this.entries();
     const asc = this.sortAscending() ? 1 : -1;
     const sortBy = this.sortBy();
 
@@ -136,10 +171,20 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     this.openMenuId.set(null);
   }
 
+  @HostListener('window:resize')
+  onResize() {
+    this.checkToolbarResponsive();
+  }
+
+  private checkToolbarResponsive() {
+      // Threshold for collapsing breadcrumbs to make room for search
+      this.isToolbarCollapsed.set(window.innerWidth < 1000); // Or use a container query logic if preferred
+  }
+
   @HostListener('window:focus')
   onWindowFocus() {
     // Refresh directory silently
-    if (!this.renamingEntry() && !this.isCreatingFolder() && !this.isCreatingFile()) {
+    if (!this.renamingEntry() && !this.isCreatingFolder() && !this.isCreatingFile() && !this.searchQuery()) {
       this.loadCurrentDirectory(false);
     }
   }
@@ -221,7 +266,41 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- Navigation ---
+  // --- Search Logic ---
+
+  async onSearch() {
+      const query = this.searchQuery().trim();
+      if (!query) {
+          this.searchResults.set([]);
+          return;
+      }
+
+      this.isSearching.set(true);
+      try {
+          const results = await this.fileManager.searchEntries({
+              handle: this.rootHandle || undefined,
+              spaceId: this.spaceId
+          }, query);
+          this.searchResults.set(results);
+      } catch (err) {
+          console.error('[FileExplorer] Search failed:', err);
+          this.snackbar.error('Search failed.');
+      } finally {
+          this.isSearching.set(false);
+      }
+  }
+
+  clearSearch() {
+      this.searchQuery.set('');
+      this.searchResults.set([]);
+      this.isSearchExpanded.set(false);
+  }
+
+  toggleSearchExpanded() {
+      this.isSearchExpanded.set(!this.isSearchExpanded());
+  }
+
+  // --- Utilities & State Management ---
 
   async navigateInto(entry: FileExplorerEntry) {
     if (entry.kind === 'directory') {

@@ -21,8 +21,8 @@
 
             <div class="toolbar-divider"></div>
 
-            <!-- Center: Breadcrumbs -->
-            <div class="explorer-breadcrumbs">
+            <!-- Center: Breadcrumbs (Collapsible) -->
+            <div class="explorer-breadcrumbs" [class.hidden]="isToolbarCollapsed()">
                 @for (crumb of localBreadcrumbs(); track i; let i = $index) {
                     <button class="breadcrumb-item" [class.last]="crumb.isLast" (click)="crumb.action()">
                         {{ crumb.label }}
@@ -32,6 +32,32 @@
                     }
                 }
             </div>
+
+            <!-- New: Space-wide Search -->
+            <div class="explorer-search-container" [class.expanded]="isSearchExpanded()">
+                <div class="search-input-group">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" 
+                           class="explorer-search-input" 
+                           placeholder="Search space..."
+                           [ngModel]="searchQuery()"
+                           (ngModelChange)="searchQuery.set($event); onSearch()"
+                           (keyup.escape)="clearSearch()">
+                    @if (searchQuery()) {
+                        <button class="clear-search-btn" (click)="clearSearch()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Mobile Search Toggle (Visible on small screens) -->
+            <button class="nav-btn mobile-search-toggle" 
+                    (click)="toggleSearchExpanded()" 
+                    [class.active]="isSearchExpanded()"
+                    title="Search">
+                <i class="bi bi-search"></i>
+            </button>
 
             <!-- Right: View & Sort Controls -->
             <div class="view-sort-controls">
