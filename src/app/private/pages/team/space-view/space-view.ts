@@ -72,6 +72,9 @@ export class SpaceView implements OnInit, OnDestroy {
             this.loading.set(true);
             this.spaceHandle.set(null);
 
+            // Auto-close app window when switching spaces
+            this.explorerVisible.set(false);
+
             this.spaceSub?.unsubscribe();
 
             if (spaceId) {

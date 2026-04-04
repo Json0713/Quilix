@@ -71,6 +71,9 @@ export class SpaceView implements OnInit, OnDestroy {
             const spaceId = params['spaceId'];
             this.loading.set(true);
             this.spaceHandle.set(null);
+            
+            // Auto-close app window when switching spaces
+            this.explorerVisible.set(false);
 
             // Tear down previous live subscription
             this.spaceSub?.unsubscribe();
