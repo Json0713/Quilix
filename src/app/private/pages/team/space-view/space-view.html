@@ -44,7 +44,9 @@
                     <div class="app-window" 
                          [class.maximized]="isMaximized()"
                          [style.left.px]="isMaximized() ? null : windowPosition().x"
-                         [style.top.px]="isMaximized() ? null : windowPosition().y">
+                         [style.top.px]="isMaximized() ? null : windowPosition().y"
+                         [style.width.px]="isMaximized() ? null : windowSize().width"
+                         [style.height.px]="isMaximized() ? null : windowSize().height">
                         
                         <!-- Window Title Bar (Draggable) -->
                         <div class="window-title-bar" (mousedown)="onDragStart($event)">
@@ -79,6 +81,16 @@
                                 </div>
                             }
                         </div>
+
+                        <!-- Window Footer (Draggable Security Handle) -->
+                        <div class="window-footer" (mousedown)="onDragStart($event)">
+                            <div class="grab-handle"></div>
+                        </div>
+
+                        <!-- Single SE Resizer Handle -->
+                        @if (!isMaximized()) {
+                            <div class="resizer-se" (mousedown)="onResizeStart($event)"></div>
+                        }
                     </div>
                 </div>
             }

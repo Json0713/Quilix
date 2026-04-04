@@ -35,14 +35,22 @@ export class SpaceView implements OnInit, OnDestroy {
     // App Window Management
     explorerVisible = signal<boolean>(false);
     isMaximized = signal<boolean>(false);
-    windowPosition = signal<{ x: number, y: number }>({ x: 20, y: 20 });
+    windowSize = signal<{ width: number, height: number }>({ width: 800, height: 580 });
+    windowPosition = signal<{ x: number, y: number }>({ x: 0, y: 0 }); // Centered dynamically
+    
     isDragging = false;
+    isResizing = false;
     private dragOffset = { x: 0, y: 0 };
+    private initialSize = { width: 0, height: 0 };
+    private initialPos = { x: 0, y: 0 };
+
+    private readonly STORAGE_KEY = 'quilix_explorer_state_team';
 
     private paramSub!: Subscription;
     private spaceSub: any;
 
     async ngOnInit() {
+        this.loadWindowState();
         const mode = await this.fileSystem.getStorageMode();
         this.isFileSystemMode.set(mode === 'filesystem');
 
@@ -109,34 +117,52 @@ export class SpaceView implements OnInit, OnDestroy {
 
     // Window Actions
     toggleExplorer() {
-        this.explorerVisible.update(v => !v);
-        // Reset to windowed mode if opening
-        if (!this.explorerVisible()) this.isMaximized.set(false);
+        const isMobile = window.innerWidth < 768;
+        this.explorerVisible.update(v => {
+            const next = !v;
+            // If opening on mobile, default to maximized
+            if (next && isMobile) {
+                this.isMaximized.set(true);
+            }
+            return next;
+        });
+
+        if (!this.explorerVisible()) {
+            this.isMaximized.set(false);
+        }
     }
 
     toggleMaximize() {
         this.isMaximized.update(v => !v);
     }
 
-    // Dragging Logic
+    // --- Window Interaction (Drag & Resize) ---
+
     onDragStart(event: MouseEvent) {
-        if (this.isMaximized()) return;
+        // Disable dragging in maximized mode or on mobile
+        if (this.isMaximized() || window.innerWidth < 768) return;
+        
         this.isDragging = true;
         this.dragOffset = {
             x: event.clientX - this.windowPosition().x,
             y: event.clientY - this.windowPosition().y
         };
         
-        // Add global listeners
         window.addEventListener('mousemove', this.onDragMove);
         window.addEventListener('mouseup', this.onDragEnd);
+        
+        // Prevent text selection during drag
+        event.preventDefault();
     }
 
     onDragMove = (event: MouseEvent) => {
         if (!this.isDragging) return;
-        this.windowPosition.set({
-            x: event.clientX - this.dragOffset.x,
-            y: event.clientY - this.dragOffset.y
+        
+        requestAnimationFrame(() => {
+            this.windowPosition.set({
+                x: event.clientX - this.dragOffset.x,
+                y: event.clientY - this.dragOffset.y
+            });
         });
     }
 
@@ -144,6 +170,79 @@ export class SpaceView implements OnInit, OnDestroy {
         this.isDragging = false;
         window.removeEventListener('mousemove', this.onDragMove);
         window.removeEventListener('mouseup', this.onDragEnd);
+        this.saveWindowState();
+    }
+
+    // SE Corner Resizing
+    onResizeStart(event: MouseEvent) {
+        if (this.isMaximized() || window.innerWidth < 768) return;
+        
+        event.stopPropagation();
+        event.preventDefault();
+        
+        this.isResizing = true;
+        this.initialPos = { x: event.clientX, y: event.clientY };
+        this.initialSize = { ...this.windowSize() };
+
+        window.addEventListener('mousemove', this.onResizeMove);
+        window.addEventListener('mouseup', this.onResizeEnd);
+    }
+
+    onResizeMove = (event: MouseEvent) => {
+        if (!this.isResizing) return;
+
+        requestAnimationFrame(() => {
+            const deltaX = event.clientX - this.initialPos.x;
+            const deltaY = event.clientY - this.initialPos.y;
+
+            // Apply constraints (Min: 600x450)
+            this.windowSize.set({
+                width: Math.max(600, this.initialSize.width + deltaX),
+                height: Math.max(450, this.initialSize.height + deltaY)
+            });
+        });
+    }
+
+    onResizeEnd = () => {
+        this.isResizing = false;
+        window.removeEventListener('mousemove', this.onResizeMove);
+        window.removeEventListener('mouseup', this.onResizeEnd);
+        this.saveWindowState();
+    }
+
+    private saveWindowState() {
+        const state = {
+            width: this.windowSize().width,
+            height: this.windowSize().height,
+            x: this.windowPosition().x,
+            y: this.windowPosition().y
+        };
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+    }
+
+    private loadWindowState() {
+        const saved = localStorage.getItem(this.STORAGE_KEY);
+        if (saved) {
+            try {
+                const state = JSON.parse(saved);
+                this.windowSize.set({ width: state.width || 800, height: state.height || 580 });
+                this.windowPosition.set({ x: state.x || 0, y: state.y || 0 });
+                return;
+            } catch (e) {
+                console.error('[SpaceView] Failed to load window state:', e);
+            }
+        }
+        
+        // Default Centering if no state
+        this.centerWindow();
+    }
+
+    private centerWindow() {
+        const size = this.windowSize();
+        this.windowPosition.set({
+            x: (window.innerWidth - size.width) / 2,
+            y: (window.innerHeight - size.height) / 2
+        });
     }
 
     ngOnDestroy() {

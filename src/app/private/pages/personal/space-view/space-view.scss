@@ -136,11 +136,16 @@
         transform: none !important;
     }
 
-    @media (max-width: 992px) {
-        width: 95% !important;
-        height: 90% !important;
-        left: 2.5% !important;
-        top: 5% !important;
+    @media (max-width: 768px) {
+        width: 92% !important;
+        height: 65% !important;
+        left: 4% !important;
+        top: 17.5% !important;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        
+        // In mobile, we don't want it to look like a window but a clean modal
+        .window-title-bar { cursor: default; }
     }
 }
 
@@ -175,21 +180,17 @@
         .control-btn {
             width: 32px;
             height: 32px;
-            border-radius: 6px;
+            border-radius: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-muted);
+            background-color: transparent;
+            border: none;
             transition: all 0.2s;
 
             &:hover {
-                background: rgba(var(--text-main-rgb), 0.05);
                 color: var(--text-main);
-            }
-
-            &.close-btn:hover {
-                background: #ef4444;
-                color: white;
             }
         }
     }
@@ -199,6 +200,60 @@
     flex: 1;
     min-height: 0;
     background: var(--surface-main);
+    position: relative;
+    overflow: hidden;
+}
+
+.window-footer {
+    height: 8px;
+    background: var(--surface-alt);
+    border-top: 1px solid var(--border);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    user-select: none;
+
+    &:active { cursor: grabbing; }
+    &:hover { background: var(--border); }
+
+    .grab-handle {
+        width: 30px;
+        height: 2px;
+        background: var(--text-muted);
+        opacity: 0.3;
+        border-radius: 2px;
+    }
+}
+
+.resizer-se {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    cursor: nwse-resize;
+    z-index: 10;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    
+    // Smooth curve icon ")" in --action
+    &::after {
+        content: '';
+        width: 12px;
+        height: 12px;
+        border-right: 3px solid var(--action);
+        border-bottom: 3px solid var(--action);
+        border-radius: 0 0 10px 0;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+
+    &:hover::after {
+        opacity: 1;
+    }
 }
 
 @keyframes windowOpen {
