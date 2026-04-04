@@ -292,12 +292,37 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
 
     async navigateInto(entry: FileExplorerEntry) {
         if (entry.kind === 'directory') {
-            this.history.update(h => [...h, {
-                name: entry.name,
-                handle: entry.handle as FileSystemDirectoryHandle,
-                id: entry.id, // Now captured in native mode as well
-                parentHandle: this.currentNode().handle // Track parent for faster re-linking
-            }]);
+            if (entry.parentChain && entry.parentChain.length > 0) {
+                // Reconstruct from root
+                const rootNode = this.history()[0];
+                const reconstructedHistory = [rootNode];
+                
+                for (const link of entry.parentChain) {
+                    reconstructedHistory.push({
+                        name: link.name,
+                        handle: link.handle as FileSystemDirectoryHandle,
+                        id: link.id,
+                        parentHandle: reconstructedHistory[reconstructedHistory.length - 1].handle
+                    });
+                }
+                
+                reconstructedHistory.push({
+                    name: entry.name,
+                    handle: entry.handle as FileSystemDirectoryHandle,
+                    id: entry.id,
+                    parentHandle: reconstructedHistory[reconstructedHistory.length - 1].handle
+                });
+                
+                this.history.set(reconstructedHistory);
+            } else {
+                this.history.update(h => [...h, {
+                    name: entry.name,
+                    handle: entry.handle as FileSystemDirectoryHandle,
+                    id: entry.id, // Now captured in native mode as well
+                    parentHandle: this.currentNode().handle // Track parent for faster re-linking
+                }]);
+            }
+            
             this.forwardHistory.set([]); // Clear forward stack on new branching path
             this.selectedEntry.set(null);
             this.openMenuId.set(null);

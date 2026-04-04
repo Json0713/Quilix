@@ -10,6 +10,7 @@ export interface FileExplorerEntry {
     sizeBytes?: number;
     lastModified?: number;
     parentId?: string | null;
+    parentChain?: { id?: string, name: string, handle?: FileSystemDirectoryHandle }[];
 }
 
 export interface ClipboardItem {
@@ -239,7 +240,7 @@ export class FileManagerService {
     private async searchNative(rootHandle: FileSystemDirectoryHandle, searchTerms: string[]): Promise<FileExplorerEntry[]> {
         const results: FileExplorerEntry[] = [];
         
-        const traverse = async (dirHandle: FileSystemDirectoryHandle) => {
+        const traverse = async (dirHandle: FileSystemDirectoryHandle, currentChain: {name: string, handle: FileSystemDirectoryHandle}[]) => {
             for await (const entry of (dirHandle as any).values()) {
                 if (entry.name.startsWith('.quilix')) continue;
 
@@ -270,37 +271,54 @@ export class FileManagerService {
                         handle: entry,
                         id,
                         sizeBytes,
-                        lastModified
+                        lastModified,
+                        parentChain: [...currentChain]
                     });
                 }
 
                 if (entry.kind === 'directory') {
-                    await traverse(entry as FileSystemDirectoryHandle);
+                    await traverse(entry as FileSystemDirectoryHandle, [...currentChain, { name: entry.name, handle: entry as FileSystemDirectoryHandle }]);
                 }
             }
         };
 
-        await traverse(rootHandle);
+        await traverse(rootHandle, []);
         return this.sortEntries(results);
     }
 
     private async searchVirtual(spaceId: string, searchTerms: string[]): Promise<FileExplorerEntry[]> {
-        // Fetch all items in this space (since it's a flat structure in the DB usually or we can query by spaceId)
+        // Fetch all items in this space
         const allItems = await db.virtual_entries.where('spaceId').equals(spaceId).toArray();
+        const itemMap = new Map(allItems.map(i => [i.id, i]));
         
         const filtered = allItems.filter(item => {
             const nameLower = item.name.toLowerCase();
             return searchTerms.every(term => nameLower.includes(term));
         });
 
-        return this.sortEntries(filtered.map(i => ({
-            id: i.id,
-            name: i.name,
-            kind: i.kind,
-            sizeBytes: i.sizeBytes,
-            lastModified: i.lastModified,
-            parentId: i.parentId === 'root' ? null : i.parentId
-        })));
+        return this.sortEntries(filtered.map(i => {
+            const chain = [];
+            let currentParent = i.parentId;
+            while (currentParent && currentParent !== 'root') {
+                const parentItem = itemMap.get(currentParent);
+                if (parentItem) {
+                    chain.unshift({ id: parentItem.id, name: parentItem.name });
+                    currentParent = parentItem.parentId;
+                } else {
+                    break;
+                }
+            }
+
+            return {
+                id: i.id,
+                name: i.name,
+                kind: i.kind,
+                sizeBytes: i.sizeBytes,
+                lastModified: i.lastModified,
+                parentId: i.parentId === 'root' ? null : i.parentId,
+                parentChain: chain
+            };
+        }));
     }
 
     setClipboard(entry: FileExplorerEntry, action: 'copy' | 'cut') {
