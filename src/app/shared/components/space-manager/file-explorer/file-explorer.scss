@@ -15,14 +15,22 @@
     position: relative;
     overflow-y: auto;
     overflow-x: hidden;
+    // Refined thin scrollbar
+    scrollbar-width: thin; // Firefox native
     
-    // Hide scrollbar for a cleaner look
     &::-webkit-scrollbar {
-        width: 6px;
+        width: 4px;
+        height: 4px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent; 
     }
     &::-webkit-scrollbar-thumb {
         background-color: var(--border);
         border-radius: 4px;
+        &:hover {
+            background-color: var(--text-muted);
+        }
     }
 }
 
