@@ -172,9 +172,9 @@
                     </div>
                 }
 
-                @for (entry of sortedEntries(); track entry.name) {
+                @for (entry of sortedEntries(); track (entry.id || entry.handle || entry.name + entry.kind + entry.lastModified)) {
                     <div class="file-card"
-                         [class.selected]="selectedEntry()?.name === entry.name"
+                         [class.selected]="(selectedEntry()?.id && selectedEntry()?.id === entry.id) || (selectedEntry()?.handle && selectedEntry()?.handle === entry.handle) || (!entry.id && !entry.handle && selectedEntry()?.name === entry.name)"
                          (click)="toggleSelection(entry, $event)"
                          (dblclick)="navigateInto(entry)"
                          (contextmenu)="openContextMenu(entry, $event)">

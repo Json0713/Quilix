@@ -213,7 +213,11 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       
       // Clear selection if it doesn't exist anymore
       const currentSelected = this.selectedEntry();
-      if (currentSelected && !newEntries.find(e => e.name === currentSelected.name)) {
+      if (currentSelected && !newEntries.find(e => 
+          (e.id && e.id === currentSelected.id) || 
+          (e.handle && e.handle === currentSelected.handle) || 
+          (!e.id && !e.handle && e.name === currentSelected.name)
+      )) {
           this.selectedEntry.set(null);
       }
 
