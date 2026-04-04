@@ -5,123 +5,35 @@
         <i class="bi bi-layout-sidebar"></i>
     </button>
 
-    <!-- Left: Window Controls (File Manager style) -->
+    <!-- Left: Navigation Controls -->
     <div class="nav-controls">
-        @if (toolbarService.config()?.navControls; as customNav) {
-            <button class="nav-btn" [class.disabled]="!customNav.canGoBack" (click)="customNav.onBack()" title="Back">
-                <i class="bi bi-arrow-left"></i>
-            </button>
-            <button class="nav-btn" [class.disabled]="!customNav.canGoForward" (click)="customNav.onForward()" title="Forward">
-                <i class="bi bi-arrow-right"></i>
-            </button>
-            <button class="nav-btn" (click)="customNav.onRefresh()" title="Refresh">
-                <i class="bi bi-arrow-clockwise"></i>
-            </button>
-        } @else {
-            <button class="nav-btn" [class.disabled]="!canGoBack" (click)="goBack()" title="Back">
-                <i class="bi bi-arrow-left"></i>
-            </button>
-            <button class="nav-btn" [class.disabled]="!canGoForward" (click)="goForward()" title="Forward">
-                <i class="bi bi-arrow-right"></i>
-            </button>
-            <button class="nav-btn" (click)="refresh()" title="Refresh">
-                <i class="bi bi-arrow-clockwise"></i>
-            </button>
-        }
+        <button class="nav-btn" [class.disabled]="!canGoBack" (click)="goBack()" title="Back">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <button class="nav-btn" [class.disabled]="!canGoForward" (click)="goForward()" title="Forward">
+            <i class="bi bi-arrow-right"></i>
+        </button>
+        <button class="nav-btn" (click)="refresh()" title="Refresh">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
     </div>
 
-    <!-- Center: Address Bar / Breadcrumbs / Toolbar Actions -->
+    <!-- Center: Address Bar / Breadcrumbs -->
     <div class="nav-address-bar">
         <div class="breadcrumbs">
-            @if (toolbarService.config()?.breadcrumbs; as customCrumbs) {
-                <!-- DYNAMIC BREADCRUMBS INJECTED FROM ACTIVE COMPONENT -->
-                @for (crumb of customCrumbs; track i; let i = $index) {
-                    <a class="breadcrumb-item custom" [class.last]="crumb.isLast" 
-                       [class.deleted-space]="crumb.isDeleted" (click)="triggerBreadcrumb(crumb)">
-                        @if (crumb.icon) { <i [class]="crumb.icon" style="margin-right: 4px;"></i> }
-                        {{ crumb.label }}
-                    </a>
-                    @if (!crumb.isLast) {
-                        <i class="bi bi-chevron-right breadcrumb-separator"></i>
-                    }
-                }
-            } @else {
-                <!-- NATIVE ROUTER BREADCRUMBS (DEFAULT) -->
-                @for (crumb of defaultBreadcrumbs; track i; let i = $index) {
-                    <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast"
-                        [class.deleted-space]="crumb.isDeleted" (click)="onBreadcrumbClick(crumb)">
-                        {{ crumb.label }}
-                    </a>
-                    @if (!crumb.isLast) {
-                        <i class="bi bi-chevron-right breadcrumb-separator"></i>
-                    }
+            <!-- NATIVE ROUTER BREADCRUMBS (DEFAULT) -->
+            @for (crumb of defaultBreadcrumbs; track i; let i = $index) {
+                <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast"
+                    [class.deleted-space]="crumb.isDeleted" (click)="onBreadcrumbClick(crumb)">
+                    {{ crumb.label }}
+                </a>
+                @if (!crumb.isLast) {
+                    <i class="bi bi-chevron-right breadcrumb-separator"></i>
                 }
             }
         </div>
     </div>
 
-    <!-- DYNAMIC TOOLBAR INJECTIONS (PILLS, DROPDOWNS, ACTIONS) -->
-    @if (toolbarService.config(); as config) {
-        <div class="global-toolbar-controls">
-            
-            <!-- Pill Groups (e.g. View Modes / Select Modes) -->
-            @if (config.pillGroups?.length) {
-                <div class="toolbar-pill-groups">
-                    @for (group of config.pillGroups; track group.id) {
-                        <div class="controls-pill">
-                            @for (pill of group.pills; track pill.id; let last = $last) {
-                                <button class="pill-btn nav-btn" [class.active]="pill.isActive" 
-                                        (click)="pill.action()" [title]="pill.tooltip || ''">
-                                    <i [class]="pill.icon"></i>
-                                </button>
-                                @if (!last) { <span class="pill-divider"></span> }
-                            }
-                        </div>
-                    }
-                </div>
-            }
-
-            <!-- Dropdowns (e.g. Sort by) -->
-            @if (config.dropdowns?.length) {
-                <div class="toolbar-dropdowns">
-                    @for (menu of config.dropdowns; track menu.id) {
-                        <div class="dropdown">
-                            <button class="action-btn-icon" data-bs-toggle="dropdown" [title]="menu.label || ''">
-                                <i [class]="menu.icon"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                @for (item of menu.items; track item.id) {
-                                    <li>
-                                        <button class="dropdown-item d-flex align-items-center gap-2" (click)="item.action()">
-                                            @if (item.icon) { <i [class]="item.icon"></i> }
-                                            {{ item.label }}
-                                        </button>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                    }
-                </div>
-            }
-            
-            <!-- Primary Actions (e.g. New Folder / Upload) -->
-            @if (config.actions?.length) {
-                <div class="toolbar-actions">
-                    @for (action of config.actions; track action.id) {
-                        @if (action.isPrimary) {
-                            <button class="new-btn" (click)="action.action()" [disabled]="action.isDisabled">
-                                <i [class]="action.icon"></i> {{ action.label }}
-                            </button>
-                        } @else {
-                            <button class="action-btn-icon" (click)="action.action()" [disabled]="action.isDisabled" [title]="action.label">
-                                <i [class]="action.icon"></i>
-                            </button>
-                        }
-                    }
-                </div>
-            }
-        </div>
-    }
 
     <!-- Right: Global Search -->
     <div #navSearch class="nav-search" [class.mobile-search-active]="isMobileSearchActive">

@@ -1,14 +1,12 @@
 import { Component, inject, OnInit, HostListener, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
-import { filter } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
 import { NavigationControlService } from '../../../core/services/ui/navigation-control.service';
 import { SidebarService } from '../../../services/ui/common/sidebar/sidebar.service';
 import { TabService } from '../../../core/services/ui/tab.service';
 import { SpaceService } from '../../../core/services/components/space.service';
 import { Space } from '../../../core/interfaces/space';
-import { Subscription } from 'dexie';
-import { ToolbarService } from '../../../core/services/ui/toolbar.service';
 
 interface Breadcrumb {
     label: string;
@@ -31,7 +29,6 @@ export class NavigationBar implements OnInit, OnDestroy {
     private tabService = inject(TabService);
     private spaceService = inject(SpaceService);
     private router = inject(Router);
-    public toolbarService = inject(ToolbarService); // <-- Inject Dynamic Toolbar Context
 
     @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
     @ViewChild('navSearch') navSearch!: ElementRef<HTMLDivElement>;
@@ -41,7 +38,7 @@ export class NavigationBar implements OnInit, OnDestroy {
     isMobileOpen = this.sidebarService.isMobileOpen;
     isMobileSearchActive = false;
 
-    private spaceSub?: Subscription;
+    private spaceSub?: any;
 
     constructor() {
         this.router.events.pipe(
@@ -211,15 +208,6 @@ export class NavigationBar implements OnInit, OnDestroy {
         if (this.spaceSub) {
             this.spaceSub.unsubscribe();
             this.spaceSub = undefined;
-        }
-    }
-
-    // New helper: Execute Toolbar Custom Action or Router Link
-    triggerBreadcrumb(crumb: any) {
-        if (crumb.action) {
-            crumb.action();
-        } else if (crumb.url) {
-            this.onBreadcrumbClick(crumb as Breadcrumb);
         }
     }
 
