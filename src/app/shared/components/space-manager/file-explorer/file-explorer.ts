@@ -364,8 +364,23 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     event.preventDefault(); // Prevent native right click
     event.stopPropagation();
     this.selectedEntry.set(entry);
-    this.contextMenuX.set(event.clientX);
-    this.contextMenuY.set(event.clientY);
+    
+    const menuWidth = 180; // approximate max menu width
+    const menuHeight = 260; // approximate menu height
+    
+    let x = event.clientX;
+    let y = event.clientY;
+    
+    if (x + menuWidth > window.innerWidth) {
+        x = window.innerWidth - menuWidth - 10;
+    }
+    
+    if (y + menuHeight > window.innerHeight) {
+        y = window.innerHeight - menuHeight - 10;
+    }
+    
+    this.contextMenuX.set(Math.max(10, x));
+    this.contextMenuY.set(Math.max(10, y));
     this.openMenuId.set(entry.name);
   }
 
