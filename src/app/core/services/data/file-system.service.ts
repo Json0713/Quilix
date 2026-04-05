@@ -364,20 +364,34 @@ export class FileSystemService {
 
     /**
      * Recursively copies all entries from one directory handle to another.
+     * Uses batching to prevent UI freezing and accelerate transfers without hitting open-file limits.
      */
     async copyDirectoryContents(src: FileSystemDirectoryHandle, dest: FileSystemDirectoryHandle): Promise<void> {
+        const entries = [];
         for await (const entry of (src as any).values()) {
-            if (entry.kind === 'file') {
-                const fileHandle = entry as FileSystemFileHandle;
-                const file = await fileHandle.getFile();
-                const destFileHandle = await dest.getFileHandle(entry.name, { create: true });
-                const writable = await (destFileHandle as any).createWritable();
-                await writable.write(file);
-                await writable.close();
-            } else if (entry.kind === 'directory') {
-                const destDirHandle = await dest.getDirectoryHandle(entry.name, { create: true });
-                await this.copyDirectoryContents(entry as FileSystemDirectoryHandle, destDirHandle);
-            }
+            entries.push(entry);
+        }
+
+        const CONCURRENCY_LIMIT = 5;
+        for (let i = 0; i < entries.length; i += CONCURRENCY_LIMIT) {
+            const batch = entries.slice(i, i + CONCURRENCY_LIMIT);
+            await Promise.all(batch.map(async (entry) => {
+                try {
+                    if (entry.kind === 'file') {
+                        const fileHandle = entry as FileSystemFileHandle;
+                        const file = await fileHandle.getFile();
+                        const destFileHandle = await dest.getFileHandle(entry.name, { create: true });
+                        const writable = await (destFileHandle as any).createWritable();
+                        await writable.write(file);
+                        await writable.close();
+                    } else if (entry.kind === 'directory') {
+                        const destDirHandle = await dest.getDirectoryHandle(entry.name, { create: true });
+                        await this.copyDirectoryContents(entry as FileSystemDirectoryHandle, destDirHandle);
+                    }
+                } catch (err) {
+                    console.warn(`[FileSystem] Failed to copy entry ${entry.name}:`, err);
+                }
+            }));
         }
     }
 

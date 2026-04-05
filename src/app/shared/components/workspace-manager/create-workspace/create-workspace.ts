@@ -163,28 +163,33 @@ export class CreateWorkspaceComponent {
     }
 
     private async handleFolderSelection(dirHandle: any) {
-        this.isSubmitting.set(true);
-        try {
-            const workspaceName = dirHandle.name;
-            const validationError = this.spaceService.validateName(workspaceName);
-            if (validationError) {
-                this.toastService.error(`Invalid folder name: ${validationError}`);
-                return;
-            }
-
-            if (await this.workspaceService.existsByName(workspaceName)) {
-                this.toastService.error(`Workspace "${workspaceName}" already exists.`);
-                return;
-            }
-
-            // Calculate recursive size for preview
-            const totalBytes = await this.calculateFolderSize(dirHandle);
-
-            this.selectedFolderHandle.set(dirHandle);
-            this.folderSizePreview.set(this.formatSize(totalBytes));
-        } finally {
-            this.isSubmitting.set(false);
+        const workspaceName = dirHandle.name;
+        const validationError = this.spaceService.validateName(workspaceName);
+        if (validationError) {
+            this.toastService.error(`Invalid folder name: ${validationError}`);
+            return;
         }
+
+        if (await this.workspaceService.existsByName(workspaceName)) {
+            this.toastService.error(`Workspace "${workspaceName}" already exists.`);
+            return;
+        }
+
+        // Set the selection instantly so the UI isn't locked by large folders
+        this.selectedFolderHandle.set(dirHandle);
+        this.folderSizePreview.set('Calculating...');
+
+        // Calculate recursive size implicitly without blocking the "Import" action
+        this.calculateFolderSize(dirHandle).then(totalBytes => {
+            if (this.selectedFolderHandle() === dirHandle) {
+                this.folderSizePreview.set(this.formatSize(totalBytes));
+            }
+        }).catch(err => {
+            console.warn('[CreateWorkspace] Could not calculate folder size:', err);
+            if (this.selectedFolderHandle() === dirHandle) {
+                this.folderSizePreview.set('Unknown Size');
+            }
+        });
     }
 
     removeSelection(event?: Event) {

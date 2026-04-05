@@ -3,12 +3,28 @@ import { liveQuery } from 'dexie';
 import { db } from '../../database/dexie.service';
 import { Workspace, WorkspaceRole } from '../../interfaces/workspace';
 import { FileSystemService } from '../data/file-system.service';
+import { SpaceService } from './space.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class WorkspaceService {
     private fileSystem = inject(FileSystemService);
+    private spaceService = inject(SpaceService);
+    private autoSyncInterval: any;
+
+    constructor() {
+        if (typeof window !== 'undefined') {
+            // Check for OS folder updates lightly every 5 seconds when visible
+            this.autoSyncInterval = setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    this.syncExternalRenames().catch(err => {
+                        console.error('[WorkspaceService] Auto-sync failed', err);
+                    });
+                }
+            }, 5000);
+        }
+    }
 
     // Real-time observable of workspaces, sorted by order, then lastActiveAt
     readonly workspaces$ = liveQuery(async () => {
@@ -281,6 +297,11 @@ export class WorkspaceService {
 
                     await db.workspaces.add(newWorkspace);
                     foundWorkspaceIds.add(newWorkspaceId);
+
+                    // Also immediately auto-discover any initial un-tracked sub-folders inside it
+                    await this.spaceService.syncExternalRenames(newWorkspaceId, diskName).catch(err => {
+                        console.warn(`[WorkspaceService] Failed to index initial spaces for ${diskName}`, err);
+                    });
                 }
             }
 
