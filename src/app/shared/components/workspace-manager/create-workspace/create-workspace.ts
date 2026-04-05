@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WorkspaceService } from '../../../../core/services/components/workspace.service';
@@ -15,7 +15,7 @@ import { WorkspaceRole } from '../../../../core/interfaces/workspace';
     templateUrl: './create-workspace.html',
     styleUrl: './create-workspace.scss'
 })
-export class CreateWorkspaceComponent {
+export class CreateWorkspaceComponent implements OnInit {
     private workspaceService = inject(WorkspaceService);
     private spaceService = inject(SpaceService);
     private modalService = inject(ModalService);
@@ -29,6 +29,12 @@ export class CreateWorkspaceComponent {
     selectedFolderHandle = signal<FileSystemDirectoryHandle | null>(null);
     folderSizePreview = signal<string>('0 B');
     validationError = signal<string | null>(null);
+    isFileSystemMode = signal<boolean>(true);
+
+    async ngOnInit() {
+        const mode = await this.fileSystem.getStorageMode();
+        this.isFileSystemMode.set(mode === 'filesystem');
+    }
 
     onNameChange(newName: string) {
         this.workspaceName.set(newName);
@@ -86,6 +92,11 @@ export class CreateWorkspaceComponent {
         event.preventDefault();
         this.isDragging.set(false);
 
+        if (!this.isFileSystemMode()) {
+            this.toastService.error('Native folder import requires File System mode.');
+            return;
+        }
+
         if (this.isSubmitting() || this.selectedFolderHandle()) return;
 
         // Check if drops are supported in the File System API by checking dataTransfer items
@@ -124,6 +135,10 @@ export class CreateWorkspaceComponent {
     }
 
     async onClickImportFolder() {
+        if (!this.isFileSystemMode()) {
+            this.toastService.error('Native folder import requires File System mode.');
+            return;
+        }
         if (this.isSubmitting() || this.selectedFolderHandle()) return;
 
         try {

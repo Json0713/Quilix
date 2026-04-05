@@ -47,13 +47,17 @@
     </div>
 
     <div class="import-dropzone-section" [class.drag-over]="isDragging()"
-        [class.has-selection]="selectedFolderHandle() !== null" (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
-        (click)="!selectedFolderHandle() && onClickImportFolder()"
-        [attr.role]="!selectedFolderHandle() ? 'button' : null" [attr.tabindex]="!selectedFolderHandle() ? '0' : null"
-        (keyup.enter)="!selectedFolderHandle() && onClickImportFolder()">
+        [class.has-selection]="selectedFolderHandle() !== null" [class.disabled]="!isFileSystemMode()" (dragover)="isFileSystemMode() && onDragOver($event)"
+        (dragleave)="isFileSystemMode() && onDragLeave($event)" (drop)="isFileSystemMode() && onDrop($event)"
+        (click)="isFileSystemMode() && !selectedFolderHandle() && onClickImportFolder()"
+        [attr.role]="isFileSystemMode() && !selectedFolderHandle() ? 'button' : null" [attr.tabindex]="isFileSystemMode() && !selectedFolderHandle() ? '0' : null"
+        (keyup.enter)="isFileSystemMode() && !selectedFolderHandle() && onClickImportFolder()">
 
-        @if (!selectedFolderHandle()) {
+        @if (!isFileSystemMode()) {
+        <i class="bi bi-x-octagon drop-icon"></i>
+        <strong class="drop-title">Import Disabled</strong>
+        <span class="drop-desc">Enable File System from the Settings to import external OS folders.</span>
+        } @else if (!selectedFolderHandle()) {
         <i class="bi bi-folder-plus drop-icon"></i>
         <strong class="drop-title">Import from Folder</strong>
         <span class="drop-desc">Drag & Drop an existing folder here or click to browse</span>

@@ -242,6 +242,20 @@
             background: rgba(145, 147, 147, 0.145);
             cursor: default;
         }
+
+        &.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(145, 147, 147, 0.05);
+            
+            i.drop-icon, strong.drop-title {
+                color: var(--text-muted);
+            }
+
+            &:hover {
+                transform: none;
+            }
+        }
     }
 
     /* ACTIONS (Matches Reusable Modal Buttons) */
