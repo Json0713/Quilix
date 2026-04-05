@@ -309,15 +309,18 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
         if (!workspace) return;
 
         const raw = this.renameValue().trim();
+        
+        // Eagerly clear the local renaming state to prevent duplicate inputs/clicks
+        // from re-triggering this function while the first one is running.
+        this.renamingSpaceId.set(null);
+        this.renameValue.set('');
+        this.renameError.set(null);
+
         if (raw) {
             await this.spaceService.rename(spaceId, raw, workspace.name);
             // Sync tab label immediately
             await this.tabService.updateTabLabelBySpaceId(spaceId, raw);
         }
-
-        this.renamingSpaceId.set(null);
-        this.renameValue.set('');
-        this.renameError.set(null);
     }
 
     cancelRename() {

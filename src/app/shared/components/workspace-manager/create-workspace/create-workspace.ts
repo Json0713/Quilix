@@ -218,6 +218,7 @@ export class CreateWorkspaceComponent implements OnInit {
         if (!handle || this.isSubmitting()) return;
 
         this.isSubmitting.set(true);
+        this.fileSystem.acquireSyncLock();
         try {
             const workspaceName = handle.name;
             const workspace = await this.workspaceService.create(workspaceName, this.selectedRole());
@@ -249,6 +250,7 @@ export class CreateWorkspaceComponent implements OnInit {
             console.error('Error importing folder workspace:', error);
             this.toastService.error('Failed to import folder as workspace.');
         } finally {
+            this.fileSystem.releaseSyncLock();
             this.isSubmitting.set(false);
         }
     }

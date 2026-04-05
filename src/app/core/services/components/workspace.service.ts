@@ -76,28 +76,33 @@ export class WorkspaceService {
 
         const workspaceId = crypto.randomUUID();
 
-        if (storageMode === 'filesystem') {
-            const handle = await this.fileSystem.getOrCreateWorkspaceFolder(name.trim());
-            if (handle) {
-                folderPath = `Quilix/${name.trim()}`;
-                await this.fileSystem.writeDirectoryId(handle, workspaceId);
-                console.log(`[WorkspaceService] Local folder created at: ${folderPath}`);
-            } else {
-                console.warn('[WorkspaceService] Failed to create local folder, falling back to metadata only.');
+        this.fileSystem.acquireSyncLock();
+        try {
+            if (storageMode === 'filesystem') {
+                const handle = await this.fileSystem.getOrCreateWorkspaceFolder(name.trim());
+                if (handle) {
+                    folderPath = `Quilix/${name.trim()}`;
+                    await this.fileSystem.writeDirectoryId(handle, workspaceId);
+                    console.log(`[WorkspaceService] Local folder created at: ${folderPath}`);
+                } else {
+                    console.warn('[WorkspaceService] Failed to create local folder, falling back to metadata only.');
+                }
             }
+
+            const workspace: Workspace = {
+                id: workspaceId,
+                name: name.trim(),
+                role,
+                createdAt: now,
+                lastActiveAt: now,
+                folderPath
+            };
+
+            await db.workspaces.add(workspace);
+            return workspace;
+        } finally {
+            this.fileSystem.releaseSyncLock();
         }
-
-        const workspace: Workspace = {
-            id: workspaceId,
-            name: name.trim(),
-            role,
-            createdAt: now,
-            lastActiveAt: now,
-            folderPath
-        };
-
-        await db.workspaces.add(workspace);
-        return workspace;
     }
 
     /**
@@ -110,25 +115,30 @@ export class WorkspaceService {
         const sanitized = newName.trim();
         if (!sanitized) return false;
 
-        let newFolderPath = workspace.folderPath;
-        const storageMode = await this.fileSystem.getStorageMode();
+        this.fileSystem.acquireSyncLock();
+        try {
+            let newFolderPath = workspace.folderPath;
+            const storageMode = await this.fileSystem.getStorageMode();
 
-        if (storageMode === 'filesystem' && workspace.folderPath) {
-            const quilixHandle = await this.fileSystem.getQuilixRootHandle();
-            if (quilixHandle) {
-                const renamed = await this.fileSystem.safeRenameFolder(quilixHandle, workspace.name, sanitized);
-                if (renamed) {
-                    newFolderPath = `Quilix/${sanitized}`;
+            if (storageMode === 'filesystem' && workspace.folderPath) {
+                const quilixHandle = await this.fileSystem.getQuilixRootHandle();
+                if (quilixHandle) {
+                    const renamed = await this.fileSystem.safeRenameFolder(quilixHandle, workspace.name, sanitized);
+                    if (renamed) {
+                        newFolderPath = `Quilix/${sanitized}`;
+                    } else {
+                        return false; // Abort if OS physical rename fails
+                    }
                 } else {
-                    return false; // Abort if OS physical rename fails
+                    return false;
                 }
-            } else {
-                return false;
             }
-        }
 
-        await db.workspaces.update(workspaceId, { name: sanitized, folderPath: newFolderPath });
-        return true;
+            await db.workspaces.update(workspaceId, { name: sanitized, folderPath: newFolderPath });
+            return true;
+        } finally {
+            this.fileSystem.releaseSyncLock();
+        }
     }
 
     async updateLastActive(workspaceId: string): Promise<void> {
@@ -164,12 +174,17 @@ export class WorkspaceService {
      * Restore a missing workspace physical folder.
      */
     async restoreWorkspace(workspaceId: string, workspaceName: string): Promise<boolean> {
-        const success = await this.fileSystem.restoreWorkspaceFolder(workspaceName, workspaceId);
-        if (success) {
-            await db.workspaces.update(workspaceId, { isMissingOnDisk: false });
-            return true;
+        this.fileSystem.acquireSyncLock();
+        try {
+            const success = await this.fileSystem.restoreWorkspaceFolder(workspaceName, workspaceId);
+            if (success) {
+                await db.workspaces.update(workspaceId, { isMissingOnDisk: false });
+                return true;
+            }
+            return false;
+        } finally {
+            this.fileSystem.releaseSyncLock();
         }
-        return false;
     }
 
     /**
@@ -179,12 +194,17 @@ export class WorkspaceService {
         const workspace = await this.getById(workspaceId);
         if (!workspace) return;
 
-        const storageMode = await this.fileSystem.getStorageMode();
-        if (storageMode === 'filesystem' && workspace.folderPath) {
-            await this.fileSystem.permanentlyDeleteWorkspaceFolder(workspace.name);
-        }
+        this.fileSystem.acquireSyncLock();
+        try {
+            const storageMode = await this.fileSystem.getStorageMode();
+            if (storageMode === 'filesystem' && workspace.folderPath) {
+                await this.fileSystem.permanentlyDeleteWorkspaceFolder(workspace.name);
+            }
 
-        await db.workspaces.delete(workspaceId);
+            await db.workspaces.delete(workspaceId);
+        } finally {
+            this.fileSystem.releaseSyncLock();
+        }
     }
 
     /**
@@ -200,18 +220,23 @@ export class WorkspaceService {
             return;
         }
 
-        for (const w of all) {
-            if (!w.folderPath) {
-                const folderHandle = await this.fileSystem.getOrCreateWorkspaceFolder(w.name);
-                if (folderHandle) {
-                    const newPath = `Quilix/${w.name}`;
-                    await this.fileSystem.writeDirectoryId(folderHandle, w.id);
-                    await db.workspaces.update(w.id, { folderPath: newPath });
-                    console.log(`[WorkspaceService] Migrated workspace ${w.name} to ${newPath}`);
-                } else {
-                    console.error(`[WorkspaceService] Failed to create folder for ${w.name} during migration.`);
+        this.fileSystem.acquireSyncLock();
+        try {
+            for (const w of all) {
+                if (!w.folderPath) {
+                    const folderHandle = await this.fileSystem.getOrCreateWorkspaceFolder(w.name);
+                    if (folderHandle) {
+                        const newPath = `Quilix/${w.name}`;
+                        await this.fileSystem.writeDirectoryId(folderHandle, w.id);
+                        await db.workspaces.update(w.id, { folderPath: newPath });
+                        console.log(`[WorkspaceService] Migrated workspace ${w.name} to ${newPath}`);
+                    } else {
+                        console.error(`[WorkspaceService] Failed to create folder for ${w.name} during migration.`);
+                    }
                 }
             }
+        } finally {
+            this.fileSystem.releaseSyncLock();
         }
     }
 

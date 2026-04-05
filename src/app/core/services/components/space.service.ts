@@ -126,6 +126,7 @@ export class SpaceService {
 
         const spaceId = crypto.randomUUID();
         this.startOperation(spaceId);
+        this.fileSystem.acquireSyncLock();
 
         try {
             // Create folder on filesystem if applicable
@@ -146,6 +147,7 @@ export class SpaceService {
             await db.spaces.add(space);
             return space;
         } finally {
+            this.fileSystem.releaseSyncLock();
             this.stopOperation(spaceId);
         }
     }
@@ -155,11 +157,11 @@ export class SpaceService {
      * On filesystem mode: creates new folder, removes old one.
      */
     async rename(spaceId: string, newName: string, workspaceName: string): Promise<boolean> {
-        const space = await db.spaces.get(spaceId);
-        if (!space) return false;
-
         this.startOperation(spaceId);
+        this.fileSystem.acquireSyncLock();
         try {
+            const space = await db.spaces.get(spaceId);
+            if (!space) return false;
             const sanitized = this.sanitizeName(newName);
             if (!sanitized) return false;
 
@@ -179,6 +181,7 @@ export class SpaceService {
             await db.spaces.update(spaceId, { name: sanitized, folderName: newFolderName });
             return true;
         } finally {
+            this.fileSystem.releaseSyncLock();
             this.stopOperation(spaceId);
         }
     }
@@ -199,11 +202,10 @@ export class SpaceService {
      * Folder is preserved on disk — only removed on permanent delete.
      */
     async moveToTrash(spaceId: string, _workspaceName: string): Promise<boolean> {
-        const space = await db.spaces.get(spaceId);
-        if (!space) return false;
-
         this.startOperation(spaceId);
         try {
+            const space = await db.spaces.get(spaceId);
+            if (!space) return false;
             await db.spaces.update(spaceId, { trashedAt: Date.now() });
             return true;
         } finally {
@@ -230,16 +232,21 @@ export class SpaceService {
         const space = await db.spaces.get(spaceId);
         if (!space) return false;
 
-        // Delete folder on filesystem if applicable
-        if (workspaceName) {
+        this.fileSystem.acquireSyncLock();
+        try {
+            // Delete folder on filesystem if applicable
+            if (workspaceName) {
             const storageMode = await this.fileSystem.getStorageMode();
             if (storageMode === 'filesystem') {
                 await this.deleteSpaceFolder(workspaceName, space.folderName);
             }
         }
 
-        await db.spaces.delete(spaceId);
-        return true;
+            await db.spaces.delete(spaceId);
+            return true;
+        } finally {
+            this.fileSystem.releaseSyncLock();
+        }
     }
 
     /**
