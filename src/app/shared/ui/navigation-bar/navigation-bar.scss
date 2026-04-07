@@ -232,7 +232,7 @@
     .navigation-bar {
         padding: 0 0.5rem;
         gap: 0.5rem;
-        padding-left: 0.5rem; // Removed old 3.5rem since toggle is now natively here
+        padding-left: 0.5rem; // padding for mobile toggle
 
         .nav-mobile-toggle {
             display: flex; // Show on mobile
