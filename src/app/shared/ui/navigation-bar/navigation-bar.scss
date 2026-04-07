@@ -187,9 +187,9 @@
 
                 &:focus {
                     outline: none;
-                    background: rgba(255, 255, 255, 0.08);
-                    border-color: var(--accent);
-                    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
+                    background: rgba(255, 255, 255, 0.05);
+                    border-color: var(--border);
+                    box-shadow: 0 0 0 2px rgba(var(--surface-rgb), 0.2);
                 }
             }
 
@@ -296,7 +296,7 @@
 
                     .global-search-input {
                         padding-left: 12px; // Reduced since icon is hidden
-                        border-color: var(--accent);
+                        border-color: var(--border);
                         background: rgba(255, 255, 255, 0.08);
                     }
                 }
