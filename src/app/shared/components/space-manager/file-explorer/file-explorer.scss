@@ -226,14 +226,14 @@
         display: flex;
         align-items: center;
         background: var(--surface-alt);
-        border-radius: 8px;
-        padding: 2px;
+        border-radius: 50px;
+        padding: 1px;
         border: 1px solid var(--border);
 
         .pill-btn {
             width: 28px;
             height: 28px;
-            border-radius: 6px;
+            border-radius: 50px;
         }
 
         .pill-divider {
