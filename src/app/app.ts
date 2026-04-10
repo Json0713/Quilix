@@ -18,6 +18,8 @@ import { TooltipService } from './services/ui/common/tooltip/tooltip.service';
 import { FileSystemService } from './core/services/data/file-system.service';
 import { SystemSyncService } from './core/services/sync/system-sync.service';
 import { PwaNavigationService } from './core/pwa/pwa-navigation.service';
+import { ShortcutService } from './core/services/ui/shortcut.service';
+
 
 @Component({
   selector: 'app-root',
@@ -40,6 +42,8 @@ export class App {
   private fileSystem = inject(FileSystemService);
   private systemSync = inject(SystemSyncService);
   private pwaNav = inject(PwaNavigationService);
+  private shortcuts = inject(ShortcutService);
+
 
   constructor() {
     this.toastRelay.consume();
@@ -50,6 +54,7 @@ export class App {
     this.systemSync.init();
     this.validateFileSystem();
     this.pwaNav.init();
+    this.shortcuts.init();
   }
 
   private async validateFileSystem() {
@@ -73,17 +78,5 @@ export class App {
     }
   }
 
-  // ── Global Native Desktop Keyboard Shortcuts ──
-  @HostListener('window:keydown', ['$event'])
-  onGlobalKeyDown(event: KeyboardEvent) {
-    // Intercept Ctrl+Q (or Cmd+Q on Mac) to spawn a fresh Quilix environment perfectly mimicking native PWA popups
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'q') {
-      event.preventDefault(); // Bypass any aggressive browser hijacking
-
-      // Fire a completely isolated OS popup pointed directly at the absolute root Origin!
-      // This will instantly boot up a clean Tab Engine natively without polluting any internal Window params.
-      window.open(window.location.origin, '_blank', 'popup,width=1024,height=768');
-    }
-  }
 
 }

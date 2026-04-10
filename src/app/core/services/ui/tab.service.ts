@@ -22,7 +22,7 @@ export class TabService {
         // window.open natively copies sessionStorage from parent to child, carrying over the WRONG Window ID.
         // If we boot up with a tearOffId parameter, we FORCE a brand new Window ID to violently separate scopes.
         const params = new URLSearchParams(window.location.search);
-        if (params.has('tearOffId')) {
+        if (params.has('tearOffId') || params.has('fresh')) {
             existingId = crypto.randomUUID();
             sessionStorage.setItem('quilix_windowId', existingId);
         } else if (!existingId) {
@@ -82,6 +82,9 @@ export class TabService {
                     }
                 }, 100);
             }
+        } else if (urlParams.has('fresh')) {
+            // Clean up the 'fresh' flag from URL to keep address bar tidy
+            window.history.replaceState(null, '', window.location.pathname);
         }
 
         // First login or blank launch → auto-create a standard empty Home tab
