@@ -38,24 +38,3 @@
 
   position: relative;
 }
-
-/* --- Window Controls Overlay (WCO) Fallback --- */
-.wco-fallback-bar {
-  display: none; // Hidden by default
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: var(--surface-main, #2B2A2A); // Matching theme fallback
-  -webkit-app-region: drag;
-  
-  // Only activate when in WCO mode
-  @media (display-mode: window-controls-overlay) {
-    display: block;
-    height: 42px !important;
-    left: 0;
-    right: 0;
-    width: 100%;
-  }
-}
