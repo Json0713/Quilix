@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { Breadcrumb } from '../../../../shared/ui/common/breadcrumb/breadcrumb';
 import { PersonalMetricsComponent } from './metrics/metrics';
+import { InfrastructureMapComponent } from '../../../../shared/components/infrastructure-map/infrastructure-map';
 
 @Component({
   selector: 'app-personal-index',
   standalone: true,
-  imports: [CommonModule, Breadcrumb, PersonalMetricsComponent],
+  imports: [CommonModule, Breadcrumb, PersonalMetricsComponent, InfrastructureMapComponent],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })

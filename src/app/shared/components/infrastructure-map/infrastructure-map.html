@@ -1,0 +1,83 @@
+<div class="map-wrapper" #mapContainer
+     (mousedown)="startCanvasInteraction($event)" 
+     (mousemove)="onCanvasMove($event)" 
+     (mouseup)="endCanvasInteraction()" 
+     (mouseleave)="endCanvasInteraction()"
+     (wheel)="onWheel($event)"
+     [class.is-panning]="isPanning()"
+     [class.is-lassoing]="lasso().active"
+     [style.backgroundPosition]="panX() + 'px ' + panY() + 'px'">
+    
+    <!-- Controls Overlay -->
+    <div class="map-controls">
+      <button class="btn btn-icon" (click)="forceRefresh()" title="Reset Layout"><i class="bi bi-arrow-clockwise"></i></button>
+      <div class="divider"></div>
+      <button class="btn btn-icon" (click)="zoomIn()" title="Zoom In"><i class="bi bi-zoom-in"></i></button>
+      <button class="btn btn-icon" (click)="zoomOut()" title="Zoom Out"><i class="bi bi-zoom-out"></i></button>
+    </div>
+
+    @if (isContainerReady()) {
+      <div class="pan-surface" 
+           [style.transform]="'translate3d(' + panX() + 'px, ' + panY() + 'px, 0) scale(' + zoomScale() + ')'"
+           [style.transformOrigin]="'0 0'">
+        
+        <!-- SVG Canvas for the Wires -->
+        <svg class="wires-canvas" preserveAspectRatio="none">
+          @for (node of nodes(); track trackByNode($index, node)) {
+            @if (node.parentId) {
+              <!-- Wire paths trigger CD updates when the child node resolves OnDragMove -->
+              <path class="wire" [attr.d]="getWirePath(node)" fill="none" stroke-width="2" stroke-dasharray="4" />
+            }
+          }
+        </svg>
+    
+        <!-- The Draggable Nodes -->
+        <div class="nodes-layer">
+          @for (node of nodes(); track trackByNode($index, node)) {
+            <div 
+              class="map-node type-{{ node.type }}" 
+              [class.is-selected]="selectedNodeIds.has(node.id)"
+              (mousedown)="onNodeClick($event, node)"
+              cdkDrag 
+              (cdkDragStarted)="onDragStarted($event, node)"
+              (cdkDragMoved)="onDragMoved($event, node)"
+              (cdkDragEnded)="onDragEnded($event, node)"
+              [cdkDragFreeDragPosition]="node.initialPosition"
+              [style.left.px]="node.x"
+              [style.top.px]="node.y"
+              [style.transform]="getBrotherTransform(node)">
+              
+              <div class="node-icon-box">
+                <i class="bi {{ node.icon }}"></i>
+              </div>
+              
+              <div class="node-details">
+                <span class="node-label">{{ node.label }}</span>
+                <span class="node-badge">{{ node.type | titlecase }}</span>
+              </div>
+    
+            </div>
+          }
+        </div>
+
+      </div>
+
+      <!-- Lasso Box Overlay (Positioned completely outside scale but normalized visually to cursor) -->
+      @if (lasso().active) {
+        <div class="lasso-box"
+             [style.left.px]="lasso().left"
+             [style.top.px]="lasso().top"
+             [style.width.px]="lasso().width"
+             [style.height.px]="lasso().height"></div>
+      }
+    } @else {
+      <!-- Initializing State -->
+      <div class="map-initializing">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Scanning Infrastructure...</p>
+      </div>
+    }
+  </div>
+  
