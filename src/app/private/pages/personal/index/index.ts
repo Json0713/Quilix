@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { Breadcrumb } from '../../../../shared/ui/common/breadcrumb/breadcrumb';
-import { PersonalMetricsComponent } from './metrics/metrics.component';
+import { PersonalMetricsComponent } from './metrics/metrics';
 
 @Component({
   selector: 'app-personal-index',

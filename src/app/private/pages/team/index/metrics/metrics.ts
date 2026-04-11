@@ -4,13 +4,13 @@ import { Subscription } from 'rxjs';
 import { StorageAnalyticsService } from '../../../../../core/services/data/storage-analytics.service';
 
 @Component({
-  selector: 'app-personal-metrics',
+  selector: 'app-team-metrics',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './metrics.component.html',
-  styleUrl: './metrics.component.scss',
+  templateUrl: './metrics.html',
+  styleUrl: './metrics.scss',
 })
-export class PersonalMetricsComponent implements OnInit, OnDestroy {
+export class TeamMetricsComponent implements OnInit, OnDestroy {
   public analytics = inject(StorageAnalyticsService);
 
   private metricsSub?: Subscription;
