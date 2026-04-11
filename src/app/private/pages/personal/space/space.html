@@ -1,11 +1,11 @@
 <app-breadcrumb></app-breadcrumb>
 
 @if (!loading()) {
-<div class="space-view-container">
+<div class="space-container">
     @if (space()) {
         <main class="page-content">
             <!-- Space View Grid -->
-            <div class="space-view-grid">
+            <div class="space-grid">
                 <!-- File Manager App Card -->
                 <div class="space-card app-card" (click)="toggleExplorer()">
                     <div class="card-icon">
@@ -13,27 +13,27 @@
                     </div>
                     <div class="card-details">
                         <h3>File Manager</h3>
-                        <p>Manage, organize, and upload your team's shared files.</p>
+                        <p>Manage, organize, and upload your space files.</p>
                     </div>
                     <div class="card-action">
                         <i class="bi bi-arrow-up-right"></i>
                     </div>
                 </div>
 
-                <!-- Placeholder Cards for other team features -->
+                <!-- Placeholder Cards for other features -->
                 <div class="space-card placeholder-card">
-                    <div class="card-icon opacity-50"><i class="bi bi-calendar-event"></i></div>
+                    <div class="card-icon opacity-50"><i class="bi bi-calendar3"></i></div>
                     <div class="card-details">
-                        <h3 class="opacity-50">Team Calendar</h3>
-                        <p class="opacity-50">Coming soon: Shared workspace events.</p>
+                        <h3 class="opacity-50">Calendar</h3>
+                        <p class="opacity-50">Coming soon: Team schedules and deadlines.</p>
                     </div>
                 </div>
 
                 <div class="space-card placeholder-card">
-                    <div class="card-icon opacity-50"><i class="bi bi-kanban"></i></div>
+                    <div class="card-icon opacity-50"><i class="bi bi-chat-dots"></i></div>
                     <div class="card-details">
-                        <h3 class="opacity-50">Project Board</h3>
-                        <p class="opacity-50">Coming soon: Track team tasks and milestones.</p>
+                        <h3 class="opacity-50">Discussions</h3>
+                        <p class="opacity-50">Coming soon: Real-time team collaboration.</p>
                     </div>
                 </div>
             </div>
@@ -112,7 +112,7 @@
         <div class="space-not-found">
             <i class="bi bi-folder-x"></i>
             <h3>Space not found</h3>
-            <p>This team space may have been deleted or archived.</p>
+            <p>This space may have been deleted or moved.</p>
         </div>
     }
 </div>

@@ -12,13 +12,13 @@ import { Breadcrumb } from '../../../../shared/ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 
 @Component({
-    selector: 'app-personal-space-view',
+    selector: 'app-personal-space',
     standalone: true,
     imports: [CommonModule, FileExplorerComponent, Breadcrumb],
-    templateUrl: './space-view.html',
-    styleUrl: './space-view.scss',
+    templateUrl: './space.html',
+    styleUrl: './space.scss',
 })
-export class SpaceView implements OnInit, OnDestroy {
+export class PersonalSpace implements OnInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private spaceService = inject(SpaceService);
     private fileSystem = inject(FileSystemService);
@@ -126,7 +126,7 @@ export class SpaceView implements OnInit, OnDestroy {
                 this.spaceHandle.set(spHandle);
             }
         } catch (e) {
-            console.error('[SpaceView] Failed to resolve physical directory handle for Space:', e);
+            console.error('[PersonalSpace] Failed to resolve physical directory handle for Space:', e);
             this.spaceHandle.set(null);
         } finally {
             this.loading.set(false);
@@ -247,7 +247,7 @@ export class SpaceView implements OnInit, OnDestroy {
                 this.windowPosition.set({ x: state.x || 0, y: state.y || 0 });
                 return;
             } catch (e) {
-                console.error('[SpaceView] Failed to load window state:', e);
+                console.error('[PersonalSpace] Failed to load window state:', e);
             }
         }
         

@@ -31,7 +31,7 @@ export const TEAM_ROUTES: Routes = [
       },
       {
         path: 'spaces/:spaceId',
-        loadComponent: () => import('./space-view/space-view').then(m => m.SpaceView)
+        loadComponent: () => import('./space/space').then(m => m.TeamSpace)
       }
     ]
   }
