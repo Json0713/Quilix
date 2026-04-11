@@ -172,6 +172,7 @@
       .node-icon-box { color: #10b981; background: rgba(16, 185, 129, 0.15); }
     }
   
+    &.type-file,
     &.type-subspace {
       width: 160px; /* slightly smaller */
       padding: 0.5rem 0.75rem;

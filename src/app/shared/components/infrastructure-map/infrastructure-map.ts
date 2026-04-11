@@ -12,7 +12,7 @@ import { db } from '../../../core/database/dexie.service';
 
 interface MapNode {
   id: string;
-  type: 'workspace' | 'space' | 'subspace' | 'overflow' | 'loading';
+  type: 'workspace' | 'space' | 'subspace' | 'file' | 'overflow' | 'loading';
   label: string;
   icon: string;
   x: number;
@@ -503,14 +503,18 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
         };
 
         for (const entry of displayEntries) {
-            const nodeId = entry.id || `virtual_${entry.name}_${level}_${Math.random()}`;
+            // Use deterministic naming. If entry.id is null (e.g., native physical files un-tracked logically), we construct a deterministic semantic route key!
+            // This guarantees layout caching across refreshes hits successfully.
+            const nodeId = entry.id || `virtual_${parentNodeId}_${entry.name}`;
             const p = resolveNodePos(nodeId, currentDefaultX, currentDefaultY);
+
+            const isDirectory = entry.kind === 'directory';
 
             refNodes.push({
                 id: nodeId,
-                type: 'subspace',
+                type: isDirectory ? 'subspace' : 'file',
                 label: entry.name,
-                icon: entry.kind === 'directory' ? 'bi-folder2' : 'bi-file-earmark',
+                icon: isDirectory ? 'bi-folder2' : 'bi-file-earmark',
                 x: p.x,
                 y: p.y,
                 parentId: parentNodeId,
@@ -518,7 +522,7 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
                 currentPosition: { x: 0, y: 0 }
             });
 
-            if (entry.kind === 'directory') {
+            if (isDirectory) {
                 await this.scanDirectoryRecursive(entry.handle, spaceId, entry.id || null, nodeId, currentDefaultX, currentDefaultY, refNodes, level + 1, savedLayouts, existingNodesMap);
             }
 
