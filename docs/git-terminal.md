@@ -9,4 +9,4 @@ npm run build
 npx http-server dist/Quilix/browser
 
 # Running Test Files...
-npm run build 
+npm run build
