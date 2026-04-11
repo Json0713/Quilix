@@ -169,16 +169,29 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
 
   // ── Canvas Navigation Physics (Pan & Lasso) ──
 
-  startCanvasInteraction(event: MouseEvent) {
-    if ((event.target as HTMLElement).closest('.map-node')) return; // Ignore nodes
-    if (event.button !== 0) return;
+  private getNormalizedCoordinates(event: MouseEvent | TouchEvent) {
+      if (window.TouchEvent && event instanceof TouchEvent) {
+          if (event.touches.length > 0) {
+              return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+          }
+      }
+      const e = event as MouseEvent;
+      return { x: e.clientX, y: e.clientY };
+  }
 
-    if (event.shiftKey) {
-        // Init Lasso Boxing Overlay
+  startCanvasInteraction(event: MouseEvent | TouchEvent) {
+    if ((event.target as HTMLElement).closest('.map-node')) return; // Ignore nodes
+    
+    // Ignore native right clicks (allow touch freely)
+    if (event instanceof MouseEvent && event.button !== 0) return;
+
+    const coords = this.getNormalizedCoordinates(event);
+
+    // Lasso is logically reserved for mouse+shift users.
+    if (event instanceof MouseEvent && event.shiftKey) {
         const rect = this.mapContainer.nativeElement.getBoundingClientRect();
-        // Mouse coordinate relative strictly locally to the component container mathematically
-        const localX = event.clientX - rect.left;
-        const localY = event.clientY - rect.top;
+        const localX = coords.x - rect.left;
+        const localY = coords.y - rect.top;
 
         this.lasso.set({
            active: true,
@@ -190,33 +203,32 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
            height: 0
         });
         
-        // If they click shift somewhere else, usually they want to start a fresh group highlight
         this.selectedNodeIds.clear(); 
-        
     } else {
-        // Init Panning Viewport
-        this.selectedNodeIds.clear(); // Clear selections organically if they just click the background
-        
+        // Generic Panning
+        this.selectedNodeIds.clear(); 
         this.isPanning.set(true);
-        this.startPanX = event.clientX - this.panX();
-        this.startPanY = event.clientY - this.panY();
+        this.startPanX = coords.x - this.panX();
+        this.startPanY = coords.y - this.panY();
     }
   }
 
-  onCanvasMove(event: MouseEvent) {
-    // Process Panning Engine
+  onCanvasMove(event: MouseEvent | TouchEvent) {
+    if (!this.isPanning() && !this.lasso().active) return;
+    const coords = this.getNormalizedCoordinates(event);
+
     if (this.isPanning()) {
-        this.panX.set(event.clientX - this.startPanX);
-        this.panY.set(event.clientY - this.startPanY);
+        if (event instanceof TouchEvent && event.cancelable) event.preventDefault(); // Stop native drag effects safely
+        this.panX.set(coords.x - this.startPanX);
+        this.panY.set(coords.y - this.startPanY);
         return;
     }
 
-    // Process Lasso Rectangle Selection
     const lso = this.lasso();
-    if (lso.active) {
+    if (lso.active && event instanceof MouseEvent) {
         const rect = this.mapContainer.nativeElement.getBoundingClientRect();
-        const mouseX = event.clientX - rect.left;
-        const mouseY = event.clientY - rect.top;
+        const mouseX = coords.x - rect.left;
+        const mouseY = coords.y - rect.top;
 
         const left = Math.min(lso.startX, mouseX);
         const top = Math.min(lso.startY, mouseY);
@@ -230,7 +242,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
   endCanvasInteraction() {
     this.isPanning.set(false);
 
-    // Finalize Lasso intersections to nodes
     const lso = this.lasso();
     if (lso.active) {
        this.calculateLassoIntersections();
@@ -240,7 +251,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
 
   private calculateLassoIntersections() {
       const lso = this.lasso();
-      // Localized coordinates normalized back to the surface offsets globally
       const logicLeft = (lso.left - this.panX()) / this.zoomScale();
       const logicTop = (lso.top - this.panY()) / this.zoomScale();
       const logicRight = logicLeft + (lso.width / this.zoomScale());
@@ -248,14 +258,12 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
 
       const nodes = this.nodes();
       for (const node of nodes) {
-          // A node roughly equals ~160px width
-          const nodeWidth = node.type === 'subspace' ? 160 : 200;
+          const nodeWidth = (node.type === 'subspace' || node.type === 'file') ? 160 : 200;
           const nLeft = node.x;
           const nTop = node.y;
           const nRight = node.x + nodeWidth;
-          const nBottom = node.y + 60; // rough height block
+          const nBottom = node.y + 60; 
 
-          // Boundary AABB overlap check
           if (nLeft < logicRight && nRight > logicLeft && 
               nTop < logicBottom && nBottom > logicTop) {
               this.selectedNodeIds.add(node.id);
@@ -265,16 +273,15 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
 
   // ── Drag & Drop Multi-Node Controller ──
 
-  onNodeClick(event: MouseEvent, node: MapNode) {
-     if (event.shiftKey) {
+  onNodeClick(event: MouseEvent | TouchEvent, node: MapNode) {
+     const isShift = event instanceof MouseEvent && event.shiftKey;
+     if (isShift) {
          if (this.selectedNodeIds.has(node.id)) {
              this.selectedNodeIds.delete(node.id);
          } else {
              this.selectedNodeIds.add(node.id);
          }
      } else {
-         // If a user casually casually clicks a node without shift that is ALREADY part of the payload, we do nothing to let drag begin.
-         // If they casually click an isolated node outside the group payload, focus strictly switches to that isolated un-grouped node logically!
          if (!this.selectedNodeIds.has(node.id)) {
             this.selectedNodeIds.clear();
          }
@@ -282,31 +289,35 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
   }
 
   onDragStarted(event: CdkDragStart, node: MapNode) {
-     // Validate active grouping safely
      if (!this.selectedNodeIds.has(node.id)) {
          this.selectedNodeIds.clear();
-         this.selectedNodeIds.add(node.id); // It implicitly groups itself temporarily for internal loop consistency
+         this.selectedNodeIds.add(node.id); 
      }
   }
+
+  private animationFrameId?: number;
 
   onDragMoved(event: CdkDragMove, leadNode: MapNode) {
     const dragDelta = event.source.getFreeDragPosition();
 
-    // Map synchronous coordinates visually onto all other grouped members natively
-    // We adjust currentPosition to update wires AND apply visual DOM offset manually through binding.
-    for (const id of this.selectedNodeIds) {
-        if (id === leadNode.id) {
-             leadNode.currentPosition = dragDelta;
-             continue; 
-        }
-
-        const brother = this.nodes().find(n => n.id === id);
-        if (brother) {
-            brother.currentPosition = { x: dragDelta.x, y: dragDelta.y };
-        }
+    // 60FPS Batch DOM updating strategy to eliminate 20fps drag lag heavily on low-power touch devices.
+    if (this.animationFrameId) {
+        cancelAnimationFrame(this.animationFrameId);
     }
     
-    this.cdr.detectChanges(); // Sweep Wires logic
+    this.animationFrameId = requestAnimationFrame(() => {
+        for (const id of this.selectedNodeIds) {
+            if (id === leadNode.id) {
+                 leadNode.currentPosition = dragDelta;
+                 continue; 
+            }
+            const brother = this.nodes().find(n => n.id === id);
+            if (brother) {
+                brother.currentPosition = { x: dragDelta.x, y: dragDelta.y };
+            }
+        }
+        this.cdr.detectChanges(); 
+    });
   }
 
   onDragEnded(event: CdkDragEnd, leadNode: MapNode) {
