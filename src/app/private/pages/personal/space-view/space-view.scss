@@ -7,7 +7,7 @@
     height: 100%;
 }
 
-.dashboard-container {
+.space-view-container {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -24,13 +24,13 @@
     position: relative;
 }
 
-.dashboard-grid {
+.space-view-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
     padding-bottom: 2rem;
 
-    .dashboard-card {
+    .space-card {
         background: var(--surface-main);
         border: 1px solid var(--border);
         border-radius: 20px;
@@ -84,7 +84,7 @@
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     z-index: 2000;
-    pointer-events: none; // Allow clicks through to dashboard unless it's the window
+    pointer-events: none; // Allow clicks through to space view unless it's the window
     display: flex;
     align-items: center;
     justify-content: center;

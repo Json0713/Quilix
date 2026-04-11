@@ -1,13 +1,13 @@
 <app-breadcrumb></app-breadcrumb>
 
 @if (!loading()) {
-<div class="dashboard-container">
+<div class="space-view-container">
     @if (space()) {
         <main class="page-content">
-            <!-- Dashboard Grid -->
-            <div class="dashboard-grid">
+            <!-- Space View Grid -->
+            <div class="space-view-grid">
                 <!-- File Manager App Card -->
-                <div class="dashboard-card app-card" (click)="toggleExplorer()">
+                <div class="space-card app-card" (click)="toggleExplorer()">
                     <div class="card-icon">
                         <i class="bi bi-folder2-open"></i>
                     </div>
@@ -21,7 +21,7 @@
                 </div>
 
                 <!-- Placeholder Cards for other features -->
-                <div class="dashboard-card placeholder-card">
+                <div class="space-card placeholder-card">
                     <div class="card-icon opacity-50"><i class="bi bi-calendar3"></i></div>
                     <div class="card-details">
                         <h3 class="opacity-50">Calendar</h3>
@@ -29,7 +29,7 @@
                     </div>
                 </div>
 
-                <div class="dashboard-card placeholder-card">
+                <div class="space-card placeholder-card">
                     <div class="card-icon opacity-50"><i class="bi bi-chat-dots"></i></div>
                     <div class="card-details">
                         <h3 class="opacity-50">Discussions</h3>
