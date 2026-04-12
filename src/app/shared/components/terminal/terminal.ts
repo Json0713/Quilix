@@ -17,6 +17,8 @@ export class TerminalComponent {
     @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLDivElement>;
 
     currentInput = '';
+    isMaximized = false;
+    
     
     // Simple local history buffer for arrows
     localHistory: string[] = [];
@@ -70,9 +72,16 @@ export class TerminalComponent {
     }
 
     focusInput() {
+        if (window.getSelection()?.toString().length) {
+            return; // Allow users to highlight text without pulling focus away!
+        }
         if (this.cmdInput) {
             this.cmdInput.nativeElement.focus();
         }
+    }
+
+    toggleMaximize() {
+        this.isMaximized = !this.isMaximized;
     }
 
     private scrollToBottom() {

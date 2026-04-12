@@ -104,7 +104,7 @@ export class TerminalService {
                         '- <b>find &lt;query&gt;</b>: Recursive search within focus<br/>' +
                         '- <b>sync</b>: Force physical disk resync<br/>' +
                         '- <b>clear</b>: Clear terminal display<br/>' +
-                        '<br/><i class="text-muted">Note: Add <b>-ws</b> flag to commands to target workspaces globally (e.g. <b>cd -ws Alpha</b> or <b>rm -ws Name</b>).</i>', 
+                        '<br/><span style="color: rgba(179, 136, 255, 0.85);">Note: Add <b>-ws</b> flag to commands to target workspaces globally (e.g. <b>cd -ws Alpha</b> or <b>rm -ws Name</b>).</span>', 
                         true
                     );
                     break;
@@ -420,11 +420,11 @@ export class TerminalService {
             return;
         }
 
-        let out = '<div class="ls-grid" style="flex-direction: column; gap: 4px;">';
+        let out = '<div class="ls-grid">';
         for (const e of entries) {
             const icon = e.kind === 'directory' ? 'bi-folder2 text-primary' : 'bi-file-earmark text-secondary';
-            const breadcrumb = e.parentChain ? e.parentChain.map(c => c.name).join('/') + '/' : '';
-            out += `<span class="ls-item"><i class="bi ${icon} me-2"></i><b>${e.name}</b> <span class="text-muted ms-2" style="font-size: 0.7rem;">(${breadcrumb}${e.name})</span></span>`;
+            const breadcrumb = e.parentChain && e.parentChain.length ? e.parentChain.map(c => c.name).join('/') + '/' : '';
+            out += `<span class="ls-item"><i class="bi ${icon} me-2"></i><span><b>${e.name}</b> <span style="opacity: 0.85; margin-left: 8px;">(${breadcrumb}${e.name})</span></span></span>`;
         }
         out += '</div>';
         this.printOutput(out, true);

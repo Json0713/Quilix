@@ -21,6 +21,13 @@
     &.is-open {
         transform: translateY(0);
     }
+
+    &.is-maximized {
+        height: 100%;
+        top: 0;
+        bottom: 0;
+        z-index: 1055; /* Force above navbar/modals when maximized */
+    }
 }
 
 .terminal-header {
@@ -117,16 +124,23 @@
 
 .ls-grid {
     display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 4px;
-    margin-bottom: 8px;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    padding-left: 8px;
 }
 
 .ls-item {
     display: flex;
     align-items: center;
     white-space: nowrap;
+    font-family: var(--bs-font-sans-serif);
+    font-size: 0.9rem;
+
+    i {
+        font-size: 1.1rem;
+    }
 }
 
 .input-row {
