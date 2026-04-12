@@ -5,6 +5,8 @@ import { FileManagerService } from '../components/file-manager.service';
 import { Workspace } from '../../interfaces/workspace';
 import { Space } from '../../interfaces/space';
 import { FileSystemService } from '../data/file-system.service';
+import { Router } from '@angular/router';
+import { WorkspaceService } from '../components/workspace.service';
 
 export interface TerminalLine {
     text: string;
@@ -18,12 +20,15 @@ export class TerminalService {
     private spaces = inject(SpaceService);
     private fileManager = inject(FileManagerService);
     private fileSystem = inject(FileSystemService);
+    private workspaceService = inject(WorkspaceService);
+    private router = inject(Router);
 
     isOpen = signal<boolean>(false);
     historyLines = signal<TerminalLine[]>([]);
     
     currentWorkspace = signal<Workspace | null>(null);
     currentSpace = signal<Space | null>(null);
+    isAtGlobalRoot = signal<boolean>(false);
 
     constructor() {
         this.printSystem('Quilix Virtual Shell (Angular Native) initialized.');
@@ -50,6 +55,7 @@ export class TerminalService {
     getPromptString(): string {
         const ws = this.currentWorkspace();
         const sp = this.currentSpace();
+        if (this.isAtGlobalRoot()) return 'quilix> ';
         if (!ws) return 'quilix> ';
         if (!sp) return `quilix/${ws.name.toLowerCase()}> `;
         return `quilix/${ws.name.toLowerCase()}/${sp.name.toLowerCase()}> `;
@@ -80,12 +86,14 @@ export class TerminalService {
 
         const args = raw.split(/\s+/);
         const cmd = args[0].toLowerCase();
+        const targetRaw = raw.substring(cmd.length).trim();
+        
         await this.refreshContext();
 
         try {
             switch(cmd) {
                 case 'help':
-                    this.printOutput('Available commands: <br/>- <b>pwd</b>: Print current path<br/>- <b>ls</b>: List directories/files<br/>- <b>cd</b> &lt;name&gt;: Navigate into space or root (cd ..)<br/>- <b>mkdir</b> &lt;name&gt;: Create a space (if at root) or directory<br/>- <b>rm</b> &lt;name&gt;: Delete a space or file<br/>- <b>clear</b>: Clear terminal display', true);
+                    this.printOutput('Available commands: <br/>- <b>pwd</b>: Print current path<br/>- <b>ls</b>: List directories/files<br/>- <b>cd</b> &lt;name&gt;: Navigate into space or root (cd ..)<br/>- <b>cd -ws</b> &lt;name&gt;: Jump directly to another Workspace<br/>- <b>mkdir</b> &lt;name&gt;: Create a space (if at root) or directory<br/>- <b>rm</b> &lt;name&gt;: Delete a space or file<br/>- <b>clear</b>: Clear terminal display', true);
                     break;
                 case 'clear':
                     this.clear();
@@ -98,14 +106,14 @@ export class TerminalService {
                     await this.runLs();
                     break;
                 case 'cd':
-                    await this.runCd(args[1]);
+                    await this.runCd(targetRaw);
                     break;
                 case 'mkdir':
                 case 'touch':
-                    await this.runMkdir(args[1]);
+                    await this.runMkdir(targetRaw);
                     break;
                 case 'rm':
-                    await this.runRm(args[1]);
+                    await this.runRm(targetRaw);
                     break;
                 default:
                     this.printError(`Command not found: ${cmd}`);
@@ -116,9 +124,25 @@ export class TerminalService {
     }
 
     private async runLs() {
+        if (this.isAtGlobalRoot()) {
+            const workspaces = await this.workspaceService.getAll();
+            if (workspaces.length === 0) {
+                this.printOutput('No workspaces found.');
+                return;
+            }
+            let out = '<div class="ls-grid">';
+            for (const w of workspaces) {
+                const icon = w.role === 'team' ? 'bi-building text-primary' : 'bi-person-fill text-primary';
+                out += `<span class="ls-item space"><i class="bi ${icon} me-2"></i>${w.name}</span>`;
+            }
+            out += '</div>';
+            this.printOutput(out, true);
+            return;
+        }
+
         const ws = this.currentWorkspace();
         if (!ws) {
-            this.printError('No active workspace.');
+            this.printError('No active workspace. Try "cd .." to view workspaces.');
             return;
         }
 
@@ -161,10 +185,59 @@ export class TerminalService {
     private async runCd(target: string) {
         if (!target) {
             this.currentSpace.set(null);
+            this.isAtGlobalRoot.set(false);
             return;
         }
+
+        // Feature: Workspace Cross-jumping
+        if (target.startsWith('-ws ')) {
+            const wsTarget = target.substring(4).trim();
+            const workspaces = await this.workspaceService.getAll();
+            const match = workspaces.find(w => w.name.toLowerCase() === wsTarget.toLowerCase());
+            
+            if (match) {
+                if (this.currentWorkspace()?.id === match.id) {
+                    this.printSystem(`Already in workspace: ${match.name}`);
+                    return;
+                }
+                this.printSystem(`Switching to workspace: ${match.name}...`);
+                await this.auth.loginExisting(match);
+                localStorage.setItem('quilix_entry_type', 'return');
+                localStorage.setItem('quilix_entry_name', match.name);
+                this.router.navigate([match.role === 'personal' ? '/personal' : '/team']).then(() => {
+                    this.isAtGlobalRoot.set(false);
+                    this.refreshContext();
+                });
+            } else {
+                this.printError(`Workspace not found: ${wsTarget}`);
+            }
+            return;
+        }
+
         if (target === '..') {
-            this.currentSpace.set(null);
+            if (this.currentSpace()) {
+                this.currentSpace.set(null); // Go to Workspace root
+            } else {
+                this.isAtGlobalRoot.set(true); // Go to Global root
+            }
+            return;
+        }
+
+        if (this.isAtGlobalRoot()) {
+            const workspaces = await this.workspaceService.getAll();
+            const match = workspaces.find(w => w.name.toLowerCase() === target.toLowerCase());
+            if (match) {
+                this.printSystem(`Switching to workspace: ${match.name}...`);
+                await this.auth.loginExisting(match);
+                localStorage.setItem('quilix_entry_type', 'return');
+                localStorage.setItem('quilix_entry_name', match.name);
+                this.router.navigate([match.role === 'personal' ? '/personal' : '/team']).then(() => {
+                    this.isAtGlobalRoot.set(false);
+                    this.refreshContext();
+                });
+            } else {
+                this.printError(`Workspace not found: ${target}`);
+            }
             return;
         }
 
@@ -233,7 +306,23 @@ export class TerminalService {
                 this.printError(`Space not found: ${target}`);
             }
         } else {
-            this.printError('Deleting nested files via terminal is currently limited to Workspace Root.');
+            // Delete file/folder inside space
+            const sp = this.currentSpace()!;
+            const mode = await this.fileSystem.getStorageMode();
+            let handle: any = undefined;
+            if (mode === 'filesystem') {
+                handle = await this.fileSystem.resolveSpaceHandle(ws.name, sp.id);
+            }
+            
+            const entries = await this.fileManager.readDirectory({ handle, spaceId: sp.id, parentId: sp.id });
+            const match = entries.find(e => e.name.toLowerCase() === target.toLowerCase());
+            
+            if (match) {
+                await this.fileManager.deleteEntry({ parentHandle: handle }, match);
+                this.printOutput(`Deleted ${match.kind}: ${target}`);
+            } else {
+                this.printError(`File or folder not found: ${target}`);
+            }
         }
     }
 }
