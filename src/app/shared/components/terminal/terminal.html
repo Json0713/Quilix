@@ -1,0 +1,39 @@
+<div class="terminal-panel" [class.is-open]="terminal.isOpen()">
+    <div class="terminal-header">
+        <div class="tabs">
+            <span class="tab active">Terminal</span>
+            <span class="tab">Output</span>
+            <span class="tab">Problems</span>
+        </div>
+        <div class="tools">
+            <button (click)="terminal.clear()" title="Clear Terminal"><i class="bi bi-trash"></i></button>
+            <button (click)="terminal.toggle()" title="Close Panel"><i class="bi bi-x-lg"></i></button>
+        </div>
+    </div>
+
+    <div class="terminal-body" #scrollContainer (click)="focusInput()">
+        <!-- History Lines -->
+        @for (line of terminal.historyLines(); track $index) {
+            <div class="line" [ngClass]="'type-' + line.type">
+                @if (line.isHtml) {
+                    <span [innerHTML]="line.text"></span>
+                } @else {
+                    <span>{{ line.text }}</span>
+                }
+            </div>
+        }
+
+        <!-- Active Input Line -->
+        <div class="input-row">
+            <span class="prompt">{{ terminal.getPromptString() }}</span>
+            <input 
+                #cmdInput
+                type="text" 
+                [(ngModel)]="currentInput" 
+                (keydown)="onKeydown($event)" 
+                autocomplete="off" 
+                spellcheck="false"
+            />
+        </div>
+    </div>
+</div>

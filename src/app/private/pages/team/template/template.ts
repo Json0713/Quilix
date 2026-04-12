@@ -9,10 +9,11 @@ import { TabBarComponent } from '../../../../shared/ui/tab-bar/tab-bar';
 import { NavigationBar } from '../../../../shared/ui/navigation-bar/navigation-bar';
 import { TabService } from '../../../../core/services/ui/tab.service';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { TerminalComponent } from '../../../../shared/components/terminal/terminal';
 
 @Component({
   selector: 'app-team-template',
-  imports: [RouterOutlet, TeamSidebarComponent, TabBarComponent, NavigationBar],
+  imports: [RouterOutlet, TeamSidebarComponent, TabBarComponent, NavigationBar, TerminalComponent],
   templateUrl: './template.html',
   styleUrl: './template.scss',
 })
