@@ -75,6 +75,15 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
 
         this.workspaceSub = this.workspaceService.workspaces$.subscribe(ws => {
             this.hasMissingWorkspaces.set(ws.some(w => w.isMissingOnDisk && w.role === 'team'));
+            
+            // Keep activeWorkspace reactive to disk renames from other components
+            const currentActive = this.activeWorkspace();
+            if (currentActive) {
+                const refreshed = ws.find(w => w.id === currentActive.id);
+                if (refreshed && refreshed.name !== currentActive.name) {
+                    this.activeWorkspace.set(refreshed);
+                }
+            }
         });
 
         this.authSub = this.authService.authEvents$.subscribe(async (event) => {

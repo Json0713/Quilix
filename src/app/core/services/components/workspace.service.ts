@@ -15,14 +15,14 @@ export class WorkspaceService {
 
     constructor() {
         if (typeof window !== 'undefined') {
-            // Check for OS folder updates lightly every 5 seconds when visible
+            // Check for OS folder updates lightly every 2 seconds when visible
             this.autoSyncInterval = setInterval(() => {
                 if (document.visibilityState === 'visible') {
                     this.syncExternalRenames().catch(err => {
                         console.error('[WorkspaceService] Auto-sync failed', err);
                     });
                 }
-            }, 5000);
+            }, 2000);
         }
     }
 
@@ -135,6 +135,15 @@ export class WorkspaceService {
             }
 
             await db.workspaces.update(workspaceId, { name: sanitized, folderPath: newFolderPath });
+            
+            if (storageMode === 'filesystem') {
+                setTimeout(() => {
+                    this.spaceService.syncExternalRenames(workspaceId, sanitized).catch(err => {
+                        console.warn('[WorkspaceService] Failed to index spaces after internal rename', err);
+                    });
+                }, 50);
+            }
+
             return true;
         } finally {
             this.fileSystem.releaseSyncLock();
@@ -325,6 +334,12 @@ export class WorkspaceService {
                                 folderPath: `Quilix/${diskName}`,
                                 isMissingOnDisk: false // Ensure it's marked as present
                             });
+
+                            setTimeout(() => {
+                                this.spaceService.syncExternalRenames(folderId, diskName).catch(err => {
+                                    console.warn(`[WorkspaceService] Failed to index spaces after external rename for ${diskName}`, err);
+                                });
+                            }, 50);
                         } else if (ws.isMissingOnDisk) {
                             // If it was marked as missing but we found it now
                             await db.workspaces.update(folderId, { isMissingOnDisk: false });
