@@ -22,10 +22,10 @@ export class TerminalComponent {
     localHistory: string[] = [];
     historyIndex = -1;
 
-    // Global toggle (Ctrl + ` or Ctrl + J)
+    // Global toggle (Ctrl + ` or Ctrl + M)
     @HostListener('document:keydown', ['$event'])
     handleGlobalKeyboard(event: KeyboardEvent) {
-        if ((event.ctrlKey || event.metaKey) && (event.key === '`' || event.key === 'j')) {
+        if ((event.ctrlKey || event.metaKey) && (event.key === '`' || event.key.toLowerCase() === 'm')) {
             event.preventDefault();
             this.terminal.toggle();
             
