@@ -442,6 +442,15 @@ export class SpaceService {
                             spacesToUpdate.push(space);
                         }
                     }
+
+                    // SHADOW CACHE: Proactively mirror the subdirectory tree into virtual_entries.
+                    // This is the ONLY way we can know subspace structure for restoration after 
+                    // an OS-level deletion — filesystem mode never writes subdirs to the DB otherwise.
+                    // This is a fire-and-forget background task; errors must not block sync.
+                    this.cacheSubdirectoryTree(handle, workspaceId, spaceId, null, 0).catch(err => {
+                        console.warn(`[SpaceService] Subdirectory cache update failed for space ${spaceId}:`, err);
+                    });
+
                 } else {
                     // AUTO-DISCOVERY: No .quilix-id means this folder was created manually inside the Workspace via OS
                     console.log(`[SpaceService] NATIVE DISCOVERY: Found untracked OS space "${diskName}" inside "${workspaceName}". Ingesting...`);
@@ -463,6 +472,11 @@ export class SpaceService {
 
                     newSpaces.push(newSpace);
                     foundSpaceIds.add(newSpaceId);
+
+                    // SHADOW CACHE: Also cache subdirs for newly discovered spaces
+                    this.cacheSubdirectoryTree(handle, workspaceId, newSpaceId, null, 0).catch(err => {
+                        console.warn(`[SpaceService] Subdirectory cache failed for new space ${newSpaceId}:`, err);
+                    });
                 }
             }
 
@@ -498,6 +512,81 @@ export class SpaceService {
             }
         } finally {
             this.isSyncing.set(false);
+        }
+    }
+
+    /**
+     * Proactively mirrors a space's entire subdirectory tree into virtual_entries.
+     * This creates a persistent structural snapshot so that if the physical folder is deleted 
+     * from outside the app, the restore flow can reconstruct the full tree hierarchy.
+     *
+     * SAFETY: This method only writes 'directory' kind entries, never 'file'.
+     * It uses bulkPut (upsert), so re-running it on every sync is idempotent.
+     * It only runs in filesystem mode and does NOT interfere with indexeddb-mode reads.
+     *
+     * @param dirHandle  - Handle to the directory to scan
+     * @param workspaceId - The parent workspace ID
+     * @param spaceId     - The owning space ID
+     * @param parentId    - The virtual_entries parentId (null => 'root')
+     * @param depth       - Current recursion depth (guards against runaway traversal)
+     */
+    private async cacheSubdirectoryTree(
+        dirHandle: FileSystemDirectoryHandle,
+        workspaceId: string,
+        spaceId: string,
+        parentId: string | null,
+        depth: number
+    ): Promise<void> {
+        if (depth > 6) return; // Safety limit: prevent infinite loops for very deep trees
+
+        const parentKey = parentId ?? 'root';
+        const entriesToPut: any[] = [];
+        const childHandles: { handle: FileSystemDirectoryHandle; id: string }[] = [];
+
+        try {
+            for await (const entry of (dirHandle as any).values()) {
+                // Only cache directory entries — files can't be restored, no point storing
+                if (entry.name.startsWith('.quilix') || entry.kind !== 'directory') continue;
+
+                let id: string | undefined = undefined;
+                try {
+                    const res = await this.fileSystem.readDirectoryId(entry as FileSystemDirectoryHandle);
+                    id = res?.id;
+
+                    // If the directory has no ID, assign and write one so it's permanently trackable
+                    if (!id) {
+                        id = crypto.randomUUID();
+                        await this.fileSystem.writeDirectoryId(entry as FileSystemDirectoryHandle, id);
+                    }
+                } catch {
+                    continue; // Can't read this entry, skip it safely
+                }
+
+                entriesToPut.push({
+                    id,
+                    workspaceId,
+                    spaceId,
+                    parentId: parentKey,
+                    name: entry.name,
+                    kind: 'directory',
+                    lastModified: Date.now()
+                });
+
+                childHandles.push({ handle: entry as FileSystemDirectoryHandle, id });
+            }
+        } catch (err) {
+            console.warn(`[SpaceService] cacheSubdirectoryTree: Could not read dir at depth ${depth}:`, err);
+            return;
+        }
+
+        // Upsert all discovered directory entries in one batch operation
+        if (entriesToPut.length > 0) {
+            await db.virtual_entries.bulkPut(entriesToPut);
+        }
+
+        // Recurse into each child directory sequentially to keep memory usage low
+        for (const child of childHandles) {
+            await this.cacheSubdirectoryTree(child.handle, workspaceId, spaceId, child.id, depth + 1);
         }
     }
 
