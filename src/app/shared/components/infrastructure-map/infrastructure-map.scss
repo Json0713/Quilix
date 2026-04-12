@@ -70,6 +70,47 @@
             transform: scale(0.95);
         }
     }
+
+    .dropdown-menu {
+        min-width: 150px;
+        background: var(--surface-main);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 4px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        margin-top: 8px !important;
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 4px 16px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-main);
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+
+            i {
+                font-size: 0.9rem;
+            }
+
+            &:hover {
+                background: var(--bg-hover);
+            }
+
+            &.danger-item {
+                color: #ef4444;
+
+                &:hover {
+                    background: rgba(239, 68, 68, 0.1);
+                }
+            }
+        }
+    }
   }
 
   .pan-surface {

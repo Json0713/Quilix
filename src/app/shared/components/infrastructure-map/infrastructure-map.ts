@@ -9,6 +9,7 @@ import { SpaceService } from '../../../core/services/components/space.service';
 import { FileSystemService } from '../../../core/services/data/file-system.service';
 import { FileManagerService } from '../../../core/services/components/file-manager.service';
 import { db } from '../../../core/database/dexie.service';
+import { ModalService } from '../../../services/ui/common/modal/modal';
 
 interface MapNode {
   id: string;
@@ -24,6 +25,18 @@ interface MapNode {
   currentPosition: { x: number, y: number };
 }
 
+interface LayoutNode {
+  id: string;
+  type: 'workspace' | 'space' | 'subspace' | 'file' | 'overflow' | 'loading';
+  label: string;
+  icon: string;
+  parentId: string | null;
+  children: LayoutNode[];
+  subtreeWidth: number;
+  x: number;
+  y: number;
+}
+
 @Component({
   selector: 'app-infrastructure-map',
   standalone: true,
@@ -35,9 +48,10 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLDivElement>;
 
   private auth = inject(AuthService);
-  private spaces = inject(SpaceService);
-  private fileSystem = inject(FileSystemService);
-  private fileManager = inject(FileManagerService);
+  private readonly spaces = inject(SpaceService);
+  private readonly fileSystem = inject(FileSystemService);
+  private readonly fileManager = inject(FileManagerService);
+  private readonly modal = inject(ModalService);
   private cdr = inject(ChangeDetectorRef);
 
   public nodes = signal<MapNode[]>([]);
@@ -105,16 +119,31 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
   }
 
-  public forceRefresh() {
-      // Hard clear LocalStorage coordinates array, reset view, and map again.
-      localStorage.removeItem(`quilix_map_positions_${this.currentWorkspaceId}`);
-      this.selectedNodeIds.clear();
-      
-      this.nodes.set([]); // Trigger initial view logic
-      this.panX.set(0);
-      this.panY.set(0);
+  public refreshMap() {
+      // Re-fetches structures but does NOT wipe valid saved manual layouts
+      this.scheduleBuildGraph(false);
+  }
 
-      this.scheduleBuildGraph(true);
+  public async resetLayout() {
+      const confirmed = await this.modal.confirm(
+          'Are you sure you want to completely reset the manual layout back to the automatic tree?',
+          {
+              title: 'Reset Map Layout',
+              confirmText: 'Reset Layout',
+              cancelText: 'Cancel'
+          }
+      );
+      
+      if (confirmed) {
+          localStorage.removeItem(`quilix_map_positions_${this.currentWorkspaceId}`);
+          this.selectedNodeIds.clear();
+          
+          this.nodes.set([]); // Trigger initial view logic
+          this.panX.set(0);
+          this.panY.set(0);
+
+          this.scheduleBuildGraph(true);
+      }
   }
 
   private scheduleBuildGraph(forceRefresh: boolean = false) {
@@ -137,10 +166,13 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
   private saveLayouts() {
       if (!this.currentWorkspaceId) return;
       
-      // Update cache block with whatever exists visually right now natively.
+      // Update cache block specifically only with manually dragged nodes.
       const currentMap = this.loadLayouts(); 
-      for (const node of this.nodes()) {
-          currentMap[node.id] = { x: node.x, y: node.y };
+      for (const id of this.selectedNodeIds) {
+          const node = this.nodes().find(n => n.id === id);
+          if (node) {
+              currentMap[node.id] = { x: node.x, y: node.y };
+          }
       }
       localStorage.setItem(`quilix_map_positions_${this.currentWorkspaceId}`, JSON.stringify(currentMap));
   }
@@ -388,90 +420,93 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
 
       // Hybrid Cache Layer logic
       const resolvePos = (nodeId: string, defaultX: number, defaultY: number) => {
-          // 1. Is there saved manual layout in browser?
+          let finalX = defaultX;
+          let finalY = defaultY;
+
+          // 1. Is there saved manual layout in browser for THIS specific node?
           if (savedLayouts[nodeId]) {
-              return { x: savedLayouts[nodeId].x, y: savedLayouts[nodeId].y, initX: 0, initY: 0 };
+              finalX = savedLayouts[nodeId].x;
+              finalY = savedLayouts[nodeId].y;
           }
-          // 2. Was it already actively mapped on screen prior to hot-load? Use that natively.
+
+          // 2. Prevent snatching actively dragged nodes by restoring their temporary drag-offsets
           const prior = existingNodesMap.get(nodeId);
           if (prior) {
-              return { x: prior.x, y: prior.y, initX: prior.initialPosition.x, initY: prior.initialPosition.y };
+              return { 
+                  x: finalX, 
+                  y: finalY, 
+                  initX: prior.initialPosition.x, 
+                  initY: prior.initialPosition.y, 
+                  currentPos: prior.currentPosition 
+              };
           }
-          // 3. Fallback to graph algorithmic generation coordinates entirely physically natively 
-           return { x: defaultX, y: defaultY, initX: 0, initY: 0 };
+          
+          // 3. Fallback to purely fresh computed mathematics bounds so topological insertions expand perfectly seamlessly!
+          return { x: finalX, y: finalY, initX: 0, initY: 0, currentPos: {x: 0, y: 0} };
       };
 
       // 1. Root Workspace Node
+      const rootLayoutNode: LayoutNode = {
+          id: ws.id,
+          type: 'workspace',
+          label: ws.name,
+          icon: 'bi-grid-1x2',
+          parentId: null,
+          children: [],
+          subtreeWidth: 0,
+          x: 0,
+          y: 0
+      };
+
+      // 2. Fetch Core Spaces & Subtrees Concurrently
+      const allSpaces = await this.spaces.getByWorkspace(ws.id);
+      const mode = await this.fileSystem.getStorageMode();
+
+      rootLayoutNode.children = await Promise.all(allSpaces.map(async (sp) => {
+          const spNode: LayoutNode = {
+              id: sp.id,
+              type: 'space',
+              label: sp.name,
+              icon: 'bi-folder2-open',
+              parentId: ws.id,
+              children: [],
+              subtreeWidth: 0,
+              x: 0,
+              y: 0
+          };
+          
+          let handle: any = undefined;
+          if (mode === 'filesystem') {
+             handle = await this.fileSystem.resolveSpaceHandle(ws.name, sp.id);
+          }
+          
+          // Use '1' as the starting level for recursive depth control
+          spNode.children = await this.fetchTreeRecursive(handle, sp.id, null, sp.id, 1);
+          return spNode;
+      }));
+
+      // 3. Mathematical Two-Pass Layout Calculation (Bottom-Up)
+      const spacingX = 220; // Increased horizontal stretch to eliminate text overlapping
+      this.calculateSubtreeWidth(rootLayoutNode, spacingX);
+
+      // 4. Assign Absolute Viewport Coordinates (Top-Down)
       const rPos = resolvePos(ws.id, 0, 0);
+      rootLayoutNode.x = rPos.x;
+      rootLayoutNode.y = rPos.y;
 
       if (this.nodes().length === 0 && this.panX() === 0 && this.panY() === 0) {
           const containerW = this.mapContainer.nativeElement.clientWidth;
           const containerH = this.mapContainer.nativeElement.clientHeight;
           
           this.zoomScale.set(0.7); // Default zoom out
-          // Place the workspace node strictly in the exact center mathematically
+          // Place the workspace node strictly in the exact mathematical center
           this.panX.set((containerW / 2) - ((rPos.x + 100) * 0.7));
           this.panY.set((containerH / 2) - ((rPos.y + 300) * 0.7));
       }
-      const rootNode: MapNode = {
-        id: ws.id,
-        type: 'workspace',
-        label: ws.name,
-        icon: 'bi-grid-1x2',
-        x: rPos.x,
-        y: rPos.y,
-        parentId: null,
-        initialPosition: { x: rPos.initX, y: rPos.initY },
-        currentPosition: { x: 0, y: 0 }
-      };
-      
-      buildNodes.push(rootNode);
 
-      // 2. Fetch Core Spaces
-      const allSpaces = await this.spaces.getByWorkspace(ws.id);
-      
-      const gap = 300;
-      const totalSpacesWidth = (allSpaces.length - 1) * gap;
-      let startX = -(totalSpacesWidth / 2);
+      this.assignCoordinates(rootLayoutNode, buildNodes, resolvePos);
 
-      for (let i = 0; i < allSpaces.length; i++) {
-          const sp = allSpaces[i];
-          const calculatedX = startX + (i * gap);
-          const calculatedY = 160;
-
-          const pPos = resolvePos(sp.id, calculatedX, calculatedY);
-          
-          buildNodes.push({
-              id: sp.id,
-              type: 'space',
-              label: sp.name,
-              icon: 'bi-folder2-open',
-              x: pPos.x,
-              y: pPos.y,
-              parentId: ws.id,
-              initialPosition: { x: pPos.initX, y: pPos.initY },
-              currentPosition: { x: 0, y: 0 }
-          });
-      }
-      
-      this.nodes.set([...buildNodes]);
-
-      // 3. Recursive Subspace Mapping
-      const mode = await this.fileSystem.getStorageMode();
-      
-      await Promise.all(buildNodes.filter(n => n.type === 'space').map(async (spNode) => {
-        let handle: any = undefined;
-        if (mode === 'filesystem') {
-           handle = await this.fileSystem.resolveSpaceHandle(ws.name, spNode.id);
-        }
-        // Since we load coordinates, we need the initial algorithmic parentX/parentY to be correct.
-        // It relies on the tree shape, so calculating default logic is complex but safe:
-        const treeRootX = startX + (allSpaces.findIndex(s => s.id === spNode.id) * gap);
-        
-        await this.scanDirectoryRecursive(handle, spNode.id, null, spNode.id, treeRootX, 160, buildNodes, 1, savedLayouts, existingNodesMap);
-      }));
-
-      // Set final tree layout
+      // Set final tree layout natively
       this.nodes.set([...buildNodes]); 
       
     } finally {
@@ -479,86 +514,127 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async scanDirectoryRecursive(
+  // ── Two-Pass Core Algorithms ──
+
+  private calculateSubtreeWidth(node: LayoutNode, spacingX: number): number {
+      if (node.children.length === 0) {
+          // A leaf node guarantees at least `spacingX` width for itself
+          node.subtreeWidth = spacingX;
+          return node.subtreeWidth;
+      }
+      let sum = 0;
+      for (const child of node.children) {
+          sum += this.calculateSubtreeWidth(child, spacingX);
+      }
+      // Expand the parent's logical stride if its children need more space laterally
+      node.subtreeWidth = Math.max(spacingX, sum);
+      return node.subtreeWidth;
+  }
+
+  private assignCoordinates(
+      node: LayoutNode,
+      refNodes: MapNode[],
+      resolveNodePos: (id: string, defX: number, defY: number) => {x: number, y: number, initX: number, initY: number, currentPos: {x: number, y: number}}
+  ) {
+      const p = resolveNodePos(node.id, node.x, node.y);
+
+      // Construct concrete UI MapNode and push to the flattened render array
+      refNodes.push({
+          id: node.id,
+          type: node.type,
+          label: node.label,
+          icon: node.icon,
+          x: p.x,
+          y: p.y,
+          parentId: node.parentId,
+          initialPosition: { x: p.initX, y: p.initY },
+          currentPosition: p.currentPos
+      });
+
+      if (node.children.length > 0) {
+          // Starting visually from the leftmost edge of this parent's allocated block
+          let currentX = node.x - (node.subtreeWidth / 2);
+          for (const child of node.children) {
+              // The child's center is half of its own block
+              child.x = currentX + (child.subtreeWidth / 2);
+              
+              // Y spacing tiering
+              const isSpaceLevel = node.type === 'workspace'; 
+              const childGapY = isSpaceLevel ? 160 : 120;
+              
+              child.y = node.y + childGapY;
+              
+              if (child.type === 'overflow') {
+                  child.y -= 10; // Visual adjustment hook for overflow icons
+              }
+
+              this.assignCoordinates(child, refNodes, resolveNodePos);
+              
+              // Move the X "cursor" past this child's block to lay the sibling next to it safely
+              currentX += child.subtreeWidth;
+          }
+      }
+  }
+
+  private async fetchTreeRecursive(
       dirHandle: any, 
       spaceId: string, 
       parentDirectoryId: string | null, 
       parentNodeId: string, 
-      defaulParentX: number, 
-      defaultParentY: number, 
-      refNodes: MapNode[], 
-      level: number,
-      savedLayouts: Record<string, {x: number, y: number}>,
-      existingNodesMap: Map<string, MapNode>
-  ) {
-      if (level > 3) return; 
+      level: number
+  ): Promise<LayoutNode[]> {
+      if (level > 4) return []; // Stop runaway depth
 
       try {
         const entries = await this.fileManager.readDirectory({ handle: dirHandle, spaceId, parentId: parentDirectoryId });
-        if (entries.length === 0) return;
+        if (entries.length === 0) return [];
 
-        const spacingX = 180;
-        const spacingY = 120;
-        
         const UI_LIMIT = 5;
         const displayEntries = entries.slice(0, UI_LIMIT);
         const hasOverflow = entries.length > UI_LIMIT;
-        
-        const clusterBlocks = displayEntries.length + (hasOverflow ? 1 : 0);
-        const totalClusterWidth = (clusterBlocks - 1) * spacingX;
-        let currentDefaultX = defaulParentX - (totalClusterWidth / 2);
-        let currentDefaultY = defaultParentY + spacingY;
 
-        const resolveNodePos = (nId: string, currX: number, currY: number) => {
-          if (savedLayouts[nId]) return { x: savedLayouts[nId].x, y: savedLayouts[nId].y, initX: 0, initY: 0 };
-          const p = existingNodesMap.get(nId);
-          if (p) return { x: p.x, y: p.y, initX: p.initialPosition.x, initY: p.initialPosition.y };
-          return { x: currX, y: currY, initX: 0, initY: 0 };
-        };
+        const childrenNodes: LayoutNode[] = [];
 
         for (const entry of displayEntries) {
-            // Use deterministic naming. If entry.id is null (e.g., native physical files un-tracked logically), we construct a deterministic semantic route key!
-            // This guarantees layout caching across refreshes hits successfully.
             const nodeId = entry.id || `virtual_${parentNodeId}_${entry.name}`;
-            const p = resolveNodePos(nodeId, currentDefaultX, currentDefaultY);
-
             const isDirectory = entry.kind === 'directory';
 
-            refNodes.push({
+            const node: LayoutNode = {
                 id: nodeId,
                 type: isDirectory ? 'subspace' : 'file',
                 label: entry.name,
                 icon: isDirectory ? 'bi-folder2' : 'bi-file-earmark',
-                x: p.x,
-                y: p.y,
                 parentId: parentNodeId,
-                initialPosition: { x: p.initX, y: p.initY },
-                currentPosition: { x: 0, y: 0 }
-            });
+                children: [],
+                subtreeWidth: 0,
+                x: 0,
+                y: 0
+            };
 
             if (isDirectory) {
-                await this.scanDirectoryRecursive(entry.handle, spaceId, entry.id || null, nodeId, currentDefaultX, currentDefaultY, refNodes, level + 1, savedLayouts, existingNodesMap);
+                // Fetch deeply dynamically
+                node.children = await this.fetchTreeRecursive(entry.handle, spaceId, entry.id || null, nodeId, level + 1);
             }
-
-            currentDefaultX += spacingX;
+            childrenNodes.push(node);
         }
 
         if (hasOverflow) {
-            const overId = `overflow_${parentNodeId}`;
-            const p = resolveNodePos(overId, currentDefaultX, defaultParentY + (spacingY * 0.9));
-             refNodes.push({
-                id: overId,
+             childrenNodes.push({
+                id: `overflow_${parentNodeId}`,
                 type: 'overflow',
                 label: `+ ${entries.length - UI_LIMIT} More`,
                 icon: 'bi-box-seam',
-                x: p.x,
-                y: p.y,
                 parentId: parentNodeId,
-                initialPosition: { x: p.initX, y: p.initY },
-                currentPosition: { x: 0, y: 0 }
+                children: [],
+                subtreeWidth: 0,
+                x: 0,
+                y: 0
             });
         }
 
-      } catch (err) { }
+        return childrenNodes;
+      } catch (err) {
+         return []; 
+      }
   }
 }

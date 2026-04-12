@@ -14,7 +14,23 @@
     
     <!-- Controls Overlay -->
     <div class="map-controls">
-      <button class="btn btn-icon" (click)="forceRefresh()" title="Reset Layout"><i class="bi bi-arrow-clockwise"></i></button>
+      <div class="dropdown">
+        <button class="btn btn-icon" data-bs-toggle="dropdown" title="Map Options"><i class="bi bi-three-dots-vertical"></i></button>
+        <ul class="dropdown-menu">
+            <li>
+                <button class="dropdown-item" (click)="refreshMap()">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Refresh Map</span>
+                </button>
+            </li>
+            <li>
+                <button class="dropdown-item danger-item" (click)="resetLayout()">
+                    <i class="bi bi-aspect-ratio"></i>
+                    <span>Reset Layout</span>
+                </button>
+            </li>
+        </ul>
+      </div>
       <div class="divider"></div>
       <button class="btn btn-icon" (click)="zoomIn()" title="Zoom In"><i class="bi bi-zoom-in"></i></button>
       <button class="btn btn-icon" (click)="zoomOut()" title="Zoom Out"><i class="bi bi-zoom-out"></i></button>
