@@ -110,10 +110,9 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
       localStorage.removeItem(`quilix_map_positions_${this.currentWorkspaceId}`);
       this.selectedNodeIds.clear();
       
-      const containerW = this.mapContainer.nativeElement.clientWidth;
-      this.panX.set((containerW / 2) - 100);
-      this.panY.set(60);
-      this.zoomScale.set(1);
+      this.nodes.set([]); // Trigger initial view logic
+      this.panX.set(0);
+      this.panY.set(0);
 
       this.scheduleBuildGraph(true);
   }
@@ -384,12 +383,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
       let buildNodes: MapNode[] = [];
 
       const savedLayouts = forcePhysicalLayoutReset ? {} : this.loadLayouts();
-
-      if (this.nodes().length === 0 && this.panX() === 0 && this.panY() === 0) {
-          const containerW = this.mapContainer.nativeElement.clientWidth;
-          this.panX.set((containerW / 2) - 100);
-          this.panY.set(60);
-      }
       
       const existingNodesMap = new Map(this.nodes().map(n => [n.id, n]));
 
@@ -410,6 +403,16 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
 
       // 1. Root Workspace Node
       const rPos = resolvePos(ws.id, 0, 0);
+
+      if (this.nodes().length === 0 && this.panX() === 0 && this.panY() === 0) {
+          const containerW = this.mapContainer.nativeElement.clientWidth;
+          const containerH = this.mapContainer.nativeElement.clientHeight;
+          
+          this.zoomScale.set(0.7); // Default zoom out
+          // Place the workspace node strictly in the exact center mathematically
+          this.panX.set((containerW / 2) - ((rPos.x + 100) * 0.7));
+          this.panY.set((containerH / 2) - ((rPos.y + 300) * 0.7));
+      }
       const rootNode: MapNode = {
         id: ws.id,
         type: 'workspace',
