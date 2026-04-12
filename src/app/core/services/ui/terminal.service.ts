@@ -186,7 +186,7 @@ export class TerminalService {
             }
             let out = '<div class="ls-grid">';
             for (const s of spaces) {
-                out += `<span class="ls-item space"><i class="bi bi-folder-fill me-2 text-primary"></i>${s.name}</span>`;
+                out += `<span class="ls-item space me-2 text-primary"><i class="bi bi-folder-fill me-2 text-warning"></i>${s.name}</span>`;
             }
             out += '</div>';
             this.printOutput(out, true);
@@ -204,8 +204,8 @@ export class TerminalService {
             }
             let out = '<div class="ls-grid">';
             for (const e of entries) {
-                const icon = e.kind === 'directory' ? 'bi-folder2 text-primary' : 'bi-file-earmark text-secondary';
-                out += `<span class="ls-item"><i class="bi ${icon} me-2"></i>${e.name}</span>`;
+                const icon = e.kind === 'directory' ? 'bi-folder2 text-warning' : 'bi-file-earmark text-info';
+                out += `<span class="ls-item me-2"><i class="bi ${icon} me-2"></i>${e.name}</span>`;
             }
             out += '</div>';
             this.printOutput(out, true);
@@ -422,7 +422,7 @@ export class TerminalService {
 
         let out = '<div class="ls-grid">';
         for (const e of entries) {
-            const icon = e.kind === 'directory' ? 'bi-folder2 text-primary' : 'bi-file-earmark text-secondary';
+            const icon = e.kind === 'directory' ? 'bi-folder2 text-warning' : 'bi-file-earmark text-info';
             const breadcrumb = e.parentChain && e.parentChain.length ? e.parentChain.map(c => c.name).join('/') + '/' : '';
             out += `<span class="ls-item"><i class="bi ${icon} me-2"></i><span><b>${e.name}</b> <span style="opacity: 0.85; margin-left: 8px;">(${breadcrumb}${e.name})</span></span></span>`;
         }
