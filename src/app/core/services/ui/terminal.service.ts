@@ -104,7 +104,7 @@ export class TerminalService {
                         '- <b>find &lt;query&gt;</b>: Recursive search within focus<br/>' +
                         '- <b>sync</b>: Force physical disk resync<br/>' +
                         '- <b>clear</b>: Clear terminal display<br/>' +
-                        '<br/><span> Note: Add <b>-ws</b> flag to commands to target workspaces globally (e.g. <b>cd -ws Alpha</b> or <b>rm -ws Name</b>).</span>', 
+                        '<br/><span class="text-secondary"> Info: Add <b>-ws</b> flag to commands to target workspaces globally (e.g. <b>cd -ws Alpha</b> or <b>rm -ws Name</b>).</span>', 
                         true
                     );
                     break;
