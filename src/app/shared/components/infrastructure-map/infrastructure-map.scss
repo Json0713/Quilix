@@ -154,6 +154,11 @@
     .wire {
       stroke: var(--border-active, rgba(100, 100, 200, 0.4));
       transition: stroke 0.3s;
+      
+      &.warning-wire {
+          stroke: #ef4444; /* High visibility red/warning for detached components */
+          stroke-dasharray: 6;
+      }
     }
   }
   
@@ -192,6 +197,16 @@
     &.is-selected {
         border-color: var(--primary);
         box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    &.is-missing {
+      background: rgba(239, 68, 68, 0.05) !important;
+      border-color: rgba(239, 68, 68, 0.5) !important;
+      
+      .node-icon-box {
+          color: #ef4444 !important;
+          background: rgba(239, 68, 68, 0.15) !important;
+      }
     }
   
     /* The Drag Drop module applies this class while dragging */

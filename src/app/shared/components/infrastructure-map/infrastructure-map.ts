@@ -23,6 +23,7 @@ interface MapNode {
   initialPosition: { x: number, y: number };
   // updated ONLY through event reporting to recalculate SVG wires
   currentPosition: { x: number, y: number };
+  isMissingOnDisk?: boolean;
 }
 
 interface LayoutNode {
@@ -35,6 +36,7 @@ interface LayoutNode {
   subtreeWidth: number;
   x: number;
   y: number;
+  isMissingOnDisk?: boolean;
 }
 
 @Component({
@@ -455,7 +457,8 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
           children: [],
           subtreeWidth: 0,
           x: 0,
-          y: 0
+          y: 0,
+          isMissingOnDisk: ws.isMissingOnDisk
       };
 
       // 2. Fetch Core Spaces & Subtrees Concurrently
@@ -472,7 +475,8 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
               children: [],
               subtreeWidth: 0,
               x: 0,
-              y: 0
+              y: 0,
+              isMissingOnDisk: sp.isMissingOnDisk
           };
           
           let handle: any = undefined;
@@ -561,7 +565,8 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
           y: p.y,
           parentId: node.parentId,
           initialPosition: { x: p.initX, y: p.initY },
-          currentPosition: p.currentPos
+          currentPosition: p.currentPos,
+          isMissingOnDisk: node.isMissingOnDisk
       });
 
       if (node.children.length > 0) {
@@ -611,6 +616,11 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
               
               if (child.type === 'overflow') {
                   child.y -= 10; 
+              }
+
+              // Inherit topological warning states instantly so missing spaces seamlessly turn subdirectories into visually detached tracks!
+              if (node.isMissingOnDisk) {
+                  child.isMissingOnDisk = true;
               }
 
               this.assignCoordinates(child, refNodes, resolveNodePos, overrides.get(child.id));

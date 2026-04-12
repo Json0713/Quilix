@@ -46,7 +46,7 @@
           @for (node of nodes(); track trackByNode($index, node)) {
             @if (node.parentId) {
               <!-- Wire paths trigger CD updates when the child node resolves OnDragMove -->
-              <path class="wire" [attr.d]="getWirePath(node)" fill="none" stroke-width="2" stroke-dasharray="4" />
+              <path class="wire" [class.warning-wire]="node.isMissingOnDisk" [attr.d]="getWirePath(node)" fill="none" stroke-width="2" stroke-dasharray="4" />
             }
           }
         </svg>
@@ -57,6 +57,7 @@
             <div 
               class="map-node type-{{ node.type }}" 
               [class.is-selected]="selectedNodeIds.has(node.id)"
+              [class.is-missing]="node.isMissingOnDisk"
               (mousedown)="onNodeClick($event, node)"
               (touchstart)="onNodeClick($event, node)"
               cdkDrag 
@@ -74,7 +75,12 @@
               </div>
               
               <div class="node-details">
-                <span class="node-label">{{ node.label }}</span>
+                <span class="node-label">
+                  {{ node.label }}
+                  @if (node.isMissingOnDisk) {
+                    <i class="bi bi-exclamation-circle-fill text-warning ms-1" title="Missing from disk"></i>
+                  }
+                </span>
                 <span class="node-badge">{{ node.type | titlecase }}</span>
               </div>
     
