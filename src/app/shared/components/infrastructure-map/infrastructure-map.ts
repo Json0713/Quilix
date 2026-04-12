@@ -523,8 +523,11 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
           return node.subtreeWidth;
       }
       let sum = 0;
-      for (const child of node.children) {
-          sum += this.calculateSubtreeWidth(child, spacingX);
+      const margin = node.type === 'workspace' ? 80 : 30; // Horizontal gap boundaries between blocks
+
+      for (let i = 0; i < node.children.length; i++) {
+          sum += this.calculateSubtreeWidth(node.children[i], spacingX);
+          if (i > 0) sum += margin; 
       }
       // Expand the parent's logical stride if its children need more space laterally
       node.subtreeWidth = Math.max(spacingX, sum);
@@ -534,9 +537,19 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
   private assignCoordinates(
       node: LayoutNode,
       refNodes: MapNode[],
-      resolveNodePos: (id: string, defX: number, defY: number) => {x: number, y: number, initX: number, initY: number, currentPos: {x: number, y: number}}
+      resolveNodePos: (id: string, defX: number, defY: number) => {x: number, y: number, initX: number, initY: number, currentPos: {x: number, y: number}},
+      collisionOverrideX?: number
   ) {
-      const p = resolveNodePos(node.id, node.x, node.y);
+      // 1. Establish precise algorithmic coordinate or inherit manual boundary push
+      const p = resolveNodePos(node.id, collisionOverrideX ?? node.x, node.y);
+      
+      if (collisionOverrideX !== undefined) {
+          p.x = collisionOverrideX; // Enforce visual repulsion priority over manual layout!
+      }
+
+      // 2. IMPORTANT: Update the LayoutNode reference point down the tree instantly so children align perfectly under the dragged/repulsed parent
+      node.x = p.x;
+      node.y = p.y;
 
       // Construct concrete UI MapNode and push to the flattened render array
       refNodes.push({
@@ -552,26 +565,55 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
       });
 
       if (node.children.length > 0) {
-          // Starting visually from the leftmost edge of this parent's allocated block
-          let currentX = node.x - (node.subtreeWidth / 2);
+          
+          // PHASE 1: Determine Topographical Targets 
+          let organicCurrentX = node.x - (node.subtreeWidth / 2);
+          const margin = node.type === 'workspace' ? 80 : 30;
+
           for (const child of node.children) {
-              // The child's center is half of its own block
-              child.x = currentX + (child.subtreeWidth / 2);
+              child.x = organicCurrentX + (child.subtreeWidth / 2);
               
-              // Y spacing tiering
+              // Fetch user-defined explicit coordinates to prepare for collision sweep
+              const intended = resolveNodePos(child.id, child.x, node.y);
+              child.x = intended.x;
+              
+              organicCurrentX += child.subtreeWidth + margin;
+          }
+
+          // PHASE 2: Spatial Collision Repulsion (Uniformly applied across the tree)
+          let overrides = new Map<string, number>();
+          
+          // Sort structurally left-to-right organically or by manual user preference
+          const sortedChildren = [...node.children].sort((a, b) => a.x - b.x);
+
+          let safeLeftBoundary = -Infinity;
+          
+          for (const child of sortedChildren) {
+              const requiredLeftEdge = child.x - (child.subtreeWidth / 2);
+
+              let finalSafeX = child.x;
+              if (requiredLeftEdge < safeLeftBoundary) {
+                  // Subtree overlaps prior sibling's protected boundary zone! PUSH RIGHT mathematically.
+                  finalSafeX = safeLeftBoundary + (child.subtreeWidth / 2);
+                  overrides.set(child.id, finalSafeX);
+              }
+              
+              // Lock down physical right boundary protected block
+              safeLeftBoundary = finalSafeX + (child.subtreeWidth / 2) + margin; 
+          }
+
+          // PHASE 3: Cascade recursive geometry down into files and deeper sub-spaces dynamically!
+          for (const child of node.children) {
               const isSpaceLevel = node.type === 'workspace'; 
               const childGapY = isSpaceLevel ? 160 : 120;
               
               child.y = node.y + childGapY;
               
               if (child.type === 'overflow') {
-                  child.y -= 10; // Visual adjustment hook for overflow icons
+                  child.y -= 10; 
               }
 
-              this.assignCoordinates(child, refNodes, resolveNodePos);
-              
-              // Move the X "cursor" past this child's block to lay the sibling next to it safely
-              currentX += child.subtreeWidth;
+              this.assignCoordinates(child, refNodes, resolveNodePos, overrides.get(child.id));
           }
       }
   }

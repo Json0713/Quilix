@@ -102,11 +102,11 @@
                 background: var(--bg-hover);
             }
 
-            &.danger-item {
-                color: #ef4444;
+            &.secondary-item {
+                color: #9a44ef;
 
                 &:hover {
-                    background: rgba(239, 68, 68, 0.1);
+                    background: rgba(165, 68, 239, 0.1);
                 }
             }
         }
