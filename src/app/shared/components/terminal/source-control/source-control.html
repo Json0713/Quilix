@@ -1,0 +1,167 @@
+<div class="source-control-panel">
+    <!-- Header Bar -->
+    <div class="sc-header">
+        <div class="sc-header-left">
+            <i class="bi bi-diagram-3"></i>
+            <span class="sc-title">Explorer</span>
+            <span class="sc-badge" [class.filesystem]="storageMode() === 'filesystem'">
+                {{ storageMode() === 'filesystem' ? 'File System' : 'IndexedDB' }}
+            </span>
+        </div>
+        <div class="sc-header-right">
+            <button class="sc-action" (click)="refresh()" title="Refresh Tree" [disabled]="isLoading()">
+                <i class="bi bi-arrow-clockwise" [class.spinning]="isLoading()"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tree Content -->
+    <div class="sc-body">
+        @if (isLoading() && tree().length === 0) {
+            <div class="sc-loading">
+                <i class="bi bi-arrow-clockwise spinning"></i>
+                <span>Loading workspace tree...</span>
+            </div>
+        } @else if (tree().length === 0) {
+            <div class="sc-empty">
+                <i class="bi bi-inbox"></i>
+                <span>No workspaces found.</span>
+                <span class="sc-empty-hint">Create a workspace to get started.</span>
+            </div>
+        } @else {
+            <!-- Workspace Explorer Section -->
+            <div class="sc-section">
+                <div class="sc-section-header" >
+                    <span class="sc-section-title">WORKSPACE EXPLORER</span>
+                </div>
+                <div class="sc-tree">
+                    @for (node of tree(); track node.id) {
+                        <ng-container *ngTemplateOutlet="treeNodeTpl; context: { $implicit: node }"></ng-container>
+                    }
+                </div>
+            </div>
+
+            <!-- Recent Changes Section -->
+            @if (recentChanges().length > 0) {
+                <div class="sc-section">
+                    <div class="sc-section-header clickable" (click)="toggleRecentChanges()">
+                        <i class="bi" [ngClass]="showRecentChanges() ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                        <span class="sc-section-title">RECENT CHANGES</span>
+                        <span class="sc-count">{{ recentChanges().length }}</span>
+                    </div>
+                    @if (showRecentChanges()) {
+                        <div class="sc-recent-list">
+                            @for (change of recentChanges(); track change.path) {
+                                <div class="sc-recent-item">
+                                    <i class="bi" [ngClass]="getChangeIcon(change.kind)"></i>
+                                    <span class="sc-recent-name">{{ change.name }}</span>
+                                    <span class="sc-recent-path">{{ change.path }}</span>
+                                    <span class="sc-recent-time">{{ formatTime(change.lastModified) }}</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Project Timeline Section -->
+            @if (auditLog().length > 0) {
+                <div class="sc-section">
+                    <div class="sc-section-header clickable" (click)="toggleAuditLog()">
+                        <i class="bi" [ngClass]="showAuditLog() ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                        <span class="sc-section-title">PROJECT TIMELINE</span>
+                        <span class="sc-count">{{ auditLog().length }}</span>
+                    </div>
+                    @if (showAuditLog()) {
+                        <div class="sc-timeline-list">
+                            @for (event of auditLog(); track event.id) {
+                                <div class="sc-timeline-item" [ngClass]="'event-' + event.type">
+                                    <div class="sc-timeline-marker">
+                                        <div class="sc-timeline-line"></div>
+                                        <i class="bi" [ngClass]="{
+                                            'bi-plus-circle': event.type === 'create',
+                                            'bi-person-badge': event.type === 'login',
+                                            'bi-trash': event.type === 'delete',
+                                            'bi-arrow-repeat': event.type === 'sync' || event.type === 'update'
+                                        }"></i>
+                                    </div>
+                                    <div class="sc-timeline-content">
+                                        <div class="sc-timeline-desc">{{ event.description }}</div>
+                                        <div class="sc-timeline-time">{{ formatTime(event.timestamp) }}</div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- Recursive Tree Node Template -->
+<ng-template #treeNodeTpl let-node>
+    <div class="tree-node" [style.--depth]="node.depth">
+        <div class="tree-row" 
+             [class.active-workspace]="node.type === 'workspace' && node.id === activeWorkspaceId()"
+             [class.missing]="node.metadata.isMissingOnDisk"
+             (click)="node.type !== 'file' ? toggleNode(node) : null">
+            
+            <!-- Expand/Collapse chevron (directories only) -->
+            @if (node.type !== 'file') {
+                <i class="bi chevron" [ngClass]="node.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+            } @else {
+                <span class="chevron-spacer"></span>
+            }
+
+            <!-- Node icon -->
+            <i class="bi node-icon" [ngClass]="getNodeIcon(node)" [style.color]="getNodeIconColor(node)"></i>
+            
+            <!-- Node name -->
+            <span class="node-name">{{ node.name }}</span>
+
+            <!-- Health warning -->
+            @if (node.metadata.isMissingOnDisk) {
+                <i class="bi bi-exclamation-triangle-fill warning-badge" title="Missing on disk"></i>
+            }
+
+            <!-- File size or Creation date -->
+            @if (node.type === 'file' && node.metadata.sizeBytes) {
+                <span class="node-meta">{{ formatSize(node.metadata.sizeBytes) }}</span>
+            } @else if (node.metadata.createdAt) {
+                <span class="node-meta" [title]="'Created: ' + (node.metadata.createdAt | date:'medium')">
+                    {{ formatTime(node.metadata.createdAt) }}
+                </span>
+            }
+
+            <!-- Workspace role badge -->
+            @if (node.type === 'workspace') {
+                <span class="role-badge">{{ node.metadata.role }}</span>
+            }
+        </div>
+
+        <!-- Children (recursive) -->
+        @if (node.expanded && node.children.length > 0) {
+            <div class="tree-children">
+                @for (child of node.children; track child.id) {
+                    <ng-container *ngTemplateOutlet="treeNodeTpl; context: { $implicit: child }"></ng-container>
+                }
+            </div>
+        }
+
+        <!-- Loading indicator for expanding nodes -->
+        @if (node.expanded && !node.loaded) {
+            <div class="tree-loading" [style.padding-left.px]="(node.depth + 1) * 16 + 24">
+                <i class="bi bi-arrow-clockwise spinning"></i>
+                <span>Loading...</span>
+            </div>
+        }
+
+        <!-- Empty children -->
+        @if (node.expanded && node.loaded && node.children.length === 0 && node.type !== 'file') {
+            <div class="tree-empty" [style.padding-left.px]="(node.depth + 1) * 16 + 24">
+                <span>Empty</span>
+            </div>
+        }
+    </div>
+</ng-template>

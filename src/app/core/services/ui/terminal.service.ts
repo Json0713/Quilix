@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
 import { SpaceService } from '../components/space.service';
 import { FileManagerService } from '../components/file-manager.service';
@@ -14,6 +14,18 @@ export interface TerminalLine {
     isHtml?: boolean;
 }
 
+export interface TerminalInstance {
+    id: string;
+    label: string;
+    historyLines: TerminalLine[];
+    currentWorkspace: Workspace | null;
+    currentSpace: Space | null;
+    isAtGlobalRoot: boolean;
+    localHistory: string[];
+    historyIndex: number;
+    currentInput: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TerminalService {
     private auth = inject(AuthService);
@@ -24,16 +36,90 @@ export class TerminalService {
     private router = inject(Router);
 
     isOpen = signal<boolean>(false);
-    historyLines = signal<TerminalLine[]>([]);
-    
-    currentWorkspace = signal<Workspace | null>(null);
-    currentSpace = signal<Space | null>(null);
-    isAtGlobalRoot = signal<boolean>(false);
+
+    // ── Multi-Instance State ──
+    instances = signal<TerminalInstance[]>([]);
+    activeInstanceId = signal<string>('');
+
+    // Computed: active instance (convenience accessor)
+    activeInstance = computed<TerminalInstance | null>(() => {
+        const id = this.activeInstanceId();
+        return this.instances().find(i => i.id === id) ?? null;
+    });
+
+    // ── Backward-compatible accessors ──
+    // These delegate to the active instance so existing template bindings still work
+    historyLines = computed<TerminalLine[]>(() => this.activeInstance()?.historyLines ?? []);
+
+    private instanceCounter = 0;
 
     constructor() {
-        this.printSystem('Quilix Virtual Shell (Angular Native) initialized.');
-        this.printSystem('Type "help" to see available commands.');
+        // Boot with one initial instance
+        this.createInstance();
     }
+
+    // ── Instance Management ──
+
+    createInstance(): TerminalInstance {
+        this.instanceCounter++;
+        const inst: TerminalInstance = {
+            id: crypto.randomUUID(),
+            label: `quilix ${this.instanceCounter}`,
+            historyLines: [],
+            currentWorkspace: null,
+            currentSpace: null,
+            isAtGlobalRoot: false,
+            localHistory: [],
+            historyIndex: -1,
+            currentInput: '',
+        };
+
+        // Print welcome only on the first instance
+        if (this.instanceCounter === 1) {
+            inst.historyLines.push(
+                { text: 'Quilix Virtual Shell (Angular Native) initialized.', type: 'system' },
+                { text: 'Type "help" to see available commands.', type: 'system' }
+            );
+        } else {
+            inst.historyLines.push(
+                { text: `Terminal session "${inst.label}" started.`, type: 'system' }
+            );
+        }
+
+        this.instances.update(arr => [...arr, inst]);
+        this.activeInstanceId.set(inst.id);
+        return inst;
+    }
+
+    removeInstance(id: string) {
+        const current = this.instances();
+        if (current.length <= 1) return; // Cannot close last instance
+
+        this.instances.update(arr => arr.filter(i => i.id !== id));
+
+        // If the removed instance was active, switch to the last remaining one
+        if (this.activeInstanceId() === id) {
+            const remaining = this.instances();
+            this.activeInstanceId.set(remaining[remaining.length - 1].id);
+        }
+    }
+
+    setActiveInstance(id: string) {
+        if (this.instances().find(i => i.id === id)) {
+            this.activeInstanceId.set(id);
+        }
+    }
+
+    // ── Helper to mutate the active instance immutably via signal ──
+
+    private updateActiveInstance(fn: (inst: TerminalInstance) => TerminalInstance) {
+        const id = this.activeInstanceId();
+        this.instances.update(arr =>
+            arr.map(i => i.id === id ? fn({ ...i }) : i)
+        );
+    }
+
+    // ── Public API (delegates to active instance) ──
 
     toggle() {
         this.isOpen.set(!this.isOpen());
@@ -44,45 +130,98 @@ export class TerminalService {
 
     async refreshContext() {
         const ws = await this.auth.getCurrentWorkspace();
-        this.currentWorkspace.set(ws || null);
-        if (!ws) {
-            this.currentSpace.set(null);
-        } else if (this.currentSpace() && this.currentSpace()?.workspaceId !== ws.id) {
-            this.currentSpace.set(null);
-        }
+        const inst = this.activeInstance();
+        if (!inst) return;
+
+        this.updateActiveInstance(i => {
+            i.currentWorkspace = ws || null;
+            if (!ws) {
+                i.currentSpace = null;
+            } else if (i.currentSpace && i.currentSpace.workspaceId !== ws.id) {
+                i.currentSpace = null;
+            }
+            return i;
+        });
     }
 
     getPromptString(): string {
-        const ws = this.currentWorkspace();
-        const sp = this.currentSpace();
-        if (this.isAtGlobalRoot()) return 'quilix> ';
+        const inst = this.activeInstance();
+        if (!inst) return 'quilix> ';
+        const ws = inst.currentWorkspace;
+        const sp = inst.currentSpace;
+        if (inst.isAtGlobalRoot) return 'quilix> ';
         if (!ws) return 'quilix> ';
         if (!sp) return `quilix/${ws.name.toLowerCase()}> `;
         return `quilix/${ws.name.toLowerCase()}/${sp.name.toLowerCase()}> `;
     }
 
+    // ── Print helpers (always target active instance) ──
+
     printError(text: string) {
-        this.historyLines.update(l => [...l, { text, type: 'error' }]);
+        this.updateActiveInstance(i => {
+            i.historyLines = [...i.historyLines, { text, type: 'error' }];
+            return i;
+        });
     }
 
     printSystem(text: string) {
-        this.historyLines.update(l => [...l, { text, type: 'system' }]);
+        this.updateActiveInstance(i => {
+            i.historyLines = [...i.historyLines, { text, type: 'system' }];
+            return i;
+        });
     }
 
     printOutput(text: string, isHtml = false) {
-        this.historyLines.update(l => [...l, { text, type: 'output', isHtml }]);
+        this.updateActiveInstance(i => {
+            i.historyLines = [...i.historyLines, { text, type: 'output', isHtml }];
+            return i;
+        });
     }
 
     clear() {
-        this.historyLines.set([]);
+        this.updateActiveInstance(i => {
+            i.historyLines = [];
+            return i;
+        });
     }
+
+    // ── Context accessors for active instance ──
+
+    private getCurrentWorkspace(): Workspace | null {
+        return this.activeInstance()?.currentWorkspace ?? null;
+    }
+
+    private getCurrentSpace(): Space | null {
+        return this.activeInstance()?.currentSpace ?? null;
+    }
+
+    private getIsAtGlobalRoot(): boolean {
+        return this.activeInstance()?.isAtGlobalRoot ?? false;
+    }
+
+    private setCurrentSpace(sp: Space | null) {
+        this.updateActiveInstance(i => { i.currentSpace = sp; return i; });
+    }
+
+    private setIsAtGlobalRoot(val: boolean) {
+        this.updateActiveInstance(i => { i.isAtGlobalRoot = val; return i; });
+    }
+
+    private setCurrentWorkspace(ws: Workspace | null) {
+        this.updateActiveInstance(i => { i.currentWorkspace = ws; return i; });
+    }
+
+    // ── Command Execution ──
 
     async execute(command: string) {
         const raw = command.trim();
         if (!raw) return;
 
         // Print command verbatim
-        this.historyLines.update(l => [...l, { text: `${this.getPromptString()}${raw}`, type: 'command' }]);
+        this.updateActiveInstance(i => {
+            i.historyLines = [...i.historyLines, { text: `${this.getPromptString()}${raw}`, type: 'command' }];
+            return i;
+        });
 
         const args = raw.split(/\s+/);
         const cmd = args[0].toLowerCase();
@@ -154,7 +293,7 @@ export class TerminalService {
     }
 
     private async runLs() {
-        if (this.isAtGlobalRoot()) {
+        if (this.getIsAtGlobalRoot()) {
             const workspaces = await this.workspaceService.getAll();
             if (workspaces.length === 0) {
                 this.printOutput('No workspaces found.');
@@ -170,13 +309,13 @@ export class TerminalService {
             return;
         }
 
-        const ws = this.currentWorkspace();
+        const ws = this.getCurrentWorkspace();
         if (!ws) {
             this.printError('No active workspace. Try "cd .." to view workspaces.');
             return;
         }
 
-        const sp = this.currentSpace();
+        const sp = this.getCurrentSpace();
         if (!sp) {
             // At workspace root, list spaces
             const spaces = await this.spaces.getByWorkspace(ws.id);
@@ -214,8 +353,8 @@ export class TerminalService {
 
     private async runCd(target: string) {
         if (!target) {
-            this.currentSpace.set(null);
-            this.isAtGlobalRoot.set(false);
+            this.setCurrentSpace(null);
+            this.setIsAtGlobalRoot(false);
             return;
         }
 
@@ -226,7 +365,7 @@ export class TerminalService {
             const match = workspaces.find(w => w.name.toLowerCase() === wsTarget.toLowerCase());
             
             if (match) {
-                if (this.currentWorkspace()?.id === match.id) {
+                if (this.getCurrentWorkspace()?.id === match.id) {
                     this.printSystem(`Already in workspace: ${match.name}`);
                     return;
                 }
@@ -235,7 +374,7 @@ export class TerminalService {
                 localStorage.setItem('quilix_entry_type', 'return');
                 localStorage.setItem('quilix_entry_name', match.name);
                 this.router.navigate([match.role === 'personal' ? '/personal' : '/team']).then(() => {
-                    this.isAtGlobalRoot.set(false);
+                    this.setIsAtGlobalRoot(false);
                     this.refreshContext();
                 });
             } else {
@@ -245,15 +384,15 @@ export class TerminalService {
         }
 
         if (target === '..') {
-            if (this.currentSpace()) {
-                this.currentSpace.set(null); // Go to Workspace root
+            if (this.getCurrentSpace()) {
+                this.setCurrentSpace(null); // Go to Workspace root
             } else {
-                this.isAtGlobalRoot.set(true); // Go to Global root
+                this.setIsAtGlobalRoot(true); // Go to Global root
             }
             return;
         }
 
-        if (this.isAtGlobalRoot()) {
+        if (this.getIsAtGlobalRoot()) {
             const workspaces = await this.workspaceService.getAll();
             const match = workspaces.find(w => w.name.toLowerCase() === target.toLowerCase());
             if (match) {
@@ -262,7 +401,7 @@ export class TerminalService {
                 localStorage.setItem('quilix_entry_type', 'return');
                 localStorage.setItem('quilix_entry_name', match.name);
                 this.router.navigate([match.role === 'personal' ? '/personal' : '/team']).then(() => {
-                    this.isAtGlobalRoot.set(false);
+                    this.setIsAtGlobalRoot(false);
                     this.refreshContext();
                 });
             } else {
@@ -271,13 +410,13 @@ export class TerminalService {
             return;
         }
 
-        const ws = this.currentWorkspace();
+        const ws = this.getCurrentWorkspace();
         if (!ws) {
             this.printError('No active workspace.');
             return;
         }
 
-        if (this.currentSpace()) {
+        if (this.getCurrentSpace()) {
             this.printError('Deep directory navigation via shell is not fully implemented. Try "cd .." first.');
             return;
         }
@@ -286,7 +425,7 @@ export class TerminalService {
         const spaces = await this.spaces.getByWorkspace(ws.id);
         const match = spaces.find(s => s.name.toLowerCase() === target.toLowerCase());
         if (match) {
-            this.currentSpace.set(match);
+            this.setCurrentSpace(match);
         } else {
             this.printError(`Space not found: ${target}`);
         }
@@ -307,7 +446,7 @@ export class TerminalService {
                 localStorage.setItem('quilix_entry_type', 'return');
                 localStorage.setItem('quilix_entry_name', name);
                 this.router.navigate(['/personal']).then(() => {
-                    this.isAtGlobalRoot.set(false);
+                    this.setIsAtGlobalRoot(false);
                     this.refreshContext();
                 });
             } else {
@@ -316,13 +455,13 @@ export class TerminalService {
             return;
         }
 
-        const ws = this.currentWorkspace();
+        const ws = this.getCurrentWorkspace();
         if (!ws) {
             this.printError('No active workspace.');
             return;
         }
 
-        if (!this.currentSpace()) {
+        if (!this.getCurrentSpace()) {
             // Create Space
             await this.spaces.create(ws.id, ws.name, target);
             this.printOutput(`Created space ${target}`);
@@ -351,13 +490,13 @@ export class TerminalService {
             return;
         }
 
-        const ws = this.currentWorkspace();
+        const ws = this.getCurrentWorkspace();
         if (!ws) {
             this.printError('No active workspace.');
             return;
         }
 
-        if (!this.currentSpace()) {
+        if (!this.getCurrentSpace()) {
             // Delete Space
             const spaces = await this.spaces.getByWorkspace(ws.id);
             const match = spaces.find(s => s.name.toLowerCase() === target.toLowerCase());
@@ -369,7 +508,7 @@ export class TerminalService {
             }
         } else {
             // Delete file/folder inside space
-            const sp = this.currentSpace()!;
+            const sp = this.getCurrentSpace()!;
             const mode = await this.fileSystem.getStorageMode();
             let handle: any = undefined;
             if (mode === 'filesystem') {
@@ -394,13 +533,13 @@ export class TerminalService {
             return;
         }
         
-        const ws = this.currentWorkspace();
+        const ws = this.getCurrentWorkspace();
         if (!ws) {
             this.printError('No active workspace required to search within.');
             return;
         }
 
-        const sp = this.currentSpace();
+        const sp = this.getCurrentSpace();
         if (!sp) {
             this.printError('Must be inside a Space to perform recursive searches.');
             return;
@@ -461,13 +600,13 @@ export class TerminalService {
             return;
         }
 
-        const ws = this.currentWorkspace();
+        const ws = this.getCurrentWorkspace();
         if (!ws) {
             this.printError('No active workspace.');
             return;
         }
 
-        if (!this.currentSpace()) {
+        if (!this.getCurrentSpace()) {
             // Rename Space
             const spaces = await this.spaces.getByWorkspace(ws.id);
             const spMatch = spaces.find(s => s.name.toLowerCase() === oldName.toLowerCase());
@@ -483,7 +622,7 @@ export class TerminalService {
             }
         } else {
             // Rename File/Folder inside Space
-            const sp = this.currentSpace()!;
+            const sp = this.getCurrentSpace()!;
             const mode = await this.fileSystem.getStorageMode();
             let handle: any = undefined;
             if (mode === 'filesystem') {

@@ -1,40 +1,91 @@
 <div class="terminal-panel" [class.is-open]="terminal.isOpen()" [class.is-maximized]="isMaximized">
     <div class="terminal-header">
         <div class="tabs">
-            <span class="tab active">Terminal</span>
-            <span class="tab">Output</span>
-            <span class="tab">Problems</span>
+            <span class="tab" [class.active]="activeTab() === 'terminal'" (click)="setTab('terminal')">Terminal</span>
+            <span class="tab" [class.active]="activeTab() === 'source-control'" (click)="setTab('source-control')">Source Control</span>
+            <span class="tab" [class.active]="activeTab() === 'output'" (click)="setTab('output')">Output</span>
+            <span class="tab" [class.active]="activeTab() === 'problems'" (click)="setTab('problems')">Problems</span>
         </div>
         <div class="tools">
+            @if (activeTab() === 'terminal') {
+                <button (click)="terminal.createInstance()" title="New Terminal"><i class="bi bi-plus-lg"></i></button>
+            }
             <button (click)="terminal.clear()" title="Clear Terminal"><i class="bi bi-trash"></i></button>
             <button (click)="toggleMaximize()" [title]="isMaximized ? 'Restore Down' : 'Maximize'"><i class="bi" [ngClass]="isMaximized ? 'bi-fullscreen-exit' : 'bi-fullscreen'"></i></button>
             <button (click)="terminal.toggle()" title="Close Panel"><i class="bi bi-x-lg"></i></button>
         </div>
     </div>
 
-    <div class="terminal-body" #scrollContainer (click)="focusInput()">
-        <!-- History Lines -->
-        @for (line of terminal.historyLines(); track $index) {
-            <div class="line" [ngClass]="'type-' + line.type">
-                @if (line.isHtml) {
-                    <span [innerHTML]="line.text"></span>
-                } @else {
-                    <span>{{ line.text }}</span>
+    @switch (activeTab()) {
+        @case ('terminal') {
+            <div class="terminal-content">
+                <!-- Main terminal output area -->
+                <div class="terminal-body" #scrollContainer (click)="focusInput()">
+                    <!-- History Lines -->
+                    @for (line of terminal.historyLines(); track $index) {
+                        <div class="line" [ngClass]="'type-' + line.type">
+                            @if (line.isHtml) {
+                                <span [innerHTML]="line.text"></span>
+                            } @else {
+                                <span>{{ line.text }}</span>
+                            }
+                        </div>
+                    }
+
+                    <!-- Active Input Line -->
+                    <div class="input-row">
+                        <span class="prompt">{{ terminal.getPromptString() }}</span>
+                        <input 
+                            #cmdInput
+                            type="text" 
+                            [ngModel]="currentInput"
+                            (ngModelChange)="currentInput = $event"
+                            (keydown)="onKeydown($event)" 
+                            autocomplete="off" 
+                            spellcheck="false"
+                        />
+                    </div>
+                </div>
+
+                <!-- Instance Sidebar (right side, VS Code style) -->
+                @if (terminal.instances().length > 0) {
+                    <div class="instance-sidebar">
+                        @for (inst of terminal.instances(); track inst.id) {
+                            <div class="instance-row" 
+                                 [class.active]="inst.id === terminal.activeInstanceId()"
+                                 (click)="terminal.setActiveInstance(inst.id)">
+                                <i class="bi bi-terminal"></i>
+                                <span class="instance-label">{{ inst.label }}</span>
+                                @if (terminal.instances().length > 1) {
+                                    <button class="instance-close" 
+                                            (click)="terminal.removeInstance(inst.id); $event.stopPropagation()"
+                                            title="Close Terminal">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
                 }
             </div>
         }
-
-        <!-- Active Input Line -->
-        <div class="input-row">
-            <span class="prompt">{{ terminal.getPromptString() }}</span>
-            <input 
-                #cmdInput
-                type="text" 
-                [(ngModel)]="currentInput" 
-                (keydown)="onKeydown($event)" 
-                autocomplete="off" 
-                spellcheck="false"
-            />
-        </div>
-    </div>
+        @case ('source-control') {
+            <!-- Dedicated container to enforce flex-box scrolling rules -->
+            <div class="source-control-container">
+                <app-source-control />
+            </div>
+        }
+        @case ('output') {
+            <div class="placeholder-panel">
+                <i class="bi bi-journal-text"></i>
+                <span>No output available.</span>
+            </div>
+        }
+        @case ('problems') {
+            <div class="placeholder-panel">
+                <i class="bi bi-check-circle"></i>
+                <span>No problems detected.</span>
+            </div>
+        }
+    }
 </div>

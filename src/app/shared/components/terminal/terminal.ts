@@ -1,12 +1,15 @@
-import { Component, ElementRef, ViewChild, inject, HostListener } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, HostListener, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TerminalService } from '../../../core/services/ui/terminal.service';
+import { SourceControl } from './source-control/source-control';
+
+export type TerminalTab = 'terminal' | 'source-control' | 'output' | 'problems';
 
 @Component({
     selector: 'app-terminal',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, SourceControl],
     templateUrl: './terminal.html',
     styleUrl: './terminal.scss',
 })
@@ -16,13 +19,8 @@ export class TerminalComponent {
     @ViewChild('cmdInput') cmdInput!: ElementRef<HTMLInputElement>;
     @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLDivElement>;
 
-    currentInput = '';
+    activeTab = signal<TerminalTab>('terminal');
     isMaximized = false;
-    
-    
-    // Simple local history buffer for arrows
-    localHistory: string[] = [];
-    historyIndex = -1;
 
     // Global toggle (Ctrl + ` or Ctrl + M)
     @HostListener('document:keydown', ['$event'])
@@ -38,32 +36,71 @@ export class TerminalComponent {
         }
     }
 
+    setTab(tab: TerminalTab) {
+        this.activeTab.set(tab);
+        // Auto-focus terminal input when switching to terminal tab
+        if (tab === 'terminal') {
+            setTimeout(() => this.focusInput(), 50);
+        }
+    }
+
+    // Get current input for the active instance
+    get currentInput(): string {
+        return this.terminal.activeInstance()?.currentInput ?? '';
+    }
+
+    set currentInput(value: string) {
+        const inst = this.terminal.activeInstance();
+        if (!inst) return;
+        this.terminal.instances.update(arr =>
+            arr.map(i => i.id === inst.id ? { ...i, currentInput: value } : i)
+        );
+    }
+
     async onKeydown(event: KeyboardEvent) {
+        const inst = this.terminal.activeInstance();
+        if (!inst) return;
+
         if (event.key === 'Enter') {
             event.preventDefault();
             const cmd = this.currentInput;
             if (cmd.trim()) {
-                this.localHistory.push(cmd);
+                // Push to instance-local history
+                this.terminal.instances.update(arr =>
+                    arr.map(i => i.id === inst.id
+                        ? { ...i, localHistory: [...i.localHistory, cmd], historyIndex: i.localHistory.length + 1 }
+                        : i)
+                );
             }
-            this.historyIndex = this.localHistory.length;
             this.currentInput = '';
             
             await this.terminal.execute(cmd);
             this.scrollToBottom();
         } else if (event.key === 'ArrowUp') {
             event.preventDefault();
-            if (this.historyIndex > 0) {
-                this.historyIndex--;
-                this.currentInput = this.localHistory[this.historyIndex];
+            if (inst.historyIndex > 0) {
+                const newIndex = inst.historyIndex - 1;
+                this.terminal.instances.update(arr =>
+                    arr.map(i => i.id === inst.id
+                        ? { ...i, historyIndex: newIndex, currentInput: i.localHistory[newIndex] }
+                        : i)
+                );
             }
         } else if (event.key === 'ArrowDown') {
             event.preventDefault();
-            if (this.historyIndex < this.localHistory.length - 1) {
-                this.historyIndex++;
-                this.currentInput = this.localHistory[this.historyIndex];
+            if (inst.historyIndex < inst.localHistory.length - 1) {
+                const newIndex = inst.historyIndex + 1;
+                this.terminal.instances.update(arr =>
+                    arr.map(i => i.id === inst.id
+                        ? { ...i, historyIndex: newIndex, currentInput: i.localHistory[newIndex] }
+                        : i)
+                );
             } else {
-                this.historyIndex = this.localHistory.length;
-                this.currentInput = '';
+                this.terminal.instances.update(arr =>
+                    arr.map(i => i.id === inst.id
+                        ? { ...i, historyIndex: i.localHistory.length, currentInput: '' }
+                        : i)
+                );
             }
         } else if (event.key === 'Escape') {
             event.preventDefault();
@@ -72,6 +109,7 @@ export class TerminalComponent {
     }
 
     focusInput() {
+        if (this.activeTab() !== 'terminal') return;
         if (window.getSelection()?.toString().length) {
             return; // Allow users to highlight text without pulling focus away!
         }
