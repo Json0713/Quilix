@@ -1,0 +1,66 @@
+<div class="activity-graph-container">
+    <div class="graph-header">
+        <div class="graph-title">Activity (Last 7 Days)</div>
+        <div class="graph-nav">
+            <button class="nav-btn" (click)="moveWindow(-7)" title="Previous Week">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <span class="nav-label" (click)="resetToToday()" title="Recenter to Today">{{ windowLabel }}</span>
+            <button class="nav-btn" (click)="moveWindow(7)" title="Next Week">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="graph-canvas">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+            <!-- Simplified Baseline -->
+            <line x1="0" y1="95" x2="100" y2="95" class="graph-baseline" />
+            
+            <!-- The main path (Curved) -->
+            <path [attr.d]="curvePath()" 
+                  fill="none" 
+                  stroke="var(--bs-primary)" 
+                  stroke-width="1.2" 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round">
+            </path>
+
+            <!-- Small data points -->
+            @for (bucket of buckets(); track bucket.date; let i = $index) {
+                @if (bucket.count > 0) {
+                    <circle [attr.cx]="i * (100 / (buckets().length - 1))" 
+                            [attr.cy]="100 - (bucket.intensity * 90) - 5" 
+                            r="1.5"
+                            class="graph-point"
+                            [class.point-today]="bucket.isToday">
+                    </circle>
+                }
+            }
+        </svg>
+
+        <!-- Invisible Hotspots for Interactivity -->
+        <div class="graph-hotspots">
+            @for (bucket of buckets(); track bucket.date; let i = $index) {
+                <div class="hotspot" 
+                     [class.today]="bucket.isToday" 
+                     [class.selected]="bucket.isSelected"
+                     [style.left.%]="(i * (100 / (buckets().length - 1)))"
+                     (click)="selectDay(bucket)"
+                     [title]="bucket.count + ' activities on ' + (bucket.date | date:'EEE, MMM d')">
+                    <div class="hotspot-label">{{ bucket.date | date:'EEE' }}</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (selectedDate()) {
+        <div class="graph-filter-hint">
+            <i class="bi bi-funnel-fill"></i>
+            <span>Filtering by {{ selectedDate() | date:'EEEE, MMM d' }}</span>
+            <button class="clear-btn" (click)="selectDay(buckets()[0]); selectedDate.set(null); onRangeSelected.emit(null)">
+                Clear
+            </button>
+        </div>
+    }
+</div>

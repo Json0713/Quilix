@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WorkspaceService } from '../../../../core/services/components/workspace.service';
 import { SpaceService } from '../../../../core/services/components/space.service';
@@ -9,6 +9,7 @@ import { Workspace } from '../../../../core/interfaces/workspace';
 import { Space } from '../../../../core/interfaces/space';
 import { ActivityService } from '../../../../core/services/ui/activity.service';
 import { ActivityRecord } from '../../../../core/interfaces/activity';
+import { ActivityGraph } from './activity-graph/activity-graph';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -54,7 +55,7 @@ export interface RecentChange {
 @Component({
     selector: 'app-source-control',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, ActivityGraph],
     templateUrl: './source-control.html',
     styleUrl: './source-control.scss',
 })
@@ -74,17 +75,40 @@ export class SourceControl implements OnInit {
     showRecentChanges = signal(true);
     showAuditLog = signal(true);
     showSyncLog = signal(true);
-    
-    // Timeline Activities (Exclude Sync)
-    // Use RxJS 'from' to correctly bridge Dexie's Observable to RxJS
-    projectActivities = toSignal(from(this.activityService.activities$).pipe(
-        map((logs: ActivityRecord[]) => logs.filter(l => l.category !== 'system'))
-    ), { initialValue: [] });
 
-    // Sync Activities
-    syncActivities = toSignal(from(this.activityService.activities$).pipe(
-        map((logs: ActivityRecord[]) => logs.filter(l => l.category === 'system'))
-    ), { initialValue: [] });
+    // ── Pagination & Filtering ──
+    visibleSyncCount = signal(10);
+    private timerHandle: any;
+    now = signal<number>(Date.now()); // Stable reference for calculations
+    
+    // Filtering State
+    selectedTimeRange = signal<{ start: number, end: number } | null>(null);
+
+    // Raw Activities from Service (accessible to template)
+    protected allActivities = toSignal(from(this.activityService.activities$), { initialValue: [] });
+
+    // Timeline Activities (Exclude Sync, apply filter)
+    projectActivities = computed(() => {
+        const logs = this.allActivities().filter(l => l.category !== 'system');
+        const range = this.selectedTimeRange();
+        if (!range) return logs;
+        return logs.filter(l => l.timestamp >= range.start && l.timestamp < range.end);
+    });
+
+    // Entire Sync Stream (accessible to template)
+    protected rawSyncActivities = computed(() => {
+        const logs = this.allActivities().filter(l => l.category === 'system');
+        const range = this.selectedTimeRange();
+        if (!range) return logs;
+        return logs.filter(l => l.timestamp >= range.start && l.timestamp < range.end);
+    });
+
+    // Paginated Sync Activities
+    syncActivities = computed(() => {
+        return this.rawSyncActivities().slice(0, this.visibleSyncCount());
+    });
+
+    hasMoreSync = computed(() => this.rawSyncActivities().length > this.visibleSyncCount());
 
     /** @deprecated Use projectActivities */
     auditLog = signal<AuditLogEvent[]>([]);
@@ -93,6 +117,11 @@ export class SourceControl implements OnInit {
 
     async ngOnInit() {
         await this.refresh();
+        
+        // Update 'now' every 30 seconds to refresh relative timestamps safely
+        this.timerHandle = setInterval(() => {
+            this.now.set(Date.now());
+        }, 30000);
     }
 
     async refresh() {
@@ -181,6 +210,10 @@ export class SourceControl implements OnInit {
         }
     }
 
+    onRangeSelected(range: { start: number, end: number } | null) {
+        this.selectedTimeRange.set(range);
+    }
+
     getChangeIcon(kind: string): string {
         return kind === 'directory' ? 'bi-folder2 text-warning' : 'bi-file-earmark text-info';
     }
@@ -221,7 +254,8 @@ export class SourceControl implements OnInit {
 
     formatTime(timestamp: number): string {
         if (!timestamp) return '';
-        const diff = Date.now() - timestamp;
+        const currentNow = this.now(); // Stable signal reference
+        const diff = currentNow - timestamp;
         const minutes = Math.floor(diff / 60000);
         if (minutes < 1) return 'just now';
         if (minutes < 60) return `${minutes}m ago`;
@@ -382,6 +416,14 @@ export class SourceControl implements OnInit {
 
     toggleSyncLog() {
         this.showSyncLog.update(v => !v);
+    }
+
+    showMoreSync() {
+        this.visibleSyncCount.update(c => c + 10);
+    }
+
+    showLessSync() {
+        this.visibleSyncCount.set(10);
     }
 
     private getFileIcon(name: string): string {

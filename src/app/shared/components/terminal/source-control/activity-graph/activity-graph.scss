@@ -1,0 +1,187 @@
+.activity-graph-container {
+    padding: 1rem;
+    background: var(app-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.graph-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.graph-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-color);
+    letter-spacing: 0.5px;
+}
+
+.graph-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+    }
+}
+
+.nav-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    min-width: 120px;
+    text-align: center;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.graph-canvas {
+    position: relative;
+    height: 60px;
+    width: 100%;
+    margin-top: 5px;
+    overflow: visible;
+
+    svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+        overflow: visible;
+    }
+}
+
+.graph-baseline {
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 0.5;
+    stroke-dasharray: 2 2;
+}
+
+polyline {
+    stroke: var(--bs-primary);
+    stroke-width: 1;
+    opacity: 0.8;
+    transition: points 0.3s ease-in-out;
+}
+
+.graph-point {
+    fill: var(--bs-primary);
+    stroke: var(--bg-color);
+    stroke-width: 0.5;
+    transition: r 0.2s, fill 0.2s;
+
+    &.point-today {
+        fill: #f59e0b;
+    }
+}
+
+.graph-hotspots {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.hotspot {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 24px;
+    margin-left: -12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    .hotspot-label {
+        font-size: 0.5rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: -14px;
+        letter-spacing: 0.3px;
+    }
+
+    &:hover, &.selected {
+        background: rgba(255, 255, 255, 0.03);
+
+        .hotspot-label {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+    }
+
+    &.selected::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 1px;
+        height: 80%;
+        background: rgba(var(--bs-primary-rgb), 0.2);
+    }
+}
+
+.graph-filter-hint {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    border-radius: 4px;
+    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.7rem;
+    color: var(--bs-primary);
+
+    i {
+        font-size: 0.8rem;
+    }
+
+    .clear-btn {
+        margin-left: auto;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: var(--text-color);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        cursor: pointer;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    }
+}
+
+@keyframes barGrow {
+    from { height: 0; }
+}
+
+.bar {
+    animation: barGrow 0.4s ease-out;
+}

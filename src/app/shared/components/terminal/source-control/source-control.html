@@ -29,6 +29,12 @@
                 <span class="sc-empty-hint">Create a workspace to get started.</span>
             </div>
         } @else {
+            <!-- Activity Overview Graph -->
+            <app-activity-graph 
+                [activities]="allActivities()" 
+                (onRangeSelected)="onRangeSelected($event)">
+            </app-activity-graph>
+
             <!-- Workspace Explorer Section -->
             <div class="sc-section">
                 <div class="sc-section-header" >
@@ -69,6 +75,15 @@
                 <div class="sc-section-header clickable" (click)="showAuditLog.set(!showAuditLog())">
                     <i class="bi" [ngClass]="showAuditLog() ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
                     <span class="sc-section-title">PROJECT TIMELINE</span>
+                    
+                    @if (selectedTimeRange()) {
+                        <span class="sc-filter-badge" (click)="$event.stopPropagation(); onRangeSelected(null)">
+                            <i class="bi bi-funnel-fill"></i>
+                            Filtered
+                            <i class="bi bi-x-circle-fill ms-1"></i>
+                        </span>
+                    }
+
                     <span class="sc-count">{{ projectActivities().length }}</span>
                 </div>
                 @if (showAuditLog()) {
@@ -124,6 +139,22 @@
                             </div>
                         } @empty {
                             <div class="sc-empty">No sync records found.</div>
+                        }
+
+                        <!-- Pagination Controls -->
+                        @if (hasMoreSync() || visibleSyncCount() > 10) {
+                            <div class="sc-pagination">
+                                @if (hasMoreSync()) {
+                                    <button class="btn-link" (click)="showMoreSync()">
+                                        See more ({{ rawSyncActivities().length - visibleSyncCount() }} remaining)...
+                                    </button>
+                                }
+                                @if (visibleSyncCount() > 10) {
+                                    <button class="btn-link text-muted" (click)="showLessSync()">
+                                        Show less
+                                    </button>
+                                }
+                            </div>
                         }
                     </div>
                 }
