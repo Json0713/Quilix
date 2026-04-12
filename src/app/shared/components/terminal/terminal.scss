@@ -28,6 +28,10 @@
         bottom: 0;
         z-index: 1055; /* Force above navbar/modals when maximized */
     }
+
+    &.sidebar-hidden .instance-sidebar {
+        display: none !important;
+    }
 }
 
 .terminal-header {
@@ -39,10 +43,21 @@
     background-color: var(--surface-main);
     border-bottom: 1px solid var(--bs-gray-800);
     user-select: none;
+    overflow: hidden;
+
+    .tabs-scroll-wrapper {
+        flex: 1;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        &::-webkit-scrollbar { display: none; }
+    }
 
     .tabs {
         display: flex;
         gap: 16px;
+        padding: 0 4px;
 
         .tab {
             font-size: 0.75rem;
@@ -67,15 +82,23 @@
 
     .tools {
         display: flex;
-        gap: 12px;
+        gap: 8px;
+        padding-left: 8px;
+        background: var(--surface-main);
+        z-index: 2;
 
         button {
             background: none;
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            padding: 4px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: color 0.2s;
+            min-width: 28px;
+            min-height: 28px;
 
             &:hover {
                 color: var(--text-main);
@@ -294,5 +317,47 @@
         font-family: inherit;
         font-size: inherit;
         padding: 0;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .terminal-panel {
+        height: 60vh;
+
+        &:not(.is-maximized) {
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+    }
+
+    .instance-sidebar {
+        position: absolute;
+        right: 0;
+        top: 36px;
+        bottom: 0;
+        z-index: 10;
+        width: 150px;
+        box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .terminal-header {
+        padding: 0 8px;
+    }
+
+    .input-row {
+        align-items: flex-start;
+        flex-direction: column;
+
+        input {
+            width: 100%;
+            margin-top: 2px;
+        }
+    }
+}
+
+@media (min-width: 769px) {
+    .tool-sidebar-toggle {
+        display: none !important;
     }
 }

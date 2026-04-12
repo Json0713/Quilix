@@ -1,12 +1,15 @@
-<div class="terminal-panel" [class.is-open]="terminal.isOpen()" [class.is-maximized]="isMaximized()">
+<div class="terminal-panel" [class.is-open]="terminal.isOpen()" [class.is-maximized]="isMaximized()" [class.sidebar-hidden]="!isSidebarVisible()">
     <div class="terminal-header">
-        <div class="tabs">
-            <span class="tab" [class.active]="activeTab() === 'terminal'" (click)="setTab('terminal')">Terminal</span>
-            <span class="tab" [class.active]="activeTab() === 'source-control'" (click)="setTab('source-control')">Source Control</span>
-            <span class="tab" [class.active]="activeTab() === 'output'" (click)="setTab('output')">Output</span>
-            <span class="tab" [class.active]="activeTab() === 'problems'" (click)="setTab('problems')">Problems</span>
+        <div class="tabs-scroll-wrapper">
+            <div class="tabs">
+                <span class="tab" [class.active]="activeTab() === 'terminal'" (click)="setTab('terminal')">Terminal</span>
+                <span class="tab" [class.active]="activeTab() === 'source-control'" (click)="setTab('source-control')">Source Control</span>
+                <span class="tab" [class.active]="activeTab() === 'output'" (click)="setTab('output')">Output</span>
+                <span class="tab" [class.active]="activeTab() === 'problems'" (click)="setTab('problems')">Problems</span>
+            </div>
         </div>
         <div class="tools">
+            <button class="tool-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Sidebar"><i class="bi bi-layout-sidebar"></i></button>
             @if (activeTab() === 'terminal') {
                 <button (click)="terminal.createInstance()" title="New Terminal"><i class="bi bi-plus-lg"></i></button>
             }

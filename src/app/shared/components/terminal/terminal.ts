@@ -21,13 +21,35 @@ export class TerminalComponent {
 
     activeTab = this.terminal.activeTab;
     isMaximized = this.terminal.isMaximized;
+    isSidebarVisible = signal<boolean>(true);
+
+    constructor() {
+        if (this.isMobile()) {
+            this.isSidebarVisible.set(false);
+        }
+    }
+
+    private isMobile(): boolean {
+        return window.innerWidth < 768;
+    }
+
+    toggleSidebar() {
+        this.isSidebarVisible.update(v => !v);
+    }
 
     // Global toggle (Ctrl + ` or Ctrl + M)
     @HostListener('document:keydown', ['$event'])
     handleGlobalKeyboard(event: KeyboardEvent) {
         if ((event.ctrlKey || event.metaKey) && (event.key === '`' || event.key.toLowerCase() === 'm')) {
             event.preventDefault();
+            
+            const opening = !this.terminal.isOpen();
             this.terminal.toggle();
+            
+            if (opening && this.isMobile()) {
+                this.isMaximized.set(true);
+                this.isSidebarVisible.set(false);
+            }
             
             // Auto-focus input when opened
             if (this.terminal.isOpen()) {

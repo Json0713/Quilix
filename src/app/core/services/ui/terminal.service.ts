@@ -14,6 +14,8 @@ export interface TerminalLine {
     isHtml?: boolean;
 }
 
+const HISTORY_BUFFER_LIMIT = 500;
+
 export interface TerminalInstance {
     id: string;
     label: string;
@@ -163,21 +165,24 @@ export class TerminalService {
 
     printError(text: string) {
         this.updateActiveInstance(i => {
-            i.historyLines = [...i.historyLines, { text, type: 'error' }];
+            const newLines: TerminalLine[] = [...i.historyLines, { text, type: 'error' }];
+            i.historyLines = newLines.slice(-HISTORY_BUFFER_LIMIT);
             return i;
         });
     }
 
     printSystem(text: string) {
         this.updateActiveInstance(i => {
-            i.historyLines = [...i.historyLines, { text, type: 'system' }];
+            const newLines: TerminalLine[] = [...i.historyLines, { text, type: 'system' }];
+            i.historyLines = newLines.slice(-HISTORY_BUFFER_LIMIT);
             return i;
         });
     }
 
     printOutput(text: string, isHtml = false) {
         this.updateActiveInstance(i => {
-            i.historyLines = [...i.historyLines, { text, type: 'output', isHtml }];
+            const newLines: TerminalLine[] = [...i.historyLines, { text, type: 'output', isHtml }];
+            i.historyLines = newLines.slice(-HISTORY_BUFFER_LIMIT);
             return i;
         });
     }
@@ -223,7 +228,8 @@ export class TerminalService {
 
         // Print command verbatim
         this.updateActiveInstance(i => {
-            i.historyLines = [...i.historyLines, { text: `${this.getPromptString()}${raw}`, type: 'command' }];
+            const newLines: TerminalLine[] = [...i.historyLines, { text: `${this.getPromptString()}${raw}`, type: 'command' }];
+            i.historyLines = newLines.slice(-HISTORY_BUFFER_LIMIT);
             return i;
         });
 
