@@ -552,15 +552,17 @@ export class SpaceService {
                 try {
                     const res = await this.fileSystem.readDirectoryId(entry as FileSystemDirectoryHandle);
                     id = res?.id;
-
-                    // If the directory has no ID, assign and write one so it's permanently trackable
-                    if (!id) {
-                        id = crypto.randomUUID();
-                        await this.fileSystem.writeDirectoryId(entry as FileSystemDirectoryHandle, id);
-                    }
                 } catch {
-                    continue; // Can't read this entry, skip it safely
+                    continue;
                 }
+
+                // RACE-SAFETY: Do NOT auto-assign IDs here.
+                // ID assignment is exclusively the responsibility of FileManagerService.readNativeDirectory
+                // (the "self-healing" block). If two concurrent callers both generate IDs for the same
+                // directory, virtual_entries gets two different records for the same folder — causing
+                // duplicate nodes in the map. We skip unregistered directories entirely; they will be
+                // picked up on the next sync cycle after the user browsed them and IDs were assigned.
+                if (!id) continue;
 
                 entriesToPut.push({
                     id,
@@ -579,8 +581,23 @@ export class SpaceService {
             return;
         }
 
-        // Upsert all discovered directory entries in one batch operation
         if (entriesToPut.length > 0) {
+            // DEDUPLICATION: For each entry we are about to write, remove any stale records that share
+            // the same (spaceId + parentId + name) but have a different primary id. This cleans up
+            // any leftover ghost records from past race conditions so the map never shows duplicate nodes.
+            for (const entry of entriesToPut) {
+                const stale = await db.virtual_entries
+                    .where('[spaceId+parentId+name]')
+                    .equals([entry.spaceId, entry.parentId, entry.name])
+                    .filter((e: any) => e.id !== entry.id)
+                    .toArray();
+                if (stale.length > 0) {
+                    await db.virtual_entries.bulkDelete(stale.map((e: any) => e.id));
+                    console.log(`[SpaceService] Removed ${stale.length} stale ghost record(s) for "${entry.name}"`);
+                }
+            }
+
+            // Upsert all discovered directory entries in one batch operation
             await db.virtual_entries.bulkPut(entriesToPut);
         }
 
@@ -616,8 +633,9 @@ export class SpaceService {
     /**
      * Recursively recreates subdirectory folders for a space from IndexedDB virtual_entries.
      * Only recreates 'directory' kind entries — file content cannot be restored from DB.
+     * Public so WorkspaceService can call it when restoring all spaces under a workspace.
      */
-    private async restoreSubdirectoryTree(
+    async restoreSubdirectoryTree(
         workspaceName: string,
         spaceFolderName: string,
         spaceId: string,
@@ -629,18 +647,19 @@ export class SpaceService {
             .equals([spaceId, parentKey])
             .toArray();
 
+        if (children.length === 0) return;
+
+        // Resolve workspace and space handles once for this level (not per-entry)
+        const wsHandle = await this.fileSystem.getOrCreateWorkspaceFolder(workspaceName);
+        if (!wsHandle) return;
+
+        const spaceHandle = await wsHandle.getDirectoryHandle(spaceFolderName, { create: false }).catch(() => null);
+        if (!spaceHandle) return;
+
         for (const entry of children) {
             if (entry.kind !== 'directory') continue;
 
             try {
-                // Resolve the workspace handle and navigate to the space folder, then create this subdir
-                const wsHandle = await this.fileSystem.getOrCreateWorkspaceFolder(workspaceName);
-                if (!wsHandle) continue;
-
-                // Navigate down to the space folder
-                const spaceHandle = await wsHandle.getDirectoryHandle(spaceFolderName, { create: false }).catch(() => null);
-                if (!spaceHandle) continue;
-
                 // Resolve path to parent subdirectory if nested
                 const targetHandle = parentId
                     ? await this.resolveVirtualPath(spaceHandle, spaceId, parentId)

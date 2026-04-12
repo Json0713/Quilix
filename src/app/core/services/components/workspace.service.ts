@@ -200,6 +200,11 @@ export class WorkspaceService {
                 if (spaceRestored) {
                     await db.spaces.update(space.id, { isMissingOnDisk: false });
                     console.log(`[WorkspaceService] Restored child space folder: "${space.folderName}" under "${workspaceName}"`);
+
+                    // Also recreate all subdirectories inside this space that were cached before deletion.
+                    // Without this, restoring a workspace recreates empty space folders — the entire
+                    // internal tree (subfolders) is permanently lost.
+                    await this.spaceService.restoreSubdirectoryTree(workspaceName, space.folderName, space.id, null);
                 } else {
                     console.warn(`[WorkspaceService] Could not restore space folder: "${space.folderName}"`);
                 }
