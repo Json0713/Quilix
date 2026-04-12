@@ -3,6 +3,7 @@ import { liveQuery } from 'dexie';
 import { db } from '../../database/dexie.service';
 import { Space } from '../../interfaces/space';
 import { FileSystemService } from '../data/file-system.service';
+import { ActivityService } from '../ui/activity.service';
 
 /** Characters not allowed in space names (filesystem-safe for major OSs) */
 const INVALID_CHARS = /[\/\\:*?"<>|]/g;
@@ -13,6 +14,7 @@ const MAX_NAME_LENGTH = 206;
 })
 export class SpaceService {
     private fileSystem = inject(FileSystemService);
+    private activityService = inject(ActivityService);
 
     // ── Loading States (Reactive) ──
     readonly isSyncing = signal<boolean>(false);
@@ -145,6 +147,16 @@ export class SpaceService {
             };
 
             await db.spaces.add(space);
+
+            await this.activityService.log({
+                type: 'create',
+                category: 'space',
+                entityId: spaceId,
+                entityName: name,
+                description: `Created space "${name}" in workspace "${workspaceName}"`,
+                metadata: { workspaceId }
+            });
+
             return space;
         } finally {
             this.fileSystem.releaseSyncLock();
@@ -178,7 +190,19 @@ export class SpaceService {
                 }
             }
 
+            const oldName = space.name;
             await db.spaces.update(spaceId, { name: sanitized, folderName: newFolderName });
+
+            await this.activityService.log({
+                type: 'rename',
+                category: 'space',
+                entityId: spaceId,
+                entityName: sanitized,
+                oldName: oldName,
+                newName: sanitized,
+                description: `Renamed space from "${oldName}" to "${sanitized}"`
+            });
+
             return true;
         } finally {
             this.fileSystem.releaseSyncLock();
@@ -207,6 +231,15 @@ export class SpaceService {
             const space = await db.spaces.get(spaceId);
             if (!space) return false;
             await db.spaces.update(spaceId, { trashedAt: Date.now() });
+
+            await this.activityService.log({
+                type: 'trash',
+                category: 'space',
+                entityId: spaceId,
+                entityName: space.name,
+                description: `Moved space "${space.name}" to trash`
+            });
+
             return true;
         } finally {
             this.stopOperation(spaceId);
@@ -222,6 +255,15 @@ export class SpaceService {
         if (!space) return false;
 
         await db.spaces.update(spaceId, { trashedAt: undefined as any });
+
+        await this.activityService.log({
+            type: 'restore',
+            category: 'space',
+            entityId: spaceId,
+            entityName: space.name,
+            description: `Restored space "${space.name}" from trash`
+        });
+
         return true;
     }
 
@@ -242,7 +284,17 @@ export class SpaceService {
             }
         }
 
+            const deletedName = space.name;
             await db.spaces.delete(spaceId);
+
+            await this.activityService.log({
+                type: 'delete',
+                category: 'space',
+                entityId: spaceId,
+                entityName: deletedName,
+                description: `Permanently deleted space "${deletedName}"`
+            });
+
             return true;
         } finally {
             this.fileSystem.releaseSyncLock();

@@ -65,36 +65,69 @@
             }
 
             <!-- Project Timeline Section -->
-            @if (auditLog().length > 0) {
-                <div class="sc-section">
-                    <div class="sc-section-header clickable" (click)="toggleAuditLog()">
-                        <i class="bi" [ngClass]="showAuditLog() ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
-                        <span class="sc-section-title">PROJECT TIMELINE</span>
-                        <span class="sc-count">{{ auditLog().length }}</span>
-                    </div>
-                    @if (showAuditLog()) {
-                        <div class="sc-timeline-list">
-                            @for (event of auditLog(); track event.id) {
-                                <div class="sc-timeline-item" [ngClass]="'event-' + event.type">
-                                    <div class="sc-timeline-marker">
-                                        <div class="sc-timeline-line"></div>
-                                        <i class="bi" [ngClass]="{
-                                            'bi-plus-circle': event.type === 'create',
-                                            'bi-person-badge': event.type === 'login',
-                                            'bi-trash': event.type === 'delete',
-                                            'bi-arrow-repeat': event.type === 'sync' || event.type === 'update'
-                                        }"></i>
-                                    </div>
-                                    <div class="sc-timeline-content">
-                                        <div class="sc-timeline-desc">{{ event.description }}</div>
-                                        <div class="sc-timeline-time">{{ formatTime(event.timestamp) }}</div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
+            <div class="sc-section">
+                <div class="sc-section-header clickable" (click)="showAuditLog.set(!showAuditLog())">
+                    <i class="bi" [ngClass]="showAuditLog() ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                    <span class="sc-section-title">PROJECT TIMELINE</span>
+                    <span class="sc-count">{{ projectActivities().length }}</span>
                 </div>
-            }
+                @if (showAuditLog()) {
+                    <div class="sc-timeline-list">
+                        @for (event of projectActivities(); track event.id) {
+                            <div class="sc-timeline-item" [ngClass]="'event-' + event.type">
+                                <div class="sc-timeline-marker" [ngClass]="getActivityClass(event.type)">
+                                    <i class="bi" [ngClass]="getActivityIcon(event.type)"></i>
+                                    <div class="sc-timeline-line"></div>
+                                </div>
+                                <div class="sc-timeline-content">
+                                    <div class="sc-timeline-desc">
+                                        @if (event.type === 'rename') {
+                                            Renamed {{ event.category }} 
+                                            <span class="diff-old">{{ event.oldName }}</span> 
+                                            <i class="bi bi-arrow-right mx-1"></i>
+                                            <span class="diff-new">{{ event.newName }}</span>
+                                        } @else {
+                                            {{ event.description }}
+                                        }
+                                    </div>
+                                    <div class="sc-timeline-time">{{ formatTime(event.timestamp) }}</div>
+                                </div>
+                            </div>
+                        } @empty {
+                            <div class="sc-empty">No recent project activity.</div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Sync History Section -->
+            <div class="sc-section">
+                <div class="sc-section-header clickable" (click)="toggleSyncLog()">
+                    <i class="bi" [ngClass]="showSyncLog() ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                    <span class="sc-section-title">SYNC HISTORY</span>
+                    <span class="sc-count">{{ syncActivities().length }}</span>
+                </div>
+                @if (showSyncLog()) {
+                    <div class="sc-timeline-list">
+                        @for (event of syncActivities(); track event.id) {
+                            <div class="sc-timeline-item event-sync">
+                                <div class="sc-timeline-marker activity-green">
+                                    <i class="bi" [ngClass]="getActivityIcon(event.type)"></i>
+                                    <div class="sc-timeline-line"></div>
+                                </div>
+                                <div class="sc-timeline-content">
+                                    <div class="sc-timeline-desc text-success">
+                                        {{ event.description }}
+                                    </div>
+                                    <div class="sc-timeline-time">{{ formatTime(event.timestamp) }}</div>
+                                </div>
+                            </div>
+                        } @empty {
+                            <div class="sc-empty">No sync records found.</div>
+                        }
+                    </div>
+                }
+            </div>
         }
     </div>
 </div>

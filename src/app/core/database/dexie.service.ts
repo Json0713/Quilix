@@ -44,6 +44,7 @@ export class DexieService extends Dexie {
     tabs!: Table<Tab, string>;
     tasks!: Table<Task, string>;
     virtual_entries!: Table<any, string>;
+    activities!: Table<any, string>;
 
     constructor() {
         super('QuilixDB');
@@ -107,6 +108,11 @@ export class DexieService extends Dexie {
         // (v9 was skipped intentionally to allow headroom for a hotfix.)
         this.version(10).stores({
             virtual_entries: 'id, workspaceId, spaceId, parentId, name, kind, [spaceId+parentId], [spaceId+parentId+name]',
+        });
+
+        // v11 – Comprehensive activity logging.
+        this.version(11).stores({
+            activities: 'id, type, category, entityId, timestamp, [category+type], [category+timestamp]'
         });
 
         // Open the database connection eagerly to reduce first-operation latency.

@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { db } from '../../database/dexie.service';
 import { FileSystemService } from '../data/file-system.service';
+import { ActivityService } from '../ui/activity.service';
 
 export interface FileExplorerEntry {
     id?: string; // For Virtual mode
@@ -23,6 +24,7 @@ export interface ClipboardItem {
 })
 export class FileManagerService {
     private fileSystem = inject(FileSystemService);
+    private activityService = inject(ActivityService);
 
     // Global clipboard state for files
     clipboard = signal<ClipboardItem | null>(null);
@@ -133,6 +135,15 @@ export class FileManagerService {
                 lastModified: Date.now()
             };
             await db.virtual_entries.add(entry);
+
+            await this.activityService.log({
+                type: 'create',
+                category: 'file',
+                entityId: id,
+                entityName: uniqueName,
+                description: `Created folder "${uniqueName}"`
+            });
+
             return { id, name: uniqueName, kind: 'directory', parentId: context.parentId };
         }
     }
@@ -161,6 +172,15 @@ export class FileManagerService {
                 content: new Blob([''], { type: 'text/plain' })
             };
             await db.virtual_entries.add(entry);
+
+            await this.activityService.log({
+                type: 'create',
+                category: 'file',
+                entityId: id,
+                entityName: uniqueName,
+                description: `Created file "${uniqueName}"`
+            });
+
             return { id, name: uniqueName, kind: 'file', parentId: context.parentId };
         }
     }
@@ -181,6 +201,14 @@ export class FileManagerService {
                 await db.virtual_entries.delete(entry.id!);
             });
         }
+
+        await this.activityService.log({
+            type: 'delete',
+            category: 'file',
+            entityId: entry.id || 'native',
+            entityName: entry.name,
+            description: `Deleted ${entry.kind} "${entry.name}"`
+        });
     }
 
     private async deleteVirtualDirectoryRecursive(parentId: string) {
@@ -215,7 +243,19 @@ export class FileManagerService {
             const renamed = await this.fileSystem.safeRenameFolder(context.parentHandle, entry.name, resolvedName);
             return renamed;
         } else if (entry.id) {
+            const oldName = entry.name;
             await db.virtual_entries.update(entry.id, { name: resolvedName, lastModified: Date.now() });
+
+            await this.activityService.log({
+                type: 'rename',
+                category: 'file',
+                entityId: entry.id,
+                entityName: resolvedName,
+                oldName: oldName,
+                newName: resolvedName,
+                description: `Renamed ${entry.kind} from "${oldName}" to "${resolvedName}"`
+            });
+
             return true;
         }
         return false;
@@ -360,6 +400,15 @@ export class FileManagerService {
                         name: uniqueName,
                         lastModified: Date.now()
                     });
+
+                    await this.activityService.log({
+                        type: 'move',
+                        category: 'file',
+                        entityId: item.entry.id,
+                        entityName: uniqueName,
+                        description: `Moved ${item.entry.kind} "${uniqueName}"`
+                    });
+
                     this.clearClipboard();
                 } else {
                     await this.copyVirtualEntry(item.entry.id, context.workspaceId, context.spaceId, context.parentId || 'root', uniqueName);

@@ -4,6 +4,7 @@ import { db } from '../../database/dexie.service';
 import { Workspace, WorkspaceRole } from '../../interfaces/workspace';
 import { FileSystemService } from '../data/file-system.service';
 import { SpaceService } from './space.service';
+import { ActivityService } from '../ui/activity.service';
 
 @Injectable({
     providedIn: 'root',
@@ -11,6 +12,7 @@ import { SpaceService } from './space.service';
 export class WorkspaceService {
     private fileSystem = inject(FileSystemService);
     private spaceService = inject(SpaceService);
+    private activityService = inject(ActivityService);
     private autoSyncInterval: any;
 
     constructor() {
@@ -99,6 +101,15 @@ export class WorkspaceService {
             };
 
             await db.workspaces.add(workspace);
+
+            await this.activityService.log({
+                type: 'create',
+                category: 'workspace',
+                entityId: workspaceId,
+                entityName: workspace.name,
+                description: `Created ${role} workspace "${workspace.name}"`
+            });
+
             return workspace;
         } finally {
             this.fileSystem.releaseSyncLock();
@@ -134,8 +145,19 @@ export class WorkspaceService {
                 }
             }
 
+            const oldName = workspace.name;
             await db.workspaces.update(workspaceId, { name: sanitized, folderPath: newFolderPath });
             
+            await this.activityService.log({
+                type: 'rename',
+                category: 'workspace',
+                entityId: workspaceId,
+                entityName: sanitized,
+                oldName: oldName,
+                newName: sanitized,
+                description: `Renamed workspace from "${oldName}" to "${sanitized}"`
+            });
+
             if (storageMode === 'filesystem') {
                 setTimeout(() => {
                     this.spaceService.syncExternalRenames(workspaceId, sanitized).catch(err => {
@@ -170,6 +192,16 @@ export class WorkspaceService {
      */
     async moveToTrash(workspaceId: string): Promise<void> {
         await db.workspaces.update(workspaceId, { trashedAt: Date.now() });
+        const ws = await this.getById(workspaceId);
+        if (ws) {
+            await this.activityService.log({
+                type: 'trash',
+                category: 'workspace',
+                entityId: workspaceId,
+                entityName: ws.name,
+                description: `Moved workspace "${ws.name}" to trash`
+            });
+        }
     }
 
     /**
@@ -177,6 +209,16 @@ export class WorkspaceService {
      */
     async restoreFromTrash(workspaceId: string): Promise<void> {
         await db.workspaces.update(workspaceId, { trashedAt: undefined as any });
+        const ws = await this.getById(workspaceId);
+        if (ws) {
+            await this.activityService.log({
+                type: 'restore',
+                category: 'workspace',
+                entityId: workspaceId,
+                entityName: ws.name,
+                description: `Restored workspace "${ws.name}" from trash`
+            });
+        }
     }
 
     /**
@@ -239,7 +281,16 @@ export class WorkspaceService {
                 await this.fileSystem.permanentlyDeleteWorkspaceFolder(workspace.name);
             }
 
+            const deletedName = workspace.name;
             await db.workspaces.delete(workspaceId);
+
+            await this.activityService.log({
+                type: 'delete',
+                category: 'workspace',
+                entityId: workspaceId,
+                entityName: deletedName,
+                description: `Permanently deleted workspace "${deletedName}"`
+            });
         } finally {
             this.fileSystem.releaseSyncLock();
         }

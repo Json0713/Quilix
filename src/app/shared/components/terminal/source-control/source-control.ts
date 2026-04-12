@@ -7,6 +7,11 @@ import { FileSystemService } from '../../../../core/services/data/file-system.se
 import { AuthService } from '../../../../core/auth/auth.service';
 import { Workspace } from '../../../../core/interfaces/workspace';
 import { Space } from '../../../../core/interfaces/space';
+import { ActivityService } from '../../../../core/services/ui/activity.service';
+import { ActivityRecord } from '../../../../core/interfaces/activity';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Observable, from } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface TreeNode {
     id: string;
@@ -29,6 +34,7 @@ export interface TreeNode {
     };
 }
 
+/** @deprecated Use ActivityRecord instead */
 export interface AuditLogEvent {
     id: string;
     type: 'create' | 'update' | 'delete' | 'sync' | 'login';
@@ -58,6 +64,7 @@ export class SourceControl implements OnInit {
     private fileManager = inject(FileManagerService);
     private fileSystem = inject(FileSystemService);
     private auth = inject(AuthService);
+    private activityService = inject(ActivityService);
 
     tree = signal<TreeNode[]>([]);
     recentChanges = signal<RecentChange[]>([]);
@@ -66,6 +73,20 @@ export class SourceControl implements OnInit {
     activeWorkspaceId = signal<string | null>(null);
     showRecentChanges = signal(true);
     showAuditLog = signal(true);
+    showSyncLog = signal(true);
+    
+    // Timeline Activities (Exclude Sync)
+    // Use RxJS 'from' to correctly bridge Dexie's Observable to RxJS
+    projectActivities = toSignal(from(this.activityService.activities$).pipe(
+        map((logs: ActivityRecord[]) => logs.filter(l => l.category !== 'system'))
+    ), { initialValue: [] });
+
+    // Sync Activities
+    syncActivities = toSignal(from(this.activityService.activities$).pipe(
+        map((logs: ActivityRecord[]) => logs.filter(l => l.category === 'system'))
+    ), { initialValue: [] });
+
+    /** @deprecated Use projectActivities */
     auditLog = signal<AuditLogEvent[]>([]);
 
     private readonly MAX_DEPTH = 6;
@@ -115,10 +136,9 @@ export class SourceControl implements OnInit {
 
             this.tree.set(nodes);
 
-            // Build recent changes and audit log from the active workspace
+            // Build recent changes from the active workspace
             if (currentWs) {
                 await this.buildRecentChanges(currentWs);
-                await this.buildAuditLog(currentWs);
             }
         } catch (err) {
             console.error('[SourceControl] Failed to load tree:', err);
@@ -163,6 +183,40 @@ export class SourceControl implements OnInit {
 
     getChangeIcon(kind: string): string {
         return kind === 'directory' ? 'bi-folder2 text-warning' : 'bi-file-earmark text-info';
+    }
+
+    getActivityIcon(type: string): string {
+        switch (type) {
+            case 'create': return 'bi-plus-circle-fill';
+            case 'rename': return 'bi-pencil-square';
+            case 'trash': return 'bi-trash3';
+            case 'restore': return 'bi-arrow-counterclockwise';
+            case 'delete': return 'bi-x-circle';
+            case 'move': return 'bi-arrows-move';
+            case 'sync_export': return 'bi-cloud-upload';
+            case 'sync_import': return 'bi-cloud-download';
+            case 'error': return 'bi-exclamation-triangle-fill';
+            default: return 'bi-info-circle';
+        }
+    }
+
+    getActivityClass(type: string): string {
+        switch (type) {
+            case 'create':
+            case 'restore':
+            case 'sync_export':
+            case 'sync_import':
+                return 'activity-green';
+            case 'delete':
+            case 'trash':
+            case 'error':
+                return 'activity-red';
+            case 'rename':
+            case 'move':
+                return 'activity-blue';
+            default:
+                return 'activity-neutral';
+        }
     }
 
     formatTime(timestamp: number): string {
@@ -326,61 +380,8 @@ export class SourceControl implements OnInit {
         this.recentChanges.set(changes.slice(0, 10));
     }
 
-    toggleAuditLog() {
-        this.showAuditLog.update(v => !v);
-    }
-
-    private async buildAuditLog(ws: Workspace) {
-        const events: AuditLogEvent[] = [];
-        
-        // 1. Workspace events
-        events.push({
-            id: `ws-create-${ws.id}`,
-            type: 'create',
-            entityType: 'workspace',
-            entityName: ws.name,
-            timestamp: ws.createdAt,
-            description: `Workspace "${ws.name}" was initially defined.`
-        });
-
-        if (ws.lastActiveAt) {
-            events.push({
-                id: `ws-login-${ws.id}-${ws.lastActiveAt}`,
-                type: 'login',
-                entityType: 'workspace',
-                entityName: ws.name,
-                timestamp: ws.lastActiveAt,
-                description: `User session restored for workspace "${ws.name}".`
-            });
-        }
-
-        // 2. Space events
-        const spaces = await this.spaceService.getByWorkspace(ws.id);
-        for (const sp of spaces) {
-            events.push({
-                id: `sp-create-${sp.id}`,
-                type: 'create',
-                entityType: 'space',
-                entityName: sp.name,
-                timestamp: sp.createdAt,
-                description: `Space "${sp.name}" was mounted in this workspace.`
-            });
-            
-            if (sp.trashedAt) {
-                events.push({
-                    id: `sp-trash-${sp.id}`,
-                    type: 'delete',
-                    entityType: 'space',
-                    entityName: sp.name,
-                    timestamp: sp.trashedAt,
-                    description: `Space "${sp.name}" was moved to system garbage.`
-                });
-            }
-        }
-
-        // Sort by timestamp descending and limit
-        events.sort((a, b) => b.timestamp - a.timestamp);
-        this.auditLog.set(events.slice(0, 15));
+    toggleSyncLog() {
+        this.showSyncLog.update(v => !v);
     }
 
     private getFileIcon(name: string): string {

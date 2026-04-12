@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { db } from '../../database/dexie.service';
 import { FileSystemService } from '../data/file-system.service';
+import { ActivityService } from '../ui/activity.service';
 
 export interface SystemState {
     version: number;
@@ -17,6 +18,7 @@ export interface SystemState {
 })
 export class SystemSyncService {
     private fileSystem = inject(FileSystemService);
+    private activityService = inject(ActivityService);
     private exportTrigger$ = new Subject<void>();
     private readonly SYNC_FILENAME = '.quilix-data.json';
 
@@ -91,6 +93,14 @@ export class SystemSyncService {
             const writable = await (fileHandle as any).createWritable();
             await writable.write(JSON.stringify(state, null, 2));
             await writable.close();
+
+            await this.activityService.log({
+                type: 'sync_export',
+                category: 'system',
+                entityId: 'sync-file',
+                entityName: this.SYNC_FILENAME,
+                description: `Successfully backed up system state to disk`
+            });
 
             console.log('[SystemSync] Successfully exported state to disk.');
             return true;
@@ -200,6 +210,14 @@ export class SystemSyncService {
                     });
                     await db.tabs.bulkPut(toPutTabs);
                 }
+            });
+
+            await this.activityService.log({
+                type: 'sync_import',
+                category: 'system',
+                entityId: 'sync-file',
+                entityName: this.SYNC_FILENAME,
+                description: `Successfully restored system state from disk`
             });
 
             console.log('[SystemSync] Import successful. Data restored and merged.');

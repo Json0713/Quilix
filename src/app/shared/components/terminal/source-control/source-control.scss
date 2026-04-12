@@ -426,11 +426,55 @@
     opacity: 0.7;
 }
 
-// Event-specific colors
-.event-create .sc-timeline-marker > i { color: var(--bs-primary); }
-.event-login .sc-timeline-marker > i { color: #10b981; }
+// ── Activity Status & Shading (GitHub style) ──
+
+.activity-green { 
+    color: #10b981 !important; 
+    i { color: #10b981 !important; }
+}
+
+.activity-red { 
+    color: var(--bs-danger) !important; 
+    i { color: var(--bs-danger) !important; }
+}
+
+.activity-blue { 
+    color: var(--bs-primary) !important; 
+    i { color: var(--bs-primary) !important; }
+}
+
+.activity-neutral { 
+    color: var(--text-muted) !important; 
+    i { color: var(--text-muted) !important; }
+}
+
+// Diff Shading for Renames
+.diff-old {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.15);
+    padding: 1px 4px;
+    border-radius: 3px;
+    text-decoration: line-through;
+    font-family: var(--font-mono);
+}
+
+.diff-new {
+    color: #10b981;
+    background-color: rgba(16, 185, 129, 0.15);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-weight: 500;
+    font-family: var(--font-mono);
+}
+
+// Event-specific colors (Override markers)
+.event-create .sc-timeline-marker > i { color: #10b981; }
+.event-rename .sc-timeline-marker > i { color: var(--bs-primary); }
+.event-trash .sc-timeline-marker > i { color: var(--bs-danger); }
 .event-delete .sc-timeline-marker > i { color: var(--bs-danger); }
-.event-update .sc-timeline-marker > i { color: #f59e0b; }
+.event-restore .sc-timeline-marker > i { color: #10b981; }
+.event-move .sc-timeline-marker > i { color: var(--bs-primary); }
+.event-sync .sc-timeline-marker > i { color: #10b981; }
 
 // ── Animations ──
 
