@@ -38,18 +38,18 @@
     <!-- Right: Global Search -->
     <div #navSearch class="nav-search" [class.mobile-search-active]="isMobileSearchActive">
         <!-- Mobile Search Toggle Icon (always visible on mobile) -->
-        <button class="mobile-search-toggle" (click)="toggleMobileSearch()" title="Search"
+        <button class="mobile-search-toggle" (click)="openSearch()" title="Search"
             [class.active]="isMobileSearchActive">
             <i class="bi bi-search"></i>
         </button>
 
         <!-- Dropdown / Desktop Input Area -->
         <div class="search-container" [class.dropdown-active]="isMobileSearchActive">
-            <div class="search-input-wrapper">
+            <div class="search-input-wrapper" (click)="openSearch()">
                 @if (!isMobileSearchActive) {
                 <i class="bi bi-search search-icon"></i>
                 }
-                <input type="text" #searchInput class="global-search-input" placeholder="Search ...">
+                <input type="text" #searchInput class="global-search-input" placeholder="Search ..." readonly>
                 <!-- Keyboard shortcut hint like macOS Spotlight -->
                 <div class="search-shortcut">Ctrl K</div>
             </div>

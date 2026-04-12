@@ -4,7 +4,7 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(1px);
-  z-index: 9998;
+  z-index: 10000;
   animation: fadeIn 0.2s ease;
 }
 
@@ -12,7 +12,7 @@
 .modal-wrapper {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 10001;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,6 +49,15 @@
     app-task-detail {
       padding: 32px;
     }
+  }
+
+  &.modal-search {
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    max-width: none;
+    width: auto;
   }
 }
 

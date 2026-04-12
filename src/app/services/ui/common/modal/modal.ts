@@ -127,4 +127,14 @@ export class ModalService {
       explorerEntryData: entry
     });
   }
+  
+  openGlobalSearch(): void {
+    this._closeExistingGracefully();
+    this._modal.set({
+      id: ++this.id,
+      type: 'custom',
+      title: 'Global Search',
+      view: 'global-search'
+    });
+  }
 }

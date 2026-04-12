@@ -53,6 +53,15 @@ export class AppThemeService {
     this.updateMetaThemeColor(effective);
   }
 
+  toggleTheme(): void {
+    const current = this.theme();
+    if (current === 'light') {
+      this.apply('dark');
+    } else {
+      this.apply('light');
+    }
+  }
+
   private updateMetaThemeColor(mode: 'light' | 'dark'): void {
     const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
     if (!meta) return;

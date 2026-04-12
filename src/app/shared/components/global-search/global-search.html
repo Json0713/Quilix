@@ -1,0 +1,51 @@
+<div class="global-search-wrapper">
+    <div class="search-header">
+        <i class="bi bi-search search-main-icon"></i>
+        <input #searchInput type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()"
+            placeholder="Search commands, pages, or tools..." class="search-main-input">
+        <button class="search-close-btn" (click)="close()" title="Close Search">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <div class="search-body" #scrollContainer>
+        @if (results.length > 0) {
+            <div class="results-list">
+                @for (item of results; track item.id; let i = $index) {
+                    <!-- Category Header -->
+                    @if (i === 0 || results[i-1].category !== item.category) {
+                        <div class="category-label">{{ item.category }}</div>
+                    }
+
+                    <div class="search-result-item" [class.active]="i === selectedIndex" 
+                        (mouseenter)="selectIndex(i)" (click)="executeAction(item)">
+                        <div class="item-icon">
+                            <i [class]="item.icon"></i>
+                        </div>
+                        <div class="item-content">
+                            <div class="item-title">{{ item.title }}</div>
+                            <div class="item-desc">{{ item.description }}</div>
+                        </div>
+                        <div class="item-action-hint">
+                            <i class="bi bi-arrow-return-left"></i>
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <div class="no-results">
+                <i class="bi bi-search"></i>
+                <p>No results found for "{{ searchQuery }}"</p>
+                <span>Try searching for 'terminal', 'tasks', or 'theme'.</span>
+            </div>
+        }
+    </div>
+
+    <div class="search-footer">
+        <div class="footer-tip">
+            <kbd><i class="bi bi-arrow-up"></i></kbd> <kbd><i class="bi bi-arrow-down"></i></kbd> Navigate
+            <kbd>Enter</kbd> Select
+        </div>
+        <div class="footer-count">{{ results.length }} items indexed</div>
+    </div>
+</div>

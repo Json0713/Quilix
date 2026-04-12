@@ -1,10 +1,10 @@
 import { Component, ElementRef, ViewChild, inject, HostListener, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TerminalService } from '../../../core/services/ui/terminal.service';
+import { TerminalService, TerminalTab } from '../../../core/services/ui/terminal.service';
 import { SourceControl } from './source-control/source-control';
 
-export type TerminalTab = 'terminal' | 'source-control' | 'output' | 'problems';
+// export type TerminalTab = 'terminal' | 'source-control' | 'output' | 'problems'; // REMOVED
 
 @Component({
     selector: 'app-terminal',
@@ -19,8 +19,8 @@ export class TerminalComponent {
     @ViewChild('cmdInput') cmdInput!: ElementRef<HTMLInputElement>;
     @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLDivElement>;
 
-    activeTab = signal<TerminalTab>('terminal');
-    isMaximized = false;
+    activeTab = this.terminal.activeTab;
+    isMaximized = this.terminal.isMaximized;
 
     // Global toggle (Ctrl + ` or Ctrl + M)
     @HostListener('document:keydown', ['$event'])
@@ -119,7 +119,7 @@ export class TerminalComponent {
     }
 
     toggleMaximize() {
-        this.isMaximized = !this.isMaximized;
+        this.isMaximized.update(v => !v);
     }
 
     private scrollToBottom() {

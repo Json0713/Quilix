@@ -2,17 +2,23 @@
 <div class="modal-backdrop" (click)="cancel()"></div>
 
 <div class="modal-wrapper" role="dialog" aria-modal="true">
-  <div class="modal-card" [class.modal-xl]="modal.modal()?.view === 'task'">
+  <div class="modal-card" 
+    [class.modal-xl]="modal.modal()?.view === 'task'"
+    [class.modal-search]="modal.modal()?.view === 'global-search'">
 
     <!-- CLOSE BUTTON -->
+    @if (modal.modal()?.view !== 'global-search') {
     <button type="button" class="modal-close" aria-label="Close modal" (click)="cancel()">
       <i class="bi bi-x-lg"></i>
     </button>
+    }
 
     <!-- TITLE -->
+    @if (modal.modal()?.view !== 'global-search') {
     <h3 class="modal-title">
       {{ modal.modal()?.title }}
     </h3>
+    }
 
     @switch (modal.modal()?.type) {
 
@@ -27,6 +33,8 @@
         <app-edit-workspace></app-edit-workspace>
       } @else if (modal.modal()?.view === 'details') {
         <app-details-view [entry]="modal.modal()!.explorerEntryData!"></app-details-view>
+      } @else if (modal.modal()?.view === 'global-search') {
+        <app-global-search />
       }
     }
 

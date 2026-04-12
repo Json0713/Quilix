@@ -7,6 +7,7 @@ import { SidebarService } from '../../../services/ui/common/sidebar/sidebar.serv
 import { TabService } from '../../../core/services/ui/tab.service';
 import { SpaceService } from '../../../core/services/components/space.service';
 import { Space } from '../../../core/interfaces/space';
+import { ModalService } from '../../../services/ui/common/modal/modal';
 
 interface Breadcrumb {
     label: string;
@@ -29,6 +30,7 @@ export class NavigationBar implements OnInit, OnDestroy {
     private tabService = inject(TabService);
     private spaceService = inject(SpaceService);
     private router = inject(Router);
+    private modal = inject(ModalService);
 
     @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
     @ViewChild('navSearch') navSearch!: ElementRef<HTMLDivElement>;
@@ -56,11 +58,13 @@ export class NavigationBar implements OnInit, OnDestroy {
     handleKeyboardEvent(event: KeyboardEvent) {
         // Catch Ctrl+K or Cmd+K
         if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
-            event.preventDefault(); // Stop default browser behavior natively
-            if (this.searchInput) {
-                this.searchInput.nativeElement.focus();
-            }
+            event.preventDefault();
+            this.openSearch();
         }
+    }
+
+    openSearch() {
+        this.modal.openGlobalSearch();
     }
 
     @HostListener('window:resize')

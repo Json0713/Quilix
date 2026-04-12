@@ -26,6 +26,8 @@ export interface TerminalInstance {
     currentInput: string;
 }
 
+export type TerminalTab = 'terminal' | 'source-control' | 'output' | 'problems';
+
 @Injectable({ providedIn: 'root' })
 export class TerminalService {
     private auth = inject(AuthService);
@@ -36,6 +38,8 @@ export class TerminalService {
     private router = inject(Router);
 
     isOpen = signal<boolean>(false);
+    activeTab = signal<TerminalTab>('terminal');
+    isMaximized = signal<boolean>(false);
 
     // ── Multi-Instance State ──
     instances = signal<TerminalInstance[]>([]);

@@ -1,4 +1,4 @@
-<div class="terminal-panel" [class.is-open]="terminal.isOpen()" [class.is-maximized]="isMaximized">
+<div class="terminal-panel" [class.is-open]="terminal.isOpen()" [class.is-maximized]="isMaximized()">
     <div class="terminal-header">
         <div class="tabs">
             <span class="tab" [class.active]="activeTab() === 'terminal'" (click)="setTab('terminal')">Terminal</span>
@@ -11,7 +11,7 @@
                 <button (click)="terminal.createInstance()" title="New Terminal"><i class="bi bi-plus-lg"></i></button>
             }
             <button (click)="terminal.clear()" title="Clear Terminal"><i class="bi bi-trash"></i></button>
-            <button (click)="toggleMaximize()" [title]="isMaximized ? 'Restore Down' : 'Maximize'"><i class="bi" [ngClass]="isMaximized ? 'bi-fullscreen-exit' : 'bi-fullscreen'"></i></button>
+            <button (click)="toggleMaximize()" [title]="isMaximized() ? 'Restore Down' : 'Maximize'"><i class="bi" [ngClass]="isMaximized() ? 'bi-fullscreen-exit' : 'bi-fullscreen'"></i></button>
             <button (click)="terminal.toggle()" title="Close Panel"><i class="bi bi-x-lg"></i></button>
         </div>
     </div>
