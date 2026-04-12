@@ -509,10 +509,102 @@ export class SpaceService {
         if (!space || !space.folderName) return false;
 
         const success = await this.fileSystem.restoreSpaceFolder(workspaceName, space.folderName, space.id);
-        if (success) {
-            await db.spaces.update(spaceId, { isMissingOnDisk: false });
-            return true;
+        if (!success) return false;
+
+        await db.spaces.update(spaceId, { isMissingOnDisk: false });
+
+        // Recreate the subdirectory structure tracked in IndexedDB.
+        // NOTE: File *content* cannot be recovered (it was on disk and is now gone).
+        // We rebuild the folder tree so the app's file explorer doesn't break.
+        const storageMode = await this.fileSystem.getStorageMode();
+        if (storageMode === 'filesystem') {
+            await this.restoreSubdirectoryTree(workspaceName, space.folderName, spaceId, null);
         }
-        return false;
+
+        return true;
+    }
+
+    /**
+     * Recursively recreates subdirectory folders for a space from IndexedDB virtual_entries.
+     * Only recreates 'directory' kind entries — file content cannot be restored from DB.
+     */
+    private async restoreSubdirectoryTree(
+        workspaceName: string,
+        spaceFolderName: string,
+        spaceId: string,
+        parentId: string | null
+    ): Promise<void> {
+        const parentKey = parentId ?? 'root';
+        const children = await db.virtual_entries
+            .where('[spaceId+parentId]')
+            .equals([spaceId, parentKey])
+            .toArray();
+
+        for (const entry of children) {
+            if (entry.kind !== 'directory') continue;
+
+            try {
+                // Resolve the workspace handle and navigate to the space folder, then create this subdir
+                const wsHandle = await this.fileSystem.getOrCreateWorkspaceFolder(workspaceName);
+                if (!wsHandle) continue;
+
+                // Navigate down to the space folder
+                const spaceHandle = await wsHandle.getDirectoryHandle(spaceFolderName, { create: false }).catch(() => null);
+                if (!spaceHandle) continue;
+
+                // Resolve path to parent subdirectory if nested
+                const targetHandle = parentId
+                    ? await this.resolveVirtualPath(spaceHandle, spaceId, parentId)
+                    : spaceHandle;
+
+                if (!targetHandle) continue;
+
+                // Create the directory
+                const newDirHandle = await targetHandle.getDirectoryHandle(entry.name, { create: true });
+                console.log(`[SpaceService] Restored subdir: "${entry.name}" under spaceId=${spaceId}`);
+
+                // Write the virtual entry's ID as the directory anchor
+                if (entry.id) {
+                    await this.fileSystem.writeDirectoryId(newDirHandle, entry.id);
+                }
+
+                // Recurse into children of this restored directory
+                await this.restoreSubdirectoryTree(workspaceName, spaceFolderName, spaceId, entry.id);
+            } catch (err) {
+                console.warn(`[SpaceService] Could not restore subdir "${entry.name}":`, err);
+            }
+        }
+    }
+
+    /**
+     * Resolves a FileSystemDirectoryHandle for a virtual entry's parent path,
+     * walking up the virtual_entries chain from the space root.
+     */
+    private async resolveVirtualPath(
+        spaceHandle: FileSystemDirectoryHandle,
+        spaceId: string,
+        entryId: string
+    ): Promise<FileSystemDirectoryHandle | null> {
+        // Build the ancestor chain from root down to entryId
+        const chain: string[] = [];
+        let currentId: string | null = entryId;
+
+        while (currentId) {
+            const entry: any = await db.virtual_entries.get(currentId);
+            if (!entry || entry.kind !== 'directory') break;
+            chain.unshift(entry.name);
+            currentId = entry.parentId === 'root' ? null : entry.parentId;
+        }
+
+        // Walk the chain top-down from spaceHandle
+        let handle: FileSystemDirectoryHandle = spaceHandle;
+        for (const name of chain) {
+            try {
+                handle = await handle.getDirectoryHandle(name, { create: true });
+            } catch {
+                return null;
+            }
+        }
+        return handle;
     }
 }

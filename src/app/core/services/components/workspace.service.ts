@@ -177,11 +177,35 @@ export class WorkspaceService {
         this.fileSystem.acquireSyncLock();
         try {
             const success = await this.fileSystem.restoreWorkspaceFolder(workspaceName, workspaceId);
-            if (success) {
-                await db.workspaces.update(workspaceId, { isMissingOnDisk: false });
-                return true;
+            if (!success) return false;
+
+            // Clear the missing flag on the workspace itself
+            await db.workspaces.update(workspaceId, { isMissingOnDisk: false });
+
+            // Also restore all child space folders, which are also missing since the
+            // parent workspace folder was deleted from disk along with all its contents.
+            const childSpaces = await db.spaces
+                .where('workspaceId')
+                .equals(workspaceId)
+                .filter(s => !s.trashedAt)
+                .toArray();
+
+            for (const space of childSpaces) {
+                // Recreate the physical folder for this space inside the restored workspace
+                const spaceRestored = await this.fileSystem.restoreSpaceFolder(
+                    workspaceName,
+                    space.folderName,
+                    space.id
+                );
+                if (spaceRestored) {
+                    await db.spaces.update(space.id, { isMissingOnDisk: false });
+                    console.log(`[WorkspaceService] Restored child space folder: "${space.folderName}" under "${workspaceName}"`);
+                } else {
+                    console.warn(`[WorkspaceService] Could not restore space folder: "${space.folderName}"`);
+                }
             }
-            return false;
+
+            return true;
         } finally {
             this.fileSystem.releaseSyncLock();
         }
