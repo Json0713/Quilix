@@ -93,10 +93,32 @@ export class TerminalService {
         try {
             switch(cmd) {
                 case 'help':
-                    this.printOutput('Available commands: <br/>- <b>pwd</b>: Print current path<br/>- <b>ls</b>: List directories/files<br/>- <b>cd</b> &lt;name&gt;: Navigate into space or root (cd ..)<br/>- <b>cd -ws</b> &lt;name&gt;: Jump directly to another Workspace<br/>- <b>mkdir</b> &lt;name&gt;: Create a space (if at root) or directory<br/>- <b>rm</b> &lt;name&gt;: Delete a space or file<br/>- <b>clear</b>: Clear terminal display', true);
+                    this.printOutput(
+                        'Available commands:<br/>' +
+                        '- <b>pwd</b>: Print current path<br/>' +
+                        '- <b>ls</b>: List directories/files<br/>' +
+                        '- <b>cd &lt;target&gt;</b>: Navigate to space or root (..)<br/>' +
+                        '- <b>mkdir &lt;name&gt;</b>: Create new space/folder<br/>' +
+                        '- <b>rn &quot;old&quot; to &quot;new&quot;</b>: Rename space/folder<br/>' +
+                        '- <b>rm &lt;name&gt;</b>: Delete space/folder<br/>' +
+                        '- <b>find &lt;query&gt;</b>: Recursive search within focus<br/>' +
+                        '- <b>sync</b>: Force physical disk resync<br/>' +
+                        '- <b>clear</b>: Clear terminal display<br/>' +
+                        '<br/><i class="text-muted">Note: Add <b>-ws</b> flag to commands to target workspaces globally (e.g. <b>cd -ws Alpha</b> or <b>rm -ws Name</b>).</i>', 
+                        true
+                    );
                     break;
                 case 'clear':
                     this.clear();
+                    break;
+                case 'sync':
+                    this.printSystem('Running disk reconciliation...');
+                    try {
+                        await this.workspaceService.syncExternalRenames();
+                        this.printOutput('Storage perfectly synced with physical disk.');
+                    } catch (e) {
+                         this.printError('Sync failed.');
+                    }
                     break;
                 case 'pwd':
                     this.printOutput(this.getPromptString().replace('> ', ''));
@@ -114,6 +136,14 @@ export class TerminalService {
                     break;
                 case 'rm':
                     await this.runRm(targetRaw);
+                    break;
+                case 'rn':
+                case 'rename':
+                    await this.runRename(raw);
+                    break;
+                case 'find':
+                case 'search':
+                    await this.runFind(targetRaw);
                     break;
                 default:
                     this.printError(`Command not found: ${cmd}`);
@@ -268,6 +298,24 @@ export class TerminalService {
             return;
         }
 
+        if (target.startsWith('-ws ')) {
+            const name = target.substring(4).trim();
+            this.printSystem(`Creating workspace: ${name}...`);
+            const res = await this.auth.createWorkspace(name, 'personal');
+            if (res.success) {
+                this.printOutput(`Created workspace ${name} and switching...`);
+                localStorage.setItem('quilix_entry_type', 'return');
+                localStorage.setItem('quilix_entry_name', name);
+                this.router.navigate(['/personal']).then(() => {
+                    this.isAtGlobalRoot.set(false);
+                    this.refreshContext();
+                });
+            } else {
+                this.printError(`Failed to create space (maybe duplicate name).`);
+            }
+            return;
+        }
+
         const ws = this.currentWorkspace();
         if (!ws) {
             this.printError('No active workspace.');
@@ -286,6 +334,20 @@ export class TerminalService {
     private async runRm(target: string) {
         if (!target) {
             this.printError('Missing target. Usage: rm <name>');
+            return;
+        }
+
+        if (target.startsWith('-ws ')) {
+            const wsTarget = target.substring(4).trim();
+            const workspaces = await this.workspaceService.getAll();
+            const match = workspaces.find(w => w.name.toLowerCase() === wsTarget.toLowerCase());
+            if (match) {
+                this.printSystem(`Trashing workspace: ${match.name}...`);
+                await this.auth.deleteWorkspace(match.id);
+                this.printOutput(`Workspace deleted.`);
+            } else {
+                this.printError(`Workspace not found: ${wsTarget}`);
+            }
             return;
         }
 
@@ -322,6 +384,124 @@ export class TerminalService {
                 this.printOutput(`Deleted ${match.kind}: ${target}`);
             } else {
                 this.printError(`File or folder not found: ${target}`);
+            }
+        }
+    }
+
+    private async runFind(target: string) {
+        if (!target) {
+            this.printError('Missing query. Usage: find <query>');
+            return;
+        }
+        
+        const ws = this.currentWorkspace();
+        if (!ws) {
+            this.printError('No active workspace required to search within.');
+            return;
+        }
+
+        const sp = this.currentSpace();
+        if (!sp) {
+            this.printError('Must be inside a Space to perform recursive searches.');
+            return;
+        }
+
+        const mode = await this.fileSystem.getStorageMode();
+        let handle: any = undefined;
+        if (mode === 'filesystem') {
+            handle = await this.fileSystem.resolveSpaceHandle(ws.name, sp.id);
+        }
+
+        this.printSystem(`Searching for "${target}"...`);
+        const entries = await this.fileManager.searchEntries({ handle, spaceId: sp.id }, target);
+        
+        if (entries.length === 0) {
+            this.printOutput('No matches found.');
+            return;
+        }
+
+        let out = '<div class="ls-grid" style="flex-direction: column; gap: 4px;">';
+        for (const e of entries) {
+            const icon = e.kind === 'directory' ? 'bi-folder2 text-primary' : 'bi-file-earmark text-secondary';
+            const breadcrumb = e.parentChain ? e.parentChain.map(c => c.name).join('/') + '/' : '';
+            out += `<span class="ls-item"><i class="bi ${icon} me-2"></i><b>${e.name}</b> <span class="text-muted ms-2" style="font-size: 0.7rem;">(${breadcrumb}${e.name})</span></span>`;
+        }
+        out += '</div>';
+        this.printOutput(out, true);
+    }
+
+    private async runRename(raw: string) {
+        // syntax: rn "old" to "new" or rn -ws "old" to "new"
+        const match = raw.match(/^rn\s+(?:-ws\s+)?["'](.*?)["']\s+to\s+["'](.*?)["']/i) || 
+                      raw.match(/^rename\s+(?:-ws\s+)?["'](.*?)["']\s+to\s+["'](.*?)["']/i);
+                      
+        if (!match) {
+            this.printError('Invalid syntax. Usage: rn "old name" to "new name"');
+            return;
+        }
+
+        const oldName = match[1];
+        const newName = match[2];
+        const isWs = raw.toLowerCase().includes('-ws ');
+
+        if (isWs) {
+            const workspaces = await this.workspaceService.getAll();
+            const wsMatch = workspaces.find(w => w.name.toLowerCase() === oldName.toLowerCase());
+            if (wsMatch) {
+                // Workspace rename is robust and handles DB safely
+                const success = await this.workspaceService.rename(wsMatch.id, newName);
+                if (success) {
+                    this.printOutput(`Renamed workspace "${oldName}" to "${newName}"`);
+                } else {
+                    this.printError(`Failed to rename workspace (perhaps name taken or disk locked).`);
+                }
+            } else {
+                this.printError(`Workspace not found: ${oldName}`);
+            }
+            return;
+        }
+
+        const ws = this.currentWorkspace();
+        if (!ws) {
+            this.printError('No active workspace.');
+            return;
+        }
+
+        if (!this.currentSpace()) {
+            // Rename Space
+            const spaces = await this.spaces.getByWorkspace(ws.id);
+            const spMatch = spaces.find(s => s.name.toLowerCase() === oldName.toLowerCase());
+            if (spMatch) {
+                const updated = await this.spaces.rename(spMatch.id, newName, ws.name);
+                if (updated) {
+                    this.printOutput(`Renamed space "${oldName}" to "${newName}"`);
+                } else {
+                    this.printError(`Failed to rename space.`);
+                }
+            } else {
+                this.printError(`Space not found: ${oldName}`);
+            }
+        } else {
+            // Rename File/Folder inside Space
+            const sp = this.currentSpace()!;
+            const mode = await this.fileSystem.getStorageMode();
+            let handle: any = undefined;
+            if (mode === 'filesystem') {
+                handle = await this.fileSystem.resolveSpaceHandle(ws.name, sp.id);
+            }
+            
+            const entries = await this.fileManager.readDirectory({ handle, spaceId: sp.id, parentId: sp.id });
+            const eMatch = entries.find(e => e.name.toLowerCase() === oldName.toLowerCase());
+            
+            if (eMatch) {
+                const success = await this.fileManager.renameEntry({ parentHandle: handle, spaceId: sp.id, parentId: sp.id }, eMatch, newName);
+                if (success) {
+                     this.printOutput(`Renamed "${oldName}" to "${newName}"`);
+                } else {
+                     this.printError(`Failed to rename (name exists or locked).`);
+                }
+            } else {
+                this.printError(`File or folder not found: ${oldName}`);
             }
         }
     }
