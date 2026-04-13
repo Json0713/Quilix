@@ -14,29 +14,59 @@
 
     <div class="graph-canvas">
         <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="graphGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="var(--bs-primary)" stop-opacity="0.2" />
+                    <stop offset="100%" stop-color="var(--bs-primary)" stop-opacity="0" />
+                </linearGradient>
+            </defs>
+
+            <!-- Grid Lines -->
+            @for (bucket of buckets(); track bucket.date; let i = $index) {
+                <line [attr.x1]="i * (100 / (buckets().length - 1))" 
+                      y1="0" 
+                      [attr.x2]="i * (100 / (buckets().length - 1))" 
+                      y2="95" 
+                      class="graph-grid-line" />
+            }
+            
             <!-- Simplified Baseline -->
             <line x1="0" y1="95" x2="100" y2="95" class="graph-baseline" />
             
+            <!-- Area Fill (Gradient) -->
+            <path [attr.d]="areaPath()" fill="url(#graphGradient)" class="graph-area-path"></path>
+
             <!-- The main path (Curved) -->
             <path [attr.d]="curvePath()" 
                   fill="none" 
                   stroke="var(--bs-primary)" 
                   stroke-width="1.2" 
                   stroke-linecap="round" 
-                  stroke-linejoin="round">
+                  stroke-linejoin="round"
+                  class="graph-curve-path">
             </path>
+
+            <!-- Vertical Marker on Hover -->
+            @if (hoveredIndex() !== null) {
+                <line [attr.x1]="hoveredIndex()! * (100 / (buckets().length - 1))" 
+                      y1="0" 
+                      [attr.x2]="hoveredIndex()! * (100 / (buckets().length - 1))" 
+                      y2="95" 
+                      class="graph-marker-line" />
+            }
 
             <!-- Small data points -->
             @for (bucket of buckets(); track bucket.date; let i = $index) {
                 @if (bucket.count > 0) {
                     <circle [attr.cx]="i * (100 / (buckets().length - 1))" 
-                            [attr.cy]="100 - (bucket.intensity * 90) - 5" 
-                            r="1.5"
+                            [attr.cy]="95 - (bucket.intensity * 80)" 
                             class="graph-point"
-                            [class.point-today]="bucket.isToday">
+                            [class.point-today]="bucket.isToday"
+                            [class.point-hovered]="hoveredIndex() === i">
                     </circle>
                 }
             }
+
         </svg>
 
         <!-- Invisible Hotspots for Interactivity -->
@@ -46,6 +76,8 @@
                      [class.today]="bucket.isToday" 
                      [class.selected]="bucket.isSelected"
                      [style.left.%]="(i * (100 / (buckets().length - 1)))"
+                     (mouseenter)="hoveredIndex.set(i)"
+                     (mouseleave)="hoveredIndex.set(null)"
                      (click)="selectDay(bucket)"
                      [title]="bucket.count + ' activities on ' + (bucket.date | date:'EEE, MMM d')">
                     <div class="hotspot-label">{{ bucket.date | date:'EEE' }}</div>
@@ -64,3 +96,4 @@
         </div>
     }
 </div>
+

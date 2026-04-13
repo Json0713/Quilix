@@ -68,19 +68,36 @@ export class ActivityGraph {
         return results;
     });
 
+    hoveredIndex = signal<number | null>(null);
+
     // SVG Path Calculation for Curved Line Graph
     curvePath = computed(() => {
         const buckets = this.buckets();
         if (buckets.length === 0) return '';
+        const points = this.calculatePoints(buckets);
+        return this.generateCurve(points);
+    });
 
-        const points = buckets.map((b, i) => ({
+    areaPath = computed(() => {
+        const buckets = this.buckets();
+        if (buckets.length === 0) return '';
+        const points = this.calculatePoints(buckets);
+        const curve = this.generateCurve(points);
+        if (!curve) return '';
+        
+        // Close the path for the area fill (baseline is at y=95)
+        return `${curve} L ${points[points.length - 1].x},95 L ${points[0].x},95 Z`;
+    });
+
+    private calculatePoints(buckets: DayBucket[]) {
+        return buckets.map((b, i) => ({
             x: i * (100 / (buckets.length - 1)),
-            y: 100 - (b.intensity * 90) - 5
+            y: 95 - (b.intensity * 80) // Baseline at 95, max height 80 units
         }));
+    }
 
+    private generateCurve(points: {x: number, y: number}[]) {
         if (points.length < 2) return '';
-
-        // Generate Cubic Bezier path
         let path = `M ${points[0].x},${points[0].y}`;
 
         for (let i = 0; i < points.length - 1; i++) {
@@ -98,9 +115,9 @@ export class ActivityGraph {
 
             path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
         }
-
         return path;
-    });
+    }
+
 
     get windowLabel(): string {
         const b = this.buckets();
