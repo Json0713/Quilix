@@ -226,7 +226,7 @@ export class SourceControl implements OnInit {
             case 'restore': return 'bi-arrow-counterclockwise';
             case 'delete': return 'bi-x-circle';
             case 'move': return 'bi-arrows-move';
-            case 'sync_export': return 'bi-cloud-upload';
+            case 'sync_export': return 'bi-hdd-rack';
             case 'sync_import': return 'bi-cloud-download';
             case 'error': return 'bi-exclamation-triangle-fill';
             default: return 'bi-info-circle';
