@@ -5,7 +5,8 @@ import { FileManagerService } from '../components/file-manager.service';
 import { Workspace } from '../../interfaces/workspace';
 import { Space } from '../../interfaces/space';
 import { FileSystemService } from '../data/file-system.service';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs';
 import { WorkspaceService } from '../components/workspace.service';
 
 export interface TerminalLine {
@@ -62,6 +63,15 @@ export class TerminalService {
     constructor() {
         // Boot with one initial instance
         this.createInstance();
+
+        // Auto-close maximized terminal on navigation
+        this.router.events.pipe(
+            filter(event => event instanceof NavigationEnd)
+        ).subscribe(() => {
+            if (this.isMaximized()) {
+                this.isOpen.set(false);
+            }
+        });
     }
 
     // ── Instance Management ──
