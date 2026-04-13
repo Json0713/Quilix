@@ -46,28 +46,19 @@
                   class="graph-curve-path">
             </path>
 
-            <!-- Vertical Marker on Hover -->
-            @if (hoveredIndex() !== null) {
-                <line [attr.x1]="hoveredIndex()! * (100 / (buckets().length - 1))" 
-                      y1="0" 
-                      [attr.x2]="hoveredIndex()! * (100 / (buckets().length - 1))" 
-                      y2="95" 
-                      class="graph-marker-line" />
-            }
-
-            <!-- Small data points -->
+            <!-- Vertical Markers (Sticky on Selection + Hover) -->
             @for (bucket of buckets(); track bucket.date; let i = $index) {
-                @if (bucket.count > 0) {
-                    <circle [attr.cx]="i * (100 / (buckets().length - 1))" 
-                            [attr.cy]="95 - (bucket.intensity * 80)" 
-                            class="graph-point"
-                            [class.point-today]="bucket.isToday"
-                            [class.point-hovered]="hoveredIndex() === i">
-                    </circle>
+                @if (bucket.isSelected || hoveredIndex() === i) {
+                    <line [attr.x1]="i * (100 / (buckets().length - 1))" 
+                          y1="0" 
+                          [attr.x2]="i * (100 / (buckets().length - 1))" 
+                          y2="95" 
+                          class="graph-marker-line"
+                          [class.marker-active]="bucket.isSelected" />
                 }
             }
-
         </svg>
+
 
         <!-- Invisible Hotspots for Interactivity -->
         <div class="graph-hotspots">

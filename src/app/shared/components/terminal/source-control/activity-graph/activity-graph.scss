@@ -98,28 +98,17 @@
 }
 
 .graph-marker-line {
-    stroke: rgba(var(--bs-primary-rgb), 0.4);
+    stroke: rgba(var(--bs-primary-rgb), 0.3);
     stroke-width: 0.5;
     stroke-dasharray: 2 2;
     pointer-events: none;
-}
-
-.graph-point {
-    r: 1.2;
-    fill: var(--bs-primary);
-    stroke: none;
     transition: all 0.2s ease;
 
-    &.point-today {
-        fill: #f59e0b;
-    }
-
-    &.point-hovered {
-        fill: #fff;
-        r: 2.2;
+    &.marker-active {
+        stroke: rgba(var(--bs-primary-rgb), 0.5);
+        stroke-width: 0.8;
     }
 }
-
 
 .graph-hotspots {
     position: absolute;
@@ -156,9 +145,8 @@
         transition: all 0.2s;
     }
 
-    &:hover,
-    &.selected {
-        background: linear-gradient(to bottom, transparent, rgba(var(--bs-primary-rgb), 0.03));
+    &:hover, &.selected {
+        background: linear-gradient(to bottom, transparent, rgba(var(--bs-primary-rgb), 0.05));
 
         .hotspot-label {
             color: var(--text-color);
