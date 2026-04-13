@@ -335,7 +335,7 @@ export class TerminalService {
             }
             let out = '<div class="ls-grid">';
             for (const s of spaces) {
-                out += `<span class="ls-item space me-2 text-primary"><i class="bi bi-folder-fill me-2 text-warning"></i>${s.name}</span>`;
+                out += `<span class="ls-item space me-2 text-primary"><i class="bi bi-folder-fill me-2 text-warning"></i>${s.name}/</span>`;
             }
             out += '</div>';
             this.printOutput(out, true);

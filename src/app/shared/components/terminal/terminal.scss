@@ -173,7 +173,7 @@
     padding: 6px 12px;
     cursor: pointer;
     font-size: 0.78rem;
-    color: var(--bs-gray-500);
+    color: var(--text-main);
     transition: background-color 0.15s ease, color 0.15s ease;
     position: relative;
 
@@ -219,7 +219,7 @@
 
         i.bi-terminal {
             opacity: 1;
-            color: var(--bs-primary);
+            color: var(--text-main);
         }
 
         .instance-close {
