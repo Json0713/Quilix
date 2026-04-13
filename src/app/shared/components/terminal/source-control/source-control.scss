@@ -85,20 +85,7 @@
     overflow-y: auto;
     padding: 4px 0;
 
-    &::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: #424242;
-        border: 2px solid var(--app-bg);
-        border-radius: 10px;
-    }
-
+    scrollbar-width: thin;
     display: flex;
     flex-direction: column;
 }
