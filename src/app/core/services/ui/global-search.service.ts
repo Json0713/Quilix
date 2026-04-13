@@ -23,13 +23,16 @@ export class GlobalSearchService {
     private theme = inject(AppThemeService);
     private tabService = inject(TabService);
     private modal = inject(ModalService);
+    private cachedItems: SearchItem[] | null = null;
 
     getSearchItems(): SearchItem[] {
+        if (this.cachedItems) return this.cachedItems;
+
         const url = this.router.url;
         const prefix = url.includes('/team') ? 'team' : 'personal';
         const displayPrefix = prefix === 'team' ? 'Team' : 'Personal';
 
-        const items: SearchItem[] = [
+        this.cachedItems = [
             // Navigation
             {
                 id: 'nav-home',
@@ -125,18 +128,23 @@ export class GlobalSearchService {
             }
         ];
 
-        return items;
+        return this.cachedItems;
     }
 
     search(query: string): SearchItem[] {
-        if (!query) return this.getSearchItems();
+        const all = this.getSearchItems();
+        if (!query) return all;
 
         const q = query.toLowerCase().trim();
-        return this.getSearchItems().filter(item => 
+        return all.filter(item => 
             item.title.toLowerCase().includes(q) || 
             item.description.toLowerCase().includes(q) ||
             item.category.toLowerCase().includes(q)
         );
+    }
+
+    refreshCache() {
+        this.cachedItems = null;
     }
 
     private navigate(path: string) {

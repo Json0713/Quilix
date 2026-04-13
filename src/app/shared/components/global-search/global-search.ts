@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { GlobalSearchService, SearchItem } from '../../../core/services/ui/global-search.service';
 import { ModalService } from '../../../services/ui/common/modal/modal';
 
@@ -20,9 +21,17 @@ export class GlobalSearchComponent implements OnInit, AfterViewInit {
     searchQuery = '';
     results: SearchItem[] = [];
     selectedIndex = 0;
+    private searchSubject = new Subject<string>();
 
     ngOnInit() {
         this.results = this.searchService.getSearchItems();
+
+        this.searchSubject.pipe(
+            debounceTime(100),
+            distinctUntilChanged()
+        ).subscribe(query => {
+            this.executeSearch(query);
+        });
     }
 
     ngAfterViewInit() {
@@ -34,7 +43,11 @@ export class GlobalSearchComponent implements OnInit, AfterViewInit {
     }
 
     onSearch() {
-        this.results = this.searchService.search(this.searchQuery);
+        this.searchSubject.next(this.searchQuery);
+    }
+
+    private executeSearch(query: string) {
+        this.results = this.searchService.search(query);
         this.selectedIndex = 0;
     }
 
@@ -74,7 +87,8 @@ export class GlobalSearchComponent implements OnInit, AfterViewInit {
     private ensureActiveItemVisible() {
         const activeEl = document.querySelector('.search-result-item.active');
         if (activeEl) {
-            activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            // Use 'auto' instead of 'smooth' for performance on mobile
+            activeEl.scrollIntoView({ block: 'nearest', behavior: 'auto' });
         }
     }
 }
