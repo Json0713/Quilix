@@ -1,137 +1,86 @@
 :host {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
     width: 100%;
 }
 
 .metric-card {
-    background: var(--surface-main);
-    border: 1px solid var(--border);
+    background: rgba(var(--surface-main-rgb), 0.4);
+    border: 1px solid var(--bs-gray-800);
     border-radius: 12px;
-    padding: 24px;
+    padding: 16px;
     display: flex;
-    flex: 1;
-    min-width: 300px;
     align-items: center;
-    gap: 20px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
-        0 2px 4px -2px rgba(0, 0, 0, 0.025);
-    transition: all 0.3s ease;
+    gap: 16px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
 
     &:hover {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05),
-            0 4px 6px -4px rgba(0, 0, 0, 0.025);
-    }
-}
-
-/* ... existing stat styles ... */
-
-@media (max-width: 770px) {
-    :host {
-        gap: 16px;
-    }
-
-    .metric-card {
-        padding: 16px;
-        gap: 16px;
-        min-width: 200px;
-        /* Allow cards to wrap more gracefully */
-    }
-
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        font-size: 20px;
-    }
-
-    .stat-text {
-        .label {
-            font-size: 12px;
-        }
-
-        .value-row .value {
-            font-size: 24px;
-        }
-    }
-}
-
-@media (max-width: 600px) {
-    .metric-card {
-        flex: 1 1 100%;
-        min-width: 100%;
+        background: rgba(var(--surface-main-rgb), 0.6);
+        border-color: var(--bs-primary);
+        transform: translateY(-2px);
     }
 }
 
 .stat-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: 1.5rem;
     flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.03);
 
-    &.type-total {
-        background: rgba(245, 158, 11, 0.1);
-        color: #f59e0b;
-        /* Neon Blue */
-    }
-
-    &.type-progress {
-        background: rgba(239, 68, 68, 0.1);
-        color: #ef4444;
-        /* Red (Missing) */
-    }
-
-    &.type-completed {
-        background: rgba(16, 185, 129, 0.1);
-        color: #10b981;
-        /* Emerald */
-    }
-
-    &.type-spaces {
-        background: rgba(59, 130, 246, 0.1);
-        color: #3b82f6;
-        /* Amber */
-    }
+    &.type-total { color: var(--bs-primary); background: rgba(var(--bs-primary-rgb), 0.1); }
+    &.type-progress { color: var(--bs-danger); background: rgba(var(--bs-danger-rgb), 0.1); }
+    &.type-completed { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+    &.type-spaces { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
 }
 
 .stat-text {
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 
     .label {
-        display: block;
-        color: var(--text-muted);
-        font-size: 14px;
-        font-weight: 500;
-        margin-bottom: 8px;
+        font-size: 0.65rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        letter-spacing: 0.8px;
     }
 
     .value-row {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
-        gap: 12px;
+        gap: 8px;
 
         .value {
-            font-size: 32px;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-main);
-            line-height: 1;
+            letter-spacing: -0.5px;
         }
 
         .limit {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-alt);
-            background: var(--surface-alt);
-            padding: 4px 10px;
-            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1px 8px;
+            border-radius: 50px;
             white-space: nowrap;
         }
+    }
+}
+
+@media (max-width: 768px) {
+    :host {
+        grid-template-columns: 1fr;
     }
 }

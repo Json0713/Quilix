@@ -1,11 +1,11 @@
 <div class="workspace-row" [class.view-card]="viewMode === 'card'" [class.missing]="workspace.isMissingOnDisk"
-    [class.selected]="isSelected" [class.in-select-mode]="isSelectionMode"
+    [class.selected]="isSelected" [class.in-select-mode]="isSelectionMode" [class.menu-open]="isMenuOpen"
     (click)="isSelectionMode ? toggleSelect.emit(workspace.id) : null">
 
-    <!-- Col: Name -->
+    <!-- Col: Name / Identifier -->
     <div class="col-name">
         @if (isSelectionMode && !isCurrentWorkspace) {
-        <div class="workspace-checkbox" (click)="$event.stopPropagation(); toggleSelect.emit(workspace.id)">
+        <div class="workspace-checkbox" (click)="$event.stopPropagation(); toggleSelect.emit(workspace.id)" [class.checked]="isSelected">
             <i class="bi" [class.bi-check-square-fill]="isSelected" [class.bi-square]="!isSelected"></i>
         </div>
         } @else if (!isSelectionMode && !isCurrentWorkspace) {
@@ -13,15 +13,15 @@
         }
 
         <div class="icon-wrapper">
-            <i class="bi bi-archive"></i>
+            <i class="bi" [class]="workspace.role === 'team' ? 'bi-building' : 'bi-person-workspace'"></i>
         </div>
 
-        <span class="workspace-title">{{ workspace.name }}</span>
+        <span class="workspace-title" [title]="workspace.name">{{ workspace.name }}</span>
     </div>
 
     <div class="col-metadata">
-        <!-- Col: Type -->
-        <div class="col-type">
+        <!-- Col: Environment / Type -->
+        <div class="col-type" data-label="Environment">
             @if (workspace.role === 'personal') {
             <span class="workspace-badge badge-personal">
                 <i class="bi bi-person-fill"></i> Personal
@@ -33,33 +33,33 @@
             }
         </div>
 
-        <!-- Col: Date Modified -->
-        <div class="col-date">
+        <!-- Col: Last Active / Date -->
+        <div class="col-date" data-label="Last Active" [title]="workspace.lastActiveAt | date:'medium'">
             {{ workspace.lastActiveAt | date:'MMM d, y' }}
         </div>
 
-        <!-- Col: File Size -->
-        <div class="col-size"
+        <!-- Col: Package / File Size -->
+        <div class="col-size" data-label="Package Size"
             [title]="workspace.sizeBytes !== undefined ? workspace.sizeBytes + ' bytes' : 'Calculating...'">
             <span class="size">{{ formatBytes(workspace.sizeBytes) }}</span>
         </div>
 
-        <!-- Col: Status -->
-        <div class="col-status">
+        <!-- Col: Vitals / Status -->
+        <div class="col-status" data-label="Vitals">
             @if (isFileSystemMode) {
-            @if (workspace.isMissingOnDisk) {
-            <span class="workspace-badge badge-error">
-                <i class="bi bi-exclamation-circle-fill"></i> Missing
-            </span>
+                @if (workspace.isMissingOnDisk) {
+                <span class="workspace-badge badge-error">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Missing
+                </span>
+                } @else {
+                <span class="workspace-badge badge-success">
+                    <i class="bi bi-check-circle-fill"></i> Synced
+                </span>
+                }
             } @else {
-            <span class="workspace-badge badge-success">
-                <i class="bi bi-check-circle-fill"></i> Synced
-            </span>
-            }
-            } @else {
-            <span class="workspace-badge badge-info">
-                <i class="bi bi-database"></i> IndexedDB
-            </span>
+                <span class="workspace-badge badge-info">
+                    <i class="bi bi-database-fill"></i> IndexedDB
+                </span>
             }
         </div>
     </div>
@@ -67,7 +67,7 @@
     <!-- Col: Actions (Kebab Menu) -->
     <div class="col-actions" (click)="$event.stopPropagation()">
         <div class="workspace-menu-wrapper">
-            <button class="action-btn menu-trigger" [class.active]="isMenuOpen" (click)="toggleMenu.emit($event)"
+            <button class="menu-trigger" [class.active]="isMenuOpen" (click)="toggleMenu.emit($event)"
                 title="Options">
                 <i class="bi bi-three-dots-vertical"></i>
             </button>
@@ -77,7 +77,7 @@
                 @if (!isCurrentWorkspace && !workspace.isMissingOnDisk) {
                 <button class="dropdown-item switch-item" (click)="switchWorkspace.emit(workspace)">
                     <i class="bi bi-box-arrow-in-right"></i>
-                    <span>Switch | Open</span>
+                    <span>Switch Workspace</span>
                 </button>
                 }
 
@@ -94,7 +94,7 @@
                     } @else {
                     <i class="bi bi-arrow-counterclockwise"></i>
                     }
-                    <span>Restore</span>
+                    <span>Restore Folder</span>
                 </button>
                 }
 

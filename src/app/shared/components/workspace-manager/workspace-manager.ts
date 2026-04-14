@@ -12,8 +12,13 @@ import { Breadcrumb } from '../../ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { FileSyncService } from '../../../core/services/sync/file-sync.service';
 import { WorkspaceCardComponent } from './workspace-card/workspace-card';
+import { WorkspaceMetrics } from './workspace-metrics/workspace-metrics';
 import { SnackbarService } from '../../../services/ui/common/snackbar/snackbar.service';
 import { ModalService } from '../../../services/ui/common/modal/modal';
+import { ActivityService } from '../../../core/services/ui/activity.service';
+import { ActivityGraph } from '../terminal/source-control/activity-graph/activity-graph';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { from } from 'rxjs';
 
 export interface ManagedWorkspace extends Workspace {
     isMissingOnDisk?: boolean;
@@ -25,7 +30,7 @@ export interface ManagedWorkspace extends Workspace {
 @Component({
     selector: 'app-workspace-manager',
     standalone: true,
-    imports: [CommonModule, DragDropModule, Breadcrumb, WorkspaceCardComponent],
+    imports: [CommonModule, DragDropModule, Breadcrumb, WorkspaceCardComponent, WorkspaceMetrics, ActivityGraph],
     templateUrl: './workspace-manager.html',
     styleUrl: './workspace-manager.scss',
 })
@@ -40,6 +45,14 @@ export class WorkspaceManagerComponent implements OnInit {
     private router = inject(Router);
     private modalService = inject(ModalService);
     private fileSync = inject(FileSyncService);
+    private activityService = inject(ActivityService);
+
+    // ── Activity Graph Integration ──
+    protected allActivities = toSignal(from(this.activityService.activities$), { initialValue: [] });
+    protected graphActivities = computed(() => {
+        return this.allActivities().filter(l => l.category !== 'system');
+    });
+    selectedTimeRange = signal<{ start: number, end: number } | null>(null);
 
     get totalWorkspaces() { return this.workspaces().length; }
     get syncedFolders() { return this.workspaces().filter(w => !w.isMissingOnDisk).length; }
@@ -85,6 +98,7 @@ export class WorkspaceManagerComponent implements OnInit {
 
     // ── Single-item state ──
     openMenuId = signal<string | null>(null);
+    headerMenuOpen = signal<boolean>(false);
 
     // ── View state ──
     viewMode = signal<'list' | 'card'>('list');
@@ -92,11 +106,19 @@ export class WorkspaceManagerComponent implements OnInit {
     @HostListener('document:click')
     closeAllMenus() {
         this.openMenuId.set(null);
+        this.headerMenuOpen.set(false);
     }
 
     toggleMenu(id: string, event: Event) {
         event.stopPropagation();
+        this.headerMenuOpen.set(false);
         this.openMenuId.update(current => current === id ? null : id);
+    }
+
+    toggleHeaderMenu(event: Event) {
+        event.stopPropagation();
+        this.openMenuId.set(null);
+        this.headerMenuOpen.update(v => !v);
     }
 
     async ngOnInit() {
@@ -463,5 +485,9 @@ export class WorkspaceManagerComponent implements OnInit {
         this.workspaceService.updateWorkspaceOrder(updates).catch(err => {
             console.error('Failed to update workspace order', err);
         });
+    }
+
+    onRangeSelected(range: { start: number, end: number } | null) {
+        this.selectedTimeRange.set(range);
     }
 }

@@ -1,151 +1,203 @@
 <div class="dashboard-container">
-    <app-breadcrumb></app-breadcrumb>
-
-    <!-- Metrics Grid -->
-    <!-- <app-workspace-metrics [totalWorkspaces]="totalWorkspaces" [syncedFolders]="syncedFolders"
-        [missingFolders]="missingFolders" [totalSpaces]="totalSpaces()" [isFileSystemMode]="isFileSystemMode()">
-    </app-workspace-metrics> -->
-
-    <!-- Storage Health Banner -->
-    <!-- <app-storage-health-banner [isFileSystemMode]="isFileSystemMode()" [needsReauth]="needsReauth()"
-        [missingCount]="missingFolders" [isReauthing]="isReauthing()" (reconnectStorage)="reconnectStorage()">
-    </app-storage-health-banner> -->
-
-    <!-- Recent Section -->
-    @if (suggestionWorkspaces().length > 0) {
-    <div class="workspace-suggestions-section">
-        <div class="suggestions-grid">
-            @for (ws of suggestionWorkspaces(); track ws.id) {
-            <app-workspace-card [workspace]="ws" [isCurrentWorkspace]="ws.id === currentWorkspaceId()"
-                [isFileSystemMode]="isFileSystemMode()" [isMenuOpen]="openMenuId() === 'suggestion-' + ws.id"
-                [viewMode]="'card'" (restoreWorkspace)="restoreWorkspace($event)"
-                (trashWorkspace)="trashWorkspace($event)" (switchWorkspace)="switchToWorkspace($event)"
-                (renameWorkspace)="renameWorkspace($event)" (toggleMenu)="toggleMenu('suggestion-' + ws.id, $event)">
-            </app-workspace-card>
-            }
+    <!-- Clean Native Header -->
+    <div class="sc-header">
+        <div class="sc-header-left">
+            <app-breadcrumb></app-breadcrumb>
         </div>
-    </div>
-    }
-
-    <!-- Workspace Track -->
-    <div class="workspace-track-section">
-        <div class="track-actions">
-            <h2 class="track-title">Workspaces Track</h2>
-
+        
+        <div class="sc-header-right">
             <div class="track-controls">
-                <div class="controls-pill">
-                    @if (!isLoading() && otherWorkspaces().length > 0) {
-                    <button class="pill-btn pill-select" [class.active]="selectionMode()"
-                        (click)="toggleSelectionMode()" title="Select">
-                        @if (selectionMode()) {
-                        <i class="bi bi-x-lg"></i>
-                        } @else {
-                        <i class="bi bi-check2-square"></i>
-                        }
-                    </button>
-                    <span class="pill-divider"></span>
-                    }
-                    <button class="pill-btn pill-view" [class.active]="viewMode() === 'list'"
+                <!-- Desktop View Switcher -->
+                <div class="controls-pill d-none d-md-flex">
+                    <button class="pill-btn" [class.active]="viewMode() === 'list'"
                         (click)="setViewMode('list')" title="List View">
                         <i class="bi bi-list"></i>
                     </button>
-                    <button class="pill-btn pill-view" [class.active]="viewMode() === 'card'"
+                    <button class="pill-btn" [class.active]="viewMode() === 'card'"
                         (click)="setViewMode('card')" title="Grid View">
                         <i class="bi bi-grid-fill"></i>
                     </button>
                 </div>
 
-                <button class="action-btn primary"
-                    style="padding: 0.35rem 0.75rem; border-radius: 50px; font-size: 0.85rem; border: none; background: var(--action); color: var(--text-white); cursor: pointer; margin-left: 8px;"
-                    (click)="openCreateWorkspace()">
-                    <i class="bi bi-plus-lg"></i> Create
-                </button>
+                <!-- Main Options Menu (3-dots) -->
+                <div class="header-menu-container">
+                    <button class="header-options-btn" [class.active]="headerMenuOpen()" (click)="toggleHeaderMenu($event)" title="Options">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+
+                    @if (headerMenuOpen()) {
+                    <div class="header-dropdown" (click)="$event.stopPropagation()">
+                        <!-- Contextual Actions based on Selection Mode -->
+                        @if (selectionMode()) {
+                            <div class="dropdown-group">
+                                <span class="group-label">Selection: {{ selectedCount() }} items</span>
+                                <button class="dropdown-item" (click)="toggleSelectAll()">
+                                    <i class="bi" [class.bi-check-square]="!isAllSelected()" [class.bi-dash-square]="isAllSelected()"></i>
+                                    <span>{{ isAllSelected() ? 'Deselect All' : 'Select All' }}</span>
+                                </button>
+                                
+                                @if (selectedCount() > 0) {
+                                    @if (isFileSystemMode() && hasSelectedMissing()) {
+                                    <button class="dropdown-item success" (click)="bulkRestoreFolders(); headerMenuOpen.set(false)" [disabled]="isBulkProcessing()">
+                                        <i class="bi bi-arrow-counterclockwise" [class.spin]="isBulkProcessing()"></i>
+                                        <span>Restore Selected</span>
+                                    </button>
+                                    }
+                                    <button class="dropdown-item danger" (click)="requestBulkTrash(); headerMenuOpen.set(false)" [disabled]="isBulkProcessing()">
+                                        <i class="bi bi-trash3"></i>
+                                        <span>Trash Selected</span>
+                                    </button>
+                                }
+
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" (click)="exitSelectionMode(); headerMenuOpen.set(false)">
+                                    <i class="bi bi-x-lg"></i>
+                                    <span>Cancel Selection</span>
+                                </button>
+                            </div>
+                        } @else {
+                            <div class="dropdown-group">
+                                <button class="dropdown-item primary" (click)="openCreateWorkspace(); headerMenuOpen.set(false)">
+                                    <i class="bi bi-plus-lg"></i>
+                                    <span>New Workspace</span>
+                                </button>
+                                <button class="dropdown-item" (click)="toggleSelectionMode(); headerMenuOpen.set(false)" [disabled]="otherWorkspaces().length === 0">
+                                    <i class="bi bi-check2-square"></i>
+                                    <span>Select Items</span>
+                                </button>
+                            </div>
+
+                            <div class="dropdown-divider d-md-none"></div>
+                            <!-- Mobile-only view switcher -->
+                            <div class="dropdown-group d-md-none">
+                                <button class="dropdown-item" (click)="setViewMode(viewMode() === 'list' ? 'card' : 'list'); headerMenuOpen.set(false)">
+                                    <i class="bi" [class.bi-grid-fill]="viewMode() === 'list'" [class.bi-list]="viewMode() === 'card'"></i>
+                                    <span>Switch to {{ viewMode() === 'list' ? 'Grid' : 'List' }}</span>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                    }
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Selection toolbar -->
-        @if (selectionMode()) {
-        <div class="selection-toolbar">
-            <div class="toolbar-left">
-                <div class="workspace-checkbox" (click)="toggleSelectAll()" [class.checked]="isAllSelected()">
-                    <i class="bi" [class.bi-check-square-fill]="isAllSelected()"
-                        [class.bi-square]="!isAllSelected()"></i>
-                </div>
-                <span class="selection-count">
-                    {{ selectedCount() }} selected
-                </span>
-            </div>
-
-            <div class="toolbar-actions">
-                @if (confirmingBulkTrash()) {
-                <div class="bulk-confirm">
-                    <span class="confirm-label">Trash {{
-                        selectedCount() }} workspace{{ selectedCount() > 1 ? 's' : '' }}?</span>
-                    <button class="action-btn confirm-yes" (click)="confirmBulkTrash()" [disabled]="isBulkProcessing()">
-                        @if (isBulkProcessing()) {
-                        <i class="bi bi-arrow-repeat spin"></i>
-                        } @else {
-                        Yes
-                        }
+    <!-- Bulk Trash Confirmation Overlay -->
+    @if (confirmingBulkTrash()) {
+        <div class="bulk-confirm-overlay">
+            <div class="confirm-card">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <h3>Trash {{ selectedCount() }} Workspaces?</h3>
+                <p>This will move the selected workspaces to the trash. You can restore them later or permanently delete them.</p>
+                <div class="confirm-actions">
+                    <button class="confirm-btn secondary" (click)="cancelBulkTrash()">No, Keep Them</button>
+                    <button class="confirm-btn danger" (click)="confirmBulkTrash()" [disabled]="isBulkProcessing()">
+                        @if (isBulkProcessing()) { <i class="bi bi-arrow-repeat spin"></i> Processing... } @else { Yes, Trash Items }
                     </button>
-                    <button class="action-btn confirm-no" (click)="cancelBulkTrash()"
-                        [disabled]="isBulkProcessing()">No</button>
                 </div>
-                } @else {
-                @if (isFileSystemMode() && hasSelectedMissing()) {
-                <button class="action-btn restore-action" (click)="bulkRestoreFolders()"
-                    [disabled]="isBulkProcessing()">
-                    @if (isBulkProcessing()) {
-                    <i class="bi bi-arrow-repeat spin"></i>
-                    } @else {
-                    <i class="bi bi-arrow-counterclockwise"></i>
-                    }
-                    <span class="btn-label">Restore Folders</span>
-                </button>
-                }
-                <button class="action-btn trash-action" (click)="requestBulkTrash()" [disabled]="selectedCount() === 0">
-                    <i class="bi bi-trash3"></i>
-                    <span class="btn-label">Trash</span>
-                </button>
+            </div>
+        </div>
+    }
+
+    <div class="sc-body">
+        <!-- Activity Insight Graph -->
+        <div class="sc-section">
+            <div class="sc-section-header">
+                <span class="sc-section-title">ACTIVITY TRENDS</span>
+            </div>
+            <app-activity-graph 
+                [activities]="graphActivities()" 
+                (onRangeSelected)="onRangeSelected($event)">
+            </app-activity-graph>
+        </div>
+
+        <!-- Metrics Section -->
+        <div class="sc-section" [class.d-none]="selectionMode()">
+            <div class="sc-section-header">
+                <span class="sc-section-title">WORKSPACE ANALYTICS</span>
+            </div>
+            <app-workspace-metrics 
+                [totalWorkspaces]="totalWorkspaces" 
+                [syncedFolders]="syncedFolders"
+                [missingFolders]="missingFolders" 
+                [totalSpaces]="totalSpaces()" 
+                [isFileSystemMode]="isFileSystemMode()">
+            </app-workspace-metrics>
+        </div>
+
+        <!-- Recent Suggestions Section -->
+        @if (suggestionWorkspaces().length > 0 && !selectionMode()) {
+        <div class="sc-section">
+            <div class="sc-section-header">
+                <span class="sc-section-title">PINNED & RECENT</span>
+                <span class="sc-count">{{ suggestionWorkspaces().length }}</span>
+            </div>
+            <div class="suggestions-grid">
+                @for (ws of suggestionWorkspaces(); track ws.id) {
+                <app-workspace-card 
+                    [workspace]="ws" 
+                    [isCurrentWorkspace]="ws.id === currentWorkspaceId()"
+                    [isFileSystemMode]="isFileSystemMode()" 
+                    [isMenuOpen]="openMenuId() === 'suggestion-' + ws.id"
+                    [viewMode]="'card'" 
+                    (restoreWorkspace)="restoreWorkspace($event)"
+                    (trashWorkspace)="trashWorkspace($event)" 
+                    (switchWorkspace)="switchToWorkspace($event)"
+                    (renameWorkspace)="renameWorkspace($event)" 
+                    (toggleMenu)="toggleMenu('suggestion-' + ws.id, $event)">
+                </app-workspace-card>
                 }
             </div>
         </div>
         }
 
-        @if (isLoading()) {
-        <div class="loading-state">
-            <i class="bi bi-arrow-repeat spin"></i>
-            <span>Loading workspaces...</span>
-        </div>
-        } @else if (otherWorkspaces().length === 0) {
-        <div class="empty-state">
-            <i class="bi bi-folder-x"></i>
-            <p>No other workspaces found.</p>
-        </div>
-        } @else {
-        <div class="workspace-table" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onDrop($event)"
-            [cdkDropListDisabled]="selectionMode()" [class.view-card]="viewMode() === 'card'">
-            <div class="table-header">
-                <div class="col-name">Name</div>
-                <div class="col-type">Type</div>
-                <div class="col-date">Date Modified</div>
-                <div class="col-size">File Size</div>
-                <div class="col-status">Status</div>
+        <!-- Workspace Track Section -->
+        <div class="sc-section">
+            <div class="sc-section-header">
+                <span class="sc-section-title">WORKSPACES TRACK</span>
+                <span class="sc-count">{{ otherWorkspaces().length }}</span>
             </div>
-            @for (ws of otherWorkspaces(); track ws.id) {
-            <app-workspace-card cdkDrag [workspace]="ws" [isCurrentWorkspace]="false"
-                [isFileSystemMode]="isFileSystemMode()" [isSelectionMode]="selectionMode()"
-                [isSelected]="isSelected(ws.id)" [isMenuOpen]="openMenuId() === 'track-' + ws.id"
-                [viewMode]="viewMode()" (restoreWorkspace)="restoreWorkspace($event)"
-                (trashWorkspace)="trashWorkspace($event)" (switchWorkspace)="switchToWorkspace($event)"
-                (renameWorkspace)="renameWorkspace($event)" (toggleSelect)="toggleSelect($event)"
-                (toggleMenu)="toggleMenu('track-' + ws.id, $event)">
-                <div class="drag-handle" dragHandle cdkDragHandle>
-                    <i class="bi bi-grip-vertical"></i>
+
+            @if (isLoading()) {
+                <div class="loading-state">
+                    <i class="bi bi-arrow-repeat spin"></i>
+                    <span>Optimizing workspace view...</span>
                 </div>
-            </app-workspace-card>
+            } @else if (otherWorkspaces().length === 0) {
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>No other workspaces found.</p>
+                </div>
+            } @else {
+                <div class="workspace-table" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onDrop($event)"
+                    [cdkDropListDisabled]="selectionMode()" [class.view-card]="viewMode() === 'card'" [class.selection-active]="selectionMode()">
+                    
+                    <!-- Table Header: Hidden on Mobile List View via CSS -->
+                    <div class="table-header">
+                        <div class="col-name">Identifier</div>
+                        <div class="col-type">Environment</div>
+                        <div class="col-date">Last Active</div>
+                        <div class="col-size">Package</div>
+                        <div class="col-status">Vitals</div>
+                        <div class="col-actions"></div>
+                    </div>
+
+                    @for (ws of otherWorkspaces(); track ws.id) {
+                    <app-workspace-card cdkDrag [workspace]="ws" [isCurrentWorkspace]="false"
+                        [isFileSystemMode]="isFileSystemMode()" [isSelectionMode]="selectionMode()"
+                        [isSelected]="isSelected(ws.id)" [isMenuOpen]="openMenuId() === 'track-' + ws.id"
+                        [viewMode]="viewMode()" (restoreWorkspace)="restoreWorkspace($event)"
+                        (trashWorkspace)="trashWorkspace($event)" (switchWorkspace)="switchToWorkspace($event)"
+                        (renameWorkspace)="renameWorkspace($event)" (toggleSelect)="toggleSelect($event)"
+                        (toggleMenu)="toggleMenu('track-' + ws.id, $event)">
+                        <div class="drag-handle" dragHandle cdkDragHandle>
+                            <i class="bi bi-grip-vertical"></i>
+                        </div>
+                    </app-workspace-card>
+                    }
+                </div>
             }
         </div>
-        }
     </div>
 </div>

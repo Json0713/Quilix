@@ -1,499 +1,407 @@
-/* Workspace Manager Layout & Consistency */
 .dashboard-container {
-    max-width: 1800px;
-    padding: 24px;
-    margin: 0 auto;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    overflow-x: hidden; // Prevention of horizontal scroll
+    font-family: var(--bs-font-sans-serif);
+    background-color: var(--app-bg);
+    position: relative;
 }
 
-/* Workspace Track Section */
-.workspace-track-section {
+// ── Header (Overhauled with 3-dots Menu) ──
+
+.sc-header {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 20px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--bs-gray-800);
+    background: rgba(var(--surface-main-rgb), 0.7);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    min-height: 48px;
+}
 
-    .track-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 4px;
+.sc-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
-        .track-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-main);
+    app-breadcrumb {
+        ::ng-deep .breadcrumb-container {
+            padding: 0;
             margin: 0;
-            padding-left: 4px;
+            background: transparent;
+            border: none;
         }
+    }
+}
 
-        .track-controls {
+.sc-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+// ── Header Actions & Dropdown ──
+
+.track-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .controls-pill {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 4px;
+        border-radius: 10px;
+        border: 1px solid var(--bs-gray-800);
+
+        .pill-btn {
             display: flex;
             align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
 
-            .controls-pill {
-                display: flex;
-                align-items: center;
-                gap: 2px;
-                background: var(--surface-main);
-                padding: 3px;
-                border-radius: 100px;
-                border: 1px solid var(--border-color);
+            i { font-size: 0.9rem; }
 
-                .pill-btn {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 32px;
-                    height: 32px;
-                    border: none;
-                    border-radius: 100px;
-                    background: transparent;
-                    color: var(--text-muted);
-                    cursor: pointer;
-                    transition: all 0.2s ease;
+            &:hover:not(.active) {
+                color: var(--text-main);
+                background: rgba(255, 255, 255, 0.05);
+            }
 
-                    i {
-                        font-size: 1.05rem;
-                    }
+            &.active {
+                background: var(--bs-primary);
+                color: white;
+                box-shadow: 0 2px 8px rgba(var(--bs-primary-rgb), 0.3);
+            }
+        }
+    }
+}
 
-                    &:hover:not(.active) {
-                        color: var(--text-main);
-                    }
+.header-menu-container {
+    position: relative;
+}
 
-                    &.active {
-                        background: var(--surface);
-                        color: var(--text-main);
-                    }
+.header-options-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+
+    i { font-size: 1.1rem; }
+
+    &:hover, &.active {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-main);
+    }
+}
+
+.header-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 8px;
+    z-index: 1000;
+    min-width: 220px;
+    background: var(--surface-main);
+    border: 1px solid var(--bs-gray-800);
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(16px);
+    animation: slideInDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+    .dropdown-group {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .group-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 8px 12px 4px;
+        letter-spacing: 0.5px;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 9px 12px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text-main);
+        font-size: 0.82rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+
+        i {
+            font-size: 1rem;
+            color: var(--text-muted);
+            width: 16px;
+            text-align: center;
+        }
+
+        &:hover:not(:disabled) {
+            background: var(--bg-hover);
+            i { color: var(--text-main); }
+        }
+
+        &.primary {
+            color: var(--bs-primary);
+            i { color: var(--bs-primary); }
+            &:hover { background: rgba(var(--bs-primary-rgb), 0.1); }
+        }
+
+        &.danger {
+            color: var(--bs-danger);
+            i { color: var(--bs-danger); }
+            &:hover { background: rgba(var(--bs-danger-rgb), 0.1); }
+        }
+
+        &.success {
+            color: #10b981;
+            i { color: #10b981; }
+            &:hover { background: rgba(16, 185, 129, 0.1); }
+        }
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: var(--bs-gray-800);
+        margin: 6px 8px;
+    }
+}
+
+// ── Selection Toolbar (Removed, now integrated into header) ──
+// Styles for toolbar removed to reduce weight.
+
+// ── Bulk Confirmation Overlay ──
+
+.bulk-confirm-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+
+    .confirm-card {
+        background: var(--surface-main);
+        border: 1px solid var(--bs-gray-800);
+        border-radius: 20px;
+        padding: 32px;
+        max-width: 440px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+
+        i {
+            font-size: 3rem;
+            color: var(--bs-danger);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h3 { margin-bottom: 12px; font-weight: 700; color: var(--text-main); }
+        p { color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem; line-height: 1.5; }
+
+        .confirm-actions {
+            display: flex;
+            gap: 12px;
+            
+            button {
+                flex: 1;
+                padding: 10px;
+                border: none;
+                border-radius: 10px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+
+                &.secondary {
+                    background: var(--bg-muted);
+                    color: var(--text-main);
+                    &:hover { background: var(--bg-hover); }
                 }
 
-                .pill-divider {
-                    width: 1px;
-                    height: 18px;
-                    background: var(--border-color);
-                    margin: 0 2px;
-                    flex-shrink: 0;
+                &.danger {
+                    background: var(--bs-danger);
+                    color: white;
+                    &:hover { background: #dc2626; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
                 }
             }
         }
     }
 }
 
-/* Suggestions Section (always card/grid view) */
-.workspace-suggestions-section {
+// ── Body ──
+
+.sc-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden; // Prevention of horizontal scroll
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 32px;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-thumb { background: var(--bs-gray-700); border-radius: 10px; }
 }
 
-.suggestions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+// ── Sections ──
+
+.sc-section { display: flex; flex-direction: column; gap: 16px; transition: all 0.3s ease; }
+
+.sc-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 8px;
+
+    .sc-section-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+    }
+
+    .sc-count {
+        font-size: 0.65rem;
+        padding: 1px 8px;
+        border-radius: 50px;
+        background-color: var(--bg-muted);
+        color: var(--text-muted);
+        font-weight: 600;
+    }
 }
 
-/* Workspace Table */
+// ── Workspace Table (Responsive Optimization) ──
+
 .workspace-table {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-height: 200px;
+    gap: 2px;
     width: 100%;
 
     .table-header {
         display: grid;
-        grid-template-columns: minmax(200px, 2fr) 100px 1fr 100px 120px 80px;
+        grid-template-columns: minmax(200px, 3fr) 120px 140px 100px 120px 48px;
         gap: 16px;
-        padding: 0 24px 12px;
-        font-size: 0.85rem;
-        font-weight: 600;
+        padding: 8px 16px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
         color: var(--text-muted);
-        border-bottom: 1px solid var(--border-color);
-        margin-bottom: 4px;
-
-        .col-name,
-        .col-type,
-        .col-date,
-        .col-size {
-            display: flex;
-            align-items: center;
-        }
+        opacity: 0.8;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        margin-bottom: 8px;
     }
 
     &.view-card {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 16px;
-        min-height: auto;
-
-        .table-header {
-            display: none;
-        }
+        .table-header { display: none; }
     }
 }
 
-.drag-handle {
-    color: var(--text-muted);
-    cursor: grab;
-    display: flex;
-    align-items: center;
-    padding: -4px;
-    margin-left: -4px;
+// ── Suggestions Grid ──
 
-    &:active {
-        cursor: grabbing;
-    }
-
-    i {
-        font-size: 1.1rem;
-    }
+.suggestions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
 }
 
-/* Action Buttons */
-.action-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--surface);
-    border: none;
-    color: var(--text-main);
-    font-size: 0.8rem;
-    font-weight: 500;
-    padding: 6px 14px;
-    border-radius: 100px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+// ── Animations ──
 
-    i {
-        font-size: 1rem;
-    }
-
-    &:hover {
-        background: var(--primary);
-        color: #fff;
-    }
-
-    &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    &.trash-action {
-        background: rgba(239, 68, 68, 0.1);
-        color: #ef4444;
-
-        &:hover:not(:disabled) {
-            background: #ef4444;
-            color: white;
-        }
-    }
-
-    &.restore-action {
-        background: rgba(16, 185, 129, 0.1);
-        color: #10b981;
-
-        &:hover:not(:disabled) {
-            background: #10b981;
-            color: white;
-        }
-    }
+@keyframes slideInDown {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
-/* Drag & Drop Utility Classes */
-.cdk-drag-preview {
-    box-sizing: border-box;
-    overflow: hidden;
-    cursor: grabbing !important;
-
-    app-workspace-card {
-        display: block;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-        transform: scale(1.02);
-        transition: transform 0.25s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0, 0, 0.2, 1);
-        z-index: 1000;
-
-        /* Make the dragged inner card pop */
-        ::ng-deep .workspace-row {
-            border-color: var(--primary) !important;
-        }
-    }
-}
-
-.cdk-drag-placeholder {
-    opacity: 0.4 !important;
-    transition: opacity 250ms cubic-bezier(0, 0, 0.2, 1);
-
-    app-workspace-card {
-        ::ng-deep .workspace-row {
-            border: 2px dashed var(--primary) !important;
-            background: rgba(var(--primary-rgb), 0.02) !important;
-            box-shadow: none !important;
-
-            /* Hide complex inner content to keep it clean */
-            * {
-                visibility: hidden !important;
-            }
-        }
-    }
-}
-
-/* Animate the item that is being dragged to its final position */
-.cdk-drag-animating {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-/* Animate all other list items smoothly out of the way */
-.workspace-table.cdk-drop-list-dragging app-workspace-card:not(.cdk-drag-placeholder) {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1) !important;
-}
-
-
-/* Spin Utility */
-.spin {
-    animation: spin 1s linear infinite;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
-/* Selection Toolbar */
-.selection-toolbar {
-    background: var(--surface-main);
-    padding: 8px 16px;
-    border-radius: 100px;
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid var(--border-color);
+.spin { animation: spin 1s linear infinite; }
 
-    .toolbar-left {
-        display: flex;
-        align-items: center;
+// ── Responsive ──
+
+@media (max-width: 1024px) {
+    .workspace-table .table-header {
+        grid-template-columns: minmax(180px, 2fr) 100px 120px 80px 100px 48px;
         gap: 12px;
-
-        .workspace-checkbox {
-            cursor: pointer;
-            font-size: 20px;
-            color: var(--text-muted);
-            transition: color 0.2s ease;
-            display: flex;
-            align-items: center;
-
-            &.checked i {
-                color: var(--action);
-            }
-        }
-
-        .selection-count {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--text-main);
-        }
-    }
-
-    .toolbar-actions {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-
-        .bulk-confirm {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-
-            .confirm-label {
-                font-weight: 500;
-                font-size: 0.82rem;
-                color: var(--text-alt);
-            }
-
-            .confirm-yes {
-                background: rgba(239, 68, 68, 0.1);
-                color: #ef4444;
-
-                &:hover:not(:disabled) {
-                    background: #ef4444;
-                    color: white;
-                }
-            }
-        }
     }
 }
 
-/* Loading & Empty States */
-.loading-state,
-.empty-state {
-    padding: 60px 20px;
-    text-align: center;
-    background: transparent;
-    border-radius: 16px;
+@media (max-width: 768px) {
+    .sc-header { padding: 10px 16px; }
+    .sc-body { padding: 16px; gap: 24px; }
+    
+    .workspace-table, 
+    .suggestions-grid { grid-template-columns: 1fr; }
 
-    i {
-        font-size: 3rem;
-        color: var(--text-muted);
-        margin-bottom: 16px;
-        display: block;
+    .workspace-table:not(.view-card) {
+        .table-header { display: none; }
+        
+        // When in list view on mobile, workspace-row (Grid) should adapt
+        // We handle this in workspace-card.scss as well.
     }
 
-    span,
-    p {
-        color: var(--text-muted);
-        margin: 0;
-        font-size: 1.1rem;
-    }
-
-    &.loading-state {
-        background: transparent;
-
-        i {
-            font-size: 2rem;
-            color: var(--primary);
-        }
-    }
+    .d-none-mobile { display: none !important; }
 }
 
-/* ── Responsive: Folder Card Layout ── */
-@media (max-width: 770px) {
-    .dashboard-container {
-        padding: 24px;
-        gap: 20px;
-    }
-
-    .workspace-track-section {
-        gap: 16px;
-    }
-
-    .track-actions {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: 12px;
-
-        .track-title {
-            font-size: 1.1rem !important;
-            padding-left: 0;
-        }
-
-        .track-controls {
-            width: 100%;
-            justify-content: flex-end;
-
-            .controls-pill {
-
-                .pill-divider,
-                .pill-view {
-                    display: none !important;
-                }
-            }
-        }
-    }
-
-    .workspace-suggestions-section .track-title {
-        font-size: 1.1rem;
-        padding-left: 0;
-    }
-
-    /* Transform table into robust card grid */
-    .workspace-table {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 16px;
-        min-height: auto;
-
-        .table-header {
-            display: none;
-        }
-    }
-
-    /* Drag handles visible on mobile per user request */
-    .drag-handle {
-        display: flex;
-    }
-
-    /* Selection toolbar stacks on mobile */
-    .selection-toolbar {
-        border-radius: 16px;
-        flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
-        padding: 12px 16px;
-        margin-bottom: 12px;
-
-        .toolbar-left {
-            width: 100%;
-            justify-content: space-between;
-            gap: 12px;
-
-            .workspace-checkbox {
-                font-size: 20px;
-            }
-        }
-
-        .toolbar-actions {
-            width: 100%;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            gap: 8px;
-
-            .bulk-confirm {
-                width: 100%;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                gap: 8px;
-
-                .confirm-label {
-                    font-size: 0.82rem;
-                    width: 100%;
-                }
-            }
-        }
-    }
-
-    /* Loading & empty states */
-    .loading-state,
-    .empty-state {
-        padding: 48px 16px;
-        border-radius: 14px;
-        grid-column: 1 / -1;
-
-        i {
-            font-size: 2.5rem;
-        }
-
-        span,
-        p {
-            font-size: 1rem;
-        }
-    }
-
-    .action-btn {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-    }
-}
-
-/* Single column on very small screens to avoid narrow cards */
-@media (max-width: 500px) {
-
-    .workspace-table,
-    .suggestions-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .selection-toolbar .toolbar-actions {
-        justify-content: center;
-
-        .action-btn {
-            flex: 1;
-            justify-content: center;
-        }
-    }
-}
+// Utility classes
+.d-none { display: none !important; }
+@media (min-width: 768px) { .d-md-none { display: none !important; } .d-md-flex { display: flex !important; } }
+@media (max-width: 767px) { .d-none-mobile { display: none !important; } }
