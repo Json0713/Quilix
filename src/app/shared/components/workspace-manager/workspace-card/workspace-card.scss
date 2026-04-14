@@ -1,6 +1,7 @@
 :host {
     display: block;
     width: 100%;
+    min-width: 0; // Essential for host to shrink in Grid/Flex
 }
 
 .workspace-row {
@@ -306,7 +307,10 @@
 
     .col-name {
         width: 100%;
+        min-width: 0; // Allow flex child to shrink
         gap: 12px;
+        display: flex;
+        align-items: center;
 
         .icon-wrapper {
             width: 44px;
@@ -322,6 +326,10 @@
         .workspace-title {
             font-size: 1rem;
             font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
         }
 
         .workspace-checkbox {
