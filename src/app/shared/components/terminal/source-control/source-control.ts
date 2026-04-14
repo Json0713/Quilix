@@ -87,6 +87,11 @@ export class SourceControl implements OnInit {
     // Raw Activities from Service (accessible to template)
     protected allActivities = toSignal(from(this.activityService.activities$), { initialValue: [] });
 
+    // Activities specifically for the Graph (Exclude Sync to avoid bloat)
+    protected graphActivities = computed(() => {
+        return this.allActivities().filter(l => l.category !== 'system');
+    });
+
     // Timeline Activities (Exclude Sync, apply filter)
     projectActivities = computed(() => {
         const logs = this.allActivities().filter(l => l.category !== 'system');

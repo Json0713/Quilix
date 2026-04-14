@@ -32,19 +32,23 @@ export class ActivityGraph {
 
     // Generate buckets for the current 7-day window
     buckets = computed(() => {
-        const end = this.currentWindowEnd();
+        const endDay = this.currentWindowEnd();
         const activityList = this._activities();
         const results: DayBucket[] = [];
         const today = this.getStartOfToday();
 
+        // One-pass filter for the entire 7-day window to improve performance
+        const windowStart = endDay - (6 * 86400000);
+        const windowEnd = endDay + 86400000;
+        const relevantActivities = activityList.filter(a => a.timestamp >= windowStart && a.timestamp < windowEnd);
+
         // Generate 7 days ending at currentWindowEnd
         for (let i = 6; i >= 0; i--) {
-            const date = new Date(end);
-            date.setDate(date.getDate() - i);
-            const startTime = date.getTime();
+            const startTime = endDay - (i * 86400000);
             const endTime = startTime + 86400000;
+            const date = new Date(startTime);
 
-            const dayActivities = activityList.filter(a => a.timestamp >= startTime && a.timestamp < endTime);
+            const dayActivities = relevantActivities.filter(a => a.timestamp >= startTime && a.timestamp < endTime);
             
             const types: { [key: string]: number } = {};
             dayActivities.forEach(a => {

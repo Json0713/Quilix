@@ -31,7 +31,7 @@
         } @else {
             <!-- Activity Overview Graph -->
             <app-activity-graph 
-                [activities]="allActivities()" 
+                [activities]="graphActivities()" 
                 (onRangeSelected)="onRangeSelected($event)">
             </app-activity-graph>
 
