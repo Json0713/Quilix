@@ -19,7 +19,7 @@
     border: 1px solid transparent;
 
     &:hover {
-        background-color: var(--bg-hover);
+        background-color: var(--surface-main);
     }
 
     &.menu-open {
@@ -160,7 +160,7 @@
 
             &:hover,
             &.active {
-                background: var(--bg-hover);
+                background: var(--surface-main);
                 color: var(--text-main);
             }
         }
@@ -300,8 +300,7 @@
     height: 100%;
 
     &:hover {
-        border-color: var(--bs-primary);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        background: rgba(var(--surface-main-rgb), 0.7);
     }
 
     .col-name {

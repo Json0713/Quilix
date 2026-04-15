@@ -57,17 +57,17 @@
         gap: 2px;
         background: rgba(255, 255, 255, 0.03);
         padding: 4px;
-        border-radius: 10px;
+        border-radius: 50px;
         border: 1px solid var(--bs-gray-800);
 
         .pill-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
+            width: 25px;
+            height: 25px;
             border: none;
-            border-radius: 6px;
+            border-radius: 50px;
             background: transparent;
             color: var(--text-muted);
             cursor: pointer;
@@ -168,7 +168,6 @@
 
         &:hover:not(:disabled) {
             background: var(--bg-hover);
-            i { color: var(--text-main); }
         }
 
         &.primary {
