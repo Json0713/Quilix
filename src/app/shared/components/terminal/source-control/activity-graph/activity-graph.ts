@@ -178,7 +178,7 @@ export class ActivityGraph {
                 return '#10b981'; // Green
             case 'delete':
             case 'trash':
-                return '#ef4444'; // Red
+                return '#ef4444';
             case 'rename':
             case 'move':
                 return '#3b82f6';
