@@ -111,6 +111,28 @@ export class WorkspaceManagerComponent implements OnInit {
         this.activeInsightView.set(this.activeInsightView() === 'graph' ? 'metrics' : 'graph');
     }
 
+    // ── Touch Gestures for Carousel ──
+    private touchStartX = 0;
+
+    onTouchStart(event: TouchEvent) {
+        this.touchStartX = event.changedTouches[0].screenX;
+    }
+
+    onTouchEnd(event: TouchEvent) {
+        const touchEndX = event.changedTouches[0].screenX;
+        const deltaX = touchEndX - this.touchStartX;
+
+        if (Math.abs(deltaX) > 50) { // 50px threshold to prevent accidental swipes
+            if (deltaX > 0) {
+                // Swipe right -> Previous
+                this.activeInsightView.set('graph');
+            } else {
+                // Swipe left -> Next
+                this.activeInsightView.set('metrics');
+            }
+        }
+    }
+
     @HostListener('document:click')
     closeAllMenus() {
         this.openMenuId.set(null);

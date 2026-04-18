@@ -121,14 +121,7 @@
                     <span class="ws-section-title">Workspace Overview</span>
                 </div>
                 <div class="track-controls">
-                    <div class="controls-pill d-flex">
-                        <button class="pill-btn" (click)="toggleInsightView()" title="Previous View">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <button class="pill-btn" (click)="toggleInsightView()" title="Next View">
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </div>
+                    <div class="page-indicators-placeholder d-none"></div>
                     <a class="terminal-tab-ui text-primary" (click)="openSourceControlTerminal()"
                         title="Open Source Control in Terminal">
                         Terminal <i class="bi bi-box-arrow-up-right"></i>
@@ -136,7 +129,9 @@
                 </div>
             </div>
 
-            <div class="insight-carousel-content">
+            <div class="insight-carousel-content" 
+                 (touchstart)="onTouchStart($event)" 
+                 (touchend)="onTouchEnd($event)">
                 @if (activeInsightView() === 'graph') {
                 <div style="animation: fadeIn 0.4s ease;">
                     <app-activity-graph [activities]="graphActivities()" (onRangeSelected)="onRangeSelected($event)">
@@ -150,6 +145,14 @@
                     </app-workspace-metrics>
                 </div>
                 }
+            </div>
+
+            <!-- Bottom Right Page Indicators -->
+            <div style="display: flex; justify-content: flex-end; padding-top: 8px;">
+                <div class="page-indicators">
+                    <div class="indicator-line" [class.active]="activeInsightView() === 'graph'" (click)="activeInsightView.set('graph')"></div>
+                    <div class="indicator-line" [class.active]="activeInsightView() === 'metrics'" (click)="activeInsightView.set('metrics')"></div>
+                </div>
             </div>
         </div>
 

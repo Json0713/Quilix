@@ -132,6 +132,31 @@
     }
 }
 
+.page-indicators {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 12px; // Adjusted height since it's no longer forced into the header
+
+    .indicator-line {
+        width: 24px;
+        height: 4px;
+        background: rgba(var(--text-muted-rgb, 255, 255, 255), 0.2);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+        &:hover {
+            background: rgba(var(--text-muted-rgb, 255, 255, 255), 0.5);
+        }
+
+        &.active {
+            background: var(--bs-primary);
+            width: 32px;
+        }
+    }
+}
+
 .header-menu-container {
     position: relative;
 }
@@ -420,16 +445,6 @@
         margin: 0;
         max-width: 300px;
         line-height: 1.5;
-    }
-
-    &:hover {
-        background: rgba(255, 255, 255, 0.03);
-        border-color: rgba(var(--bs-primary-rgb), 0.2);
-
-        i {
-            color: var(--bs-primary);
-            opacity: 0.8;
-        }
     }
 }
 
