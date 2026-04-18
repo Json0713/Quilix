@@ -103,6 +103,13 @@ export class WorkspaceManagerComponent implements OnInit {
     // ── View state ──
     viewMode = signal<'list' | 'card'>('list');
 
+    // ── Insight/Metrics Carousel State ──
+    activeInsightView = signal<'graph' | 'metrics'>('graph');
+
+    toggleInsightView() {
+        this.activeInsightView.set(this.activeInsightView() === 'graph' ? 'metrics' : 'graph');
+    }
+
     @HostListener('document:click')
     closeAllMenus() {
         this.openMenuId.set(null);

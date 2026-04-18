@@ -101,29 +101,48 @@
     }
 
     <div class="sc-body">
-        <!-- Activity Insight Graph -->
-        <div class="sc-section">
-            <div class="sc-section-header">
-                <span class="sc-section-title">ACTIVITY TRENDS</span>
+        <!-- Activity Insights Carousel -->
+        <div class="sc-section" [class.d-none]="selectionMode() && activeInsightView() === 'metrics'">
+            <div class="sc-section-header" style="justify-content: space-between; padding-right: 4px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="sc-section-title">{{ activeInsightView() === 'graph' ? 'ACTIVITY TRENDS' : 'WORKSPACE ANALYTICS' }}</span>
+                </div>
+                <div class="track-controls">
+                    <div class="controls-pill d-flex">
+                        <button class="pill-btn" 
+                            (click)="toggleInsightView()" 
+                            title="Previous View">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="pill-btn" 
+                            (click)="toggleInsightView()" 
+                            title="Next View">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <app-activity-graph 
-                [activities]="graphActivities()" 
-                (onRangeSelected)="onRangeSelected($event)">
-            </app-activity-graph>
-        </div>
 
-        <!-- Metrics Section -->
-        <div class="sc-section" [class.d-none]="selectionMode()">
-            <div class="sc-section-header">
-                <span class="sc-section-title">WORKSPACE ANALYTICS</span>
+            <div class="insight-carousel-content">
+                @if (activeInsightView() === 'graph') {
+                    <div style="animation: fadeIn 0.4s ease;">
+                        <app-activity-graph 
+                            [activities]="graphActivities()" 
+                            (onRangeSelected)="onRangeSelected($event)">
+                        </app-activity-graph>
+                    </div>
+                } @else {
+                    <div style="animation: fadeIn 0.4s ease;">
+                        <app-workspace-metrics 
+                            [totalWorkspaces]="totalWorkspaces" 
+                            [syncedFolders]="syncedFolders"
+                            [missingFolders]="missingFolders" 
+                            [totalSpaces]="totalSpaces()" 
+                            [isFileSystemMode]="isFileSystemMode()">
+                        </app-workspace-metrics>
+                    </div>
+                }
             </div>
-            <app-workspace-metrics 
-                [totalWorkspaces]="totalWorkspaces" 
-                [syncedFolders]="syncedFolders"
-                [missingFolders]="missingFolders" 
-                [totalSpaces]="totalSpaces()" 
-                [isFileSystemMode]="isFileSystemMode()">
-            </app-workspace-metrics>
         </div>
 
         <!-- Recent Suggestions Section -->
