@@ -1,11 +1,11 @@
-<div class="dashboard-container">
+<div class="workspace-container">
     <!-- Clean Native Header -->
-    <div class="sc-header">
-        <div class="sc-header-left">
+    <div class="ws-header">
+        <div class="ws-header-left">
             <app-breadcrumb></app-breadcrumb>
         </div>
 
-        <div class="sc-header-right">
+        <div class="ws-header-right">
             <div class="track-controls">
                 <!-- Desktop View Switcher -->
                 <div class="controls-pill d-none d-md-flex">
@@ -111,12 +111,14 @@
     </div>
     }
 
-    <div class="sc-body">
-        <!-- Activity Insights Carousel -->
-        <div class="sc-section" [class.d-none]="selectionMode() && activeInsightView() === 'metrics'">
-            <div class="sc-section-header" style="justify-content: space-between; padding-right: 4px;">
+    <!-- Scrollable Content Area -->
+    <div class="workspace-content">
+        <div class="ws-body">
+            <!-- Activity Insights Carousel -->
+        <div class="ws-section" [class.d-none]="selectionMode() && activeInsightView() === 'metrics'">
+            <div class="ws-section-header" style="justify-content: space-between; padding-right: 4px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <span class="sc-section-title">{{ activeInsightView() === 'graph' ? 'ACTIVITY TRENDS' : 'WORKSPACE
+                    <span class="ws-section-title">{{ activeInsightView() === 'graph' ? 'ACTIVITY TRENDS' : 'WORKSPACE
                         ANALYTICS' }}</span>
                 </div>
                 <div class="track-controls">
@@ -153,10 +155,10 @@
         </div>
 
         <!-- Workspace Track Section -->
-        <div class="sc-section">
-            <div class="sc-section-header">
-                <span class="sc-section-title">WORKSPACES TRACK</span>
-                <span class="sc-count">{{ otherWorkspaces().length }}</span>
+        <div class="ws-section">
+            <div class="ws-section-header">
+                <span class="ws-section-title">WORKSPACES TRACK</span>
+                <span class="ws-count">{{ otherWorkspaces().length }}</span>
             </div>
 
             @if (isLoading()) {
@@ -199,6 +201,7 @@
                 }
             </div>
             }
+        </div>
         </div>
     </div>
 </div>
