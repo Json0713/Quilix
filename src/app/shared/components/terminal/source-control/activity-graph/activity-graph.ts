@@ -175,7 +175,7 @@ export class ActivityGraph {
         switch (dominant) {
             case 'create':
             case 'restore':
-                return '#10b981'; // Green
+                return '#10b981';
             case 'delete':
             case 'trash':
                 return '#ef4444';
