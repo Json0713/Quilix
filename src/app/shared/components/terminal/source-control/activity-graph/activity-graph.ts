@@ -181,7 +181,7 @@ export class ActivityGraph {
                 return '#ef4444'; // Red
             case 'rename':
             case 'move':
-                return '#3b82f6'; // Blue
+                return '#3b82f6';
             default:
                 return 'var(--bs-primary)';
         }
