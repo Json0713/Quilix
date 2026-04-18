@@ -152,27 +152,6 @@
             </div>
         </div>
 
-        <!-- Recent Suggestions Section -->
-        @if (suggestionWorkspaces().length > 0 && !selectionMode()) {
-        <div class="sc-section">
-            <div class="sc-section-header">
-                <span class="sc-section-title">PINNED & RECENT</span>
-                <span class="sc-count">{{ suggestionWorkspaces().length }}</span>
-            </div>
-            <div class="suggestions-grid">
-                @for (ws of suggestionWorkspaces(); track ws.id) {
-                <app-workspace-card [workspace]="ws" [isCurrentWorkspace]="ws.id === currentWorkspaceId()"
-                    [isFileSystemMode]="isFileSystemMode()" [isMenuOpen]="openMenuId() === 'suggestion-' + ws.id"
-                    [viewMode]="'card'" (restoreWorkspace)="restoreWorkspace($event)"
-                    (trashWorkspace)="trashWorkspace($event)" (switchWorkspace)="switchToWorkspace($event)"
-                    (renameWorkspace)="renameWorkspace($event)"
-                    (toggleMenu)="toggleMenu('suggestion-' + ws.id, $event)">
-                </app-workspace-card>
-                }
-            </div>
-        </div>
-        }
-
         <!-- Workspace Track Section -->
         <div class="sc-section">
             <div class="sc-section-header">
@@ -206,7 +185,7 @@
                 </div>
 
                 @for (ws of otherWorkspaces(); track ws.id) {
-                <app-workspace-card cdkDrag [workspace]="ws" [isCurrentWorkspace]="false"
+                <app-workspace-card cdkDrag [workspace]="ws"
                     [isFileSystemMode]="isFileSystemMode()" [isSelectionMode]="selectionMode()"
                     [isSelected]="isSelected(ws.id)" [isMenuOpen]="openMenuId() === 'track-' + ws.id"
                     [viewMode]="viewMode()" (restoreWorkspace)="restoreWorkspace($event)"

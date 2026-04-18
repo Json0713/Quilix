@@ -4,11 +4,11 @@
 
     <!-- Col: Name / Identifier -->
     <div class="col-name">
-        @if (isSelectionMode && !isCurrentWorkspace) {
+        @if (isSelectionMode) {
         <div class="workspace-checkbox" (click)="$event.stopPropagation(); toggleSelect.emit(workspace.id)" [class.checked]="isSelected">
             <i class="bi" [class.bi-check-square-fill]="isSelected" [class.bi-square]="!isSelected"></i>
         </div>
-        } @else if (!isSelectionMode && !isCurrentWorkspace) {
+        } @else if (!isSelectionMode) {
         <ng-content select="[dragHandle]"></ng-content>
         }
 
@@ -74,7 +74,7 @@
 
             @if (isMenuOpen) {
             <div class="workspace-dropdown" [class.dropdown-up]="isDropdownUp">
-                @if (!isCurrentWorkspace && !workspace.isMissingOnDisk) {
+                @if (!workspace.isMissingOnDisk) {
                 <button class="dropdown-item switch-item" (click)="switchWorkspace.emit(workspace)">
                     <i class="bi bi-box-arrow-in-right"></i>
                     <span>Switch Workspace</span>
@@ -98,7 +98,6 @@
                 </button>
                 }
 
-                @if (!isCurrentWorkspace) {
                 <button class="dropdown-item trash-item" (click)="trashWorkspace.emit(workspace)"
                     [disabled]="workspace.isTrashing">
                     @if (workspace.isTrashing) {
@@ -108,7 +107,6 @@
                     }
                     <span>Move to Trash</span>
                 </button>
-                }
             </div>
             }
         </div>

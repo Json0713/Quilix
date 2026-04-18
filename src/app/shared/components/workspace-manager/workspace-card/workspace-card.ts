@@ -12,7 +12,6 @@ import { ManagedWorkspace } from '../workspace-manager';
 })
 export class WorkspaceCardComponent implements OnChanges {
     @Input({ required: true }) workspace!: ManagedWorkspace;
-    @Input() isCurrentWorkspace = false;
     @Input() isFileSystemMode = false;
     @Input() isSelectionMode = false;
     @Input() isSelected = false;

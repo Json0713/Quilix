@@ -462,16 +462,6 @@
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-// ── Suggestions Grid ──
-
-.suggestions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 16px;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden; // Precautionary container containment
-}
 
 // ── Carousel Container ──
 .insight-carousel-content {
@@ -538,8 +528,7 @@
         gap: 24px;
     }
 
-    .workspace-table,
-    .suggestions-grid {
+    .workspace-table {
         grid-template-columns: 1fr;
     }
 
