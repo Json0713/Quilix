@@ -51,6 +51,20 @@
     align-items: center;
     gap: 12px;
 
+    .terminal-tab-ui {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-family: var(--bs-font-sans-serif);
+        letter-spacing: 0.5px;
+        color: var(--bs-gray-500);
+        cursor: pointer;
+        transition: color 0.15s ease;
+
+        &:hover {
+            color: var(--text-main);
+        }
+    }
+
     .controls-pill {
         display: flex;
         align-items: center;

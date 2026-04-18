@@ -17,6 +17,7 @@ import { SnackbarService } from '../../../services/ui/common/snackbar/snackbar.s
 import { ModalService } from '../../../services/ui/common/modal/modal';
 import { ActivityService } from '../../../core/services/ui/activity.service';
 import { ActivityGraph } from '../terminal/source-control/activity-graph/activity-graph';
+import { TerminalService } from '../../../core/services/ui/terminal.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { from } from 'rxjs';
 
@@ -46,6 +47,13 @@ export class WorkspaceManagerComponent implements OnInit {
     private modalService = inject(ModalService);
     private fileSync = inject(FileSyncService);
     private activityService = inject(ActivityService);
+    private terminalService = inject(TerminalService);
+
+    openSourceControlTerminal() {
+        this.terminalService.activeTab.set('source-control');
+        this.terminalService.isMaximized.set(true);
+        this.terminalService.isOpen.set(true);
+    }
 
     // ── Activity Graph Integration ──
     protected allActivities = toSignal(from(this.activityService.activities$), { initialValue: [] });
