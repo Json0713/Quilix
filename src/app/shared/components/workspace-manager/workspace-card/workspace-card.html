@@ -33,34 +33,10 @@
             }
         </div>
 
-        <!-- Col: Last Active / Date -->
-        <div class="col-date" data-label="Last Active" [title]="workspace.lastActiveAt | date:'medium'">
-            {{ workspace.lastActiveAt | date:'MMM d, y' }}
-        </div>
-
         <!-- Col: Package / File Size -->
-        <div class="col-size" data-label="Package Size"
+        <div class="col-size" data-label="Size"
             [title]="workspace.sizeBytes !== undefined ? workspace.sizeBytes + ' bytes' : 'Calculating...'">
             <span class="size">{{ formatBytes(workspace.sizeBytes) }}</span>
-        </div>
-
-        <!-- Col: Vitals / Status -->
-        <div class="col-status" data-label="Vitals">
-            @if (isFileSystemMode) {
-                @if (workspace.isMissingOnDisk) {
-                <span class="workspace-badge badge-error">
-                    <i class="bi bi-exclamation-triangle-fill"></i> Missing
-                </span>
-                } @else {
-                <span class="workspace-badge badge-success">
-                    <i class="bi bi-check-circle-fill"></i> Synced
-                </span>
-                }
-            } @else {
-                <span class="workspace-badge badge-info">
-                    <i class="bi bi-database-fill"></i> IndexedDB
-                </span>
-            }
         </div>
     </div>
 

@@ -180,12 +180,10 @@
 
                 <!-- Table Header: Hidden on Mobile List View via CSS -->
                 <div class="table-header">
-                    <div class="col-name">Identifier</div>
-                    <div class="col-type">Environment</div>
-                    <div class="col-date">Last Active</div>
-                    <div class="col-size">Package</div>
-                    <div class="col-status">Vitals</div>
-                    <div class="col-actions"></div>
+                    <div class="col-name">Name</div>
+                    <div class="col-type">Type</div>
+                    <div class="col-size">Size</div>
+                    <div class="col-actions">Action</div>
                 </div>
 
                 @for (ws of otherWorkspaces(); track ws.id) {

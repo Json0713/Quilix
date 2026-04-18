@@ -12,11 +12,17 @@
     flex-direction: column;
     gap: 16px;
     backdrop-filter: blur(8px);
-    transition: all 0.3s ease;
+    animation: initialLoad 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-    &:hover {
-        background: rgba(var(--surface-main-rgb), 0.6);
-        border-color: rgba(var(--bs-primary-rgb), 0.3);
+@keyframes initialLoad {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -31,8 +37,8 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: 0.72rem;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
         color: var(--text-muted);
@@ -69,6 +75,8 @@
 
 .health-bar-container {
     width: 100%;
+    animation: revealBar 1s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: left;
     
     .health-bar {
         width: 100%;
@@ -81,15 +89,18 @@
         .bar-synced {
             height: 100%;
             background: #10b981;
-            transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .bar-missing {
             height: 100%;
             background: var(--bs-danger);
-            transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
         }
     }
+}
+
+@keyframes revealBar {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
 }
 
 .metrics-row {
@@ -108,17 +119,22 @@
         display: flex;
         flex-direction: column;
         gap: 2px;
+        flex-shrink: 1;
+        min-width: 0;
 
         .label {
-            font-size: 0.65rem;
+            font-size: clamp(0.55rem, 1.5vw, 0.65rem);
             font-weight: 600;
             text-transform: uppercase;
             color: var(--text-muted);
             letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .value {
-            font-size: 1.4rem;
+            font-size: clamp(1rem, 3vw, 1.4rem);
             font-weight: 700;
             color: var(--text-main);
             letter-spacing: -0.5px;
@@ -130,13 +146,11 @@
 }
 
 @media (max-width: 768px) {
+    .analytics-panel {
+        padding: 16px;
+    }
+
     .metrics-row {
-        flex-wrap: wrap; // Allows wrapping only if absolutely necessary
-        
-        // Instead of 4 massive cards vertically, it wraps elegantly into a 2x2 inline grid
-        .metric-item {
-            flex: 1 1 40%;
-            margin-bottom: 8px;
-        }
+        gap: 8px;
     }
 }
