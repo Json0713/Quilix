@@ -6,5 +6,6 @@ import { WorkspaceManagerComponent } from '../../../../shared/components/workspa
     standalone: true,
     imports: [WorkspaceManagerComponent],
     template: `<app-workspace-manager />`,
+    styles: [`:host { display: contents; }`]
 })
 export class PersonalWorkspaces { }
