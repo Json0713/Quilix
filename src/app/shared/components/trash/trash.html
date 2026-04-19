@@ -1,16 +1,36 @@
 <div class="trash-container">
     <ng-template appPageHeaderActions>
-        @if (!isLoading() && hasAnyTrashed()) {
-        <button class="select-toggle-btn" (click)="toggleSelectionMode()" [class.active]="selectionMode()">
-            @if (selectionMode()) {
-            <i class="bi bi-x-lg"></i>
-            <span>Cancel</span>
-            } @else {
-            <i class="bi bi-check2-square"></i>
-            <span>Select</span>
+        <div class="header-menu-container">
+            <button class="header-options-btn" [class.active]="headerMenuOpen()" (click)="toggleHeaderMenu($event)"
+                title="Trash Options">
+                <i class="bi bi-three-dots-vertical"></i>
+            </button>
+
+            @if (headerMenuOpen()) {
+            <div class="header-dropdown" (click)="$event.stopPropagation()">
+                <div class="dropdown-group">
+                    <button class="dropdown-item" (click)="toggleSelectionMode(); headerMenuOpen.set(false)"
+                        [disabled]="!hasAnyTrashed()">
+                        <i class="bi" [class.bi-check2-square]="!selectionMode()" [class.bi-x-lg]="selectionMode()"></i>
+                        <span>{{ selectionMode() ? 'Cancel Selection' : 'Select Items' }}</span>
+                    </button>
+
+                    @if (selectionMode() && selectedCount() > 0) {
+                    <div class="dropdown-divider"></div>
+                    <span class="group-label">Selection: {{ selectedCount() }}</span>
+                    <button class="dropdown-item success" (click)="bulkRestore(); headerMenuOpen.set(false)">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        <span>Restore Selected</span>
+                    </button>
+                    <button class="dropdown-item danger" (click)="requestBulkDelete(); headerMenuOpen.set(false)">
+                        <i class="bi bi-trash3"></i>
+                        <span>Delete Permanently</span>
+                    </button>
+                    }
+                </div>
+            </div>
             }
-        </button>
-        }
+        </div>
     </ng-template>
 
     <!-- Storage Health Banner -->

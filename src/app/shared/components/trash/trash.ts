@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { Workspace } from '../../../core/interfaces/workspace';
 import { Space } from '../../../core/interfaces/space';
@@ -54,9 +54,21 @@ export class TrashComponent implements OnInit, OnDestroy {
     });
     hasAnyTrashed = computed(() => this.trashedWorkspaces().length > 0 || this.trashedSpaces().length > 0);
 
+    headerMenuOpen = signal<boolean>(false);
+
     private wsSub: any;
     private spaceSub: any;
     private activeWorkspaceName: string | null = null;
+
+    @HostListener('document:click')
+    closeAllMenus() {
+        this.headerMenuOpen.set(false);
+    }
+
+    toggleHeaderMenu(event: Event) {
+        event.stopPropagation();
+        this.headerMenuOpen.update(v => !v);
+    }
 
     async ngOnInit() {
         this.breadcrumbService.setTitle('Trash');

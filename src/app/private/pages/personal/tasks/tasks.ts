@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { from, Subscription } from 'rxjs';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
@@ -22,6 +22,18 @@ export class PersonalTasks implements OnInit, OnDestroy {
 
   private sub: Subscription | null = null;
   readonly tasks = signal<Task[]>([]);
+
+  headerMenuOpen = signal<boolean>(false);
+
+  @HostListener('document:click')
+  closeAllMenus() {
+    this.headerMenuOpen.set(false);
+  }
+
+  toggleHeaderMenu(event: Event) {
+    event.stopPropagation();
+    this.headerMenuOpen.update(v => !v);
+  }
 
   get totalTasks() { return this.tasks().length; }
   get inProgressTasks() { return this.tasks().filter(t => t.status === 'progress').length; }

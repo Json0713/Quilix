@@ -34,9 +34,9 @@
     gap: 16px;
 
     app-breadcrumb {
-        ::ng-deep .breadcrumb-container {
-            padding: 0;
-            margin: 0;
+        .breadcrumb-container {
+            padding: 0 !important;
+            margin: 0 !important;
             background: transparent;
             border: none;
             
@@ -75,9 +75,147 @@
 
     .header-left {
         app-breadcrumb {
-            ::ng-deep .breadcrumb-title {
+            .breadcrumb-title {
                 font-size: 1rem;
             }
         }
+    }
+}
+
+// ── Action Menu & Dropdown Styles ──
+// These are global-in-effect due to ViewEncapsulation.None on PageHeaderComponent
+
+.header-menu-container {
+    position: relative;
+    display: flex;
+}
+
+.header-options-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+
+    i {
+        font-size: 1.25rem;
+    }
+
+    &:hover,
+    &.active {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-main);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.header-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 10px;
+    z-index: 1000;
+    min-width: 240px;
+    background: var(--surface-main);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    animation: menuSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top right;
+
+    .dropdown-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .group-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 10px 14px 6px;
+        letter-spacing: 0.8px;
+        opacity: 0.7;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 10px 14px;
+        border: none;
+        border-radius: 10px;
+        background: transparent;
+        color: var(--text-main);
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: left;
+
+        i {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            width: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        &:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-main);
+            
+            i {
+                color: var(--text-main);
+                transform: scale(1.1);
+            }
+        }
+
+        &.primary {
+            color: var(--accent);
+            i { color: var(--accent); }
+            &:hover { background: rgba(var(--accent-rgb, 79, 163, 168), 0.1); }
+        }
+
+        &.danger {
+            color: var(--danger);
+            i { color: var(--danger); }
+            &:hover { background: rgba(var(--danger-rgb, 217, 83, 79), 0.1); }
+        }
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 6px 10px;
+        opacity: 0.3;
+    }
+}
+
+@keyframes menuSlideIn {
+    from {
+        transform: translateY(-8px) scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
     }
 }
