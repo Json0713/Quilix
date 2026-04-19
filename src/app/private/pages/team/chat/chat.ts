@@ -1,6 +1,7 @@
 import {
     Component, OnInit, inject, signal, ViewChild,
-    ElementRef, AfterViewChecked, HostListener, effect
+    ElementRef, AfterViewChecked, HostListener, effect,
+    untracked, ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,6 +20,7 @@ import { ChatMessage, ChatSession } from '../../../../core/database/dexie.models
 export class TeamChat implements OnInit, AfterViewChecked {
     private breadcrumb = inject(BreadcrumbService);
     protected chat = inject(ChatService);
+    private cdr = inject(ChangeDetectorRef);
 
     // ── UI state ──────────────────────────────────────────────────────────
     inputText = '';
@@ -52,6 +54,16 @@ export class TeamChat implements OnInit, AfterViewChecked {
             if (id) {
                 localStorage.setItem('quilix_team_active_session', id);
             }
+        });
+
+        // Auto-scroll whenever messages change or AI starts thinking
+        effect(() => {
+            this.chat.messages();
+            this.chat.isLoading();
+            untracked(() => {
+                this.shouldScrollToBottom = true;
+                this.cdr.detectChanges(); // Ensure the flag is picked up
+            });
         });
     }
 
@@ -110,7 +122,6 @@ export class TeamChat implements OnInit, AfterViewChecked {
             this.resizeTextarea();
         }
         await this.chat.send(text);
-        this.scrollToBottom('smooth');
     }
 
     onKeydown(event: KeyboardEvent) {

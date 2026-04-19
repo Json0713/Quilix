@@ -130,12 +130,13 @@
             <!-- Typing indicator -->
             @if (chat.isLoading()) {
                 <div class="message-row model">
-                    <div class="message-bubble typing">
+                    <div class="message-bubble typing-bubble">
                         <div class="typing-indicator">
                             <span class="dot"></span>
                             <span class="dot"></span>
                             <span class="dot"></span>
                         </div>
+                        <span class="typing-status">Thinking...</span>
                     </div>
                 </div>
             }
@@ -144,7 +145,11 @@
             @if (chat.error()) {
                 <div class="error-banner">
                     <i class="bi bi-exclamation-triangle"></i>
-                    <span>{{ chat.error() }}</span>
+                    <span class="error-message">{{ chat.error() }}</span>
+                    <button class="retry-btn" (click)="chat.retry()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Retry
+                    </button>
                 </div>
             }
         </div>

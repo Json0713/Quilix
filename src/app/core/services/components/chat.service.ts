@@ -20,6 +20,7 @@ export class ChatService {
     readonly messages = signal<ChatMessage[]>([]);
     readonly isLoading = signal<boolean>(false);
     readonly error = signal<string | null>(null);
+    private lastUserMessage: string | null = null;
 
     // ── API endpoint ──────────────────────────────────────────────────────────
     private get apiUrl(): string {
@@ -138,6 +139,7 @@ export class ChatService {
         this.error.set(null);
 
         // Persist user message
+        this.lastUserMessage = userText.trim();
         await this.addMessage(sessionId, 'user', userText.trim());
 
         // Auto-title: if this is the first user message, use it as the title
@@ -148,13 +150,19 @@ export class ChatService {
             await this.renameSession(sessionId, autoTitle);
         }
 
+        await this.callChatApi(sessionId);
+    }
+
+    /** Inner logic to send current history to API and handle response */
+    private async callChatApi(sessionId: string): Promise<void> {
+        this.error.set(null);
+        this.isLoading.set(true);
+
         // Build conversation history for the API
         const history = this.messages().map(m => ({
             role: m.role,
             content: m.content,
         }));
-
-        this.isLoading.set(true);
 
         try {
             const response = await fetch(this.apiUrl, {
@@ -192,5 +200,14 @@ export class ChatService {
         this.activeSessionId.set(null);
         this.messages.set([]);
         this.error.set(null);
+        this.lastUserMessage = null;
+    }
+
+    /** Re-send the last message if an error occurred. */
+    async retry(): Promise<void> {
+        const sessionId = this.activeSessionId();
+        if (sessionId && this.lastUserMessage) {
+            await this.callChatApi(sessionId);
+        }
     }
 }
