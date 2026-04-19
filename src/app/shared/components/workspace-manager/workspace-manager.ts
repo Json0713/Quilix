@@ -8,7 +8,6 @@ import { FileSystemService } from '../../../core/services/data/file-system.servi
 import { SpaceService } from '../../../core/services/components/space.service';
 import { SystemSyncService } from '../../../core/services/sync/system-sync.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { Breadcrumb } from '../../ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { FileSyncService } from '../../../core/services/sync/file-sync.service';
 import { WorkspaceCardComponent } from './workspace-card/workspace-card';
@@ -20,6 +19,7 @@ import { ActivityGraph } from '../terminal/source-control/activity-graph/activit
 import { TerminalService } from '../../../core/services/ui/terminal.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { from } from 'rxjs';
+import { PageHeaderActionsDirective } from '../page-header/page-header-actions.directive';
 
 export interface ManagedWorkspace extends Workspace {
     isMissingOnDisk?: boolean;
@@ -31,7 +31,7 @@ export interface ManagedWorkspace extends Workspace {
 @Component({
     selector: 'app-workspace-manager',
     standalone: true,
-    imports: [CommonModule, DragDropModule, Breadcrumb, WorkspaceCardComponent, WorkspaceMetrics, ActivityGraph],
+    imports: [CommonModule, DragDropModule, WorkspaceMetrics, ActivityGraph, WorkspaceCardComponent, PageHeaderActionsDirective],
     templateUrl: './workspace-manager.html',
     styleUrl: './workspace-manager.scss',
 })

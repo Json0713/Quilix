@@ -1,0 +1,12 @@
+<div class="page-header" [class.sticky]="headerService.isSticky()">
+    <div class="header-content">
+        <div class="header-left">
+            <app-breadcrumb></app-breadcrumb>
+        </div>
+
+        <div class="header-right">
+            <!-- Dynamic Actions projected via TemplateRef -->
+            <ng-container *ngTemplateOutlet="headerService.headerActions()"></ng-container>
+        </div>
+    </div>
+</div>

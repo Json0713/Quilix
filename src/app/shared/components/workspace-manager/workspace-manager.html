@@ -1,96 +1,91 @@
 <div class="workspace-container">
     <!-- Clean Native Header -->
-    <div class="ws-header">
-        <div class="ws-header-left">
-            <app-breadcrumb></app-breadcrumb>
-        </div>
+    <ng-template appPageHeaderActions>
+        <div class="track-controls">
+            <!-- Desktop View Switcher -->
+            <div class="controls-pill d-none d-md-flex">
+                <button class="pill-btn" [class.active]="viewMode() === 'list'" (click)="setViewMode('list')"
+                    title="List View">
+                    <i class="bi bi-list"></i>
+                </button>
+                <button class="pill-btn" [class.active]="viewMode() === 'card'" (click)="setViewMode('card')"
+                    title="Grid View">
+                    <i class="bi bi-grid-fill"></i>
+                </button>
+            </div>
 
-        <div class="ws-header-right">
-            <div class="track-controls">
-                <!-- Desktop View Switcher -->
-                <div class="controls-pill d-none d-md-flex">
-                    <button class="pill-btn" [class.active]="viewMode() === 'list'" (click)="setViewMode('list')"
-                        title="List View">
-                        <i class="bi bi-list"></i>
-                    </button>
-                    <button class="pill-btn" [class.active]="viewMode() === 'card'" (click)="setViewMode('card')"
-                        title="Grid View">
-                        <i class="bi bi-grid-fill"></i>
-                    </button>
-                </div>
+            <!-- Main Options Menu (3-dots) -->
+            <div class="header-menu-container">
+                <button class="header-options-btn" [class.active]="headerMenuOpen()"
+                    (click)="toggleHeaderMenu($event)" title="Options">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
 
-                <!-- Main Options Menu (3-dots) -->
-                <div class="header-menu-container">
-                    <button class="header-options-btn" [class.active]="headerMenuOpen()"
-                        (click)="toggleHeaderMenu($event)" title="Options">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
+                @if (headerMenuOpen()) {
+                <div class="header-dropdown" (click)="$event.stopPropagation()">
+                    <!-- Contextual Actions based on Selection Mode -->
+                    @if (selectionMode()) {
+                    <div class="dropdown-group">
+                        <span class="group-label">Selection: {{ selectedCount() }} items</span>
+                        <button class="dropdown-item" (click)="toggleSelectAll()">
+                            <i class="bi" [class.bi-check-square]="!isAllSelected()"
+                                [class.bi-dash-square]="isAllSelected()"></i>
+                            <span>{{ isAllSelected() ? 'Deselect All' : 'Select All' }}</span>
+                        </button>
 
-                    @if (headerMenuOpen()) {
-                    <div class="header-dropdown" (click)="$event.stopPropagation()">
-                        <!-- Contextual Actions based on Selection Mode -->
-                        @if (selectionMode()) {
-                        <div class="dropdown-group">
-                            <span class="group-label">Selection: {{ selectedCount() }} items</span>
-                            <button class="dropdown-item" (click)="toggleSelectAll()">
-                                <i class="bi" [class.bi-check-square]="!isAllSelected()"
-                                    [class.bi-dash-square]="isAllSelected()"></i>
-                                <span>{{ isAllSelected() ? 'Deselect All' : 'Select All' }}</span>
-                            </button>
-
-                            @if (selectedCount() > 0) {
-                            @if (isFileSystemMode() && hasSelectedMissing()) {
-                            <button class="dropdown-item success"
-                                (click)="bulkRestoreFolders(); headerMenuOpen.set(false)"
-                                [disabled]="isBulkProcessing()">
-                                <i class="bi bi-arrow-counterclockwise" [class.spin]="isBulkProcessing()"></i>
-                                <span>Restore Selected</span>
-                            </button>
-                            }
-                            <button class="dropdown-item danger" (click)="requestBulkTrash(); headerMenuOpen.set(false)"
-                                [disabled]="isBulkProcessing()">
-                                <i class="bi bi-trash3"></i>
-                                <span>Trash Selected</span>
-                            </button>
-                            }
-
-                            <div class="dropdown-divider"></div>
-                            <button class="dropdown-item" (click)="exitSelectionMode(); headerMenuOpen.set(false)">
-                                <i class="bi bi-x-lg"></i>
-                                <span>Cancel Selection</span>
-                            </button>
-                        </div>
-                        } @else {
-                        <div class="dropdown-group">
-                            <button class="dropdown-item primary"
-                                (click)="openCreateWorkspace(); headerMenuOpen.set(false)">
-                                <i class="bi bi-plus-lg"></i>
-                                <span>New Workspace</span>
-                            </button>
-                            <button class="dropdown-item" (click)="toggleSelectionMode(); headerMenuOpen.set(false)"
-                                [disabled]="otherWorkspaces().length === 0">
-                                <i class="bi bi-check2-square"></i>
-                                <span>Select Items</span>
-                            </button>
-                        </div>
-
-                        <div class="dropdown-divider d-md-none"></div>
-                        <!-- Mobile-only view switcher -->
-                        <div class="dropdown-group d-md-none">
-                            <button class="dropdown-item"
-                                (click)="setViewMode(viewMode() === 'list' ? 'card' : 'list'); headerMenuOpen.set(false)">
-                                <i class="bi" [class.bi-grid-fill]="viewMode() === 'list'"
-                                    [class.bi-list]="viewMode() === 'card'"></i>
-                                <span>Switch to {{ viewMode() === 'list' ? 'Grid' : 'List' }}</span>
-                            </button>
-                        </div>
+                        @if (selectedCount() > 0) {
+                        @if (isFileSystemMode() && hasSelectedMissing()) {
+                        <button class="dropdown-item success"
+                            (click)="bulkRestoreFolders(); headerMenuOpen.set(false)"
+                            [disabled]="isBulkProcessing()">
+                            <i class="bi bi-arrow-counterclockwise" [class.spin]="isBulkProcessing()"></i>
+                            <span>Restore Selected</span>
+                        </button>
                         }
+                        <button class="dropdown-item danger" (click)="requestBulkTrash(); headerMenuOpen.set(false)"
+                            [disabled]="isBulkProcessing()">
+                            <i class="bi bi-trash3"></i>
+                            <span>Trash Selected</span>
+                        </button>
+                        }
+
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" (click)="exitSelectionMode(); headerMenuOpen.set(false)">
+                            <i class="bi bi-x-lg"></i>
+                            <span>Cancel Selection</span>
+                        </button>
+                    </div>
+                    } @else {
+                    <div class="dropdown-group">
+                        <button class="dropdown-item primary"
+                            (click)="openCreateWorkspace(); headerMenuOpen.set(false)">
+                            <i class="bi bi-plus-lg"></i>
+                            <span>New Workspace</span>
+                        </button>
+                        <button class="dropdown-item" (click)="toggleSelectionMode(); headerMenuOpen.set(false)"
+                            [disabled]="otherWorkspaces().length === 0">
+                            <i class="bi bi-check2-square"></i>
+                            <span>Select Items</span>
+                        </button>
+                    </div>
+
+                    <div class="dropdown-divider d-md-none"></div>
+                    <!-- Mobile-only view switcher -->
+                    <div class="dropdown-group d-md-none">
+                        <button class="dropdown-item"
+                            (click)="setViewMode(viewMode() === 'list' ? 'card' : 'list'); headerMenuOpen.set(false)">
+                            <i class="bi" [class.bi-grid-fill]="viewMode() === 'list'"
+                                [class.bi-list]="viewMode() === 'card'"></i>
+                            <span>Switch to {{ viewMode() === 'list' ? 'Grid' : 'List' }}</span>
+                        </button>
                     </div>
                     }
                 </div>
+                }
             </div>
         </div>
-    </div>
+    </ng-template>
+
 
     <!-- Bulk Trash Confirmation Overlay -->
     @if (confirmingBulkTrash()) {

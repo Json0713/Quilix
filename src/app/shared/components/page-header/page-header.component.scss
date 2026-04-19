@@ -1,0 +1,83 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 54px;
+    padding: 0 24px;
+    background: var(--surface-main);
+    border-bottom: 1px solid var(--border);
+    z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &.sticky {
+        position: sticky;
+        top: 0;
+    }
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    app-breadcrumb {
+        ::ng-deep .breadcrumb-container {
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            border: none;
+            
+            .breadcrumb-title {
+                font-size: 1.15rem; // Slightly more compact for header
+                font-weight: 700;
+                letter-spacing: -0.02em;
+            }
+
+            .hairline {
+                display: none; // Remove hairline inside header for cleaner look
+            }
+        }
+    }
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    // Support for content slotted under [actions]
+    ::ng-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .page-header {
+        padding: 0 16px;
+        min-height: 56px;
+    }
+
+    .header-left {
+        app-breadcrumb {
+            ::ng-deep .breadcrumb-title {
+                font-size: 1rem;
+            }
+        }
+    }
+}
