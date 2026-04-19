@@ -36,6 +36,7 @@ export class TeamSidebarComponent implements OnInit, OnDestroy {
         { label: 'Home', icon: 'bi bi-house', route: './' },
         { label: 'Team Tasks', icon: 'bi bi-list-check', route: './tasks' },
         { label: 'Workspaces', icon: 'bi bi-archive', route: './workspaces' },
+        { label: 'Ask Quilix', icon: 'bi bi-chat-dots', route: './chat' },
     ];
 
     // ── Spaces state ──

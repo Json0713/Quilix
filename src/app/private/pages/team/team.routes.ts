@@ -30,6 +30,10 @@ export const TEAM_ROUTES: Routes = [
         loadComponent: () => import('./trash/trash').then(m => m.TeamTrash)
       },
       {
+        path: 'chat',
+        loadComponent: () => import('./chat/chat').then(m => m.TeamChat)
+      },
+      {
         path: 'spaces/:spaceId',
         loadComponent: () => import('./space/space').then(m => m.TeamSpace)
       }

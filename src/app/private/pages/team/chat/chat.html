@@ -1,0 +1,201 @@
+<div class="chat-layout" [class.history-collapsed]="!showHistory()" [class.canvas-open]="showCanvas()">
+
+    <!-- ═══════════════ LEFT ASIDE — Chat History ═══════════════ -->
+    <aside class="chat-history" [class.open]="showHistory()">
+        <div class="history-header">
+            <h3 class="history-title">Chats</h3>
+            <button class="icon-btn" (click)="newChat()" title="New Chat">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
+
+        <div class="history-list">
+            @if (chat.sessions().length === 0) {
+                <div class="history-empty">
+                    <i class="bi bi-chat-square-text"></i>
+                    <span>No conversations yet</span>
+                </div>
+            }
+
+            @for (session of chat.sessions(); track trackSession($index, session)) {
+                <div class="history-item"
+                     [class.active]="chat.activeSessionId() === session.id"
+                     [class.menu-open]="contextMenuSessionId() === session.id"
+                     (click)="selectSession(session)">
+
+                    @if (renamingSessionId() === session.id) {
+                        <input class="rename-input"
+                               [value]="renameValue()"
+                               (input)="renameValue.set($any($event.target).value)"
+                               (keydown)="onRenameKeydown($event)"
+                               (blur)="confirmRename()"
+                               (click)="$event.stopPropagation()" />
+                    } @else {
+                        <div class="item-content">
+                            <i class="bi bi-chat-dots item-icon"></i>
+                            <div class="item-text">
+                                <span class="item-title">{{ session.title }}</span>
+                                <span class="item-date">{{ formatDate(session.updatedAt) }}</span>
+                            </div>
+                        </div>
+
+                        <button class="item-menu-btn"
+                                (click)="toggleContextMenu(session.id, $event)"
+                                title="Options">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+
+                        @if (contextMenuSessionId() === session.id) {
+                            <div class="item-dropdown" (click)="$event.stopPropagation()">
+                                <button class="dropdown-item" (click)="startRename(session, $event)">
+                                    <i class="bi bi-pencil"></i>
+                                    <span>Rename</span>
+                                </button>
+                                <button class="dropdown-item danger" (click)="deleteSession(session.id, $event)">
+                                    <i class="bi bi-trash3"></i>
+                                    <span>Delete</span>
+                                </button>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+        </div>
+    </aside>
+
+    <!-- ═══════════════ MAIN — Chat Area ═══════════════ -->
+    <main class="chat-main">
+
+        <!-- Top toolbar -->
+        <div class="chat-toolbar">
+            <button class="icon-btn" (click)="toggleHistory()" title="Toggle chat history">
+                <i class="bi bi-layout-sidebar-inset"></i>
+            </button>
+            <div class="toolbar-title">
+                @if (chat.activeSessionId()) {
+                    <span>{{ chat.sessions() | slice:0:1 | json }}</span>
+                    @for (s of chat.sessions(); track s.id) {
+                        @if (s.id === chat.activeSessionId()) {
+                            <span class="active-title">{{ s.title }}</span>
+                        }
+                    }
+                } @else {
+                    <span class="active-title">Ask Quilix</span>
+                }
+            </div>
+            <button class="icon-btn" (click)="toggleCanvas()" title="Toggle canvas">
+                <i class="bi bi-layout-sidebar-reverse"></i>
+            </button>
+        </div>
+
+        <!-- Messages area -->
+        <div class="messages-area" #messagesContainer>
+
+            <!-- Empty state -->
+            @if (!chat.activeSessionId() && chat.messages().length === 0) {
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="bi bi-feather"></i>
+                    </div>
+                    <h2 class="empty-title">Ask Quilix</h2>
+                    <p class="empty-subtitle">Your AI-powered assistant for writing, coding, and brainstorming.</p>
+
+                    <div class="starters-grid">
+                        @for (starter of starters; track starter.text) {
+                            <button class="starter-card" (click)="useStarter(starter.text)">
+                                <i class="bi {{ starter.icon }}"></i>
+                                <span>{{ starter.text }}</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Messages -->
+            @for (message of chat.messages(); track trackMessage($index, message)) {
+                <div class="message-row" [class.user]="message.role === 'user'" [class.model]="message.role === 'model'">
+                    <div class="message-avatar">
+                        @if (message.role === 'user') {
+                            <i class="bi bi-person-fill"></i>
+                        } @else {
+                            <i class="bi bi-feather"></i>
+                        }
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-sender">{{ message.role === 'user' ? 'You' : 'Quilix' }}</div>
+                        <div class="message-content">{{ message.content }}</div>
+                        <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+                    </div>
+                </div>
+            }
+
+            <!-- Typing indicator -->
+            @if (chat.isLoading()) {
+                <div class="message-row model">
+                    <div class="message-avatar">
+                        <i class="bi bi-feather"></i>
+                    </div>
+                    <div class="message-bubble typing">
+                        <div class="typing-indicator">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Error display -->
+            @if (chat.error()) {
+                <div class="error-banner">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span>{{ chat.error() }}</span>
+                </div>
+            }
+        </div>
+
+        <!-- Input bar -->
+        <div class="input-bar">
+            <div class="input-wrapper">
+                <textarea #chatInput
+                          class="chat-input"
+                          placeholder="Message Quilix..."
+                          [(ngModel)]="inputText"
+                          (keydown)="onKeydown($event)"
+                          (input)="onInput()"
+                          rows="1"
+                          [disabled]="chat.isLoading()"></textarea>
+                <button class="send-btn"
+                        [disabled]="!inputText.trim() || chat.isLoading()"
+                        (click)="sendMessage()"
+                        title="Send message">
+                    <i class="bi bi-arrow-up"></i>
+                </button>
+            </div>
+            <p class="input-disclaimer">Quilix can make mistakes. Consider checking important information.</p>
+        </div>
+    </main>
+
+    <!-- ═══════════════ RIGHT ASIDE — Canvas ═══════════════ -->
+    @if (showCanvas()) {
+        <aside class="chat-canvas">
+            <div class="canvas-header">
+                <h3 class="canvas-title">Canvas</h3>
+                <button class="icon-btn" (click)="toggleCanvas()" title="Close canvas">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="canvas-body">
+                @if (canvasContent()) {
+                    <div class="canvas-content">{{ canvasContent() }}</div>
+                } @else {
+                    <div class="canvas-empty">
+                        <i class="bi bi-easel"></i>
+                        <span>Canvas content will appear here</span>
+                        <p>Tools and generated artifacts will be displayed in this panel.</p>
+                    </div>
+                }
+            </div>
+        </aside>
+    }
+</div>

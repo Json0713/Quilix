@@ -24,10 +24,10 @@ import { Space } from '../interfaces/space';
 import { Tab } from '../interfaces/tab';
 import { Session } from '../interfaces/session';
 import { Task } from '../interfaces/task';
-import { ContactMessage, Setting } from './dexie.models';
+import { ContactMessage, Setting, ChatSession, ChatMessage } from './dexie.models';
 
 // Re-export models so consumers can import from a single location if needed.
-export type { ContactMessage, Setting };
+export type { ContactMessage, Setting, ChatSession, ChatMessage };
 
 @Injectable({ providedIn: 'root' })
 export class DexieService extends Dexie {
@@ -45,6 +45,8 @@ export class DexieService extends Dexie {
     tasks!: Table<Task, string>;
     virtual_entries!: Table<any, string>;
     activities!: Table<any, string>;
+    chat_sessions!: Table<ChatSession, string>;
+    chat_messages!: Table<ChatMessage, string>;
 
     constructor() {
         super('QuilixDB');
@@ -113,6 +115,12 @@ export class DexieService extends Dexie {
         // v11 – Comprehensive activity logging.
         this.version(11).stores({
             activities: 'id, type, category, entityId, timestamp, [category+type], [category+timestamp]'
+        });
+
+        // v12 – AI Chat (local-only session + message storage).
+        this.version(12).stores({
+            chat_sessions: 'id, updatedAt',
+            chat_messages: 'id, sessionId, timestamp, [sessionId+timestamp]'
         });
 
         // Open the database connection eagerly to reduce first-operation latency.

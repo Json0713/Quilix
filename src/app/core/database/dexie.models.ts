@@ -20,3 +20,20 @@ export interface Setting {
     key: string;
     value: any;
 }
+
+/** Represents a single AI chat session stored locally in IndexedDB. */
+export interface ChatSession {
+    id: string;
+    title: string;
+    createdAt: number;
+    updatedAt: number;
+}
+
+/** Represents a single message within an AI chat session. */
+export interface ChatMessage {
+    id: string;
+    sessionId: string;
+    role: 'user' | 'model';
+    content: string;
+    timestamp: number;
+}

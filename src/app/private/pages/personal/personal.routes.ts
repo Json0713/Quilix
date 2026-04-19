@@ -30,6 +30,10 @@ export const PERSONAL_ROUTES: Routes = [
         loadComponent: () => import('./trash/trash').then(m => m.PersonalTrash)
       },
       {
+        path: 'chat',
+        loadComponent: () => import('./chat/chat').then(m => m.PersonalChat)
+      },
+      {
         path: 'spaces/:spaceId',
         loadComponent: () => import('./space/space').then(m => m.PersonalSpace)
       }

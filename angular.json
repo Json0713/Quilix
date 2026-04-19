@@ -82,7 +82,8 @@
               "buildTarget": "Quilix:build:production"
             },
             "development": {
-              "buildTarget": "Quilix:build:development"
+              "buildTarget": "Quilix:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
