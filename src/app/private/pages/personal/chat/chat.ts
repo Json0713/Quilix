@@ -22,7 +22,7 @@ export class PersonalChat implements OnInit, AfterViewChecked {
 
     // ── UI state ──────────────────────────────────────────────────────────
     inputText = '';
-    showHistory = signal<boolean>(true);
+    showHistory = signal<boolean>(false);
     showCanvas = signal<boolean>(false);
     canvasContent = signal<string>('');
     shouldScrollToBottom = false;

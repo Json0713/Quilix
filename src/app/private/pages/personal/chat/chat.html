@@ -1,8 +1,14 @@
 <div class="chat-layout" [class.history-collapsed]="!showHistory()" [class.canvas-open]="showCanvas()">
+    
+    <!-- Backdrop for mobile accessibilty — closes history when tapped outside -->
+    <div class="history-backdrop" [class.visible]="showHistory()" (click)="toggleHistory()"></div>
 
     <!-- ═══════════════ LEFT ASIDE — Chat History ═══════════════ -->
     <aside class="chat-history" [class.open]="showHistory()">
         <div class="history-header">
+            <button class="icon-btn mobile-only" (click)="toggleHistory()" title="Close History">
+                <i class="bi bi-chevron-left"></i>
+            </button>
             <h3 class="history-title">Chats</h3>
             <button class="icon-btn" (click)="newChat()" title="New Chat">
                 <i class="bi bi-plus-lg"></i>

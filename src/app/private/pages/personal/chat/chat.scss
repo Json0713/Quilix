@@ -35,6 +35,32 @@
     // Removed margin, border-radius and border to fulfill "totally cover up" requirement
     margin: 0;
     border: none;
+    position: relative; // For backdrop positioning if needed
+}
+
+// ── Mobile Accessibility — Backdrop ───────────────────────────────────────
+.history-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(2px);
+    z-index: 1040;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+
+    &.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    @media (max-width: 770px) {
+        display: block;
+    }
 }
 
 // ── Left Aside — Chat History ─────────────────────────────────────────────
@@ -302,6 +328,14 @@
     &:hover {
         background: var(--bg-active);
         color: var(--accent);
+    }
+
+    &.mobile-only {
+        display: none;
+
+        @media (max-width: 770px) {
+            display: flex;
+        }
     }
 }
 
