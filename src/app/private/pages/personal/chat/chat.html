@@ -120,15 +120,8 @@
             <!-- Messages -->
             @for (message of chat.messages(); track trackMessage($index, message)) {
                 <div class="message-row" [class.user]="message.role === 'user'" [class.model]="message.role === 'model'">
-                    <div class="message-avatar">
-                        @if (message.role === 'user') {
-                            <i class="bi bi-person-fill"></i>
-                        } @else {
-                            <i class="bi bi-feather"></i>
-                        }
-                    </div>
                     <div class="message-bubble">
-                        <div class="message-content">{{ message.content }}</div>
+                        <div class="message-content" [innerHTML]="message.content"></div>
                         <div class="message-time">{{ formatTime(message.timestamp) }}</div>
                     </div>
                 </div>
@@ -137,9 +130,6 @@
             <!-- Typing indicator -->
             @if (chat.isLoading()) {
                 <div class="message-row model">
-                    <div class="message-avatar">
-                        <i class="bi bi-feather"></i>
-                    </div>
                     <div class="message-bubble typing">
                         <div class="typing-indicator">
                             <span class="dot"></span>
