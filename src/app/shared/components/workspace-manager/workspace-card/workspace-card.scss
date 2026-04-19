@@ -10,7 +10,7 @@
     grid-template-columns: minmax(200px, 2fr) 120px 100px 48px;
     gap: 16px;
     align-items: center;
-    padding: 6px 2px;
+    padding: 6px 16px;
     background: transparent;
     border-radius: 4px;
     margin: 0 4px;
@@ -98,9 +98,7 @@
     }
 
     .col-type,
-    .col-date,
-    .col-size,
-    .col-status {
+    .col-size {
         font-size: 0.75rem;
         color: var(--text-muted);
         white-space: nowrap;
@@ -347,9 +345,7 @@
     }
 
     .col-type,
-    .col-date,
-    .col-size,
-    .col-status {
+    .col-size {
         display: flex;
         flex-direction: column;
         gap: 4px;
