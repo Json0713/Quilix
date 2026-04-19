@@ -9,11 +9,13 @@ import { FileSystemService } from '../../../core/services/data/file-system.servi
 import { TimeAgoPipe } from '../../ui/common/time-ago/time-ago-pipe';
 import { StorageHealthBanner } from '../storage-health-banner/storage-health-banner';
 import { SnackbarService } from '../../../services/ui/common/snackbar/snackbar.service';
+import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
+import { PageHeaderActionsDirective } from '../page-header/page-header-actions.directive';
 
 @Component({
     selector: 'app-trash',
     standalone: true,
-    imports: [CommonModule, TimeAgoPipe, TitleCasePipe, StorageHealthBanner],
+    imports: [CommonModule, TimeAgoPipe, TitleCasePipe, StorageHealthBanner, PageHeaderActionsDirective],
     templateUrl: './trash.html',
     styleUrl: './trash.scss',
 })
@@ -23,6 +25,7 @@ export class TrashComponent implements OnInit, OnDestroy {
     private authService = inject(AuthService);
     private fileSystem = inject(FileSystemService);
     private snackbarService = inject(SnackbarService);
+    private breadcrumbService = inject(BreadcrumbService);
 
     trashedWorkspaces = signal<Workspace[]>([]);
     trashedSpaces = signal<Space[]>([]);
@@ -56,6 +59,7 @@ export class TrashComponent implements OnInit, OnDestroy {
     private activeWorkspaceName: string | null = null;
 
     async ngOnInit() {
+        this.breadcrumbService.setTitle('Trash');
         // Check filesystem mode and permission state
         const mode = await this.fileSystem.getStorageMode();
         this.isFileSystemMode.set(mode === 'filesystem');

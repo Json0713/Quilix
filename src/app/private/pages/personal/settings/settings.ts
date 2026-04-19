@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 import { AppThemeService } from '../../../../core/services/ui/app-theme.service';
 import { OsNotificationService } from '../../../../core/services/ui/os-notification.service';
 import { TabService } from '../../../../core/services/ui/tab.service';
+import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { StorageToggleComponent } from '../../../../shared/ui/system/storage-toggle/storage-toggle';
 import { FileSystemService } from '../../../../core/services/data/file-system.service';
 
@@ -18,6 +19,7 @@ export class PersonalSettings {
   protected osNotify = inject(OsNotificationService);
   private fileSystem = inject(FileSystemService);
   private tabService = inject(TabService);
+  private breadcrumbService = inject(BreadcrumbService);
 
   currentTheme = this.themeService.theme;
 
@@ -25,6 +27,7 @@ export class PersonalSettings {
 
   constructor() {
     this.checkStorageMode();
+    this.breadcrumbService.setTitle('Settings');
     this.tabService.updateActiveTabRoute('./settings', 'Settings', 'bi bi-gear');
   }
 

@@ -7,14 +7,13 @@ import { Space } from '../../../../core/interfaces/space';
 import { FileSystemService } from '../../../../core/services/data/file-system.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { FileExplorerComponent } from '../../../../shared/components/space-manager/file-explorer/file-explorer';
-import { Breadcrumb } from '../../../../shared/ui/common/breadcrumb/breadcrumb';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-team-space',
     standalone: true,
-    imports: [CommonModule, FileExplorerComponent, Breadcrumb],
+    imports: [CommonModule, FileExplorerComponent],
     templateUrl: './space.html',
     styleUrl: './space.scss',
 })

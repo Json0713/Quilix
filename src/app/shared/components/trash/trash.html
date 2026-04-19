@@ -1,10 +1,5 @@
 <div class="trash-container">
-    <div class="trash-header">
-        <div class="header-text">
-            <h2>Trash</h2>
-            <p>Items in trash are automatically deleted forever after 30 days.</p>
-        </div>
-
+    <ng-template appPageHeaderActions>
         @if (!isLoading() && hasAnyTrashed()) {
         <button class="select-toggle-btn" (click)="toggleSelectionMode()" [class.active]="selectionMode()">
             @if (selectionMode()) {
@@ -16,7 +11,7 @@
             }
         </button>
         }
-    </div>
+    </ng-template>
 
     <!-- Storage Health Banner -->
     <app-storage-health-banner [isFileSystemMode]="isFileSystemMode()" [needsReauth]="needsReauth()" [missingCount]="0"
