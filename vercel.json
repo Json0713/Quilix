@@ -8,17 +8,13 @@
       }
     },
     {
-      "src": "api/**/*.ts",
+      "src": "api/chat.ts",
       "use": "@vercel/node"
     }
   ],
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]
