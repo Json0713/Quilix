@@ -22,7 +22,7 @@ export class TeamChat implements OnInit, AfterViewChecked {
 
     // ── UI state ──────────────────────────────────────────────────────────
     inputText = '';
-    showHistory = signal<boolean>(false);
+    showHistory = signal<boolean>(localStorage.getItem('quilix_team_sidebar_open') === 'true');
     showCanvas = signal<boolean>(false);
     canvasContent = signal<string>('');
     shouldScrollToBottom = false;
@@ -46,6 +46,16 @@ export class TeamChat implements OnInit, AfterViewChecked {
     async ngOnInit() {
         this.breadcrumb.setTitle('Ask Quilix');
         await this.chat.loadSessions();
+
+        // Restore active session from persistence
+        const savedSessionId = localStorage.getItem('quilix_team_active_session');
+        if (savedSessionId && !this.chat.activeSessionId()) {
+            const sessions = this.chat.sessions();
+            if (sessions.some(s => s.id === savedSessionId)) {
+                await this.chat.setActiveSession(savedSessionId);
+                this.shouldScrollToBottom = true;
+            }
+        }
     }
 
     ngAfterViewChecked() {
@@ -118,12 +128,14 @@ export class TeamChat implements OnInit, AfterViewChecked {
 
     async newChat() {
         this.chat.clearActiveSession();
+        localStorage.removeItem('quilix_team_active_session');
         this.inputText = '';
         setTimeout(() => this.chatInput?.nativeElement?.focus(), 100);
     }
 
     async selectSession(session: ChatSession) {
         await this.chat.setActiveSession(session.id);
+        localStorage.setItem('quilix_team_active_session', session.id);
         this.shouldScrollToBottom = true;
     }
 
@@ -175,7 +187,11 @@ export class TeamChat implements OnInit, AfterViewChecked {
     // ── Panel toggles ─────────────────────────────────────────────────────
 
     toggleHistory() {
-        this.showHistory.update(v => !v);
+        this.showHistory.update(v => {
+            const newState = !v;
+            localStorage.setItem('quilix_team_sidebar_open', String(newState));
+            return newState;
+        });
     }
 
     toggleCanvas() {
