@@ -6,8 +6,23 @@
     display: flex;
     flex-direction: column;
     flex: 1;
+    height: 100%;
+    width: 100%;
     min-height: 0;
     overflow: hidden;
+}
+
+// ── Parent Container Layout Fix ───────────────────────────────────────────
+// This ensures that the main template containers do not scroll, allowing the 
+// internal messages-area to handle scrolling exclusively.
+::ng-deep .team:has(app-team-chat),
+::ng-deep .personal:has(app-personal-chat),
+::ng-deep .team:has(app-team-chat) .container-fluid,
+::ng-deep .personal:has(app-personal-chat) .container-fluid {
+    overflow: hidden !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 // ── Layout ────────────────────────────────────────────────────────────────
@@ -17,10 +32,9 @@
     min-height: 0;
     overflow: hidden;
     background: var(--surface-main);
-    border-radius: 16px 16px 0 0;
-    margin: 0 6px;
-    border: 1px solid var(--border);
-    border-bottom: none;
+    // Removed margin, border-radius and border to fulfill "totally cover up" requirement
+    margin: 0;
+    border: none;
 }
 
 // ── Left Aside — Chat History ─────────────────────────────────────────────
@@ -298,8 +312,24 @@
     overflow-x: hidden;
     padding: 24px 16px;
     scroll-behavior: smooth;
+    
+    // Modern Premium Scrollbar
     scrollbar-width: thin;
-    scrollbar-color: rgba(128, 128, 128, 0.25) transparent;
+    scrollbar-color: var(--accent) transparent;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 10px;
+        &:hover {
+            background: var(--accent);
+        }
+    }
 
     display: flex;
     flex-direction: column;
@@ -709,9 +739,7 @@
 
 @media (max-width: 770px) {
     .chat-layout {
-        margin: 0;
-        border-radius: 0;
-        border: none;
+        // Redundant properties removed as base class now covers full-screen layout
     }
 
     .chat-history {
