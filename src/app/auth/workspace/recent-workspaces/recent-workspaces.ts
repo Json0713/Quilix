@@ -21,7 +21,6 @@ export class RecentWorkspacesComponent implements OnInit, OnDestroy {
     workspaces: Workspace[] = [];
     loading = true;
     loadingWorkspaceId: string | null = null;
-    deletingWorkspaceId: string | null = null;
 
     private workspacesSub: any;
 
@@ -58,12 +57,18 @@ export class RecentWorkspacesComponent implements OnInit, OnDestroy {
         }, 1500);
     }
 
-    requestDelete(workspace: Workspace): void {
-        this.deletingWorkspaceId = workspace.id;
-    }
+    async requestDelete(workspace: Workspace): Promise<void> {
+        const confirmed = await this.modal.confirm(
+            `Remove "${workspace.name}" from your recent history? This will not delete the actual workspace folder on disk.`,
+            {
+                title: 'Remove from History',
+                confirmText: 'Remove'
+            }
+        );
 
-    cancelDelete(): void {
-        this.deletingWorkspaceId = null;
+        if (confirmed) {
+            await this.confirmDelete(workspace);
+        }
     }
 
     async confirmDelete(workspace: Workspace): Promise<void> {
@@ -74,7 +79,6 @@ export class RecentWorkspacesComponent implements OnInit, OnDestroy {
             try {
                 await this.auth.deleteWorkspace(workspace.id);
             } finally {
-                this.deletingWorkspaceId = null;
                 this.loadingWorkspaceId = null;
             }
         }, 1200);

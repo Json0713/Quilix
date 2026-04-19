@@ -83,7 +83,6 @@ export class WorkspaceManagerComponent implements OnInit {
     // ── Selection state ──
     selectionMode = signal<boolean>(false);
     selectedIds = signal<Set<string>>(new Set());
-    confirmingBulkTrash = signal<boolean>(false);
     isBulkProcessing = signal<boolean>(false);
 
     selectedCount = computed(() => this.selectedIds().size);
@@ -319,7 +318,6 @@ export class WorkspaceManagerComponent implements OnInit {
     exitSelectionMode() {
         this.selectionMode.set(false);
         this.selectedIds.set(new Set());
-        this.confirmingBulkTrash.set(false);
     }
 
     toggleSelect(id: string) {
@@ -349,13 +347,20 @@ export class WorkspaceManagerComponent implements OnInit {
 
     // ── Bulk trash ──
 
-    requestBulkTrash() {
+    async requestBulkTrash() {
         if (this.selectedCount() === 0) return;
-        this.confirmingBulkTrash.set(true);
-    }
 
-    cancelBulkTrash() {
-        this.confirmingBulkTrash.set(false);
+        const confirmed = await this.modalService.confirm(
+            `Are you sure you want to move ${this.selectedCount()} workspaces to the trash?`,
+            {
+                title: 'Move to Trash',
+                confirmText: 'Move to Trash'
+            }
+        );
+
+        if (confirmed) {
+            await this.confirmBulkTrash();
+        }
     }
 
     async confirmBulkTrash() {
@@ -373,7 +378,6 @@ export class WorkspaceManagerComponent implements OnInit {
             this.workspaces.update(list => list.filter(w => !this.selectedIds().has(w.id)));
             this.snackbarService.info(`Moved ${ids.length} workspaces to trash.`);
             this.exitSelectionMode();
-            this.confirmingBulkTrash.set(false);
         } finally {
             this.isBulkProcessing.set(false);
         }

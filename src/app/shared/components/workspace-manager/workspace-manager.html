@@ -87,24 +87,6 @@
     </ng-template>
 
 
-    <!-- Bulk Trash Confirmation Overlay -->
-    @if (confirmingBulkTrash()) {
-    <div class="bulk-confirm-overlay">
-        <div class="confirm-card">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            <h3>Trash {{ selectedCount() }} Workspaces?</h3>
-            <p>This will move the selected workspaces to the trash. You can restore them later or permanently delete
-                them.</p>
-            <div class="confirm-actions">
-                <button class="confirm-btn secondary" (click)="cancelBulkTrash()">No, Keep Them</button>
-                <button class="confirm-btn danger" (click)="confirmBulkTrash()" [disabled]="isBulkProcessing()">
-                    @if (isBulkProcessing()) { <i class="bi bi-arrow-repeat spin"></i> Processing... } @else { Yes,
-                    Trash Items }
-                </button>
-            </div>
-        </div>
-    </div>
-    }
 
     <!-- Scrollable Content Area -->
     <div class="workspace-content">

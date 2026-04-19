@@ -7,8 +7,8 @@ import { PageHeaderService } from '../../../core/services/shared/page-header.ser
   selector: 'app-page-header',
   standalone: true,
   imports: [CommonModule, Breadcrumb, NgTemplateOutlet],
-  templateUrl: './page-header.component.html',
-  styleUrl: './page-header.component.scss',
+  templateUrl: './page-header.html',
+  styleUrl: './page-header.scss',
   encapsulation: ViewEncapsulation.None
 })
 export class PageHeaderComponent {

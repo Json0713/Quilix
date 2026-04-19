@@ -38,50 +38,6 @@
         [isReauthing]="isReauthing()" (reconnectStorage)="reconnectStorage()">
     </app-storage-health-banner>
 
-    <!-- Selection toolbar -->
-    @if (selectionMode()) {
-    <div class="selection-toolbar">
-        <div class="toolbar-left">
-            <button class="toolbar-btn checkbox-btn" (click)="toggleSelectAll()" [class.checked]="isAllSelected()">
-                <i class="bi" [class.bi-check-square-fill]="isAllSelected()" [class.bi-square]="!isAllSelected()"></i>
-            </button>
-            <span class="selection-count">
-                {{ selectedCount() }} selected
-            </span>
-        </div>
-
-        <div class="toolbar-actions">
-            @if (confirmingBulkDelete()) {
-            <div class="bulk-confirm">
-                <span class="confirm-label">Delete {{ selectedCount() }} permanently?</span>
-                <button class="toolbar-btn confirm-yes" (click)="confirmBulkDelete()" [disabled]="isBulkProcessing()">
-                    @if (isBulkProcessing()) {
-                    <i class="bi bi-arrow-repeat spin"></i>
-                    } @else {
-                    Yes
-                    }
-                </button>
-                <button class="toolbar-btn confirm-no" (click)="cancelBulkDelete()"
-                    [disabled]="isBulkProcessing()">No</button>
-            </div>
-            } @else {
-            <button class="toolbar-btn restore-action" (click)="bulkRestore()"
-                [disabled]="selectedCount() === 0 || isBulkProcessing()">
-                @if (isBulkProcessing()) {
-                <i class="bi bi-arrow-repeat spin"></i>
-                } @else {
-                <i class="bi bi-arrow-counterclockwise"></i>
-                }
-                <span class="btn-label">Restore</span>
-            </button>
-            <button class="toolbar-btn delete-action" (click)="requestBulkDelete()" [disabled]="selectedCount() === 0">
-                <i class="bi bi-trash"></i>
-                <span class="btn-label">Delete</span>
-            </button>
-            }
-        </div>
-    </div>
-    }
 
     @if (isLoading()) {
     <div class="loading-state">
@@ -136,23 +92,6 @@
                     <span class="time-info">Trashed {{ ws.trashedAt | timeAgo }}</span>
 
                     <div class="card-actions">
-                        @if (confirmingDeleteId() === ws.id) {
-                        <div class="confirm-actions">
-                            <span class="confirm-text">Delete permanently?</span>
-                            <div class="btn-group">
-                                <button class="confirm-yes" (click)="confirmDelete(ws.id)"
-                                    [disabled]="processingIds().has('ws:' + ws.id)">
-                                    @if (processingIds().has('ws:' + ws.id)) {
-                                    <i class="bi bi-arrow-repeat spin"></i>
-                                    } @else {
-                                    Yes
-                                    }
-                                </button>
-                                <button class="confirm-no" (click)="cancelDelete()"
-                                    [disabled]="processingIds().has('ws:' + ws.id)">No</button>
-                            </div>
-                        </div>
-                        } @else {
                         <button class="action-btn restore-btn" [disabled]="processingIds().has('ws:' + ws.id)"
                             (click)="restoreWorkspace(ws.id)" aria-label="Restore" title="Restore">
                             @if (processingIds().has('ws:' + ws.id)) {
@@ -166,7 +105,6 @@
                             title="Delete permanently">
                             <i class="bi bi-trash"></i>
                         </button>
-                        }
                     </div>
                 </div>
                 }
@@ -213,23 +151,6 @@
                     <span class="time-info">Trashed {{ space.trashedAt | timeAgo }}</span>
 
                     <div class="card-actions">
-                        @if (confirmingDeleteSpaceId() === space.id) {
-                        <div class="confirm-actions">
-                            <span class="confirm-text">Delete permanently?</span>
-                            <div class="btn-group">
-                                <button class="confirm-yes" (click)="confirmDeleteSpace(space.id)"
-                                    [disabled]="processingIds().has('sp:' + space.id)">
-                                    @if (processingIds().has('sp:' + space.id)) {
-                                    <i class="bi bi-arrow-repeat spin"></i>
-                                    } @else {
-                                    Yes
-                                    }
-                                </button>
-                                <button class="confirm-no" (click)="cancelDeleteSpace()"
-                                    [disabled]="processingIds().has('sp:' + space.id)">No</button>
-                            </div>
-                        </div>
-                        } @else {
                         <button class="action-btn restore-btn" [disabled]="processingIds().has('sp:' + space.id)"
                             (click)="restoreSpace(space.id)" aria-label="Restore" title="Restore">
                             @if (processingIds().has('sp:' + space.id)) {
@@ -243,7 +164,6 @@
                             title="Delete permanently">
                             <i class="bi bi-trash"></i>
                         </button>
-                        }
                     </div>
                 </div>
                 }

@@ -9,7 +9,7 @@ import { NavigationBar } from '../../../../shared/ui/navigation-bar/navigation-b
 import { TabService } from '../../../../core/services/ui/tab.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { TerminalComponent } from '../../../../shared/components/terminal/terminal';
-import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header';
 
 @Component({
   selector: 'app-personal-template',

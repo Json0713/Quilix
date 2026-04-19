@@ -9,6 +9,7 @@ import { FileSystemService } from '../../../core/services/data/file-system.servi
 import { TimeAgoPipe } from '../../ui/common/time-ago/time-ago-pipe';
 import { StorageHealthBanner } from '../storage-health-banner/storage-health-banner';
 import { SnackbarService } from '../../../services/ui/common/snackbar/snackbar.service';
+import { ModalService } from '../../../services/ui/common/modal/modal';
 import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { PageHeaderActionsDirective } from '../page-header/page-header-actions.directive';
 
@@ -26,6 +27,7 @@ export class TrashComponent implements OnInit, OnDestroy {
     private fileSystem = inject(FileSystemService);
     private snackbarService = inject(SnackbarService);
     private breadcrumbService = inject(BreadcrumbService);
+    private modalService = inject(ModalService);
 
     trashedWorkspaces = signal<Workspace[]>([]);
     trashedSpaces = signal<Space[]>([]);
@@ -33,12 +35,10 @@ export class TrashComponent implements OnInit, OnDestroy {
 
     // ── Single-item & Bulk UI state ──
     processingIds = signal<Set<string>>(new Set());
-    confirmingDeleteId = signal<string | null>(null);
 
     // ── Selection state ──
     selectionMode = signal<boolean>(false);
     selectedIds = signal<Set<string>>(new Set());
-    confirmingBulkDelete = signal<boolean>(false);
     isBulkProcessing = signal<boolean>(false);
 
     // ── Filesystem re-auth state ──
@@ -141,7 +141,6 @@ export class TrashComponent implements OnInit, OnDestroy {
     exitSelectionMode() {
         this.selectionMode.set(false);
         this.selectedIds.set(new Set());
-        this.confirmingBulkDelete.set(false);
     }
 
     toggleSelect(id: string) {
@@ -201,13 +200,20 @@ export class TrashComponent implements OnInit, OnDestroy {
 
     // ── Bulk permanent delete ──
 
-    requestBulkDelete() {
+    async requestBulkDelete() {
         if (this.selectedCount() === 0) return;
-        this.confirmingBulkDelete.set(true);
-    }
 
-    cancelBulkDelete() {
-        this.confirmingBulkDelete.set(false);
+        const confirmed = await this.modalService.confirm(
+            `Are you sure you want to permanently delete these ${this.selectedCount()} items? This action cannot be undone.`,
+            {
+                title: 'Delete Permanently',
+                confirmText: 'Delete'
+            }
+        );
+
+        if (confirmed) {
+            await this.confirmBulkDelete();
+        }
     }
 
     async confirmBulkDelete() {
@@ -230,7 +236,6 @@ export class TrashComponent implements OnInit, OnDestroy {
             }
             this.snackbarService.warning(`Permanently deleted ${ids.length} items.`);
             this.exitSelectionMode();
-            this.confirmingBulkDelete.set(false);
         } catch (error) {
             this.snackbarService.error('Error permanently deleting files.');
             console.error(error);
@@ -258,12 +263,18 @@ export class TrashComponent implements OnInit, OnDestroy {
         }
     }
 
-    requestPermanentDelete(workspaceId: string) {
-        this.confirmingDeleteId.set(workspaceId);
-    }
+    async requestPermanentDelete(workspaceId: string) {
+        const confirmed = await this.modalService.confirm(
+            'Are you sure you want to permanently delete this workspace? All data within it will be lost forever.',
+            {
+                title: 'Delete Workspace',
+                confirmText: 'Delete'
+            }
+        );
 
-    cancelDelete() {
-        this.confirmingDeleteId.set(null);
+        if (confirmed) {
+            await this.confirmDelete(workspaceId);
+        }
     }
 
     async confirmDelete(workspaceId: string) {
@@ -281,7 +292,6 @@ export class TrashComponent implements OnInit, OnDestroy {
                 next.delete('ws:' + workspaceId);
                 return next;
             });
-            this.confirmingDeleteId.set(null);
         }
     }
 
@@ -327,14 +337,18 @@ export class TrashComponent implements OnInit, OnDestroy {
         }
     }
 
-    confirmingDeleteSpaceId = signal<string | null>(null);
+    async requestDeleteSpace(spaceId: string) {
+        const confirmed = await this.modalService.confirm(
+            'Are you sure you want to permanently delete this space? This action cannot be undone.',
+            {
+                title: 'Delete Space',
+                confirmText: 'Delete'
+            }
+        );
 
-    requestDeleteSpace(spaceId: string) {
-        this.confirmingDeleteSpaceId.set(spaceId);
-    }
-
-    cancelDeleteSpace() {
-        this.confirmingDeleteSpaceId.set(null);
+        if (confirmed) {
+            await this.confirmDeleteSpace(spaceId);
+        }
     }
 
     async confirmDeleteSpace(spaceId: string) {
@@ -350,7 +364,6 @@ export class TrashComponent implements OnInit, OnDestroy {
                 next.delete('sp:' + spaceId);
                 return next;
             });
-            this.confirmingDeleteSpaceId.set(null);
         }
     }
 }
