@@ -1,4 +1,4 @@
-<div class="chat-layout" [class.history-collapsed]="!showHistory()" [class.canvas-open]="showCanvas()">
+<div class="chat-layout" [class.initializing]="isInitializing()" [class.history-collapsed]="!showHistory()" [class.canvas-open]="showCanvas()">
     
     <!-- Backdrop for mobile accessibilty — closes history when tapped outside -->
     <div class="history-backdrop" [class.visible]="showHistory()" (click)="toggleHistory()"></div>

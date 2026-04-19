@@ -32,10 +32,14 @@
     min-height: 0;
     overflow: hidden;
     background: var(--surface-main);
-    // Removed margin, border-radius and border to fulfill "totally cover up" requirement
     margin: 0;
     border: none;
-    position: relative; // For backdrop positioning if needed
+    position: relative;
+
+    // Suppress transitions during initial load to prevent 'sidebar jerk'
+    &.initializing * {
+        transition: none !important;
+    }
 }
 
 // ── Mobile Accessibility — Backdrop ───────────────────────────────────────
