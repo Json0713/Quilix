@@ -70,7 +70,12 @@ export class PersonalChat implements OnInit, AfterViewChecked {
 
         this.inputText = '';
         this.shouldScrollToBottom = true;
-        this.resizeTextarea();
+        
+        // Fix: Explicitly reset textarea height
+        if (this.chatInput) {
+            this.chatInput.nativeElement.value = '';
+            this.resizeTextarea();
+        }
         await this.chat.send(text);
         this.shouldScrollToBottom = true;
     }
