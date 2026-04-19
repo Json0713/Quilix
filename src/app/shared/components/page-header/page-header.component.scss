@@ -44,6 +44,10 @@
                 font-size: 1.15rem; // Slightly more compact for header
                 font-weight: 700;
                 letter-spacing: -0.02em;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 400px;
             }
 
             .hairline {
@@ -123,10 +127,10 @@
     top: 100%;
     margin-top: 10px;
     z-index: 1000;
-    min-width: 240px;
+    min-width: 200px;
     background: var(--surface-main);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 12px;
     padding: 8px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(20px);
