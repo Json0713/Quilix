@@ -69,7 +69,7 @@
     min-width: 260px;
     display: flex;
     flex-direction: column;
-    background: var(--surface-alt);
+    background: var(--surface-main);
     border-right: 1px solid var(--border);
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
                 min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
@@ -345,7 +345,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding: 24px 16px;
-    scroll-behavior: smooth;
+    // Removed scroll-behavior: smooth to prevent visible "scrolling from top" on refresh
     
     // Standardized Scrollbar (matching history-list)
     scrollbar-width: thin;

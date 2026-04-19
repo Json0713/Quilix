@@ -98,7 +98,7 @@
         <div class="messages-area" #messagesContainer>
 
             <!-- Empty state -->
-            @if (!chat.activeSessionId() && chat.messages().length === 0) {
+            @if (!isInitializing() && !chat.activeSessionId() && chat.messages().length === 0) {
                 <div class="empty-state">
                     <div class="empty-icon">
                         <i class="bi bi-feather"></i>

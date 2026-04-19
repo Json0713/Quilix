@@ -1,6 +1,6 @@
 import {
     Component, OnInit, inject, signal, ViewChild,
-    ElementRef, AfterViewChecked, HostListener
+    ElementRef, AfterViewChecked, HostListener, effect
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -26,6 +26,7 @@ export class TeamChat implements OnInit, AfterViewChecked {
     showCanvas = signal<boolean>(false);
     canvasContent = signal<string>('');
     shouldScrollToBottom = false;
+    isInitializing = signal<boolean>(true);
 
     // ── Session context menu ──────────────────────────────────────────────
     contextMenuSessionId = signal<string | null>(null);
@@ -43,19 +44,41 @@ export class TeamChat implements OnInit, AfterViewChecked {
         { icon: 'bi-question-circle', text: 'Explain a concept simply' },
     ];
 
+    constructor() {
+        // Automatically sync the active session to LocalStorage whenever it changes
+        // This captures both manual selections and AI auto-created sessions
+        effect(() => {
+            const id = this.chat.activeSessionId();
+            if (id) {
+                localStorage.setItem('quilix_team_active_session', id);
+            }
+        });
+    }
+
     async ngOnInit() {
         this.breadcrumb.setTitle('Ask Quilix');
+        
+        // Internal Navigation Check: 
+        // If the service already has an active session, we are navigating from another page
+        const isInternalNavigation = !!this.chat.activeSessionId();
+
         await this.chat.loadSessions();
 
-        // Restore active session from persistence
-        const savedSessionId = localStorage.getItem('quilix_team_active_session');
-        if (savedSessionId && !this.chat.activeSessionId()) {
-            const sessions = this.chat.sessions();
-            if (sessions.some(s => s.id === savedSessionId)) {
-                await this.chat.setActiveSession(savedSessionId);
-                this.shouldScrollToBottom = true;
+        if (isInternalNavigation) {
+            // Force a fresh state when navigating from Dashboard
+            this.newChat();
+        } else {
+            // Attempt to restore the last viewed session on Hard Refresh
+            const savedSessionId = localStorage.getItem('quilix_team_active_session');
+            if (savedSessionId) {
+                const sessions = this.chat.sessions();
+                if (sessions.some(s => s.id === savedSessionId)) {
+                    await this.chat.setActiveSession(savedSessionId);
+                    this.shouldScrollToBottom = true;
+                }
             }
         }
+        this.isInitializing.set(false);
     }
 
     ngAfterViewChecked() {
@@ -87,7 +110,7 @@ export class TeamChat implements OnInit, AfterViewChecked {
             this.resizeTextarea();
         }
         await this.chat.send(text);
-        this.shouldScrollToBottom = true;
+        this.scrollToBottom('smooth');
     }
 
     onKeydown(event: KeyboardEvent) {
@@ -117,10 +140,10 @@ export class TeamChat implements OnInit, AfterViewChecked {
         }, 50);
     }
 
-    private scrollToBottom() {
+    private scrollToBottom(behavior: ScrollBehavior = 'auto') {
         const el = this.messagesContainer?.nativeElement;
         if (el) {
-            el.scrollTop = el.scrollHeight;
+            el.scrollTo({ top: el.scrollHeight, behavior });
         }
     }
 
