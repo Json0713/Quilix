@@ -106,13 +106,13 @@
     .indicator-line {
         width: 24px;
         height: 4px;
-        background: rgba(var(--text-muted-rgb, 255, 255, 255), 0.2);
+        background: var(--bg-muted);
         border-radius: 4px;
         cursor: pointer;
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
         &:hover {
-            background: rgba(var(--text-muted-rgb, 255, 255, 255), 0.5);
+            background: var(--bg-alt);
         }
 
         &.active {
