@@ -68,6 +68,11 @@ export class TerminalNode implements OnInit, OnDestroy {
   private startPanX = 0;
   private startPanY = 0;
 
+  // ── Touch Gesture State ──
+  private initialPinchDistance = 0;
+  private initialPinchScale = 1;
+  private pinchMidpoint = { x: 0, y: 0 };
+
   // ── Multi-Select Lasso State ──
   public selectedNodeIds = new Set<string>();
   
@@ -184,10 +189,23 @@ export class TerminalNode implements OnInit, OnDestroy {
   onWheel(event: WheelEvent) {
     if (event.ctrlKey || event.metaKey) {
         event.preventDefault(); 
-        if (event.deltaY > 0) {
-            this.zoomOut();
-        } else {
-            this.zoomIn();
+        
+        const delta = -event.deltaY;
+        const factor = delta > 0 ? 1.1 : 0.9;
+        const newScale = Math.min(Math.max(this.zoomScale() * factor, 0.4), 2.5);
+        
+        const oldScale = this.zoomScale();
+        if (newScale !== oldScale) {
+            const rect = this.mapContainer.nativeElement.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
+            
+            const dx = (mouseX - this.panX()) / oldScale;
+            const dy = (mouseY - this.panY()) / oldScale;
+            
+            this.zoomScale.set(newScale);
+            this.panX.set(mouseX - dx * newScale);
+            this.panY.set(mouseY - dy * newScale);
         }
     }
   }
@@ -204,8 +222,24 @@ export class TerminalNode implements OnInit, OnDestroy {
 
   startCanvasInteraction(event: MouseEvent | TouchEvent) {
     if ((event.target as HTMLElement).closest('.map-node')) return;
-    
     if (event instanceof MouseEvent && event.button !== 0) return;
+
+    if (window.TouchEvent && event instanceof TouchEvent && event.touches.length === 2) {
+        // Start Pinch Zoom
+        const t1 = event.touches[0];
+        const t2 = event.touches[1];
+        this.initialPinchDistance = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        this.initialPinchScale = this.zoomScale();
+        
+        const rect = this.mapContainer.nativeElement.getBoundingClientRect();
+        this.pinchMidpoint = {
+            x: ((t1.clientX + t2.clientX) / 2) - rect.left,
+            y: ((t1.clientY + t2.clientY) / 2) - rect.top
+        };
+        
+        this.isPanning.set(false); // Stop panning when pinching
+        return;
+    }
 
     const coords = this.getNormalizedCoordinates(event);
 
@@ -234,6 +268,29 @@ export class TerminalNode implements OnInit, OnDestroy {
   }
 
   onCanvasMove(event: MouseEvent | TouchEvent) {
+    if (window.TouchEvent && event instanceof TouchEvent && event.touches.length === 2 && this.initialPinchDistance > 0) {
+        if (event.cancelable) event.preventDefault();
+        
+        const t1 = event.touches[0];
+        const t2 = event.touches[1];
+        const currentDistance = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        
+        const factor = currentDistance / this.initialPinchDistance;
+        const newScale = Math.min(Math.max(this.initialPinchScale * factor, 0.4), 2.5);
+        
+        // Logical zoom targeting the midpoint
+        const oldScale = this.zoomScale();
+        if (newScale !== oldScale) {
+            const dx = (this.pinchMidpoint.x - this.panX()) / oldScale;
+            const dy = (this.pinchMidpoint.y - this.panY()) / oldScale;
+            
+            this.zoomScale.set(newScale);
+            this.panX.set(this.pinchMidpoint.x - dx * newScale);
+            this.panY.set(this.pinchMidpoint.y - dy * newScale);
+        }
+        return;
+    }
+
     if (!this.isPanning() && !this.lasso().active) return;
     const coords = this.getNormalizedCoordinates(event);
 
@@ -261,6 +318,7 @@ export class TerminalNode implements OnInit, OnDestroy {
 
   endCanvasInteraction() {
     this.isPanning.set(false);
+    this.initialPinchDistance = 0;
 
     const lso = this.lasso();
     if (lso.active) {
