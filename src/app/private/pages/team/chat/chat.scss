@@ -1061,7 +1061,8 @@
     }
 
     .starters-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
 }
 
@@ -1088,8 +1089,41 @@
         }
     }
 
+    .empty-state {
+        padding: 20px 16px;
+
+        .empty-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            i { font-size: 1.4rem; }
+        }
+
+        .empty-title {
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+
+        .empty-subtitle {
+            font-size: 0.82rem;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+    }
+
     .starters-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .starter-card {
+        padding: 10px 12px;
+        font-size: 0.75rem;
+        gap: 8px;
+        border-radius: 10px;
+
+        i { font-size: 1rem; }
     }
 
     .message-row {
