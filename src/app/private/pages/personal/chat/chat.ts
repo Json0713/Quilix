@@ -27,6 +27,7 @@ export class PersonalChat implements OnInit, AfterViewChecked {
     inputText = '';
     showHistory = signal<boolean>(localStorage.getItem('quilix_personal_sidebar_open') === 'true');
     showCanvas = signal<boolean>(false);
+    isDropup = signal<boolean>(false);
     canvasContent = signal<string>('');
     shouldScrollToBottom = false;
     isInitializing = signal<boolean>(true);
@@ -105,6 +106,7 @@ export class PersonalChat implements OnInit, AfterViewChecked {
     onDocumentClick() {
         if (this.contextMenuSessionId()) {
             this.contextMenuSessionId.set(null);
+            this.isDropup.set(false);
         }
     }
 
@@ -186,9 +188,20 @@ export class PersonalChat implements OnInit, AfterViewChecked {
 
     toggleContextMenu(sessionId: string, event: Event) {
         event.stopPropagation();
-        this.contextMenuSessionId.set(
-            this.contextMenuSessionId() === sessionId ? null : sessionId
-        );
+        const isOpening = this.contextMenuSessionId() !== sessionId;
+        this.contextMenuSessionId.set(isOpening ? sessionId : null);
+
+        if (isOpening) {
+            const button = event.currentTarget as HTMLElement;
+            if (button) {
+                const rect = button.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                // Detect if dropdown would go off-screen or behind footer
+                this.isDropup.set(rect.bottom > viewportHeight - 180);
+            }
+        } else {
+            this.isDropup.set(false);
+        }
     }
 
     startRename(session: ChatSession, event: Event) {

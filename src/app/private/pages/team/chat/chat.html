@@ -32,7 +32,7 @@
                 </div>
             }
 
-            @for (session of chat.sessions(); track trackSession($index, session)) {
+            @for (session of chat.sessions(); track session.id; let i = $index; let count = $count) {
                 <div class="history-item"
                      [class.active]="chat.activeSessionId() === session.id"
                      [class.menu-open]="contextMenuSessionId() === session.id"
@@ -61,7 +61,7 @@
                         </button>
 
                         @if (contextMenuSessionId() === session.id) {
-                            <div class="item-dropdown" (click)="$event.stopPropagation()">
+                            <div class="item-dropdown" [class.dropup]="isDropup()" (click)="$event.stopPropagation()">
                                 <button class="dropdown-item" (click)="startRename(session, $event)">
                                     <i class="bi bi-pencil"></i>
                                     <span>Rename</span>
