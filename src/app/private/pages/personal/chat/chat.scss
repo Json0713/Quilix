@@ -96,6 +96,12 @@
     flex-shrink: 0;
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .history-actions {
     padding: 0 12px 12px;
     flex-shrink: 0;
@@ -109,7 +115,7 @@
     width: 100%;
     padding: 10px 14px;
     background: var(--surface-alt);
-    border: 1px solid var(--border);
+    border: none;
     border-radius: 12px;
     color: var(--text-main);
     font-size: 0.85rem;
@@ -119,13 +125,11 @@
     
     i {
         font-size: 1.1rem;
-        color: var(--accent);
     }
     
     &:hover {
         background: var(--bg-hover);
         border-color: var(--accent);
-        transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
@@ -372,7 +376,7 @@
         color: var(--accent);
     }
 
-    &.mobile-only {
+    &.mobile-mode {
         display: none;
 
         @media (max-width: 770px) {
