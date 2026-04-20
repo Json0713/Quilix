@@ -1,0 +1,279 @@
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%; /* Fill terminal content area */
+    background: transparent; /* Inherit terminal surface or use subtle tint */
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none; 
+    
+    &.is-panning {
+        cursor: grabbing;
+    }
+    
+    &.is-lassoing {
+        cursor: crosshair;
+    }
+
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+    background-size: 30px 30px;
+    user-select: none;
+  }
+
+  .map-controls {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(15, 15, 15, 0.6);
+    backdrop-filter: blur(8px);
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    
+    .divider {
+        width: 1px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 0 0.25rem;
+    }
+
+    .btn.btn-icon {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        color: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.2s;
+        padding: 0;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+        &:active {
+            transform: scale(0.95);
+        }
+    }
+
+    .dropdown-menu {
+        min-width: 150px;
+        background: #1e1e1e;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 4px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+
+            i {
+                font-size: 1rem;
+                opacity: 0.7;
+            }
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: #fff;
+            }
+
+            &.secondary-item {
+                color: #a855f7;
+
+                &:hover {
+                    background: rgba(168, 85, 247, 0.1);
+                }
+            }
+        }
+    }
+  }
+
+  .pan-surface {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    overflow: visible;
+  }
+  
+  .lasso-box {
+      position: absolute;
+      background: rgba(99, 102, 241, 0.1); 
+      border: 1px solid rgba(99, 102, 241, 0.5);
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 50;
+  }
+
+  .map-initializing {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .wires-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; 
+    overflow: visible; 
+  
+    .wire {
+      stroke: rgba(255, 255, 255, 0.1);
+      transition: stroke 0.3s;
+      
+      &.warning-wire {
+          stroke: #ef4444; 
+          stroke-dasharray: 6;
+          opacity: 0.6;
+      }
+    }
+  }
+  
+  .nodes-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .map-node {
+    position: absolute;
+    width: 200px; 
+    background: rgba(30, 30, 30, 0.85);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+  
+    &:active {
+      cursor: grabbing;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      border-color: #6366f1;
+      z-index: 20;
+    }
+
+    &.is-selected {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4), 0 8px 24px rgba(0,0,0,0.4);
+        background: rgba(99, 102, 241, 0.15);
+    }
+
+    &.is-missing {
+      background: rgba(239, 68, 68, 0.1) !important;
+      border-color: rgba(239, 68, 68, 0.5) !important;
+      
+      .node-icon-box {
+          color: #ef4444 !important;
+          background: rgba(239, 68, 68, 0.2) !important;
+      }
+    }
+  
+    &.type-workspace {
+      background: rgba(99, 102, 241, 0.2); 
+      border-color: rgba(99, 102, 241, 0.4);
+      .node-icon-box { color: #818cf8; background: rgba(99, 102, 241, 0.2); }
+    }
+  
+    &.type-space {
+      background: rgba(16, 185, 129, 0.1); 
+      border-color: rgba(16, 185, 129, 0.3);
+      .node-icon-box { color: #34d399; background: rgba(16, 185, 129, 0.2); }
+    }
+  
+    &.type-file,
+    &.type-subspace {
+      width: 160px; 
+      padding: 0.4rem 0.75rem;
+      background: rgba(45, 45, 45, 0.8);
+      .node-icon-box { color: rgba(255, 255, 255, 0.5); background: rgba(255,255,255,0.05); width: 28px; height: 28px; font-size: 0.85rem; }
+    }
+  
+    &.type-overflow {
+      width: auto;
+      padding: 0.3rem 0.75rem;
+      border-style: dashed;
+      background: rgba(45, 45, 45, 0.5);
+      .node-icon-box { display: none; }
+      .node-label { font-size: 0.75rem; color: rgba(255, 255, 255, 0.4); font-weight: 600;}
+      .node-badge { display: none; }
+    }
+  
+    .node-icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+  
+    .node-details {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+  
+      .node-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+  
+      .node-badge {
+        font-size: 0.6rem;
+        color: rgba(255, 255, 255, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+    }
+  }
+  
+  @keyframes spin {
+    100% { transform: rotate(360deg); }
+  }

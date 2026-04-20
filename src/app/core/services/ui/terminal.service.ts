@@ -29,7 +29,7 @@ export interface TerminalInstance {
     currentInput: string;
 }
 
-export type TerminalTab = 'terminal' | 'source-control' | 'output' | 'problems';
+export type TerminalTab = 'terminal' | 'source-control' | 'node' | 'output' | 'problems';
 
 @Injectable({ providedIn: 'root' })
 export class TerminalService {

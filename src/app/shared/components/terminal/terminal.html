@@ -4,6 +4,7 @@
             <div class="tabs">
                 <span class="tab" [class.active]="activeTab() === 'terminal'" (click)="setTab('terminal')">Terminal</span>
                 <span class="tab" [class.active]="activeTab() === 'source-control'" (click)="setTab('source-control')">Source Control</span>
+                <span class="tab" [class.active]="activeTab() === 'node'" (click)="setTab('node')">Node</span>
                 <span class="tab" [class.active]="activeTab() === 'output'" (click)="setTab('output')">Output</span>
                 <span class="tab" [class.active]="activeTab() === 'problems'" (click)="setTab('problems')">Problems</span>
             </div>
@@ -76,6 +77,11 @@
             <!-- Dedicated container to enforce flex-box scrolling rules -->
             <div class="source-control-container">
                 <app-source-control />
+            </div>
+        }
+        @case ('node') {
+            <div class="node-container">
+                <app-terminal-node />
             </div>
         }
         @case ('output') {

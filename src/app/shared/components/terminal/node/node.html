@@ -45,7 +45,6 @@
         <svg class="wires-canvas" preserveAspectRatio="none">
           @for (node of nodes(); track trackByNode($index, node)) {
             @if (node.parentId) {
-              <!-- Wire paths trigger CD updates when the child node resolves OnDragMove -->
               <path class="wire" [class.warning-wire]="node.isMissingOnDisk" [attr.d]="getWirePath(node)" fill="none" stroke-width="2" stroke-dasharray="4" />
             }
           }
@@ -90,7 +89,7 @@
 
       </div>
 
-      <!-- Lasso Box Overlay (Positioned completely outside scale but normalized visually to cursor) -->
+      <!-- Lasso Box Overlay -->
       @if (lasso().active) {
         <div class="lasso-box"
              [style.left.px]="lasso().left"
@@ -108,4 +107,3 @@
       </div>
     }
   </div>
-  

@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TerminalService, TerminalTab } from '../../../core/services/ui/terminal.service';
 import { SourceControl } from './source-control/source-control';
+import { TerminalNode } from './node/node';
 
 // export type TerminalTab = 'terminal' | 'source-control' | 'output' | 'problems'; // REMOVED
 
 @Component({
     selector: 'app-terminal',
     standalone: true,
-    imports: [CommonModule, FormsModule, SourceControl],
+    imports: [CommonModule, FormsModule, SourceControl, TerminalNode],
     templateUrl: './terminal.html',
     styleUrl: './terminal.scss',
 })

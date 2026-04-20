@@ -4,12 +4,12 @@ import { CdkDrag, CdkDragMove, CdkDragEnd, CdkDragStart } from '@angular/cdk/dra
 import { Subscription } from 'rxjs';
 import { liveQuery } from 'dexie';
 
-import { AuthService } from '../../../core/auth/auth.service';
-import { SpaceService } from '../../../core/services/components/space.service';
-import { FileSystemService } from '../../../core/services/data/file-system.service';
-import { FileManagerService } from '../../../core/services/components/file-manager.service';
-import { db } from '../../../core/database/dexie.service';
-import { ModalService } from '../../../services/ui/common/modal/modal';
+import { AuthService } from '../../../../core/auth/auth.service';
+import { SpaceService } from '../../../../core/services/components/space.service';
+import { FileSystemService } from '../../../../core/services/data/file-system.service';
+import { FileManagerService } from '../../../../core/services/components/file-manager.service';
+import { db } from '../../../../core/database/dexie.service';
+import { ModalService } from '../../../../services/ui/common/modal/modal';
 
 interface MapNode {
   id: string;
@@ -19,9 +19,7 @@ interface MapNode {
   x: number;
   y: number;
   parentId: string | null;
-  // cdkDragFreeDragPosition ONLY takes initial to prevent infinite feedback loops
   initialPosition: { x: number, y: number };
-  // updated ONLY through event reporting to recalculate SVG wires
   currentPosition: { x: number, y: number };
   isMissingOnDisk?: boolean;
 }
@@ -40,13 +38,13 @@ interface LayoutNode {
 }
 
 @Component({
-  selector: 'app-infrastructure-map',
+  selector: 'app-terminal-node',
   standalone: true,
   imports: [CommonModule, CdkDrag],
-  templateUrl: './infrastructure-map.html',
-  styleUrl: './infrastructure-map.scss'
+  templateUrl: './node.html',
+  styleUrl: './node.scss'
 })
-export class InfrastructureMapComponent implements OnInit, OnDestroy {
+export class TerminalNode implements OnInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLDivElement>;
 
   private auth = inject(AuthService);
@@ -122,7 +120,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
   }
 
   public refreshMap() {
-      // Re-fetches structures but does NOT wipe valid saved manual layouts
       this.scheduleBuildGraph(false);
   }
 
@@ -140,7 +137,7 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
           localStorage.removeItem(`quilix_map_positions_${this.currentWorkspaceId}`);
           this.selectedNodeIds.clear();
           
-          this.nodes.set([]); // Trigger initial view logic
+          this.nodes.set([]); 
           this.panX.set(0);
           this.panY.set(0);
 
@@ -155,8 +152,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
       }, 300);
   }
 
-  // ── Storage Cache Utils ──
-
   private loadLayouts(): Record<string, {x: number, y: number}> {
       try {
           const str = localStorage.getItem(`quilix_map_positions_${this.currentWorkspaceId}`);
@@ -168,7 +163,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
   private saveLayouts() {
       if (!this.currentWorkspaceId) return;
       
-      // Update cache block specifically only with manually dragged nodes.
       const currentMap = this.loadLayouts(); 
       for (const id of this.selectedNodeIds) {
           const node = this.nodes().find(n => n.id === id);
@@ -179,8 +173,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
       localStorage.setItem(`quilix_map_positions_${this.currentWorkspaceId}`, JSON.stringify(currentMap));
   }
 
-  // ── Zoom Controls ──
-  
   zoomIn() {
     this.zoomScale.update(s => Math.min(s + 0.15, 2.5));
   }
@@ -200,8 +192,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ── Canvas Navigation Physics (Pan & Lasso) ──
-
   private getNormalizedCoordinates(event: MouseEvent | TouchEvent) {
       if (window.TouchEvent && event instanceof TouchEvent) {
           if (event.touches.length > 0) {
@@ -213,14 +203,12 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
   }
 
   startCanvasInteraction(event: MouseEvent | TouchEvent) {
-    if ((event.target as HTMLElement).closest('.map-node')) return; // Ignore nodes
+    if ((event.target as HTMLElement).closest('.map-node')) return;
     
-    // Ignore native right clicks (allow touch freely)
     if (event instanceof MouseEvent && event.button !== 0) return;
 
     const coords = this.getNormalizedCoordinates(event);
 
-    // Lasso is logically reserved for mouse+shift users.
     if (event instanceof MouseEvent && event.shiftKey) {
         const rect = this.mapContainer.nativeElement.getBoundingClientRect();
         const localX = coords.x - rect.left;
@@ -238,7 +226,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
         
         this.selectedNodeIds.clear(); 
     } else {
-        // Generic Panning
         this.selectedNodeIds.clear(); 
         this.isPanning.set(true);
         this.startPanX = coords.x - this.panX();
@@ -251,7 +238,7 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
     const coords = this.getNormalizedCoordinates(event);
 
     if (this.isPanning()) {
-        if (event instanceof TouchEvent && event.cancelable) event.preventDefault(); // Stop native drag effects safely
+        if (event instanceof TouchEvent && event.cancelable) event.preventDefault();
         this.panX.set(coords.x - this.startPanX);
         this.panY.set(coords.y - this.startPanY);
         return;
@@ -304,8 +291,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
       }
   }
 
-  // ── Drag & Drop Multi-Node Controller ──
-
   onNodeClick(event: MouseEvent | TouchEvent, node: MapNode) {
      const isShift = event instanceof MouseEvent && event.shiftKey;
      if (isShift) {
@@ -323,8 +308,8 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
 
   onDragStarted(event: CdkDragStart, node: MapNode) {
      if (!this.selectedNodeIds.has(node.id)) {
-         this.selectedNodeIds.clear();
-         this.selectedNodeIds.add(node.id); 
+          this.selectedNodeIds.clear();
+          this.selectedNodeIds.add(node.id); 
      }
   }
 
@@ -333,7 +318,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
   onDragMoved(event: CdkDragMove, leadNode: MapNode) {
     const dragDelta = event.source.getFreeDragPosition();
 
-    // 60FPS Batch DOM updating strategy to eliminate 20fps drag lag heavily on low-power touch devices.
     if (this.animationFrameId) {
         cancelAnimationFrame(this.animationFrameId);
     }
@@ -354,34 +338,25 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
   }
 
   onDragEnded(event: CdkDragEnd, leadNode: MapNode) {
-      // 1. Commit absolute finalized cumulative DOM values universally globally
       for (const id of this.selectedNodeIds) {
           const gn = this.nodes().find(n => n.id === id);
           if (gn) {
               gn.x += gn.currentPosition.x;
               gn.y += gn.currentPosition.y;
               gn.currentPosition = { x: 0, y: 0 };
-              gn.initialPosition = { x: 0, y: 0 }; // Resets physical angular DOM constraints for the next possible drag
+              gn.initialPosition = { x: 0, y: 0 }; 
           }
       }
-      
-      // Zero out the specific native handle that caused the trigger because the physical CSS offsets already absorbed the value.
       event.source.reset();
-      
-      this.saveLayouts(); // Persist all
+      this.saveLayouts(); 
   }
-
-  // ── Graphics Helper Renderers ──
 
   trackByNode(index: number, node: MapNode): string {
     return node.id; 
   }
 
   getBrotherTransform(node: MapNode): string {
-      // Transforms the position specifically for nodes that are NOT being actively pulled by cdkDrag
-      // but are pulled instead by group dynamics payload.
       if (node.currentPosition.x === 0 && node.currentPosition.y === 0) return '';
-      // We check if cdkDrag logic isn't natively handling it internally
       return `translate3d(${node.currentPosition.x}px, ${node.currentPosition.y}px, 0)`;
   }
 
@@ -397,14 +372,11 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
     const childX = child.x + child.currentPosition.x + childWidthCenter;
     const childY = child.y + child.currentPosition.y; 
 
-    // Smooth Bezier Curve logic
     const distanceY = Math.abs(childY - parentY);
     const tension = Math.min(distanceY / 2, 80); 
     
     return `M ${parentX} ${parentY} C ${parentX} ${parentY + tension}, ${childX} ${childY - tension}, ${childX} ${childY}`;
   }
-
-  // ── Smart Graph Topology Compiler ──
 
   private async buildGraph(forcePhysicalLayoutReset = false) {
     if (this.isScanning) return;
@@ -415,23 +387,18 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
       if (!ws) return;
 
       let buildNodes: MapNode[] = [];
-
       const savedLayouts = forcePhysicalLayoutReset ? {} : this.loadLayouts();
-      
       const existingNodesMap = new Map(this.nodes().map(n => [n.id, n]));
 
-      // Hybrid Cache Layer logic
       const resolvePos = (nodeId: string, defaultX: number, defaultY: number) => {
           let finalX = defaultX;
           let finalY = defaultY;
 
-          // 1. Is there saved manual layout in browser for THIS specific node?
           if (savedLayouts[nodeId]) {
               finalX = savedLayouts[nodeId].x;
               finalY = savedLayouts[nodeId].y;
           }
 
-          // 2. Prevent snatching actively dragged nodes by restoring their temporary drag-offsets
           const prior = existingNodesMap.get(nodeId);
           if (prior) {
               return { 
@@ -443,11 +410,9 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
               };
           }
           
-          // 3. Fallback to purely fresh computed mathematics bounds so topological insertions expand perfectly seamlessly!
           return { x: finalX, y: finalY, initX: 0, initY: 0, currentPos: {x: 0, y: 0} };
       };
 
-      // 1. Root Workspace Node
       const rootLayoutNode: LayoutNode = {
           id: ws.id,
           type: 'workspace',
@@ -461,7 +426,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
           isMissingOnDisk: ws.isMissingOnDisk
       };
 
-      // 2. Fetch Core Spaces & Subtrees Concurrently
       const allSpaces = await this.spaces.getByWorkspace(ws.id);
       const mode = await this.fileSystem.getStorageMode();
 
@@ -484,16 +448,13 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
              handle = await this.fileSystem.resolveSpaceHandle(ws.name, sp.id);
           }
           
-          // Use '1' as the starting level for recursive depth control
           spNode.children = await this.fetchTreeRecursive(handle, sp.id, null, sp.id, 1);
           return spNode;
       }));
 
-      // 3. Mathematical Two-Pass Layout Calculation (Bottom-Up)
-      const spacingX = 220; // Increased horizontal stretch to eliminate text overlapping
+      const spacingX = 220; 
       this.calculateSubtreeWidth(rootLayoutNode, spacingX);
 
-      // 4. Assign Absolute Viewport Coordinates (Top-Down)
       const rPos = resolvePos(ws.id, 0, 0);
       rootLayoutNode.x = rPos.x;
       rootLayoutNode.y = rPos.y;
@@ -502,15 +463,12 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
           const containerW = this.mapContainer.nativeElement.clientWidth;
           const containerH = this.mapContainer.nativeElement.clientHeight;
           
-          this.zoomScale.set(0.7); // Default zoom out
-          // Place the workspace node strictly in the exact mathematical center
-          this.panX.set((containerW / 2) - ((rPos.x + 100) * 0.7));
-          this.panY.set((containerH / 2) - ((rPos.y + 300) * 0.7));
+          this.zoomScale.set(0.6); 
+          this.panX.set((containerW / 2) - ((rPos.x + 100) * 0.6));
+          this.panY.set((containerH / 2) - ((rPos.y + 100) * 0.6));
       }
 
       this.assignCoordinates(rootLayoutNode, buildNodes, resolvePos);
-
-      // Set final tree layout natively
       this.nodes.set([...buildNodes]); 
       
     } finally {
@@ -518,22 +476,18 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ── Two-Pass Core Algorithms ──
-
   private calculateSubtreeWidth(node: LayoutNode, spacingX: number): number {
       if (node.children.length === 0) {
-          // A leaf node guarantees at least `spacingX` width for itself
           node.subtreeWidth = spacingX;
           return node.subtreeWidth;
       }
       let sum = 0;
-      const margin = node.type === 'workspace' ? 80 : 30; // Horizontal gap boundaries between blocks
+      const margin = node.type === 'workspace' ? 80 : 30;
 
       for (let i = 0; i < node.children.length; i++) {
           sum += this.calculateSubtreeWidth(node.children[i], spacingX);
           if (i > 0) sum += margin; 
       }
-      // Expand the parent's logical stride if its children need more space laterally
       node.subtreeWidth = Math.max(spacingX, sum);
       return node.subtreeWidth;
   }
@@ -544,18 +498,12 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
       resolveNodePos: (id: string, defX: number, defY: number) => {x: number, y: number, initX: number, initY: number, currentPos: {x: number, y: number}},
       collisionOverrideX?: number
   ) {
-      // 1. Establish precise algorithmic coordinate or inherit manual boundary push
       const p = resolveNodePos(node.id, collisionOverrideX ?? node.x, node.y);
-      
-      if (collisionOverrideX !== undefined) {
-          p.x = collisionOverrideX; // Enforce visual repulsion priority over manual layout!
-      }
+      if (collisionOverrideX !== undefined) p.x = collisionOverrideX;
 
-      // 2. IMPORTANT: Update the LayoutNode reference point down the tree instantly so children align perfectly under the dragged/repulsed parent
       node.x = p.x;
       node.y = p.y;
 
-      // Construct concrete UI MapNode and push to the flattened render array
       refNodes.push({
           id: node.id,
           type: node.type,
@@ -570,59 +518,36 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
       });
 
       if (node.children.length > 0) {
-          
-          // PHASE 1: Determine Topographical Targets 
           let organicCurrentX = node.x - (node.subtreeWidth / 2);
           const margin = node.type === 'workspace' ? 80 : 30;
 
           for (const child of node.children) {
               child.x = organicCurrentX + (child.subtreeWidth / 2);
-              
-              // Fetch user-defined explicit coordinates to prepare for collision sweep
               const intended = resolveNodePos(child.id, child.x, node.y);
               child.x = intended.x;
-              
               organicCurrentX += child.subtreeWidth + margin;
           }
 
-          // PHASE 2: Spatial Collision Repulsion (Uniformly applied across the tree)
           let overrides = new Map<string, number>();
-          
-          // Sort structurally left-to-right organically or by manual user preference
           const sortedChildren = [...node.children].sort((a, b) => a.x - b.x);
-
           let safeLeftBoundary = -Infinity;
           
           for (const child of sortedChildren) {
               const requiredLeftEdge = child.x - (child.subtreeWidth / 2);
-
               let finalSafeX = child.x;
               if (requiredLeftEdge < safeLeftBoundary) {
-                  // Subtree overlaps prior sibling's protected boundary zone! PUSH RIGHT mathematically.
                   finalSafeX = safeLeftBoundary + (child.subtreeWidth / 2);
                   overrides.set(child.id, finalSafeX);
               }
-              
-              // Lock down physical right boundary protected block
               safeLeftBoundary = finalSafeX + (child.subtreeWidth / 2) + margin; 
           }
 
-          // PHASE 3: Cascade recursive geometry down into files and deeper sub-spaces dynamically!
           for (const child of node.children) {
               const isSpaceLevel = node.type === 'workspace'; 
               const childGapY = isSpaceLevel ? 160 : 120;
-              
               child.y = node.y + childGapY;
-              
-              if (child.type === 'overflow') {
-                  child.y -= 10; 
-              }
-
-              // Inherit topological warning states instantly so missing spaces seamlessly turn subdirectories into visually detached tracks!
-              if (node.isMissingOnDisk) {
-                  child.isMissingOnDisk = true;
-              }
-
+              if (child.type === 'overflow') child.y -= 10; 
+              if (node.isMissingOnDisk) child.isMissingOnDisk = true;
               this.assignCoordinates(child, refNodes, resolveNodePos, overrides.get(child.id));
           }
       }
@@ -635,7 +560,7 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
       parentNodeId: string, 
       level: number
   ): Promise<LayoutNode[]> {
-      if (level > 4) return []; // Stop runaway depth
+      if (level > 4) return [];
 
       try {
         const entries = await this.fileManager.readDirectory({ handle: dirHandle, spaceId, parentId: parentDirectoryId });
@@ -664,7 +589,6 @@ export class InfrastructureMapComponent implements OnInit, OnDestroy {
             };
 
             if (isDirectory) {
-                // Fetch deeply dynamically
                 node.children = await this.fetchTreeRecursive(entry.handle, spaceId, entry.id || null, nodeId, level + 1);
             }
             childrenNodes.push(node);

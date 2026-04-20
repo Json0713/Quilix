@@ -110,12 +110,14 @@
 // ── Terminal Content (Body + Instance Sidebar) ──
 
 .terminal-content,
-.source-control-container {
+.source-control-container,
+.node-container {
     flex: 1;
     display: flex;
     overflow: hidden;
 
-    app-source-control {
+    app-source-control,
+    app-terminal-node {
         display: block;
         width: 100%;
         height: 100%;
