@@ -464,8 +464,9 @@ export class TerminalNode implements OnInit, OnDestroy {
           const containerH = this.mapContainer.nativeElement.clientHeight;
           
           this.zoomScale.set(0.6); 
+          // Place the workspace node at the top center
           this.panX.set((containerW / 2) - ((rPos.x + 100) * 0.6));
-          this.panY.set((containerH / 2) - ((rPos.y + 100) * 0.6));
+          this.panY.set(80 - (rPos.y * 0.6)); 
       }
 
       this.assignCoordinates(rootLayoutNode, buildNodes, resolvePos);
