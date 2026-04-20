@@ -7,11 +7,18 @@
     <aside class="chat-history" [class.open]="showHistory()">
         <div class="history-header">
             <button class="icon-btn mobile-only" (click)="toggleHistory()" title="Close History">
-                <i class="bi bi-chevron-left"></i>
+                <i class="bi bi-chevron-double-left"></i>
             </button>
             <h3 class="history-title">Chats</h3>
-            <button class="icon-btn" (click)="newChat()" title="New Chat">
+            <button class="icon-btn" title="Search chats">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+
+        <div class="history-actions">
+            <button class="new-chat-btn" (click)="newChat()" title="Start a new conversation">
                 <i class="bi bi-plus-lg"></i>
+                <span>New Chat</span>
             </button>
         </div>
 
@@ -66,6 +73,12 @@
                     }
                 </div>
             }
+        </div>
+        <div class="history-footer">
+            <button class="footer-item" title="Settings">
+                <i class="bi bi-gear"></i>
+                <span>Settings</span>
+            </button>
         </div>
     </aside>
 

@@ -166,12 +166,22 @@ export class TeamChat implements OnInit, AfterViewChecked {
         localStorage.removeItem('quilix_team_active_session');
         this.inputText = '';
         setTimeout(() => this.chatInput?.nativeElement?.focus(), 100);
+
+        // Auto-close sidebar on mobile
+        if (window.innerWidth <= 770) {
+            this.showHistory.set(false);
+        }
     }
 
     async selectSession(session: ChatSession) {
         await this.chat.setActiveSession(session.id);
         localStorage.setItem('quilix_team_active_session', session.id);
         this.shouldScrollToBottom = true;
+
+        // Auto-close sidebar on mobile
+        if (window.innerWidth <= 770) {
+            this.showHistory.set(false);
+        }
     }
 
     toggleContextMenu(sessionId: string, event: Event) {
