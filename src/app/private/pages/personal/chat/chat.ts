@@ -8,12 +8,13 @@ import { FormsModule } from '@angular/forms';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { ChatService } from '../../../../core/services/components/chat.service';
 import { ChatMessage, ChatSession } from '../../../../core/database/dexie.models';
+import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 
 
 @Component({
     selector: 'app-personal-chat',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, MarkdownPipe],
     templateUrl: './chat.html',
     styleUrl: './chat.scss',
 })
