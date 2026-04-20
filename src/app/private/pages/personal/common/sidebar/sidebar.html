@@ -142,7 +142,7 @@
                     </button>
 
                     @if (openMenuId() === space.id) {
-                    <div class="space-menu-dropdown">
+                    <div class="space-menu-dropdown" [class.dropup]="dropdownService.isDropup()">
                         <button class="dropdown-item rename-item" (click)="startRename(space, $event)">
                             <i class="bi bi-pencil"></i>
                             <span>Rename</span>

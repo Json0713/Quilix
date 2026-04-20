@@ -12,6 +12,7 @@ import { Workspace } from '../../../../../core/interfaces/workspace';
 import { WorkspaceService } from '../../../../../core/services/components/workspace.service';
 import { SettingsKitComponent } from '../settings-kit/settings-kit';
 import { PersonalProfileMenuComponent } from '../profile-menu/profile-menu';
+import { DropdownService } from '../../../../../services/ui/common/dropdown/dropdown.service';
 
 @Component({
     selector: 'app-personal-sidebar',
@@ -28,6 +29,7 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
     private tabService = inject(TabService);
     private router = inject(Router);
     private route = inject(ActivatedRoute);
+    public dropdownService = inject(DropdownService);
 
     isCollapsed = this.sidebarService.isCollapsed;
     isMobileOpen = this.sidebarService.isMobileOpen;
@@ -116,6 +118,7 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
     onDocumentClick() {
         if (this.openMenuId()) {
             this.openMenuId.set(null);
+            this.dropdownService.reset();
         }
     }
 
@@ -264,7 +267,14 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
 
     toggleMenu(spaceId: string, event: Event) {
         event.stopPropagation();
-        this.openMenuId.set(this.openMenuId() === spaceId ? null : spaceId);
+        const isOpening = this.openMenuId() !== spaceId;
+        this.openMenuId.set(isOpening ? spaceId : null);
+
+        if (isOpening) {
+            this.dropdownService.updatePosition(event);
+        } else {
+            this.dropdownService.reset();
+        }
     }
 
     async trashSpace(spaceId: string, event: Event) {

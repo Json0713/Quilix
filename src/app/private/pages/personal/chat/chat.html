@@ -61,7 +61,7 @@
                         </button>
 
                         @if (contextMenuSessionId() === session.id) {
-                            <div class="item-dropdown" [class.dropup]="isDropup()" (click)="$event.stopPropagation()">
+                            <div class="item-dropdown" [class.dropup]="dropdownService.isDropup()" (click)="$event.stopPropagation()">
                                 <button class="dropdown-item" (click)="startRename(session, $event)">
                                     <i class="bi bi-pencil"></i>
                                     <span>Rename</span>

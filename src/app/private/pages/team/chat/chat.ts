@@ -9,6 +9,7 @@ import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/bre
 import { ChatService } from '../../../../core/services/components/chat.service';
 import { ChatMessage, ChatSession } from '../../../../core/database/dexie.models';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
+import { DropdownService } from '../../../../services/ui/common/dropdown/dropdown.service';
 
 
 @Component({
@@ -22,12 +23,12 @@ export class TeamChat implements OnInit, AfterViewChecked {
     private breadcrumb = inject(BreadcrumbService);
     protected chat = inject(ChatService);
     private cdr = inject(ChangeDetectorRef);
+    public dropdownService = inject(DropdownService);
 
     // ── UI state ──────────────────────────────────────────────────────────
     inputText = '';
     showHistory = signal<boolean>(localStorage.getItem('quilix_team_sidebar_open') === 'true');
     showCanvas = signal<boolean>(false);
-    isDropup = signal<boolean>(false);
     canvasContent = signal<string>('');
     shouldScrollToBottom = false;
     isInitializing = signal<boolean>(true);
@@ -106,7 +107,7 @@ export class TeamChat implements OnInit, AfterViewChecked {
     onDocumentClick() {
         if (this.contextMenuSessionId()) {
             this.contextMenuSessionId.set(null);
-            this.isDropup.set(false);
+            this.dropdownService.reset();
         }
     }
 
@@ -192,15 +193,9 @@ export class TeamChat implements OnInit, AfterViewChecked {
         this.contextMenuSessionId.set(isOpening ? sessionId : null);
 
         if (isOpening) {
-            const button = event.currentTarget as HTMLElement;
-            if (button) {
-                const rect = button.getBoundingClientRect();
-                const viewportHeight = window.innerHeight;
-                // Detect if dropdown would go off-screen or behind footer
-                this.isDropup.set(rect.bottom > viewportHeight - 180);
-            }
+            this.dropdownService.updatePosition(event, 180);
         } else {
-            this.isDropup.set(false);
+            this.dropdownService.reset();
         }
     }
 
