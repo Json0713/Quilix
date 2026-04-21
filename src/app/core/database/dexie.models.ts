@@ -54,5 +54,6 @@ export interface WidgetAlarm {
     time: string; // HH:mm
     enabled: boolean;
     label: string;
+    ringtone: string;
     createdAt: number;
 }

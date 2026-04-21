@@ -131,6 +131,11 @@ export class DexieService extends Dexie {
             widget_alarms: 'id, time, enabled'
         });
 
+        // v14 – Pro Alarms with customizable ringtones.
+        this.version(14).stores({
+            widget_alarms: 'id, time, enabled, ringtone'
+        });
+
         // Open the database connection eagerly to reduce first-operation latency.
         this.open().catch(err => {
             console.error('[DexieService] Failed to open database:', err);
