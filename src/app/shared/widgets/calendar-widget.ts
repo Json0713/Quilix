@@ -117,6 +117,15 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                                             <span (click)="notePriority = 'medium'" [class.active]="notePriority === 'medium'" class="medium"></span>
                                             <span (click)="notePriority = 'high'" [class.active]="notePriority === 'high'" class="high"></span>
                                         </div>
+                                        <div class="reminder-zone">
+                                            <div class="toggle-switch-mini" [class.enabled]="noteReminderEnabled()" (click)="noteReminderEnabled.set(!noteReminderEnabled())">
+                                                <div class="switch-handle"></div>
+                                            </div>
+                                            <span class="label">Remind Me</span>
+                                            @if (noteReminderEnabled()) {
+                                                <input type="time" [(ngModel)]="noteReminderTime" class="reminder-input animate-fade">
+                                            }
+                                        </div>
                                         <button class="save-btn" (click)="saveSelectedNote()" [disabled]="!noteContent && !noteTitle">
                                             <i class="bi bi-check-lg"></i> Save
                                         </button>
@@ -187,6 +196,14 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                                                     <span (click)="notePriority = 'low'" [class.active]="notePriority === 'low'" class="low"></span>
                                                     <span (click)="notePriority = 'medium'" [class.active]="notePriority === 'medium'" class="medium"></span>
                                                     <span (click)="notePriority = 'high'" [class.active]="notePriority === 'high'" class="high"></span>
+                                                </div>
+                                                <div class="reminder-zone-mobile">
+                                                    <div class="toggle-switch-mini" [class.enabled]="noteReminderEnabled()" (click)="noteReminderEnabled.set(!noteReminderEnabled())">
+                                                        <div class="switch-handle"></div>
+                                                    </div>
+                                                    @if (noteReminderEnabled()) {
+                                                        <input type="time" [(ngModel)]="noteReminderTime" class="reminder-input-mobile">
+                                                    }
                                                 </div>
                                                 <button class="save-btn-mobile" (click)="saveSelectedNote()" [disabled]="!noteContent && !noteTitle">
                                                     <i class="bi bi-check-lg"></i> Save Note
@@ -271,6 +288,22 @@ import { ModalService } from '../../services/ui/common/modal/modal';
     .priority-selector { display: flex; gap: 10px; span { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; opacity: 0.3; transition: all 0.2s; &.active { opacity: 1; transform: scale(1.2); } &.high { background: #ff4d4d; } &.medium { background: #ffaa00; } &.low { background: #00cc66; } } }
     .save-btn { padding: 8px 18px; border-radius: 8px; background: var(--accent); color: white; border: none; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; &:disabled { opacity: 0.5; cursor: not-allowed; } &:hover:not(:disabled) { background: var(--accent-hover, var(--accent)); filter: brightness(1.1); } }
 
+    .reminder-zone {
+        display: flex; align-items: center; gap: 8px; margin-left: auto; margin-right: 15px;
+        .label { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+        .reminder-input { background: var(--surface-main); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 0.75rem; color: var(--text-main); font-weight: 700; width: 100px; }
+    }
+    .reminder-zone-mobile { display: flex; align-items: center; gap: 10px; .reminder-input-mobile { background: var(--surface-main); border: 1px solid var(--border); border-radius: 8px; padding: 8px; font-size: 0.8rem; color: var(--text-main); width: 110px; } }
+
+    .toggle-switch-mini { 
+        width: 32px; height: 18px; background: var(--border); border-radius: 10px; position: relative; cursor: pointer; transition: all 0.3s; 
+        .switch-handle { position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: all 0.3s; } 
+        &.enabled { background: var(--accent); .switch-handle { transform: translateX(14px); } } 
+    }
+    
+    .animate-fade { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
     /* MOBILE NATIVE HUB - FIXED SCROLLING */
     .mobile-tabs {
         display: flex; padding: 8px 12px; background: var(--surface-alt); border-bottom: 1px solid var(--border); gap: 6px;
@@ -325,10 +358,14 @@ export class SharedCalendarWidget implements OnInit {
   noteTitle = '';
   noteContent = '';
   notePriority: 'low' | 'medium' | 'high' = 'low';
+  noteReminderEnabled = signal(false);
+  noteReminderTime = '';
 
   private db = inject(DexieService);
   private modalService = inject(ModalService);
   private readonly today = new Date();
+  private monitorInterval: any;
+  private triggeredReminders = new Set<string>();
 
   @HostListener('window:resize')
   onResize() {
@@ -339,6 +376,46 @@ export class SharedCalendarWidget implements OnInit {
     this.generateCalendar();
     await this.loadAllNotes();
     this.updateActiveNote();
+    this.startReminderMonitor();
+  }
+
+  ngOnDestroy() {
+    if (this.monitorInterval) clearInterval(this.monitorInterval);
+  }
+
+  private startReminderMonitor() {
+    this.monitorInterval = setInterval(() => {
+        this.checkReminders();
+    }, 1000 * 60); // Check every minute
+    this.checkReminders(); // Initial check
+  }
+
+  private checkReminders() {
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+    const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+    const reminder = this.notes().find(n => 
+        n.date === dateStr && 
+        n.reminderEnabled && 
+        n.reminderTime === timeStr && 
+        !this.triggeredReminders.has(n.id)
+    );
+
+    if (reminder) {
+        this.triggeredReminders.add(reminder.id);
+        this.triggerSystemNotification(reminder);
+    }
+  }
+
+  private triggerSystemNotification(note: WidgetNote) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Calendar Reminder: ' + (note.title || 'Pinned Note'), {
+            body: note.content || 'Check your pinned note for today.',
+            icon: '/favicon.ico',
+            tag: 'quilix-reminder-' + note.id
+        });
+    }
   }
 
   private generateCalendar() {
@@ -367,6 +444,8 @@ export class SharedCalendarWidget implements OnInit {
     this.noteTitle = note?.title || '';
     this.noteContent = note?.content || '';
     this.notePriority = note?.priority || 'low';
+    this.noteReminderEnabled.set(note?.reminderEnabled || false);
+    this.noteReminderTime = note?.reminderTime || '';
   }
 
   isToday(day: number): boolean {
@@ -415,6 +494,8 @@ export class SharedCalendarWidget implements OnInit {
       title: this.noteTitle,
       content: this.noteContent,
       priority: this.notePriority,
+      reminderEnabled: this.noteReminderEnabled(),
+      reminderTime: this.noteReminderTime,
       createdAt: this.activeNote()?.createdAt || Date.now()
     };
     await this.db.widget_notes.put(note);

@@ -136,6 +136,11 @@ export class DexieService extends Dexie {
             widget_alarms: 'id, time, enabled, ringtone'
         });
 
+        // v15 – Note Reminders with OS-level notifications.
+        this.version(15).stores({
+            widget_notes: 'id, date, createdAt, reminderTime, reminderEnabled'
+        });
+
         // Open the database connection eagerly to reduce first-operation latency.
         this.open().catch(err => {
             console.error('[DexieService] Failed to open database:', err);

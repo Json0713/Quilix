@@ -45,6 +45,8 @@ export interface WidgetNote {
     title: string;
     content: string;
     priority: 'low' | 'medium' | 'high';
+    reminderEnabled: boolean;
+    reminderTime: string; // HH:mm
     createdAt: number;
 }
 
