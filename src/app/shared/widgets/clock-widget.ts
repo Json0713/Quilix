@@ -178,13 +178,14 @@ import { ModalService } from '../../services/ui/common/modal/modal';
     /* WIDGET MODAL WRAPPER (480px NATIVE PATTERN) */
     .widget-modal-wrapper {
         width: 480px; max-width: 95vw; background: var(--surface-main); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4); display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        height: 550px;
         max-height: 85vh;
     }
 
     .widget-modal-header {
-        display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border); background: var(--surface-alt);
-        .header-left { display: flex; align-items: center; gap: 12px; .header-icon { font-size: 1.25rem; color: var(--accent); opacity: 0.8; } h2 { font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin: 0; } }
-        .close-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg-alt); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; &:hover { background: var(--bg-hover); color: var(--text-main); } }
+        display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface-alt);
+        .header-left { display: flex; align-items: center; gap: 10px; .header-icon { font-size: 1.1rem; color: var(--accent); opacity: 0.8; } h2 { font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0; } }
+        .close-btn { width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--bg-alt); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; &:hover { background: var(--bg-hover); color: var(--text-main); } }
     }
 
     .hub-tabs-container { padding: 16px 24px; background: var(--surface-alt); border-bottom: 1px solid var(--border); }
@@ -217,7 +218,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
         .add-alarm-form {
             display: flex; flex-direction: column; gap: 12px; padding-top: 24px; border-top: 1px solid var(--border);
             .input-group { display: flex; gap: 10px; input { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text-main); font-weight: 600; font-size: 1rem; &:focus { border-color: var(--accent); outline: none; } } .time-input { width: 120px; } .label-input { flex: 1; } }
-            .add-btn { background: var(--accent); color: white; border: none; border-radius: 12px; padding: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s; &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(var(--accent-rgb, 59, 130, 246), 0.3); } }
+            .add-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 10px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(var(--accent-rgb, 59, 130, 246), 0.2); } }
         }
     }
 
@@ -241,12 +242,12 @@ import { ModalService } from '../../services/ui/common/modal/modal';
     }
 
     .main-btn {
-        flex: 1; padding: 14px; border-radius: 14px; border: none; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.2s;
+        flex: 1; padding: 10px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
         &.start { background: var(--accent); color: white; }
         &.stop { background: #ff4d4d; color: white; }
         &.reset { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
         &.lap { background: var(--bg-alt); color: var(--accent); border: 1px solid var(--border); }
-        &:hover:not(.reset):not(.lap) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        &:hover:not(.reset):not(.lap) { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     }
 
     .alert-overlay {
