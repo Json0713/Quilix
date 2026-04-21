@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, Input, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, Input, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DexieService, WidgetAlarm } from '../../core/database/dexie.service';
@@ -13,7 +13,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
       
       <!-- SIDEBAR VIEW -->
       @if (!isModal) {
-          <div class="clock-display">
+          <div class="clock-display sidebar-mode">
             <div class="time-main">
               {{ currentTime() | date:'h:mm' }}<span class="seconds" *ngIf="showSeconds()">{{ currentTime() | date:'ss' }}</span><span class="period">{{ currentTime() | date:'a' }}</span>
             </div>
@@ -23,7 +23,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
 
       <!-- MODAL VIEW (Native Pattern) -->
       @if (isModal) {
-          <div class="widget-modal-wrapper">
+          <div class="widget-modal-wrapper" [class.is-mobile]="isMobile()">
                 <div class="widget-modal-header">
                     <div class="header-left">
                         <i class="bi bi-clock header-icon"></i>
@@ -41,7 +41,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                     </div>
                 </div>
 
-                <div class="widget-modal-body">
+                <div class="widget-modal-body thin-scroll">
                     <div class="hub-content">
                         
                         <!-- MODE: CLOCK -->
@@ -84,7 +84,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                                 <div class="add-alarm-form">
                                     <div class="input-group">
                                         <input type="time" [(ngModel)]="newAlarmTime" class="time-input">
-                                        <input type="text" [(ngModel)]="newAlarmLabel" placeholder="Label (e.g. Work)" class="label-input">
+                                        <input type="text" [(ngModel)]="newAlarmLabel" placeholder="Label..." class="label-input">
                                     </div>
                                     <button (click)="addAlarm()" class="add-btn" [disabled]="!newAlarmTime">
                                         <i class="bi bi-plus-lg"></i> Add Alarm
@@ -106,7 +106,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                                 
                                 <div class="timer-controls">
                                     @if (!timerRunning()) {
-                                        <div class="timer-presets">
+                                        <div class="timer-presets thin-scroll">
                                             <button (click)="setTimer(60)">1m</button>
                                             <button (click)="setTimer(300)">5m</button>
                                             <button (click)="setTimer(600)">10m</button>
@@ -135,7 +135,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                                     <button class="main-btn reset" (click)="resetSW()">Reset</button>
                                 </div>
                                 
-                                <div class="lap-history">
+                                <div class="lap-history thin-scroll">
                                     @for (lap of laps(); track $index) {
                                         <div class="lap-item">
                                             <span class="lap-num">Lap {{ laps().length - $index }}</span>
@@ -168,107 +168,116 @@ import { ModalService } from '../../services/ui/common/modal/modal';
     :host { display: block; }
     .clock-hub { user-select: none; }
 
-    /* SIDEBAR CLOCK */
-    .clock-display {
+    /* THIN SCROLLBAR (RESTORED & OPTIMIZED) */
+    .thin-scroll { overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
+    .thin-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+    .thin-scroll::-webkit-scrollbar-track { background: transparent; }
+    .thin-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; border: 1px solid transparent; background-clip: padding-box; }
+    .thin-scroll::-webkit-scrollbar-thumb:hover { background-color: var(--text-muted); }
+
+    /* SIDEBAR MODE (ISOLATED) */
+    .clock-display.sidebar-mode {
         text-align: center;
         .time-main { font-size: 2.2rem; font-weight: 700; color: var(--text-main); letter-spacing: -1px; .seconds { font-size: 1rem; color: var(--text-muted); margin-left: 6px; } .period { font-size: 0.8rem; margin-left: 6px; color: var(--accent); font-weight: 800; } }
         .date-sub { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: -2px; }
     }
 
-    /* WIDGET MODAL WRAPPER (480px NATIVE PATTERN) */
-    .widget-modal-wrapper {
-        width: 480px; max-width: 95vw; background: var(--surface-main); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4); display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        height: 550px;
-        max-height: 85vh;
+    /* MODAL-VIEW SCOPED OVERRIDES */
+    .clock-hub.modal-view {
+        .widget-modal-wrapper {
+            width: 480px; max-width: 95vw; background: var(--surface-main); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4); display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            height: 550px; max-height: 85vh;
+        }
+
+        .widget-modal-header {
+            display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface-alt);
+            .header-left { display: flex; align-items: center; gap: 10px; .header-icon { font-size: 1.1rem; color: var(--accent); opacity: 0.8; } h2 { font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0; } }
+            .close-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--bg-alt); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; &:hover { background: var(--bg-hover); color: var(--text-main); } }
+        }
+
+        .widget-modal-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px; display: flex; flex-direction: column; }
+        .hub-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 100%; min-height: fit-content; }
     }
 
-    .widget-modal-header {
-        display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface-alt);
-        .header-left { display: flex; align-items: center; gap: 10px; .header-icon { font-size: 1.1rem; color: var(--accent); opacity: 0.8; } h2 { font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0; } }
-        .close-btn { width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--bg-alt); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; &:hover { background: var(--bg-hover); color: var(--text-main); } }
-    }
-
-    .hub-tabs-container { padding: 16px 24px; background: var(--surface-alt); border-bottom: 1px solid var(--border); }
+    .hub-tabs-container { padding: 12px 20px; background: var(--surface-alt); border-bottom: 1px solid var(--border); }
     .hub-tabs {
         display: flex; gap: 8px; background: var(--bg-alt); padding: 5px; border-radius: 12px; border: 1px solid var(--border);
         button {
-            flex: 1; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 9px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s; font-size: 1rem;
+            flex: 1; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 9px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s; font-size: 1.1rem;
             &:hover { color: var(--text-main); }
             &.active { background: var(--bg-active); color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         }
     }
 
-    .widget-modal-body { flex: 1; overflow-y: auto; padding: 32px 24px; }
-    .hub-content { display: flex; align-items: center; justify-content: center; width: 100%; }
-
-    /* MODES */
-    .clock-display.modal-mode { .time-main { font-size: 5.5rem; margin-bottom: 10px; } .date-sub { font-size: 1.3rem; } }
+    /* MODES (MODAL ONLY) */
+    .clock-display.modal-mode { .time-main { font-size: 6rem; margin-bottom: 10px; font-weight: 900; } .date-sub { font-size: 1.5rem; font-weight: 800; } }
 
     .alarm-manager {
         width: 100%; display: flex; flex-direction: column; gap: 24px;
-        .alarm-header-sub { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; h3 { font-size: 1rem; font-weight: 800; color: var(--text-main); } .alarm-count { font-size: 0.75rem; font-weight: 700; color: var(--accent); } }
-        .alarm-list { display: flex; flex-direction: column; gap: 12px; }
+        .alarm-header-sub { display: flex; justify-content: space-between; align-items: center; h3 { font-size: 0.9rem; font-weight: 800; color: var(--text-main); } .alarm-count { font-size: 0.7rem; font-weight: 700; color: var(--accent); } }
+        .alarm-list { display: flex; flex-direction: column; gap: 10px; }
         .alarm-item {
-            display: flex; justify-content: space-between; padding: 16px; background: var(--surface-alt); border-radius: 16px; border: 1px solid var(--border); transition: all 0.2s;
-            &.enabled { border-color: var(--accent); background: var(--bg-active); opacity: 1; }
-            &:not(.enabled) { opacity: 0.6; }
-            .alarm-info { display: flex; flex-direction: column; align-items: flex-start; .alarm-time { font-size: 1.5rem; font-weight: 800; color: var(--text-main); line-height: 1; } .alarm-label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-top: 4px; } }
-            .alarm-actions { display: flex; align-items: center; gap: 16px; }
+            display: flex; justify-content: space-between; padding: 14px; background: var(--surface-alt); border-radius: 14px; border: 1px solid var(--border); transition: all 0.2s;
+            &.enabled { border-color: var(--accent); background: var(--bg-active); }
+            .alarm-info { display: flex; flex-direction: column; .alarm-time { font-size: 1.6rem; font-weight: 800; color: var(--text-main); line-height: 1; } .alarm-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-top: 4px; } }
+            .alarm-actions { display: flex; align-items: center; gap: 14px; }
         }
         .add-alarm-form {
-            display: flex; flex-direction: column; gap: 12px; padding-top: 24px; border-top: 1px solid var(--border);
-            .input-group { display: flex; gap: 10px; input { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text-main); font-weight: 600; font-size: 1rem; &:focus { border-color: var(--accent); outline: none; } } .time-input { width: 120px; } .label-input { flex: 1; } }
-            .add-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 10px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(var(--accent-rgb, 59, 130, 246), 0.2); } }
+            display: flex; flex-direction: column; gap: 10px; padding-top: 20px; border-top: 1px solid var(--border); margin-top: auto;
+            .input-group { display: flex; gap: 8px; input { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: var(--text-main); font-weight: 600; font-size: 0.9rem; &:focus { border-color: var(--accent); outline: none; } } .time-input { width: 110px; } .label-input { flex: 1; } }
+            .add-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 12px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
         }
     }
 
     .timer-display {
         display: flex; flex-direction: column; align-items: center; gap: 32px; width: 100%;
         .timer-visual {
-            width: 200px; height: 200px; position: relative;
-            svg { width: 100%; height: 100%; transform: rotate(-90deg); circle { fill: none; stroke-width: 4; &.bg { stroke: var(--border); } &.progress { stroke: var(--accent); stroke-linecap: round; stroke-dasharray: calc(45 * 2 * 3.14159); transition: stroke-dashoffset 0.1s linear; } } }
+            width: 180px; height: 180px; position: relative;
+            svg { width: 100%; height: 100%; transform: rotate(-90deg); circle { fill: none; stroke-width: 4; &.bg { stroke: var(--border); } &.progress { stroke: var(--accent); stroke-linecap: round; stroke-dasharray: calc(45 * 2 * 3.14159); } } }
             .timer-digits { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; font-weight: 900; color: var(--text-main); font-variant-numeric: tabular-nums; }
         }
         .timer-controls { display: flex; flex-direction: column; gap: 16px; width: 100%; }
-        .timer-presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; button { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; &.pomo { color: var(--accent); border-color: var(--accent); } &:hover { border-color: var(--accent); } } }
+        .timer-presets { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; button { flex-shrink: 0; padding: 8px 16px; border-radius: 8px; background: var(--surface-alt); border: 1px solid var(--border); font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; &.pomo { border-color: var(--accent); color: var(--accent); } &:hover { border-color: var(--accent); } } }
     }
 
     .stopwatch-display {
         display: flex; flex-direction: column; align-items: center; width: 100%; gap: 32px;
-        .sw-time { font-size: 4.5rem; font-weight: 900; color: var(--text-main); font-variant-numeric: tabular-nums; letter-spacing: -1.5px; }
-        .sw-controls { width: 100%; display: flex; gap: 12px; }
-        .lap-history { width: 100%; display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding-right: 6px; }
-        .lap-item { display: flex; justify-content: space-between; padding: 12px 16px; background: var(--surface-alt); border-radius: 12px; font-size: 0.95rem; font-weight: 700; .lap-num { color: var(--accent); } }
+        .sw-time { font-size: 4.5rem; font-weight: 900; color: var(--text-main); font-variant-numeric: tabular-nums; letter-spacing: -1px; }
+        .sw-controls { width: 100%; display: flex; gap: 10px; }
+        .lap-history { width: 100%; display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 4px; }
+        .lap-item { display: flex; justify-content: space-between; padding: 10px 14px; background: var(--surface-alt); border-radius: 10px; font-size: 0.9rem; font-weight: 700; .lap-num { color: var(--accent); } }
     }
 
     .main-btn {
-        flex: 1; padding: 10px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+        flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
         &.start { background: var(--accent); color: white; }
         &.stop { background: #ff4d4d; color: white; }
         &.reset { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
         &.lap { background: var(--bg-alt); color: var(--accent); border: 1px solid var(--border); }
-        &:hover:not(.reset):not(.lap) { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        &:hover:not(.reset) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     }
 
     .alert-overlay {
         position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); z-index: 9999; display: flex; align-items: center; justify-content: center;
         .alert-card {
-            background: var(--surface-main); padding: 48px; border-radius: 40px; border: 1px solid var(--accent); box-shadow: 0 30px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; gap: 20px;
-            i { font-size: 4rem; color: var(--accent); animation: float 3s ease-in-out infinite; }
-            h2 { font-size: 1.8rem; font-weight: 900; }
-            p { font-size: 1.1rem; color: var(--text-muted); }
-            .dismiss-btn { margin-top: 16px; background: var(--accent); color: white; padding: 14px 40px; border-radius: 16px; border: none; font-weight: 900; cursor: pointer; font-size: 1.1rem; transition: transform 0.2s; &:active { transform: scale(0.95); } }
+            background: var(--surface-main); padding: 40px; border-radius: 32px; border: 1px solid var(--accent); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px;
+            i { font-size: 3.5rem; color: var(--accent); animation: float 3s ease-in-out infinite; }
+            h2 { font-size: 1.6rem; font-weight: 900; }
+            .dismiss-btn { margin-top: 10px; background: var(--accent); color: white; padding: 12px 32px; border-radius: 14px; border: none; font-weight: 900; cursor: pointer; }
         }
     }
 
-    .toggle-switch { width: 44px; height: 24px; background: var(--border); border-radius: 20px; position: relative; cursor: pointer; transition: all 0.3s; .switch-handle { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: all 0.3s; } &.enabled { background: var(--accent); .switch-handle { transform: translateX(20px); } } }
+    .toggle-switch { width: 44px; height: 24px; background: var(--border); border-radius: 20px; position: relative; cursor: pointer; .switch-handle { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: all 0.2s; } &.enabled { background: var(--accent); .switch-handle { transform: translateX(20px); } } }
 
     @keyframes slideUp { from { opacity: 0; transform: translateY(15px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
     @media (max-width: 600px) {
-        .widget-modal-wrapper { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; }
-        .clock-display.modal-mode { .time-main { font-size: 4rem; } }
+        .clock-hub.modal-view {
+            .widget-modal-wrapper { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; padding-bottom: env(safe-area-inset-bottom); }
+            .clock-display.modal-mode { .time-main { font-size: 4.5rem; } .date-sub { font-size: 1.2rem; } }
+            .hub-tabs button { height: 50px; font-size: 1.3rem; }
+        }
     }
   `]
 })
@@ -279,6 +288,7 @@ export class SharedClockWidget implements OnInit, OnDestroy {
   currentTime = signal(new Date());
   showSeconds = signal(true);
   isAlerting = signal(false);
+  isMobile = signal(window.innerWidth < 600);
   
   // Timer State
   timerValue = signal(0);
@@ -302,6 +312,11 @@ export class SharedClockWidget implements OnInit, OnDestroy {
   private modalService = inject(ModalService);
   private clockInterval: any;
   private audioContext: AudioContext | null = null;
+
+  @HostListener('window:resize')
+  onResize() {
+    this.isMobile.set(window.innerWidth < 600);
+  }
 
   async ngOnInit() {
     this.clockInterval = setInterval(() => {
