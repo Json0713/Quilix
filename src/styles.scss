@@ -4,12 +4,12 @@
 
 :root {
   /* ================= Brand ================= */
-  --primary: #0f2e32;
+  --primary: #244f55;
   --primary-hover: #0f2e32;
   --primary-soft: #0f2e32;
 
   /* ================= Accent ================= */
-  --accent: #0f2e32;
+  --accent: #316b6f;
   --accent-hover: #135f64;
   --accent-soft: #e1f3f4;
 
@@ -29,7 +29,7 @@
   /* ================= Surface ================= */
   --surface: #f3f6f6;
   --surface-main: #f6f8f7;
-  --surface-alt: #eef3f4;
+  --surface-alt: #f3f6f6d0;
   --surface-muted: #eef3f4;
 
   /* ================= Borders ================= */
@@ -87,7 +87,7 @@ html.dark-theme {
   /* Surface */
   --surface: #16161c;
   --surface-main: #14141a;
-  --surface-alt: #2d2a2a;
+  --surface-alt: #1d1d20d1;
   --surface-muted: #2b2a2a;
 
   /*  Borders */

@@ -21,7 +21,7 @@
     align-items: center;
     justify-content: center;
     padding: 2rem 1.5rem;
-    background: var(--bg);
+    background: var(--surface-alt);
     animation: fadeInForm 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 
     // Order switching on mobile so banner is on top
@@ -83,6 +83,12 @@
             border-color: var(--accent);
             color: var(--accent);
         }
+    }
+}
+
+.back-link{
+    i {
+        color: var(--text-main);
     }
 }
 
@@ -167,7 +173,7 @@
         left: 4px;
         width: calc(50% - 4px);
         height: calc(100% - 8px);
-        background: var(--bg);
+        background: var(--bg-alt);
         border-radius: 8px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
