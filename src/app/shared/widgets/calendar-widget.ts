@@ -192,19 +192,27 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                                             <textarea [(ngModel)]="noteContent" placeholder="Note content..." rows="12" class="thin-scroll"></textarea>
                                             
                                             <div class="mobile-editor-controls">
-                                                <div class="priority-selector">
-                                                    <span (click)="notePriority = 'low'" [class.active]="notePriority === 'low'" class="low"></span>
-                                                    <span (click)="notePriority = 'medium'" [class.active]="notePriority === 'medium'" class="medium"></span>
-                                                    <span (click)="notePriority = 'high'" [class.active]="notePriority === 'high'" class="high"></span>
-                                                </div>
-                                                <div class="reminder-zone-mobile">
-                                                    <div class="toggle-switch-mini" [class.enabled]="noteReminderEnabled()" (click)="noteReminderEnabled.set(!noteReminderEnabled())">
-                                                        <div class="switch-handle"></div>
+                                                <div class="control-item">
+                                                    <label>Priority</label>
+                                                    <div class="priority-selector">
+                                                        <span (click)="notePriority = 'low'" [class.active]="notePriority === 'low'" class="low"></span>
+                                                        <span (click)="notePriority = 'medium'" [class.active]="notePriority === 'medium'" class="medium"></span>
+                                                        <span (click)="notePriority = 'high'" [class.active]="notePriority === 'high'" class="high"></span>
                                                     </div>
-                                                    @if (noteReminderEnabled()) {
-                                                        <input type="time" [(ngModel)]="noteReminderTime" class="reminder-input-mobile">
-                                                    }
                                                 </div>
+                                                
+                                                <div class="control-item">
+                                                    <label>Remind Me</label>
+                                                    <div class="reminder-zone-mobile">
+                                                        <div class="toggle-switch-mini" [class.enabled]="noteReminderEnabled()" (click)="noteReminderEnabled.set(!noteReminderEnabled())">
+                                                            <div class="switch-handle"></div>
+                                                        </div>
+                                                        @if (noteReminderEnabled()) {
+                                                            <input type="time" [(ngModel)]="noteReminderTime" class="reminder-input-mobile animate-fade">
+                                                        }
+                                                    </div>
+                                                </div>
+
                                                 <button class="save-btn-mobile" (click)="saveSelectedNote()" [disabled]="!noteContent && !noteTitle">
                                                     <i class="bi bi-check-lg"></i> Save Note
                                                 </button>
@@ -286,14 +294,14 @@ import { ModalService } from '../../services/ui/common/modal/modal';
     .note-editor { display: flex; flex-direction: column; gap: 16px; height: 100%; .field-group { display: flex; flex-direction: column; gap: 6px; &.expand { flex: 1; min-height: 0; } } label { font-size: 0.65rem; font-weight: 800; color: var(--accent); text-transform: uppercase; } .title-input { background: var(--surface-main); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text-main); font-weight: 700; &:focus { border-color: var(--accent); outline: none; } } textarea { background: var(--surface-main); border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: var(--text-main); font-weight: 500; resize: none; flex: 1; &:focus { border-color: var(--accent); outline: none; } } }
     .editor-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10px; }
     .priority-selector { display: flex; gap: 10px; span { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; opacity: 0.3; transition: all 0.2s; &.active { opacity: 1; transform: scale(1.2); } &.high { background: #ff4d4d; } &.medium { background: #ffaa00; } &.low { background: #00cc66; } } }
-    .save-btn { padding: 8px 18px; border-radius: 8px; background: var(--accent); color: white; border: none; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; &:disabled { opacity: 0.5; cursor: not-allowed; } &:hover:not(:disabled) { background: var(--accent-hover, var(--accent)); filter: brightness(1.1); } }
+    .save-btn { padding: 8px 24px; border-radius: 50px; background: var(--accent); color: white; border: none; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; &:disabled { opacity: 0.5; cursor: not-allowed; } &:hover:not(:disabled) { background: var(--accent-hover, var(--accent)); filter: brightness(1.1); } }
 
     .reminder-zone {
         display: flex; align-items: center; gap: 8px; margin-left: auto; margin-right: 15px;
         .label { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
-        .reminder-input { background: var(--surface-main); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 0.75rem; color: var(--text-main); font-weight: 700; width: 100px; }
+        .reminder-input { background: var(--surface-main); border: 1px solid var(--border); border-radius: 50px; padding: 4px 12px; font-size: 0.75rem; color: var(--text-main); font-weight: 700; width: 100px; }
     }
-    .reminder-zone-mobile { display: flex; align-items: center; gap: 10px; .reminder-input-mobile { background: var(--surface-main); border: 1px solid var(--border); border-radius: 8px; padding: 8px; font-size: 0.8rem; color: var(--text-main); width: 110px; } }
+    .reminder-zone-mobile { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; .reminder-input-mobile { background: var(--surface-main); border: 1px solid var(--border); border-radius: 50px; padding: 10px 16px; font-size: 0.9rem; color: var(--text-main); width: 130px; font-weight: 700; } }
 
     .toggle-switch-mini { 
         width: 32px; height: 18px; background: var(--border); border-radius: 10px; position: relative; cursor: pointer; transition: all 0.3s; 
@@ -325,8 +333,15 @@ import { ModalService } from '../../services/ui/common/modal/modal';
     .mobile-selection-hint { padding: 14px; background: var(--surface-alt); border-radius: 12px; font-size: 0.8rem; color: var(--text-alt); text-align: center; margin-top: 10px; border: 1px dashed var(--border); }
 
     .mobile-editor-controls {
-        display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--surface-alt); border-radius: 14px; margin-top: 10px;
-        .save-btn-mobile { padding: 12px 24px; border-radius: 12px; background: var(--accent); color: white; border: none; font-weight: 800; font-size: 0.9rem; }
+        display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--surface-alt); border-radius: 24px; margin-top: 15px; border: 1px solid var(--border);
+        .control-item {
+            display: flex; justify-content: space-between; align-items: center; padding: 10px 4px; 
+            &:first-child { border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+            label { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        }
+        .priority-selector { margin-right: 4px; }
+        .reminder-zone-mobile { display: flex; align-items: center; gap: 12px; .reminder-input-mobile { background: var(--surface-main); border: 1px solid var(--border); border-radius: 50px; padding: 6px 12px; font-size: 0.85rem; color: var(--text-main); font-weight: 700; width: 100px; outline: none; &:focus { border-color: var(--accent); } } }
+        .save-btn-mobile { margin-top: 8px; padding: 16px; border-radius: 50px; background: var(--accent); color: white; border: none; font-weight: 900; font-size: 1rem; width: 100%; box-shadow: 0 10px 20px rgba(0,0,0,0.15); transition: all 0.2s; cursor: pointer; &:active { transform: scale(0.98); } &:disabled { opacity: 0.5; } }
     }
 
     @keyframes slideUp { from { opacity: 0; transform: translateY(15px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }

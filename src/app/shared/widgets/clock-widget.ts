@@ -90,7 +90,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                                                 <span class="alarm-time">{{ format12h(alarm.time) }}</span>
                                                 <div class="alarm-meta">
                                                     <span class="alarm-label">{{ alarm.label || 'Alarm' }}</span>
-                                                    <span class="alarm-sound-tag"><i class="bi bi-music-note-beamed"></i> {{ alarm.ringtone | titlecase }}</span>
+                                                    <span class="alarm-sound-tag"><i class="bi bi-music-note-beamed"></i> {{ (alarm.ringtone || 'system') | titlecase }}</span>
                                                 </div>
                                             </div>
                                             <div class="alarm-actions">
@@ -117,12 +117,19 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                                         </div>
                                         <div class="field ringtone-field">
                                             <label>Ringtone</label>
-                                            <select [(ngModel)]="selectedRingtone" class="ringtone-select">
-                                                <option value="breeze">Breeze</option>
-                                                <option value="pulse">Pulse</option>
-                                                <option value="aurora">Aurora</option>
-                                                <option value="echo">Echo</option>
-                                            </select>
+                                            <div class="ringtone-select-group">
+                                                <select [(ngModel)]="selectedRingtone" class="ringtone-select">
+                                                    <option value="system">System Only</option>
+                                                    <option value="digital">Digital Beep</option>
+                                                    <option value="radar">Radar Pulse</option>
+                                                    <option value="chimes">Ethereal Chimes</option>
+                                                    <option value="classic">Mechanical Bell</option>
+                                                    <option value="breeze">Zen Breeze</option>
+                                                </select>
+                                                <button class="preview-btn" (click)="togglePreview()" [class.playing]="previewingSound()">
+                                                    <i class="bi" [class.bi-play-fill]="!previewingSound()" [class.bi-stop-fill]="previewingSound()"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                         <div class="field btn-field">
                                             <label class="hidden-label">Action</label>
@@ -201,9 +208,9 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                     <i class="bi bi-alarm-fill"></i>
                 </div>
                 <h2>{{ activeAlarmAlert()?.label || 'Alarm' }}</h2>
-                <div class="alert-time">{{ activeAlarmAlert()?.time }}</div>
+                <div class="alert-time">{{ format12h(activeAlarmAlert()?.time || '') }}</div>
                 <p>Rising time. High Performance Awaits.</p>
-                <div class="alert-ringtone">Sound: {{ activeAlarmAlert()?.ringtone | titlecase }}</div>
+                <div class="alert-ringtone">Sound: {{ (activeAlarmAlert()?.ringtone || 'system') | titlecase }}</div>
                 <button class="dismiss-btn">Stop Alarm</button>
             </div>
         </div>
@@ -235,13 +242,14 @@ import { ModalService } from '../../services/ui/common/modal/modal';
         }
 
         .widget-modal-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px; display: flex; flex-direction: column; }
-        .hub-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 100%; min-height: fit-content; &.centered { justify-content: center; } }
+        .hub-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 100%; min-height: fit-content; gap: 20px; &.centered { justify-content: center; } }
     }
 
     /* DIGITAL/ANALOG */
     .clock-display.modal-mode { 
-        width: 100%; text-align: center; cursor: pointer; padding: 20px 0;
-        .digital-face { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; padding: 20px 0;
+        .digital-face { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+        .analog-face { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
         .time-main { font-size: 4.5rem; font-weight: 950; letter-spacing: -2px; font-variant-numeric: tabular-nums; line-height: 1; color: var(--text-main); .seconds-group { color: var(--text-muted); opacity: 0.6; } .period { font-size: 1.5rem; margin-left: 10px; color: var(--accent); } }
         .date-sub { font-size: 1.25rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
         .toggle-hint { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; opacity: 0.3; }
@@ -276,7 +284,12 @@ import { ModalService } from '../../services/ui/common/modal/modal';
             .field { display: flex; flex-direction: column; gap: 6px; &.expand { flex: 1; } } 
             label { font-size: 0.6rem; font-weight: 950; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; &.hidden-label { opacity: 0; } } 
             input, .ringtone-select { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: var(--text-main); font-weight: 700; font-size: 0.85rem; width: 100%; box-sizing: border-box; &:focus { border-color: var(--accent); outline: none; } } 
-            .add-btn-grid { height: 42px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 950; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; &:disabled { opacity: 0.5; } &:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); } }
+            .ringtone-select-group { 
+                display: flex; gap: 6px; 
+                .ringtone-select { flex: 1; border-radius: 50px; }
+                .preview-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface-alt); color: var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; &.playing { background: var(--accent); color: white; border-color: var(--accent); } }
+            }
+            .add-btn-grid { height: 42px; background: var(--accent); color: white; border: none; border-radius: 50px; font-weight: 950; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; &:disabled { opacity: 0.5; } &:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); } }
         }
     }
 
@@ -290,12 +303,14 @@ import { ModalService } from '../../services/ui/common/modal/modal';
             .alert-time { font-size: 1.2rem; font-weight: 800; color: var(--accent); }
             p { color: var(--text-muted); font-weight: 700; line-height: 1.5; }
             .alert-ringtone { font-size: 0.75rem; font-weight: 900; color: var(--accent); text-transform: uppercase; background: var(--bg-alt); padding: 4px 12px; border-radius: 20px; }
-            .dismiss-btn { width: 100%; margin-top: 10px; background: var(--accent); color: white; padding: 16px; border-radius: 20px; border: none; font-weight: 950; font-size: 1.1rem; cursor: pointer; transition: all 0.2s; &:hover { transform: scale(1.02); } }
+            .dismiss-btn { width: 100%; margin-top: 10px; background: var(--accent); color: white; padding: 16px; border-radius: 50px; border: none; font-weight: 950; font-size: 1.1rem; cursor: pointer; transition: all 0.2s; &:hover { transform: scale(1.02); } }
         }
     }
 
     @keyframes shake { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(10deg); } 75% { transform: rotate(-10deg); } }
     @keyframes slideUp { from { opacity: 0; transform: translateY(15px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade { animation: fadeIn 0.3s ease; }
 
     /* SHARED STYLES */
     .hub-tabs-container { padding: 12px 20px; background: var(--surface-alt); border-bottom: 1px solid var(--border); }
@@ -312,7 +327,6 @@ import { ModalService } from '../../services/ui/common/modal/modal';
             .widget-modal-wrapper { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; padding-bottom: env(safe-area-inset-bottom); }
             .hub-tabs button { height: 55px; font-size: 1.4rem; }
             .widget-modal-body { padding: 16px; }
-            .notification-banner { display: block; }
         }
         .alert-card { width: 300px; padding: 30px; }
     }
@@ -331,9 +345,10 @@ export class SharedClockWidget implements OnInit, OnDestroy {
   alarms = signal<WidgetAlarm[]>([]);
   newAlarmTime = '';
   newAlarmLabel = '';
-  selectedRingtone = 'breeze';
+  selectedRingtone = 'system';
+  previewingSound = signal<string | null>(null);
   activeAlarmAlert = signal<WidgetAlarm | null>(null);
-  private alarmTriggered = new Set<string>(); // Prevent multi-triggers in same minute
+  private alarmTriggered = new Set<string>();
 
   // Timer
   timerValue = signal(0);
@@ -352,11 +367,20 @@ export class SharedClockWidget implements OnInit, OnDestroy {
   private modalService = inject(ModalService);
   private clockInterval: any;
   private audioContext: AudioContext | null = null;
-  private oscillator: any = null;
+  private loopInterval: any;
 
   @HostListener('window:resize')
   onResize() {
     this.isMobile.set(window.innerWidth < 600);
+  }
+
+  // GLOBAL AUDIO UNLOCKER FOR MOBILE
+  @HostListener('document:click')
+  @HostListener('document:touchstart')
+  unlockAudio() {
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+        this.audioContext.resume();
+    }
   }
 
   async ngOnInit() {
@@ -412,7 +436,7 @@ export class SharedClockWidget implements OnInit, OnDestroy {
         time: this.newAlarmTime,
         enabled: true,
         label: this.newAlarmLabel,
-        ringtone: this.selectedRingtone,
+        ringtone: this.selectedRingtone || 'system',
         createdAt: Date.now()
     };
     await this.db.widget_alarms.put(alarm);
@@ -436,13 +460,9 @@ export class SharedClockWidget implements OnInit, OnDestroy {
 
   private checkAlarms(now: Date) {
     const currentStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    const seconds = now.getSeconds();
-
-    // Reset trigger set at start of each minute
-    if (seconds === 0) this.alarmTriggered.clear();
+    if (now.getSeconds() === 0) this.alarmTriggered.clear();
 
     const active = this.alarms().find(a => a.enabled && a.time === currentStr && !this.alarmTriggered.has(a.id));
-    
     if (active) {
         this.alarmTriggered.add(active.id);
         this.triggerAlert(active);
@@ -451,18 +471,29 @@ export class SharedClockWidget implements OnInit, OnDestroy {
 
   private triggerAlert(alarm: WidgetAlarm) {
     this.activeAlarmAlert.set(alarm);
-    this.playRingtone(alarm.ringtone);
+    this.playRingtone(alarm.ringtone || 'system', true);
     
-    // System Notification for background
     if ('Notification' in window && Notification.permission === 'granted') {
         new Notification('Quilix Alarm: ' + (alarm.label || 'Time Up!'), {
-            body: `It is ${alarm.time}. High performance awaits.`,
+            body: `It is ${this.format12h(alarm.time)}. High performance awaits.`,
             icon: '/favicon.ico',
             tag: 'quilix-alarm'
         });
     }
 
-    if ('vibrate' in navigator) navigator.vibrate([200, 100, 200, 100, 500]);
+    if ('vibrate' in navigator) navigator.vibrate([300, 100, 300, 100, 500]);
+  }
+
+  togglePreview() {
+    if (this.previewingSound()) {
+        this.stopAudio();
+        this.previewingSound.set(null);
+    } else {
+        const type = this.selectedRingtone || 'system';
+        this.previewingSound.set(type);
+        this.playRingtone(type, false);
+        setTimeout(() => { if (this.previewingSound() === type) this.previewingSound.set(null); }, 3000);
+    }
   }
 
   stopAlert() {
@@ -471,41 +502,71 @@ export class SharedClockWidget implements OnInit, OnDestroy {
     if ('vibrate' in navigator) navigator.vibrate(0);
   }
 
-  private playRingtone(type: string) {
+  private playRingtone(type: string, loop: boolean) {
+    if (type === 'system') return;
+    this.stopAudio();
+    
     try {
         this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
         const master = this.audioContext.createGain();
         master.connect(this.audioContext.destination);
-        master.gain.setValueAtTime(0.5, this.audioContext.currentTime);
+        
+        // GENTLE WAKE: Ramp volume over 2 seconds
+        master.gain.setValueAtTime(0, this.audioContext.currentTime);
+        master.gain.linearRampToValueAtTime(0.5, this.audioContext.currentTime + 2);
 
-        const playTone = (freq: number, start: number, duration: number, type: OscillatorType = 'sine') => {
+        const triggerSequence = () => {
             if (!this.audioContext) return;
-            const osc = this.audioContext.createOscillator();
-            const g = this.audioContext.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, this.audioContext.currentTime + start);
-            osc.connect(g);
-            g.connect(master);
-            g.gain.setValueAtTime(0, this.audioContext.currentTime + start);
-            g.gain.linearRampToValueAtTime(0.2, this.audioContext.currentTime + start + 0.1);
-            g.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + start + duration);
-            osc.start(this.audioContext.currentTime + start);
-            osc.stop(this.audioContext.currentTime + start + duration);
+            const now = this.audioContext.currentTime;
+
+            if (type === 'digital') {
+                for (let i = 0; i < 3; i++) this.playTone(880, now + (i * 0.2), 0.1, 'square');
+            } else if (type === 'radar') {
+                const osc = this.audioContext.createOscillator();
+                const g = this.audioContext.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1200, now);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.4);
+                g.gain.setValueAtTime(0.4, now);
+                g.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                osc.connect(g); g.connect(master);
+                osc.start(now); osc.stop(now + 0.4);
+            } else if (type === 'chimes') {
+                [440, 660, 880].forEach((f, i) => this.playTone(f, now + (i * 0.3), 1.2, 'triangle'));
+            } else if (type === 'classic') {
+                this.playTone(600, now, 0.05, 'sawtooth');
+                this.playTone(600, now + 0.1, 0.05, 'sawtooth');
+            } else if (type === 'breeze') {
+                [440, 554, 659, 880].forEach((f, i) => this.playTone(f, now + (i * 0.5), 3, 'sine'));
+            }
         };
 
-        if (type === 'breeze') {
-            [440, 554, 659, 880].forEach((f, i) => playTone(f, i * 0.5, 3));
-        } else if (type === 'pulse') {
-            for(let i=0; i<10; i++) playTone(880, i * 0.4, 0.3, 'square');
-        } else if (type === 'aurora') {
-            for(let i=0; i<5; i++) playTone(330 + (i*100), i * 0.8, 4, 'triangle');
-        } else if (type === 'echo') {
-            for(let i=0; i<15; i++) playTone(1200, i * 0.6, 0.2, 'sine');
+        triggerSequence();
+        if (loop) {
+            this.loopInterval = setInterval(triggerSequence, type === 'breeze' ? 4000 : 1000);
         }
     } catch(e) {}
   }
 
+  private playTone(freq: number, startTime: number, duration: number, type: OscillatorType) {
+    if (!this.audioContext) return;
+    const osc = this.audioContext.createOscillator();
+    const g = this.audioContext.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, startTime);
+    osc.connect(g);
+    g.connect(this.audioContext.destination);
+    
+    g.gain.setValueAtTime(0, startTime);
+    g.gain.linearRampToValueAtTime(0.3, startTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+    
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+  }
+
   private stopAudio() {
+    if (this.loopInterval) clearInterval(this.loopInterval);
     if (this.audioContext) {
         this.audioContext.close();
         this.audioContext = null;
@@ -516,17 +577,17 @@ export class SharedClockWidget implements OnInit, OnDestroy {
     if (this.clockInterval) clearInterval(this.clockInterval);
     if (this.timerInterval) clearInterval(this.timerInterval);
     if (this.swInterval) clearInterval(this.swInterval);
-    this.stopAlert();
+    this.stopAudio();
   }
 
-  // Timer/SW Methods (unchanged but included for completeness)
+  // Timer/SW Methods
   setTimer(s: number) { this.timerValue.set(s); this.totalTimerTime = s; }
   startTimer() { 
     if (this.timerValue() <= 0) return;
     this.timerRunning.set(true);
     this.timerInterval = setInterval(() => {
         this.timerValue.update(v => v - 1);
-        if (this.timerValue() <= 0) { this.stopTimer(); this.triggerAlert({ id: 'tmr', time: 'Timer', label: 'Timer Up', ringtone: 'pulse', enabled: true } as any); }
+        if (this.timerValue() <= 0) { this.stopTimer(); this.triggerAlert({ id: 'tmr', time: 'Timer', label: 'Timer Up', ringtone: 'digital', enabled: true } as any); }
     }, 1000);
   }
   stopTimer() { this.timerRunning.set(false); if (this.timerInterval) clearInterval(this.timerInterval); }
