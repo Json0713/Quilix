@@ -200,6 +200,21 @@ import { ModalService } from '../../services/ui/common/modal/modal';
           </div>
       }
 
+      <!-- CUSTOM CONFIRMATION OVERLAY (STANDARD PRO) -->
+      @if (confirmDeleteAlarm()) {
+        <div class="hub-overlay-backdrop animate-fade" (click)="confirmDeleteAlarm.set(null)">
+            <div class="hub-confirm-card animate-pop" (click)="$event.stopPropagation()">
+                <div class="confirm-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <h3>Delete Alarm?</h3>
+                <p>Are you sure you want to remove the <strong>{{ format12h(confirmDeleteAlarm()!.time) }}</strong> alarm? This action cannot be undone.</p>
+                <div class="confirm-actions">
+                    <button class="btn-confirm-pill" (click)="confirmedDelete()">Delete Alarm</button>
+                    <button class="btn-cancel" (click)="confirmDeleteAlarm.set(null)">Cancel</button>
+                </div>
+            </div>
+        </div>
+      }
+
       <!-- ALARM OVERLAY (Native Alert) -->
       @if (activeAlarmAlert()) {
         <div class="alert-overlay" (click)="stopAlert()">
@@ -227,6 +242,21 @@ import { ModalService } from '../../services/ui/common/modal/modal';
     .thin-scroll::-webkit-scrollbar-track { background: transparent; }
     .thin-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; border: 1px solid transparent; background-clip: padding-box; }
     .thin-scroll::-webkit-scrollbar-thumb:hover { background-color: var(--text-muted); }
+
+    .hub-overlay-backdrop { 
+        position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: 1010; 
+        display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .hub-confirm-card { 
+        background: var(--surface-main); border: 1px solid var(--border); border-radius: 28px; padding: 30px; width: 100%; max-width: 320px; text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        .confirm-icon { font-size: 2.5rem; color: #ff4d4d; margin-bottom: 12px; }
+        h3 { font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; margin-top: 0; }
+        p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; }
+        .confirm-actions { display: flex; flex-direction: column; gap: 12px; }
+        .btn-cancel { background: transparent; border: none; color: var(--text-muted); font-weight: 700; font-size: 0.9rem; padding: 10px; cursor: pointer; &:hover { color: var(--text-main); } }
+        .btn-confirm-pill { background: #ff4d4d; border: none; color: white; font-weight: 800; font-size: 0.95rem; padding: 16px; border-radius: 50px; cursor: pointer; box-shadow: 0 8px 16px rgba(255,77,77,0.3); transition: transform 0.2s; &:active { transform: scale(0.96); } }
+    }
 
     /* MODAL VIEW */
     .clock-hub.modal-view {
@@ -348,6 +378,7 @@ export class SharedClockWidget implements OnInit, OnDestroy {
   selectedRingtone = 'system';
   previewingSound = signal<string | null>(null);
   activeAlarmAlert = signal<WidgetAlarm | null>(null);
+  confirmDeleteAlarm = signal<WidgetAlarm | null>(null);
   private alarmTriggered = new Set<string>();
 
   // Timer
@@ -452,10 +483,16 @@ export class SharedClockWidget implements OnInit, OnDestroy {
   }
 
   async deleteAlarm(alarm: WidgetAlarm) {
-    if (confirm(`Delete the "${alarm.label || 'Daily'}" alarm at ${this.format12h(alarm.time)}?`)) {
+    this.confirmDeleteAlarm.set(alarm);
+  }
+
+  async confirmedDelete() {
+    const alarm = this.confirmDeleteAlarm();
+    if (alarm) {
         await this.db.widget_alarms.delete(alarm.id);
         await this.loadAlarms();
     }
+    this.confirmDeleteAlarm.set(null);
   }
 
   private checkAlarms(now: Date) {
@@ -511,59 +548,73 @@ export class SharedClockWidget implements OnInit, OnDestroy {
         const master = this.audioContext.createGain();
         master.connect(this.audioContext.destination);
         
-        // GENTLE WAKE: Ramp volume over 2 seconds
+        // GENTLE DEEP WAKE: Ramp volume from 0 to 0.5 over 30 seconds
         master.gain.setValueAtTime(0, this.audioContext.currentTime);
-        master.gain.linearRampToValueAtTime(0.5, this.audioContext.currentTime + 2);
+        master.gain.linearRampToValueAtTime(0.5, this.audioContext.currentTime + 30);
 
         const triggerSequence = () => {
             if (!this.audioContext) return;
             const now = this.audioContext.currentTime;
 
             if (type === 'digital') {
-                for (let i = 0; i < 3; i++) this.playTone(880, now + (i * 0.2), 0.1, 'square');
+                // Triple-Beep Standard: [Beep-Beep-Beep] --- [Pause]
+                for (let i = 0; i < 3; i++) {
+                    this.playTone(880, now + (i * 0.15), 0.08, 'square', master);
+                }
             } else if (type === 'radar') {
+                // Pro Radar: Sweeping Pitch + Resonant Ping
                 const osc = this.audioContext.createOscillator();
                 const g = this.audioContext.createGain();
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(1200, now);
                 osc.frequency.exponentialRampToValueAtTime(400, now + 0.4);
-                g.gain.setValueAtTime(0.4, now);
+                g.gain.setValueAtTime(0.3, now);
                 g.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
                 osc.connect(g); g.connect(master);
                 osc.start(now); osc.stop(now + 0.4);
             } else if (type === 'chimes') {
-                [440, 660, 880].forEach((f, i) => this.playTone(f, now + (i * 0.3), 1.2, 'triangle'));
+                // Ethereal Chimes: Multi-harmonic layer
+                [440, 659.25, 880, 1108.73].forEach((f, i) => {
+                    this.playTone(f, now + (i * 0.2), 1.5, 'triangle', master);
+                });
             } else if (type === 'classic') {
-                this.playTone(600, now, 0.05, 'sawtooth');
-                this.playTone(600, now + 0.1, 0.05, 'sawtooth');
+                // Double-Strike Mechanical Bell
+                this.playTone(600, now, 0.06, 'sawtooth', master);
+                this.playTone(800, now + 0.1, 0.08, 'sawtooth', master);
             } else if (type === 'breeze') {
-                [440, 554, 659, 880].forEach((f, i) => this.playTone(f, now + (i * 0.5), 3, 'sine'));
+                // Original Zen Breeze Melody
+                [440, 554.37, 659.25, 880].forEach((f, i) => {
+                    this.playTone(f, now + (i * 0.5), 3, 'sine', master);
+                });
             }
         };
 
         triggerSequence();
         if (loop) {
-            this.loopInterval = setInterval(triggerSequence, type === 'breeze' ? 4000 : 1000);
+            let interval = 1000;
+            if (type === 'radar') interval = 1200;
+            if (type === 'chimes') interval = 2500;
+            if (type === 'breeze') interval = 4000;
+            this.loopInterval = setInterval(triggerSequence, interval);
         }
     } catch(e) {}
   }
 
-  private playTone(freq: number, startTime: number, duration: number, type: OscillatorType) {
+  private playTone(freq: number, startTime: number, duration: number, type: OscillatorType, destination: AudioNode) {
     if (!this.audioContext) return;
     const osc = this.audioContext.createOscillator();
     const g = this.audioContext.createGain();
     osc.type = type;
     osc.frequency.setValueAtTime(freq, startTime);
     osc.connect(g);
-    g.connect(this.audioContext.destination);
-    
+    g.connect(destination);
     g.gain.setValueAtTime(0, startTime);
-    g.gain.linearRampToValueAtTime(0.3, startTime + 0.02);
+    g.gain.linearRampToValueAtTime(0.4, startTime + 0.015);
     g.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-    
     osc.start(startTime);
     osc.stop(startTime + duration);
   }
+
 
   private stopAudio() {
     if (this.loopInterval) clearInterval(this.loopInterval);

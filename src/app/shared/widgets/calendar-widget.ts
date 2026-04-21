@@ -228,6 +228,21 @@ import { ModalService } from '../../services/ui/common/modal/modal';
             </div>
         }
     </div>
+
+    <!-- CUSTOM CONFIRMATION OVERLAY (STANDARD PRO) -->
+    @if (confirmDeleteNote()) {
+        <div class="hub-overlay-backdrop animate-fade" (click)="confirmDeleteNote.set(false)">
+            <div class="hub-confirm-card animate-pop" (click)="$event.stopPropagation()">
+                <div class="confirm-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <h3>Delete Note?</h3>
+                <p>Are you sure you want to remove the note for <strong>{{ getSelectedDateString() | date:'mediumDate' }}</strong>? This action cannot be undone.</p>
+                <div class="confirm-actions">
+                    <button class="btn-confirm-pill" (click)="confirmedDelete()">Delete Note</button>
+                    <button class="btn-cancel" (click)="confirmDeleteNote.set(false)">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
   `,
   styles: [`
     :host { display: block; }
@@ -351,6 +366,22 @@ import { ModalService } from '../../services/ui/common/modal/modal';
 
     @keyframes slideUp { from { opacity: 0; transform: translateY(15px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
+    /* HUB OVERLAY SYSTEM (STANDARD PRO) */
+    .hub-overlay-backdrop { 
+        position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: 1010; 
+        display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .hub-confirm-card { 
+        background: var(--surface-main); border: 1px solid var(--border); border-radius: 28px; padding: 30px; width: 100%; max-width: 320px; text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        .confirm-icon { font-size: 2.5rem; color: #ff4d4d; margin-bottom: 12px; }
+        h3 { font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; margin-top: 0; }
+        p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; }
+        .confirm-actions { display: flex; flex-direction: column; gap: 12px; }
+        .btn-cancel { background: transparent; border: none; color: var(--text-muted); font-weight: 700; font-size: 0.9rem; padding: 10px; cursor: pointer; &:hover { color: var(--text-main); } }
+        .btn-confirm-pill { background: #ff4d4d; border: none; color: white; font-weight: 800; font-size: 0.95rem; padding: 16px; border-radius: 50px; cursor: pointer; box-shadow: 0 8px 16px rgba(255,77,77,0.3); transition: transform 0.2s; &:active { transform: scale(0.96); } }
+    }
+
     @media (max-width: 850px) {
         .widget-modal-wrapper { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; padding-bottom: env(safe-area-inset-bottom); }
         .widget-modal-header { padding: 12px 16px; }
@@ -380,6 +411,7 @@ export class SharedCalendarWidget implements OnInit {
   notePriority: 'low' | 'medium' | 'high' = 'low';
   noteReminderEnabled = signal(false);
   noteReminderTime = '';
+  confirmDeleteNote = signal(false);
 
   private db = inject(DexieService);
   private modalService = inject(ModalService);
@@ -526,14 +558,21 @@ export class SharedCalendarWidget implements OnInit {
     }
   }
 
-  async deleteSelectedNote() {
+   async deleteSelectedNote() {
     if (!this.activeNote()) return;
-    await this.db.widget_notes.delete(this.activeNote()!.id);
-    await this.loadAllNotes();
-    this.updateActiveNote();
-    if (this.isMobile()) {
-        this.viewMode.set('grid');
+    this.confirmDeleteNote.set(true);
+  }
+
+  async confirmedDelete() {
+    if (this.activeNote()) {
+        await this.db.widget_notes.delete(this.activeNote()!.id);
+        await this.loadAllNotes();
+        this.updateActiveNote();
+        if (this.isMobile()) {
+            this.viewMode.set('grid');
+        }
     }
+    this.confirmDeleteNote.set(false);
   }
 
   closeModal() {
