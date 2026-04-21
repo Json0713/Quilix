@@ -1,7 +1,244 @@
 :host {
-  display: block;
-  padding: 24px;
-  max-width: 1800px;
-  margin: 0 auto;
-  width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+// ── Parent Container Layout Fix ───────────────────────────────────────────
+// This ensures that the main template containers do not scroll, allowing the 
+// dashboard-layout to handle scrolling exclusively.
+::ng-deep .team:has(app-team-index),
+::ng-deep .personal:has(app-personal-index),
+::ng-deep .team:has(app-team-index) .container-fluid,
+::ng-deep .personal:has(app-personal-index) .container-fluid {
+    overflow: hidden !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.dashboard-layout {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--surface-main);
+    border: none;
+    position: relative;
+
+    &.initializing * {
+        transition: none !important;
+    }
+}
+
+// ── Mobile Accessibility — Backdrop ───────────────────────────────────────
+.dashboard-backdrop {
+    display: none;
+    position: fixed;
+    top: 90px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(2px);
+    z-index: 1040;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+
+    &.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    @media (max-width: 770px) {
+        display: block;
+    }
+}
+
+// ── Left Aside — Modules ──────────────────────────────────────────────────
+.dashboard-aside {
+    width: 260px;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-main);
+    border-right: 1px solid var(--border);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.2s ease;
+
+    &:not(.open) {
+        width: 0;
+        min-width: 0;
+        overflow: hidden;
+        opacity: 0;
+        border-right: none;
+    }
+}
+
+.aside-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 14px;
+    flex-shrink: 0;
+}
+
+.aside-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 0;
+}
+
+.aside-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 12px;
+}
+
+.aside-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: var(--text-main);
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+
+    i {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        transition: color 0.2s ease;
+    }
+
+    &:hover {
+        background: var(--bg-hover);
+        i { color: var(--text-main); }
+    }
+
+    &.active {
+        background: var(--bg-active);
+        color: var(--accent);
+        font-weight: 600;
+        i { color: var(--accent); }
+    }
+}
+
+.aside-footer {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.footer-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--bg-hover);
+        color: var(--text-main);
+    }
+}
+
+// ── Main — Dashboard Area ────────────────────────────────────────────────
+.dashboard-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.dashboard-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-main);
+}
+
+.toolbar-left, .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toolbar-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.dashboard-content {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--app-bg);
+}
+
+.content-wrapper {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+// ── Shared UI Components ─────────────────────────────────────────────────
+.icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 10px;
+    background: var(--surface-alt);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.05rem;
+
+    &:hover {
+        background: var(--bg-hover);
+        color: var(--accent);
+        transform: translateY(-1px);
+    }
+
+    &.mobile-mode {
+        display: none;
+        @media (max-width: 770px) { display: flex; }
+    }
+}
+
+@media (max-width: 770px) {
+    .dashboard-aside {
+        position: fixed;
+        top: 90px;
+        left: 0;
+        bottom: 0;
+        z-index: 1050;
+        box-shadow: 20px 0 50px rgba(0,0,0,0.1);
+    }
 }
