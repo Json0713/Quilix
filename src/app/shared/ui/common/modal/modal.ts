@@ -10,11 +10,13 @@ import { DetailsView } from '../../../components/space-manager/file-explorer/det
 import { GlobalSearchComponent } from '../../../components/global-search/global-search';
 import { Router, NavigationStart } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SharedClockWidget } from '../../../widgets/clock-widget';
+import { SharedCalendarWidget } from '../../../widgets/calendar-widget';
 
 @Component({
   selector: 'app-modal',
   standalone: true,
-  imports: [CommonModule, Import, TaskDetailComponent, CreateWorkspaceComponent, EditWorkspaceComponent, DetailsView, GlobalSearchComponent],
+  imports: [CommonModule, Import, TaskDetailComponent, CreateWorkspaceComponent, EditWorkspaceComponent, DetailsView, GlobalSearchComponent, SharedClockWidget, SharedCalendarWidget],
   templateUrl: './modal.html',
   styleUrl: './modal.scss',
 })

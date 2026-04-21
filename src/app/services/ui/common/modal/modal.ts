@@ -137,4 +137,24 @@ export class ModalService {
       view: 'global-search'
     });
   }
+
+  openClock(): void {
+    this._closeExistingGracefully();
+    this._modal.set({
+      id: ++this.id,
+      type: 'custom',
+      title: 'World Clock',
+      view: 'clock'
+    });
+  }
+
+  openCalendar(): void {
+    this._closeExistingGracefully();
+    this._modal.set({
+      id: ++this.id,
+      type: 'custom',
+      title: 'System Calendar',
+      view: 'calendar'
+    });
+  }
 }

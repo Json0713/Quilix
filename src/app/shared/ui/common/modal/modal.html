@@ -4,17 +4,17 @@
 <div class="modal-wrapper" role="dialog" aria-modal="true">
   <div class="modal-card" 
     [class.modal-xl]="modal.modal()?.view === 'task'"
-    [class.modal-search]="modal.modal()?.view === 'global-search'">
+    [class.modal-search]="['global-search', 'clock', 'calendar'].includes(modal.modal()?.view || '')">
 
     <!-- CLOSE BUTTON -->
-    @if (modal.modal()?.view !== 'global-search') {
+    @if (!['global-search', 'clock', 'calendar'].includes(modal.modal()?.view || '')) {
     <button type="button" class="modal-close" aria-label="Close modal" (click)="cancel()">
       <i class="bi bi-x-lg"></i>
     </button>
     }
 
     <!-- TITLE -->
-    @if (modal.modal()?.view !== 'global-search') {
+    @if (!['global-search', 'clock', 'calendar'].includes(modal.modal()?.view || '')) {
     <h3 class="modal-title">
       {{ modal.modal()?.title }}
     </h3>
@@ -35,6 +35,10 @@
         <app-details-view [entry]="modal.modal()!.explorerEntryData!"></app-details-view>
       } @else if (modal.modal()?.view === 'global-search') {
         <app-global-search />
+      } @else if (modal.modal()?.view === 'clock') {
+        <app-shared-clock-widget [isModal]="true" />
+      } @else if (modal.modal()?.view === 'calendar') {
+        <app-shared-calendar-widget [isModal]="true" />
       }
     }
 

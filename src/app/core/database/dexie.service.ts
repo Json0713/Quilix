@@ -24,10 +24,10 @@ import { Space } from '../interfaces/space';
 import { Tab } from '../interfaces/tab';
 import { Session } from '../interfaces/session';
 import { Task } from '../interfaces/task';
-import { ContactMessage, Setting, ChatSession, ChatMessage } from './dexie.models';
+import { ContactMessage, Setting, ChatSession, ChatMessage, WidgetNote, WidgetAlarm } from './dexie.models';
 
 // Re-export models so consumers can import from a single location if needed.
-export type { ContactMessage, Setting, ChatSession, ChatMessage };
+export type { ContactMessage, Setting, ChatSession, ChatMessage, WidgetNote, WidgetAlarm };
 
 @Injectable({ providedIn: 'root' })
 export class DexieService extends Dexie {
@@ -47,6 +47,8 @@ export class DexieService extends Dexie {
     activities!: Table<any, string>;
     chat_sessions!: Table<ChatSession, string>;
     chat_messages!: Table<ChatMessage, string>;
+    widget_notes!: Table<WidgetNote, string>;
+    widget_alarms!: Table<WidgetAlarm, string>;
 
     constructor() {
         super('QuilixDB');
@@ -121,6 +123,12 @@ export class DexieService extends Dexie {
         this.version(12).stores({
             chat_sessions: 'id, updatedAt',
             chat_messages: 'id, sessionId, timestamp, [sessionId+timestamp]'
+        });
+
+        // v13 – Dashboard Pro Widgets (Notes & Alarms).
+        this.version(13).stores({
+            widget_notes: 'id, date, createdAt',
+            widget_alarms: 'id, time, enabled'
         });
 
         // Open the database connection eagerly to reduce first-operation latency.

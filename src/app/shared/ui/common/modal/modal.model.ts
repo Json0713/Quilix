@@ -27,7 +27,7 @@ export interface ModalConfig {
 
   resolve?: (result: boolean | any) => void;
 
-  view?: 'import' | 'task' | 'create-workspace' | 'edit-workspace' | 'details' | 'global-search';
+  view?: 'import' | 'task' | 'create-workspace' | 'edit-workspace' | 'details' | 'global-search' | 'clock' | 'calendar';
   taskData?: Task;
   workspaceData?: Workspace;
   explorerEntryData?: FileExplorerEntry;

@@ -37,3 +37,22 @@ export interface ChatMessage {
     content: string;
     timestamp: number;
 }
+
+/** Represents a note attached to a specific date in the dashboard calendar. */
+export interface WidgetNote {
+    id: string;
+    date: string; // YYYY-MM-DD
+    title: string;
+    content: string;
+    priority: 'low' | 'medium' | 'high';
+    createdAt: number;
+}
+
+/** Represents a user-defined alarm for the dashboard clock. */
+export interface WidgetAlarm {
+    id: string;
+    time: string; // HH:mm
+    enabled: boolean;
+    label: string;
+    createdAt: number;
+}

@@ -12,19 +12,24 @@
             </button>
         </div>
 
-        <div class="aside-list">
-            <div class="aside-item active">
-                <i class="bi bi-speedometer2"></i>
-                <span>Overview</span>
-            </div>
-            <div class="aside-item">
-                <i class="bi bi-bar-chart-line"></i>
-                <span>Analytics</span>
-            </div>
-            <div class="aside-item">
-                <i class="bi bi-shield-check"></i>
-                <span>Security</span>
-            </div>
+        <div class="aside-widgets">
+            <!-- Widgets Section -->
+            <div class="aside-section-label">Widgets</div>
+            
+            <app-shared-clock-widget 
+                [class.roll-up]="!isInitializing()"
+                (click)="openClock()"
+                class="interactive-widget">
+            </app-shared-clock-widget>
+
+            <app-shared-calendar-widget 
+                [class.roll-up]="!isInitializing()"
+                (click)="openCalendar()"
+                class="interactive-widget">
+            </app-shared-calendar-widget>
+
+            <div class="aside-section-label">Apps</div>
+            <app-shared-grid [class.roll-up]="!isInitializing()"></app-shared-grid>
         </div>
 
         <div class="aside-footer">
