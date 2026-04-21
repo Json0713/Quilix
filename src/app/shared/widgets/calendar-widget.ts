@@ -97,6 +97,11 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                             <div class="layout-side right thin-scroll">
                                 <div class="editor-header">
                                     <span class="selected-date">{{ getSelectedDateString() | date:'fullDate' }}</span>
+                                    <div class="priority-selector">
+                                        <span (click)="notePriority = 'low'" [class.active]="notePriority === 'low'" class="low" title="Low Priority"></span>
+                                        <span (click)="notePriority = 'medium'" [class.active]="notePriority === 'medium'" class="medium" title="Medium Priority"></span>
+                                        <span (click)="notePriority = 'high'" [class.active]="notePriority === 'high'" class="high" title="High Priority"></span>
+                                    </div>
                                     @if (activeNote()) {
                                         <button class="delete-btn" title="Delete" (click)="deleteSelectedNote()"><i class="bi bi-trash3"></i></button>
                                     }
@@ -112,11 +117,6 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                                         <textarea [(ngModel)]="noteContent" placeholder="Write here..." rows="8"></textarea>
                                     </div>
                                     <div class="editor-footer">
-                                        <div class="priority-selector">
-                                            <span (click)="notePriority = 'low'" [class.active]="notePriority === 'low'" class="low"></span>
-                                            <span (click)="notePriority = 'medium'" [class.active]="notePriority === 'medium'" class="medium"></span>
-                                            <span (click)="notePriority = 'high'" [class.active]="notePriority === 'high'" class="high"></span>
-                                        </div>
                                         <div class="reminder-zone">
                                             <div class="toggle-switch-mini" [class.enabled]="noteReminderEnabled()" (click)="noteReminderEnabled.set(!noteReminderEnabled())">
                                                 <div class="switch-handle"></div>
@@ -290,7 +290,12 @@ import { ModalService } from '../../services/ui/common/modal/modal';
     .side-nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .history-toggle { padding: 6px 12px; border-radius: 8px; background: var(--bg-alt); border: 1px solid var(--border); color: var(--text-alt); font-size: 0.72rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; &:hover { border-color: var(--accent); color: var(--accent); } &.active { background: var(--accent); color: white; border-color: var(--accent); } }
 
-    .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; .selected-date { font-size: 0.85rem; font-weight: 800; color: var(--text-muted); } .delete-btn { color: var(--text-muted); background: none; border: none; cursor: pointer; &:hover { color: #ff4d4d; } } }
+    .editor-header { 
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border);
+        .selected-date { font-size: 0.85rem; font-weight: 800; color: var(--text-muted); } 
+        .priority-selector { padding: 4px 10px; border-radius: 50px; }
+        .delete-btn { color: var(--text-muted); background: none; border: none; cursor: pointer; &:hover { color: #ff4d4d; } } 
+    }
     .note-editor { display: flex; flex-direction: column; gap: 16px; height: 100%; .field-group { display: flex; flex-direction: column; gap: 6px; &.expand { flex: 1; min-height: 0; } } label { font-size: 0.65rem; font-weight: 800; color: var(--accent); text-transform: uppercase; } .title-input { background: var(--surface-main); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text-main); font-weight: 700; &:focus { border-color: var(--accent); outline: none; } } textarea { background: var(--surface-main); border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: var(--text-main); font-weight: 500; resize: none; flex: 1; &:focus { border-color: var(--accent); outline: none; } } }
     .editor-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10px; }
     .priority-selector { display: flex; gap: 10px; span { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; opacity: 0.3; transition: all 0.2s; &.active { opacity: 1; transform: scale(1.2); } &.high { background: #ff4d4d; } &.medium { background: #ffaa00; } &.low { background: #00cc66; } } }
@@ -340,7 +345,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
             label { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         }
         .priority-selector { margin-right: 4px; }
-        .reminder-zone-mobile { display: flex; align-items: center; gap: 12px; .reminder-input-mobile { background: var(--surface-main); border: 1px solid var(--border); border-radius: 50px; padding: 6px 12px; font-size: 0.85rem; color: var(--text-main); font-weight: 700; width: 100px; outline: none; &:focus { border-color: var(--accent); } } }
+        .reminder-zone-mobile { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex: 1; .reminder-input-mobile { background: var(--surface-main); border: 1px solid var(--border); border-radius: 50px; padding: 6px 12px; font-size: 0.85rem; color: var(--text-main); font-weight: 700; width: 100px; outline: none; &:focus { border-color: var(--accent); } } }
         .save-btn-mobile { margin-top: 8px; padding: 16px; border-radius: 50px; background: var(--accent); color: white; border: none; font-weight: 900; font-size: 1rem; width: 100%; box-shadow: 0 10px 20px rgba(0,0,0,0.15); transition: all 0.2s; cursor: pointer; &:active { transform: scale(0.98); } &:disabled { opacity: 0.5; } }
     }
 
