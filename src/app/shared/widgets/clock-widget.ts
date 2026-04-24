@@ -284,9 +284,9 @@ import { AlarmService } from '../../core/services/ui/alarm.service';
 
     /* ALARM MANAGER */
     .alarm-manager {
-        width: 100%; display: flex; flex-direction: column; gap: 20px; flex: 1;
+        width: 100%; display: flex; flex-direction: column; gap: 20px; flex: 1; height: 100%;
         .alarm-header-sub { display: flex; justify-content: space-between; align-items: center; h3 { font-size: 0.85rem; font-weight: 800; color: var(--text-main); } .alarm-count { font-size: 0.7rem; font-weight: 700; color: var(--accent); } }
-        .alarm-list { display: flex; flex-direction: column; gap: 10px; max-height: 240px; width: 100%; padding-right: 12px; box-sizing: border-box; }
+        .alarm-list { display: flex; flex-direction: column; gap: 10px; max-height: 280px; width: 100%; padding-right: 12px; box-sizing: border-box; }
         .alarm-item {
             display: flex; justify-content: space-between; padding: 14px; background: var(--surface-alt); border-radius: 14px; border: 1px solid var(--border); transition: all 0.2s;
             &:hover { border-color: var(--accent); }
@@ -354,11 +354,16 @@ import { AlarmService } from '../../core/services/ui/alarm.service';
     .toggle-switch { width: 44px; height: 24px; background: var(--border); border-radius: 20px; position: relative; cursor: pointer; transition: all 0.3s; .switch-handle { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); } &.enabled { background: var(--accent); .switch-handle { transform: translateX(20px); } } }
     .empty-state { padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; background: var(--surface-alt); border-radius: 14px; border: 1px dashed var(--border); width: 100%; box-sizing: border-box; }
 
-    @media (max-width: 600px) {
+    @media (max-width: 850px) {
         .clock-hub.modal-view {
             .widget-modal-wrapper { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; padding-bottom: env(safe-area-inset-bottom); }
             .hub-tabs button { height: 55px; font-size: 1.4rem; }
-            .widget-modal-body { padding: 16px; }
+            .widget-modal-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+            .alarm-manager { 
+                display: flex; flex-direction: column; gap: 20px; flex: none; height: auto;
+                .alarm-list { max-height: 320px; flex: none; } 
+                .add-alarm-form { margin-top: 0; padding-top: 20px; }
+            }
         }
     }
   `]
