@@ -8,19 +8,57 @@
 
   <!-- Sidebar Backdrop (Mobile Only) -->
   @if (isMobileOpen()) {
-    <div class="sidebar-backdrop" (click)="closeMobileSidebar()"></div>
+  <div class="sidebar-backdrop" (click)="closeMobileSidebar()"></div>
   }
 
   <app-team-sidebar />
 
-  <section class="team-root">
+  <section class="team-root" [class.modules-collapsed]="!showModules()">
     <app-page-header />
-    <main class="team">
-      <div class="container-fluid">
-        <router-outlet />
-      </div>
-    </main>
-    
+
+    <!-- Mobile Modules Backdrop -->
+    <div class="dashboard-backdrop" [class.visible]="showModules()" (click)="closeModules()"></div>
+
+    <div class="template-body">
+      <main class="team">
+        <div class="container-fluid">
+          <router-outlet />
+        </div>
+      </main>
+
+      <!-- Right Aside — Modules -->
+      <aside class="dashboard-aside" [class.open]="showModules()">
+        <div class="aside-header">
+          <h3 class="aside-title">Modules</h3>
+          <button class="icon-btn mobile-mode" (click)="toggleModules()" title="Close Modules">
+            <i class="bi bi-chevron-double-right"></i>
+          </button>
+        </div>
+
+        <div class="aside-widgets">
+          <!-- Widgets Section -->
+          <div class="aside-section-label">Widgets</div>
+
+          <app-shared-clock-widget [class.roll-up]="!isInitializing()" (click)="openClock()" class="interactive-widget">
+          </app-shared-clock-widget>
+
+          <app-shared-calendar-widget [class.roll-up]="!isInitializing()" (click)="openCalendar()"
+            class="interactive-widget">
+          </app-shared-calendar-widget>
+
+          <div class="aside-section-label">Apps</div>
+          <app-shared-grid [class.roll-up]="!isInitializing()"></app-shared-grid>
+        </div>
+
+        <div class="aside-footer">
+          <button class="footer-item" title="Health Status">
+            <i class="bi bi-heart-pulse"></i>
+            <span>Health: Normal</span>
+          </button>
+        </div>
+      </aside>
+    </div>
+
     <!-- Global Virtual Terminal -->
     <app-terminal />
   </section>

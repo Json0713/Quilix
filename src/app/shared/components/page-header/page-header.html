@@ -7,6 +7,14 @@
         <div class="header-right">
             <!-- Dynamic Actions projected via TemplateRef -->
             <ng-container *ngTemplateOutlet="headerService.headerActions()"></ng-container>
+
+            <!-- Modules Sidebar Toggle -->
+            <button class="header-action-btn" 
+                    (click)="modulesSidebarService.toggle()" 
+                    [class.active]="modulesSidebarService.isOpen()"
+                    title="Toggle Modules">
+                <i class="bi bi-grid-3x3-gap"></i>
+            </button>
         </div>
     </div>
 </div>

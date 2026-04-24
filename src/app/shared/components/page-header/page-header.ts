@@ -2,6 +2,7 @@ import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { Breadcrumb } from '../../ui/common/breadcrumb/breadcrumb';
 import { PageHeaderService } from '../../../core/services/shared/page-header.service';
+import { ModulesSidebarService } from '../../../services/ui/common/sidebar/modules-sidebar.service';
 
 @Component({
   selector: 'app-page-header',
@@ -13,4 +14,5 @@ import { PageHeaderService } from '../../../core/services/shared/page-header.ser
 })
 export class PageHeaderComponent {
   protected headerService = inject(PageHeaderService);
+  protected modulesSidebarService = inject(ModulesSidebarService);
 }

@@ -11,10 +11,27 @@ import { TabService } from '../../../../core/services/ui/tab.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { TerminalComponent } from '../../../../shared/components/terminal/terminal';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header';
+import { ModulesSidebarService } from '../../../../services/ui/common/sidebar/modules-sidebar.service';
+import { ModalService } from '../../../../services/ui/common/modal/modal';
+import { SharedClockWidget } from '../../../../shared/widgets/clock-widget';
+import { SharedCalendarWidget } from '../../../../shared/widgets/calendar-widget';
+import { SharedAppGrid } from '../../../../shared/widgets/app-grid';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-team-template',
-  imports: [RouterOutlet, TeamSidebarComponent, TabBarComponent, NavigationBar, TerminalComponent, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet, 
+    TeamSidebarComponent, 
+    TabBarComponent, 
+    NavigationBar, 
+    TerminalComponent, 
+    PageHeaderComponent,
+    SharedClockWidget,
+    SharedCalendarWidget,
+    SharedAppGrid
+  ],
   templateUrl: './template.html',
   styleUrl: './template.scss',
 })
@@ -24,9 +41,16 @@ export class TeamTemplate implements OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private modalService = inject(ModalService);
+  private modulesSidebarService = inject(ModulesSidebarService);
+  
   private authSub: any;
   isMobileOpen = this.sidebarService.isMobileOpen;
   isCollapsed = this.sidebarService.isCollapsed;
+
+  // Modules Sidebar State
+  showModules = this.modulesSidebarService.isOpen;
+  isInitializing = this.modulesSidebarService.isInitializing;
 
   toggleMobileSidebar() {
     this.sidebarService.toggleMobile();
@@ -36,9 +60,28 @@ export class TeamTemplate implements OnDestroy {
     this.sidebarService.closeMobile();
   }
 
+  toggleModules() {
+    this.modulesSidebarService.toggle();
+  }
+
+  closeModules() {
+    this.modulesSidebarService.close();
+  }
+
+  openClock() {
+    this.modalService.openClock();
+  }
+
+  openCalendar() {
+    this.modalService.openCalendar();
+  }
+
   private readonly osNotify = inject(OsNotificationService);
 
   ngOnInit(): void {
+    // Initialize Modules Sidebar Context
+    this.modulesSidebarService.setContext('team');
+    
     // Initial tab load
     this.loadWorkspaceTabs();
 

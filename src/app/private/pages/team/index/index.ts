@@ -1,72 +1,28 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { TeamMetricsComponent } from './metrics/metrics';
-import { ModalService } from '../../../../services/ui/common/modal/modal';
-
-// Import Shared Widget Components
-import { SharedClockWidget } from '../../../../shared/widgets/clock-widget';
-import { SharedCalendarWidget } from '../../../../shared/widgets/calendar-widget';
-import { SharedAppGrid } from '../../../../shared/widgets/app-grid';
+import { ModulesSidebarService } from '../../../../services/ui/common/sidebar/modules-sidebar.service';
 
 @Component({
   selector: 'app-team-index',
   standalone: true,
   imports: [
     CommonModule, 
-    TeamMetricsComponent,
-    SharedClockWidget,
-    SharedCalendarWidget,
-    SharedAppGrid
+    TeamMetricsComponent
   ],
   templateUrl: './index.html',
   styleUrl: './index.scss',
 })
 export class TeamIndex implements OnInit {
   private breadcrumbService = inject(BreadcrumbService);
-  private modalService = inject(ModalService);
-
-  // Layout State
-  isInitializing = signal(true);
-  showModules = signal(this.getInitialSidebarState());
+  private modulesSidebarService = inject(ModulesSidebarService);
 
   ngOnInit() {
     this.breadcrumbService.setTitle('Team Home');
-
-    // Simulate initialization completion for smooth transitions
-    setTimeout(() => this.isInitializing.set(false), 300);
-  }
-
-  // Interactivity
-  openClock() {
-    this.modalService.openClock();
-  }
-
-  openCalendar() {
-    this.modalService.openCalendar();
-  }
-
-  private getInitialSidebarState(): boolean {
-    if (typeof window !== 'undefined') {
-      if (window.innerWidth <= 770) return false;
-      const saved = localStorage.getItem('quilix_team_sidebar_state');
-      return saved === null ? true : saved === 'true';
-    }
-    return true;
-  }
-
-  toggleModules() {
-    this.showModules.update(val => {
-      const newState = !val;
-      if (window.innerWidth > 770) {
-        localStorage.setItem('quilix_team_sidebar_state', String(newState));
-      }
-      return newState;
-    });
-  }
-
-  closeModules() {
-    this.showModules.set(false);
+    
+    // Smooth initialization transition handled by template level service
+    setTimeout(() => this.modulesSidebarService.setInitializing(false), 300);
   }
 }

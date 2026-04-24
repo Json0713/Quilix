@@ -1,68 +1,21 @@
-<div class="dashboard-layout" [class.initializing]="isInitializing()" [class.modules-collapsed]="!showModules()">
-
-    <!-- Mobile Backdrop -->
-    <div class="dashboard-backdrop" [class.visible]="showModules()" (click)="closeModules()"></div>
-
-    <!-- Left Aside — Modules -->
-    <aside class="dashboard-aside" [class.open]="showModules()">
-        <div class="aside-header">
-            <h3 class="aside-title">Modules</h3>
-            <button class="icon-btn mobile-mode" (click)="toggleModules()" title="Close Modules">
-                <i class="bi bi-chevron-double-left"></i>
+<div class="dashboard-main">
+    <!-- Dashboard Toolbar -->
+    <div class="dashboard-toolbar">
+        <div class="toolbar-left">
+            <div class="toolbar-title">Dashboard</div>
+        </div>
+        <div class="toolbar-right">
+            <button class="icon-btn" title="Refresh data">
+                <i class="bi bi-arrow-clockwise"></i>
             </button>
         </div>
+    </div>
 
-        <div class="aside-widgets">
-            <!-- Widgets Section -->
-            <div class="aside-section-label">Widgets</div>
-            
-            <app-shared-clock-widget 
-                [class.roll-up]="!isInitializing()"
-                (click)="openClock()"
-                class="interactive-widget">
-            </app-shared-clock-widget>
-
-            <app-shared-calendar-widget 
-                [class.roll-up]="!isInitializing()"
-                (click)="openCalendar()"
-                class="interactive-widget">
-            </app-shared-calendar-widget>
-
-            <div class="aside-section-label">Apps</div>
-            <app-shared-grid [class.roll-up]="!isInitializing()"></app-shared-grid>
+    <!-- Scrollable content -->
+    <div class="dashboard-content">
+        <div class="content-wrapper">
+            <app-personal-metrics></app-personal-metrics>
         </div>
-
-        <div class="aside-footer">
-            <button class="footer-item" title="Health Status">
-                <i class="bi bi-heart-pulse"></i>
-                <span>Health: Normal</span>
-            </button>
-        </div>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="dashboard-main">
-        <!-- Dashboard Toolbar -->
-        <div class="dashboard-toolbar">
-            <div class="toolbar-left">
-                <button class="icon-btn" (click)="toggleModules()" title="Toggle modules">
-                    <i class="bi bi-list"></i>
-                </button>
-                <div class="toolbar-title">Dashboard</div>
-            </div>
-            <div class="toolbar-right">
-                <button class="icon-btn" title="Refresh data">
-                    <i class="bi bi-arrow-clockwise"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Scrollable content -->
-        <div class="dashboard-content">
-            <div class="content-wrapper">
-                <app-personal-metrics></app-personal-metrics>
-            </div>
-        </div>
-    </main>
+    </div>
 </div>
 <!-- Removed Infrastructure Map from Home (Integrated into Terminal 'Node' tab) -->
