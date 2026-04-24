@@ -385,8 +385,17 @@ import { AlarmService } from '../../core/services/ui/alarm.service';
     .mobile-section { display: flex; flex-direction: column; gap: 20px; width: 100%; h3 { font-size: 1rem; font-weight: 800; color: var(--text-main); margin-bottom: -10px; } }
 
     /* HUB OVERLAY SYSTEM */
-    .hub-overlay-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: 1010; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .hub-confirm-card { background: var(--surface-main); border: 1px solid var(--border); border-radius: 28px; padding: 30px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); .confirm-icon { font-size: 2.5rem; color: #ff4d4d; margin-bottom: 12px; } h3 { font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; margin-top: 0; } p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; } .confirm-actions { display: flex; flex-direction: column; gap: 12px; } .btn-cancel { background: transparent; border: none; color: var(--text-muted); font-weight: 700; font-size: 0.9rem; padding: 10px; cursor: pointer; &:hover { color: var(--text-main); } } .btn-confirm-pill { background: #ff4d4d; border: none; color: white; font-weight: 800; font-size: 0.95rem; padding: 16px; border-radius: 50px; cursor: pointer; box-shadow: 0 8px 16px rgba(255,77,77,0.3); transition: transform 0.2s; &:active { transform: scale(0.96); } } }
+    .hub-overlay-backdrop { position: absolute; inset: 0; z-index: 1010; display: flex; align-items: center; justify-content: center; padding: 20px; pointer-events: none; }
+    .hub-confirm-card { 
+        pointer-events: auto;
+        background: var(--surface-main); border: 1px solid var(--border); border-radius: 24px; padding: 32px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.5); 
+        .confirm-icon { font-size: 2rem; color: var(--text-muted); margin-bottom: 16px; opacity: 0.5; } 
+        h3 { font-size: 1.2rem; font-weight: 850; color: var(--text-main); margin-bottom: 10px; margin-top: 0; } 
+        p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; padding: 0 10px; } 
+        .confirm-actions { display: flex; gap: 10px; } 
+        .btn-cancel { flex: 1; background: var(--surface-alt); border: 1px solid var(--border); color: var(--text-main); font-weight: 750; font-size: 0.85rem; padding: 14px; border-radius: 14px; cursor: pointer; transition: all 0.2s; &:hover { background: var(--bg-hover); } } 
+        .btn-confirm-pill { flex: 1; background: #e63946; border: none; color: white; font-weight: 800; font-size: 0.85rem; padding: 14px; border-radius: 14px; cursor: pointer; transition: all 0.2s; &:hover { filter: brightness(1.1); } &:active { transform: scale(0.96); } } 
+    }
 
     @media (max-width: 850px) {
         .widget-modal-wrapper { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; padding-bottom: env(safe-area-inset-bottom); }

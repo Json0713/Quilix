@@ -25,32 +25,30 @@ import { AlarmService } from '../../../core/services/ui/alarm.service';
     .global-alert-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(25px);
       z-index: 99999;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
+      pointer-events: none;
     }
 
     .alert-card {
+      pointer-events: auto;
       background: var(--surface-main);
       padding: 40px;
-      border-radius: 44px;
-      border: 1px solid var(--accent);
+      border-radius: 32px;
+      border: 1px solid var(--border);
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
-      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+      gap: 24px;
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
       width: 100%;
       max-width: 360px;
-      
-      &.reminder {
-        border-color: var(--text-muted);
-      }
+      position: relative;
+      overflow: hidden;
 
       .alert-icon-ring {
         width: 80px;
@@ -62,34 +60,29 @@ import { AlarmService } from '../../../core/services/ui/alarm.service';
         align-items: center;
         justify-content: center;
         
-        &.reminder {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--text-muted);
-            i { color: var(--text-main); animation: none; }
-        }
-
         i {
-          font-size: 2.5rem;
+          font-size: 2.2rem;
           color: var(--accent);
-          animation: shake 0.5s ease-in-out infinite;
+          animation: shake 0.6s ease-in-out infinite;
         }
       }
 
       h2 {
-        font-size: 2rem;
-        font-weight: 950;
+        font-size: 1.8rem;
+        font-weight: 850;
         color: var(--text-main);
         margin: 0;
-        letter-spacing: -1px;
+        letter-spacing: -0.5px;
       }
 
       .alert-time {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 800;
         color: var(--accent);
         background: var(--surface-alt);
-        padding: 6px 16px;
-        border-radius: 50px;
+        padding: 8px 20px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
       }
 
       p {
@@ -97,44 +90,51 @@ import { AlarmService } from '../../../core/services/ui/alarm.service';
         font-weight: 600;
         line-height: 1.6;
         margin: 0;
+        font-size: 0.95rem;
       }
 
       .dismiss-btn {
         width: 100%;
-        margin-top: 10px;
+        margin-top: 8px;
         background: var(--accent);
         color: white;
         padding: 18px;
-        border-radius: 50px;
+        border-radius: 16px;
         border: none;
-        font-weight: 900;
-        font-size: 1.1rem;
+        font-weight: 800;
+        font-size: 1rem;
         cursor: pointer;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         
-        &:hover { transform: translateY(-2px); filter: brightness(1.1); }
-        &:active { transform: scale(0.98); }
-        
-        &.reminder {
-            background: var(--surface-alt);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-        }
+        &:hover { filter: brightness(1.1); }
+        &:active { transform: scale(0.96); }
+      }
+
+      @media (max-width: 600px) {
+        max-width: calc(100% - 40px);
+        padding: 32px 24px;
+        gap: 20px;
+        border-radius: 24px;
+        h2 { font-size: 1.5rem; }
+        .alert-icon-ring { width: 70px; height: 70px; i { font-size: 1.8rem; } }
+        .dismiss-btn { padding: 16px; }
       }
     }
 
     @keyframes shake {
       0%, 100% { transform: rotate(0); }
-      25% { transform: rotate(10deg); }
-      75% { transform: rotate(-10deg); }
+      20% { transform: rotate(8deg); }
+      40% { transform: rotate(-8deg); }
+      60% { transform: rotate(4deg); }
+      80% { transform: rotate(-4deg); }
     }
 
     .animate-pop {
-      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes popIn {
-      from { opacity: 0; transform: scale(0.9) translateY(20px); }
+      from { opacity: 0; transform: scale(0.92) translateY(30px); }
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
   `]
