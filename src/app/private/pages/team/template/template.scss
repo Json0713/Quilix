@@ -147,13 +147,14 @@
 }
 
 .dashboard-aside {
-    width: 260px;
+    width: 280px;
     display: flex;
     flex-direction: column;
     background: var(--surface-main);
     border-left: 1px solid var(--border);
-    transition: width 0.3s ease, opacity 0.3s ease;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
     overflow: hidden;
+    flex-shrink: 0;
 
     &:not(.open) {
         width: 0;

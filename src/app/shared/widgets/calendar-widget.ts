@@ -3,23 +3,26 @@ import { CommonModule } from '@angular/common';
 import { DexieService, WidgetNote } from '../../core/database/dexie.service';
 import { FormsModule } from '@angular/forms';
 import { ModalService } from '../../services/ui/common/modal/modal';
+import { AlarmService } from '../../core/services/ui/alarm.service';
 
 @Component({
-  selector: 'app-shared-calendar-widget',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
+    selector: 'app-shared-calendar-widget',
+    standalone: true,
+    imports: [CommonModule, FormsModule],
+    template: `
     <div class="calendar-container" [class.modal-view]="isModal">
         
-        <!-- SIDEBAR VIEW (Vertical) -->
+        <!-- SIDEBAR VIEW (Compact Windows Style) -->
         @if (!isModal) {
-            <div class="calendar-nav">
-                <button class="nav-btn" (click)="prevMonth($event)"><i class="bi bi-chevron-left"></i></button>
-                <span class="month-title">{{ displayDate() | date:'MMMM yyyy' }}</span>
-                <button class="nav-btn" (click)="nextMonth($event)"><i class="bi bi-chevron-right"></i></button>
+            <div class="calendar-nav-sidebar">
+                <span class="month-title" (click)="resetToToday()" title="Back to Today">{{ displayDate() | date:'MMMM yyyy' }}</span>
+                <div class="nav-controls">
+                    <button class="nav-btn" (click)="prevMonth($event)"><i class="bi bi-chevron-up"></i></button>
+                    <button class="nav-btn" (click)="nextMonth($event)"><i class="bi bi-chevron-down"></i></button>
+                </div>
             </div>
 
-            <div class="calendar-grid">
+            <div class="calendar-grid sidebar-grid">
                 @for (name of ['S','M','T','W','T','F','S']; track $index) { <span class="day-name">{{name}}</span> }
                 @for (day of calendarDays(); track $index) {
                     <span class="day-cell" [class.empty]="day === 0" [class.today]="isToday(day)" [class.selected]="selectedDay() === day" (click)="selectDay(day, $event)">
@@ -59,7 +62,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                                 <div class="side-nav-header">
                                     <div class="calendar-nav">
                                         <button class="nav-btn" (click)="prevMonth($event)"><i class="bi bi-chevron-left"></i></button>
-                                        <span class="month-title-modal">{{ displayDate() | date:'MMMM yyyy' }}</span>
+                                        <span class="month-title-modal" (click)="resetToToday()" title="Back to Today">{{ displayDate() | date:'MMMM yyyy' }}</span>
                                         <button class="nav-btn" (click)="nextMonth($event)"><i class="bi bi-chevron-right"></i></button>
                                     </div>
                                     <button class="history-toggle" (click)="historyVisible.set(!historyVisible())" [class.active]="historyVisible()">
@@ -144,7 +147,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
                                         <div class="side-nav-header">
                                             <div class="calendar-nav">
                                                 <button class="nav-btn" (click)="prevMonth($event)"><i class="bi bi-chevron-left"></i></button>
-                                                <span class="month-title-modal">{{ displayDate() | date:'MMMM yyyy' }}</span>
+                                                <span class="month-title-modal" (click)="resetToToday()" title="Back to Today">{{ displayDate() | date:'MMMM yyyy' }}</span>
                                                 <button class="nav-btn" (click)="nextMonth($event)"><i class="bi bi-chevron-right"></i></button>
                                             </div>
                                         </div>
@@ -244,7 +247,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
         </div>
     }
   `,
-  styles: [`
+    styles: [`
     :host { display: block; }
     .calendar-container { user-select: none; }
 
@@ -255,24 +258,27 @@ import { ModalService } from '../../services/ui/common/modal/modal';
     .thin-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; border: 1px solid transparent; background-clip: padding-box; }
     .thin-scroll::-webkit-scrollbar-thumb:hover { background-color: var(--text-muted); }
 
-    /* DEFAULT SIDEBAR STYLES (RESTORED) */
-    .calendar-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .month-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-main); }
-    .nav-btn { width: 28px; height: 28px; border-radius: 8px; border: none; background: var(--surface-alt); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; &:hover { color: var(--accent); background: var(--bg-hover); } }
+    /* SIDEBAR VIEW STYLES */
+    .calendar-nav-sidebar { 
+        display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; 
+        .month-title { font-size: 0.85rem; font-weight: 800; color: var(--text-main); cursor: pointer; &:hover { color: var(--accent); } }
+        .nav-controls { display: flex; gap: 4px; }
+    }
     
     .calendar-grid {
-        display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center;
-        .day-name { font-size: 0.6rem; font-weight: 800; color: var(--accent); opacity: 0.6; margin-bottom: 4px; }
+        display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center;
+        .day-name { font-size: 0.6rem; font-weight: 800; color: var(--text-muted); opacity: 0.5; margin-bottom: 8px; }
         .day-cell {
-            position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.72rem; font-weight: 600; color: var(--text-alt); cursor: pointer; transition: all 0.2s;
+            position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.75rem; font-weight: 700; color: var(--text-main); cursor: pointer; transition: all 0.2s;
             &.today { background: var(--accent); color: white; }
-            &.selected:not(.today) { box-shadow: inset 0 0 0 1px var(--accent); color: var(--accent); }
+            &.selected:not(.today) { background: var(--bg-hover); box-shadow: inset 0 0 0 1px var(--accent); color: var(--accent); }
             &.empty { pointer-events: none; opacity: 0; }
-            .note-dot { position: absolute; bottom: 3px; width: 3px; height: 3px; border-radius: 50%; &.high { background: #ff4d4d; } &.medium { background: #ffaa00; } &.low { background: #00cc66; } }
+            &:hover:not(.today):not(.empty) { background: var(--bg-hover); }
+            .note-dot { position: absolute; bottom: 4px; width: 4px; height: 4px; border-radius: 50%; &.high { background: #ff4d4d; } &.medium { background: #ffaa00; } &.low { background: #00cc66; } }
         }
     }
 
-    /* MODAL-VIEW SCOPED OVERRIDES (SAFE ISOLATION) */
+    /* MODAL-VIEW SCOPED OVERRIDES */
     .calendar-container.modal-view {
         .widget-modal-wrapper {
             width: 750px; max-width: 95vw; background: var(--surface-main); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4); display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -286,24 +292,28 @@ import { ModalService } from '../../services/ui/common/modal/modal';
         }
 
         .widget-modal-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
         .modal-split-layout { display: flex; height: 100%; .layout-side { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow: hidden; position: relative; } .layout-side.left { border-right: 1px solid var(--border); overflow-x: hidden; } .layout-side.right { background: var(--surface-alt); } }
-
         .modal-grid { gap: 6px; .day-name { font-size: 0.65rem; margin-bottom: 8px; } .day-cell { font-size: 0.95rem; border-radius: 10px; } }
-        .month-title-modal { font-size: 0.95rem; font-weight: 800; color: var(--text-main); }
-
-        .notes-history-list { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box; padding-right: 12px;
-            .history-item { padding: 12px; border-radius: 12px; background: var(--surface-main); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; width: 100%; box-sizing: border-box;
-                &:hover { border-color: var(--accent); } 
-                .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; .item-date { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; } } 
-                .item-title { font-size: 0.9rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } 
-            } 
-        }
+        .month-title-modal { font-size: 0.95rem; font-weight: 800; color: var(--text-main); cursor: pointer; transition: color 0.2s; &:hover { color: var(--accent); } }
     }
+
+    .calendar-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .nav-btn { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--surface-alt); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; &:hover { color: var(--accent); background: var(--bg-hover); } }
 
     /* ASSET STYLES */
     .side-nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .history-toggle { padding: 6px 12px; border-radius: 8px; background: var(--bg-alt); border: 1px solid var(--border); color: var(--text-alt); font-size: 0.72rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; &:hover { border-color: var(--accent); color: var(--accent); } &.active { background: var(--accent); color: white; border-color: var(--accent); } }
+    .history-toggle { padding: 8px 16px; border-radius: 50px; background: var(--bg-alt); border: 1px solid var(--border); color: var(--text-alt); font-size: 0.72rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; &:hover { border-color: var(--accent); color: var(--accent); } &.active { background: var(--accent); color: white; border-color: var(--accent); } }
+    
+    .notes-history-list { display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0; }
+    .history-item { 
+        padding: 14px; background: var(--surface-alt); border: 1px solid var(--border); border-radius: 14px; cursor: pointer;
+        &:hover { border-color: var(--accent); }
+        .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .item-date { font-size: 0.72rem; font-weight: 800; color: var(--accent); text-transform: uppercase; }
+        .item-title { font-size: 0.9rem; font-weight: 750; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .note-dot { width: 8px; height: 8px; border-radius: 50%; &.high { background: #ff4d4d; } &.medium { background: #ffaa00; } &.low { background: #00cc66; } }
+    }
+    .empty-state { padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; background: var(--surface-alt); border-radius: 16px; border: 1px dashed var(--border); }
 
     .editor-header { 
         display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border);
@@ -321,8 +331,26 @@ import { ModalService } from '../../services/ui/common/modal/modal';
         .label { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
         .reminder-input { background: var(--surface-main); border: 1px solid var(--border); border-radius: 50px; padding: 4px 12px; font-size: 0.75rem; color: var(--text-main); font-weight: 700; width: 100px; }
     }
-    .reminder-zone-mobile { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; .reminder-input-mobile { background: var(--surface-main); border: 1px solid var(--border); border-radius: 50px; padding: 10px 16px; font-size: 0.9rem; color: var(--text-main); width: 130px; font-weight: 700; } }
 
+    /* MOBILE EDITOR STYLES */
+    .mobile-editor-controls {
+        display: flex; flex-direction: column; gap: 20px; padding-top: 20px; border-top: 1px solid var(--border); margin-top: 20px;
+        .control-item {
+            display: flex; justify-content: space-between; align-items: center;
+            label { font-size: 0.7rem; font-weight: 800; color: var(--accent); text-transform: uppercase; }
+        }
+    }
+    .reminder-zone-mobile {
+        display: flex; align-items: center; gap: 12px;
+        .reminder-input-mobile { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text-main); font-size: 0.9rem; font-weight: 700; }
+    }
+    .save-btn-mobile {
+        width: 100%; padding: 16px; border-radius: 16px; background: var(--accent); color: white; border: none; font-size: 1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; box-shadow: 0 8px 24px rgba(var(--accent-rgb, 79, 163, 168), 0.3);
+        &:disabled { opacity: 0.5; box-shadow: none; }
+        &:active { transform: scale(0.96); }
+    }
+    .mobile-selection-hint { font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 10px; background: var(--surface-alt); border-radius: 10px; }
+    
     .toggle-switch-mini { 
         width: 32px; height: 18px; background: var(--border); border-radius: 10px; position: relative; cursor: pointer; transition: all 0.3s; 
         .switch-handle { position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: all 0.3s; } 
@@ -332,7 +360,7 @@ import { ModalService } from '../../services/ui/common/modal/modal';
     .animate-fade { animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* MOBILE NATIVE HUB - FIXED SCROLLING */
+    /* MOBILE NATIVE HUB */
     .mobile-tabs {
         display: flex; padding: 8px 12px; background: var(--surface-alt); border-bottom: 1px solid var(--border); gap: 6px;
         button {
@@ -341,241 +369,182 @@ import { ModalService } from '../../services/ui/common/modal/modal';
             &.active { background: var(--bg-active); color: var(--accent); }
         }
     }
-    .mobile-viewport { 
-        flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; padding: 20px; min-height: 0;
-        scroll-behavior: smooth;
-    }
-    .mobile-section {
-        display: flex; flex-direction: column; gap: 20px; width: 100%;
-        h3 { font-size: 1rem; font-weight: 800; color: var(--text-main); margin-bottom: -10px; }
-        .notes-history-list { overflow: visible; } /* Let viewport handle scrolling */
-    }
-    .mobile-selection-hint { padding: 14px; background: var(--surface-alt); border-radius: 12px; font-size: 0.8rem; color: var(--text-alt); text-align: center; margin-top: 10px; border: 1px dashed var(--border); }
+    .mobile-viewport { flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; padding: 20px; }
+    .mobile-section { display: flex; flex-direction: column; gap: 20px; width: 100%; h3 { font-size: 1rem; font-weight: 800; color: var(--text-main); margin-bottom: -10px; } }
 
-    .mobile-editor-controls {
-        display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--surface-alt); border-radius: 24px; margin-top: 15px; border: 1px solid var(--border);
-        .control-item {
-            display: flex; justify-content: space-between; align-items: center; padding: 10px 4px; 
-            &:first-child { border-bottom: 1px solid var(--border); padding-bottom: 14px; }
-            label { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        }
-        .priority-selector { margin-right: 4px; }
-        .reminder-zone-mobile { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex: 1; .reminder-input-mobile { background: var(--surface-main); border: 1px solid var(--border); border-radius: 50px; padding: 6px 12px; font-size: 0.85rem; color: var(--text-main); font-weight: 700; width: 100px; outline: none; &:focus { border-color: var(--accent); } } }
-        .save-btn-mobile { margin-top: 8px; padding: 16px; border-radius: 50px; background: var(--accent); color: white; border: none; font-weight: 900; font-size: 1rem; width: 100%; box-shadow: 0 10px 20px rgba(0,0,0,0.15); transition: all 0.2s; cursor: pointer; &:active { transform: scale(0.98); } &:disabled { opacity: 0.5; } }
-    }
-
-    @keyframes slideUp { from { opacity: 0; transform: translateY(15px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
-    /* HUB OVERLAY SYSTEM (STANDARD PRO) */
-    .hub-overlay-backdrop { 
-        position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: 1010; 
-        display: flex; align-items: center; justify-content: center; padding: 20px;
-    }
-    .hub-confirm-card { 
-        background: var(--surface-main); border: 1px solid var(--border); border-radius: 28px; padding: 30px; width: 100%; max-width: 320px; text-align: center;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        .confirm-icon { font-size: 2.5rem; color: #ff4d4d; margin-bottom: 12px; }
-        h3 { font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; margin-top: 0; }
-        p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; }
-        .confirm-actions { display: flex; flex-direction: column; gap: 12px; }
-        .btn-cancel { background: transparent; border: none; color: var(--text-muted); font-weight: 700; font-size: 0.9rem; padding: 10px; cursor: pointer; &:hover { color: var(--text-main); } }
-        .btn-confirm-pill { background: #ff4d4d; border: none; color: white; font-weight: 800; font-size: 0.95rem; padding: 16px; border-radius: 50px; cursor: pointer; box-shadow: 0 8px 16px rgba(255,77,77,0.3); transition: transform 0.2s; &:active { transform: scale(0.96); } }
-    }
+    /* HUB OVERLAY SYSTEM */
+    .hub-overlay-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: 1010; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .hub-confirm-card { background: var(--surface-main); border: 1px solid var(--border); border-radius: 28px; padding: 30px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); .confirm-icon { font-size: 2.5rem; color: #ff4d4d; margin-bottom: 12px; } h3 { font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; margin-top: 0; } p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; } .confirm-actions { display: flex; flex-direction: column; gap: 12px; } .btn-cancel { background: transparent; border: none; color: var(--text-muted); font-weight: 700; font-size: 0.9rem; padding: 10px; cursor: pointer; &:hover { color: var(--text-main); } } .btn-confirm-pill { background: #ff4d4d; border: none; color: white; font-weight: 800; font-size: 0.95rem; padding: 16px; border-radius: 50px; cursor: pointer; box-shadow: 0 8px 16px rgba(255,77,77,0.3); transition: transform 0.2s; &:active { transform: scale(0.96); } } }
 
     @media (max-width: 850px) {
         .widget-modal-wrapper { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; padding-bottom: env(safe-area-inset-bottom); }
-        .widget-modal-header { padding: 12px 16px; }
-        .calendar-container.modal-view .widget-modal-wrapper { height: 100dvh; }
     }
   `]
 })
 export class SharedCalendarWidget implements OnInit {
-  @Input() isModal = false;
+    @Input() isModal = false;
 
-  displayDate = signal(new Date());
-  calendarDays = signal<number[]>([]);
-  selectedDay = signal<number>(new Date().getDate());
-  
-  // Note Data
-  notes = signal<WidgetNote[]>([]);
-  activeNote = signal<WidgetNote | null>(null);
-  historyVisible = signal(false);
-  
-  // Mobile Support
-  isMobile = signal(window.innerWidth < 850);
-  viewMode = signal<'grid' | 'editor' | 'history'>('grid');
+    displayDate = signal(new Date());
+    calendarDays = signal<number[]>([]);
+    selectedDay = signal<number>(new Date().getDate());
 
-  // Editor State
-  noteTitle = '';
-  noteContent = '';
-  notePriority: 'low' | 'medium' | 'high' = 'low';
-  noteReminderEnabled = signal(false);
-  noteReminderTime = '';
-  confirmDeleteNote = signal(false);
+    // Note Data
+    notes = signal<WidgetNote[]>([]);
+    activeNote = signal<WidgetNote | null>(null);
+    activeNoteSidebar = signal<WidgetNote | null>(null);
+    historyVisible = signal(false);
 
-  private db = inject(DexieService);
-  private modalService = inject(ModalService);
-  private readonly today = new Date();
-  private monitorInterval: any;
-  private triggeredReminders = new Set<string>();
+    // Mobile Support
+    isMobile = signal(window.innerWidth < 850);
+    viewMode = signal<'grid' | 'editor' | 'history'>('grid');
 
-  @HostListener('window:resize')
-  onResize() {
-    this.isMobile.set(window.innerWidth < 850);
-  }
+    // Editor State
+    noteTitle = '';
+    noteContent = '';
+    notePriority: 'low' | 'medium' | 'high' = 'low';
+    noteReminderEnabled = signal(false);
+    noteReminderTime = '';
+    confirmDeleteNote = signal(false);
 
-  async ngOnInit() {
-    this.generateCalendar();
-    await this.loadAllNotes();
-    this.updateActiveNote();
-    this.startReminderMonitor();
-  }
+    private db = inject(DexieService);
+    private modalService = inject(ModalService);
+    private alarmService = inject(AlarmService); // Injected but unused here, logic is in service
+    private readonly today = new Date();
 
-  ngOnDestroy() {
-    if (this.monitorInterval) clearInterval(this.monitorInterval);
-  }
-
-  private startReminderMonitor() {
-    this.monitorInterval = setInterval(() => {
-        this.checkReminders();
-    }, 1000 * 60); // Check every minute
-    this.checkReminders(); // Initial check
-  }
-
-  private checkReminders() {
-    const now = new Date();
-    const dateStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
-    const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-    const reminder = this.notes().find(n => 
-        n.date === dateStr && 
-        n.reminderEnabled && 
-        n.reminderTime === timeStr && 
-        !this.triggeredReminders.has(n.id)
-    );
-
-    if (reminder) {
-        this.triggeredReminders.add(reminder.id);
-        this.triggerSystemNotification(reminder);
+    @HostListener('window:resize')
+    onResize() {
+        this.isMobile.set(window.innerWidth < 850);
     }
-  }
 
-  private triggerSystemNotification(note: WidgetNote) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('Calendar Reminder: ' + (note.title || 'Pinned Note'), {
-            body: note.content || 'Check your pinned note for today.',
-            icon: '/favicon.ico',
-            tag: 'quilix-reminder-' + note.id
-        });
-    }
-  }
-
-  private generateCalendar() {
-    const d = this.displayDate();
-    const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
-    const lastDate = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-    const days = [];
-    for (let i = 0; i < firstDay; i++) days.push(0);
-    for (let i = 1; i <= lastDate; i++) days.push(i);
-    this.calendarDays.set(days);
-  }
-
-  private async loadAllNotes() {
-    const allNotes = await this.db.widget_notes.toArray();
-    this.notes.set(allNotes);
-  }
-
-  get sortedNotes(): WidgetNote[] {
-    return [...this.notes()].sort((a,b) => b.date.localeCompare(a.date));
-  }
-
-  private updateActiveNote() {
-    const dateStr = this.getSelectedDateString();
-    const note = this.notes().find(n => n.date === dateStr) || null;
-    this.activeNote.set(note);
-    this.noteTitle = note?.title || '';
-    this.noteContent = note?.content || '';
-    this.notePriority = note?.priority || 'low';
-    this.noteReminderEnabled.set(note?.reminderEnabled || false);
-    this.noteReminderTime = note?.reminderTime || '';
-  }
-
-  isToday(day: number): boolean {
-    const d = this.displayDate();
-    return day === this.today.getDate() && d.getMonth() === this.today.getMonth() && d.getFullYear() === this.today.getFullYear();
-  }
-
-  hasNote(day: number): boolean { return this.notes().some(n => n.date === this.getDateStringForDay(day)); }
-  getNotePriority(day: number): string { return this.notes().find(n => n.date === this.getDateStringForDay(day))?.priority || ''; }
-  getSelectedDateString(): string { return this.getDateStringForDay(this.selectedDay()); }
-
-  private getDateStringForDay(day: number): string {
-    const d = this.displayDate();
-    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-  }
-
-  nextMonth(event: Event) { event.stopPropagation(); this.displayDate.set(new Date(this.displayDate().getFullYear(), this.displayDate().getMonth() + 1, 1)); this.generateCalendar(); }
-  prevMonth(event: Event) { event.stopPropagation(); this.displayDate.set(new Date(this.displayDate().getFullYear(), this.displayDate().getMonth() - 1, 1)); this.generateCalendar(); }
-
-  selectDay(day: number, event: Event) {
-    if (day === 0) return;
-    event.stopPropagation();
-    this.selectedDay.set(day);
-    this.updateActiveNote();
-    if (this.isMobile()) {
-        this.viewMode.set('editor'); // Automatic snap to editor on mobile
-    }
-  }
-
-  selectHistoryNote(note: WidgetNote) {
-    const d = new Date(note.date + 'T00:00:00');
-    this.displayDate.set(new Date(d.getFullYear(), d.getMonth(), 1));
-    this.selectedDay.set(d.getDate());
-    this.generateCalendar();
-    this.updateActiveNote();
-    this.historyVisible.set(false);
-    if (this.isMobile()) {
-        this.viewMode.set('editor');
-    }
-  }
-
-  async saveSelectedNote() {
-    const note: WidgetNote = {
-      id: this.activeNote()?.id || crypto.randomUUID(),
-      date: this.getSelectedDateString(),
-      title: this.noteTitle,
-      content: this.noteContent,
-      priority: this.notePriority,
-      reminderEnabled: this.noteReminderEnabled(),
-      reminderTime: this.noteReminderTime,
-      createdAt: this.activeNote()?.createdAt || Date.now()
-    };
-    await this.db.widget_notes.put(note);
-    await this.loadAllNotes();
-    this.updateActiveNote();
-    if (this.isMobile()) {
-        this.viewMode.set('grid'); // Return to grid after save on mobile
-    }
-  }
-
-   async deleteSelectedNote() {
-    if (!this.activeNote()) return;
-    this.confirmDeleteNote.set(true);
-  }
-
-  async confirmedDelete() {
-    if (this.activeNote()) {
-        await this.db.widget_notes.delete(this.activeNote()!.id);
+    async ngOnInit() {
+        this.generateCalendar();
         await this.loadAllNotes();
         this.updateActiveNote();
+    }
+
+    private generateCalendar() {
+        const d = this.displayDate();
+        const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
+        const lastDate = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+        const days = [];
+        for (let i = 0; i < firstDay; i++) days.push(0);
+        for (let i = 1; i <= lastDate; i++) days.push(i);
+        this.calendarDays.set(days);
+    }
+
+    private async loadAllNotes() {
+        const allNotes = await this.db.widget_notes.toArray();
+        this.notes.set(allNotes);
+
+        // For sidebar, show today's note if exists
+        const todayStr = `${this.today.getFullYear()}-${(this.today.getMonth() + 1).toString().padStart(2, '0')}-${this.today.getDate().toString().padStart(2, '0')}`;
+        this.activeNoteSidebar.set(allNotes.find(n => n.date === todayStr) || null);
+    }
+
+    get sortedNotes(): WidgetNote[] {
+        return [...this.notes()].sort((a, b) => b.date.localeCompare(a.date));
+    }
+
+    private updateActiveNote() {
+        const dateStr = this.getSelectedDateString();
+        const note = this.notes().find(n => n.date === dateStr) || null;
+        this.activeNote.set(note);
+        this.noteTitle = note?.title || '';
+        this.noteContent = note?.content || '';
+        this.notePriority = note?.priority || 'low';
+        this.noteReminderEnabled.set(note?.reminderEnabled || false);
+        this.noteReminderTime = note?.reminderTime || '';
+    }
+
+    isToday(day: number): boolean {
+        const d = this.displayDate();
+        return day === this.today.getDate() && d.getMonth() === this.today.getMonth() && d.getFullYear() === this.today.getFullYear();
+    }
+
+    hasNote(day: number): boolean { return this.notes().some(n => n.date === this.getDateStringForDay(day)); }
+    getNotePriority(day: number): string { return this.notes().find(n => n.date === this.getDateStringForDay(day))?.priority || ''; }
+    getSelectedDateString(): string { return this.getDateStringForDay(this.selectedDay()); }
+
+    private getDateStringForDay(day: number): string {
+        const d = this.displayDate();
+        return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+    }
+
+    nextMonth(event: Event) { event.stopPropagation(); this.displayDate.set(new Date(this.displayDate().getFullYear(), this.displayDate().getMonth() + 1, 1)); this.generateCalendar(); }
+    prevMonth(event: Event) { event.stopPropagation(); this.displayDate.set(new Date(this.displayDate().getFullYear(), this.displayDate().getMonth() - 1, 1)); this.generateCalendar(); }
+
+    resetToToday() {
+    this.displayDate.set(new Date());
+    this.selectedDay.set(new Date().getDate());
+    this.generateCalendar();
+    this.updateActiveNote();
+  }
+
+  selectDay(day: number, event: Event) {
+        if (day === 0) return;
+        event.stopPropagation();
+        this.selectedDay.set(day);
+        this.updateActiveNote();
+        if (this.isMobile() && this.isModal) {
+            this.viewMode.set('editor');
+        }
+    }
+
+    selectHistoryNote(note: WidgetNote) {
+        const d = new Date(note.date + 'T00:00:00');
+        this.displayDate.set(new Date(d.getFullYear(), d.getMonth(), 1));
+        this.selectedDay.set(d.getDate());
+        this.generateCalendar();
+        this.updateActiveNote();
+        this.historyVisible.set(false);
         if (this.isMobile()) {
+            this.viewMode.set('editor');
+        }
+    }
+
+    async saveSelectedNote() {
+        const note: WidgetNote = {
+            id: this.activeNote()?.id || crypto.randomUUID(),
+            date: this.getSelectedDateString(),
+            title: this.noteTitle,
+            content: this.noteContent,
+            priority: this.notePriority,
+            reminderEnabled: this.noteReminderEnabled(),
+            reminderTime: this.noteReminderTime,
+            createdAt: this.activeNote()?.createdAt || Date.now()
+        };
+        await this.db.widget_notes.put(note);
+        await this.loadAllNotes();
+        this.updateActiveNote();
+        if (this.isMobile() && this.isModal) {
             this.viewMode.set('grid');
         }
     }
-    this.confirmDeleteNote.set(false);
-  }
 
-  closeModal() {
-    this.modalService.cancelResult(true);
-  }
+    async deleteSelectedNote() {
+        if (!this.activeNote()) return;
+        this.confirmDeleteNote.set(true);
+    }
+
+    async confirmedDelete() {
+        if (this.activeNote()) {
+            await this.db.widget_notes.delete(this.activeNote()!.id);
+            await this.loadAllNotes();
+            this.updateActiveNote();
+            if (this.isMobile() && this.isModal) {
+                this.viewMode.set('grid');
+            }
+        }
+        this.confirmDeleteNote.set(false);
+    }
+
+    openCalendarHub() {
+        // If we click the note preview in sidebar, we can potentially trigger the modal if we want
+        // But user mostly wants "Windows OS calendar" feel which often opens on click.
+        // For now we keep it simple.
+    }
+
+    closeModal() {
+        this.modalService.cancelResult(true);
+    }
 }

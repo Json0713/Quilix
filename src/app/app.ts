@@ -19,11 +19,12 @@ import { FileSystemService } from './core/services/data/file-system.service';
 import { SystemSyncService } from './core/services/sync/system-sync.service';
 import { PwaNavigationService } from './core/pwa/pwa-navigation.service';
 import { ShortcutService } from './core/services/ui/shortcut.service';
+import { GlobalAlarmAlertComponent } from './shared/components/global-alarm-alert/global-alarm-alert';
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterModule, NetworkStatus, Loader, Toast, Modal, Tooltip],
+  imports: [RouterOutlet, RouterModule, NetworkStatus, Loader, Toast, Modal, Tooltip, GlobalAlarmAlertComponent],
   standalone: true,
   templateUrl: './app.html',
   styleUrl: './app.scss'
