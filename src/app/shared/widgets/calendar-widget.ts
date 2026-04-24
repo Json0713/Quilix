@@ -11,148 +11,80 @@ import { AlarmService } from '../../core/services/ui/alarm.service';
     imports: [CommonModule, FormsModule],
     template: `
     <div class="calendar-container" [class.modal-view]="isModal">
-        
-        <!-- SIDEBAR VIEW (Compact Windows Style) -->
-        @if (!isModal) {
-            <div class="calendar-nav-sidebar">
-                <span class="month-title" (click)="resetToToday()" title="Back to Today">{{ displayDate() | date:'MMMM yyyy' }}</span>
-                <div class="nav-controls">
-                    <button class="nav-btn" (click)="prevMonth($event)"><i class="bi bi-chevron-up"></i></button>
-                    <button class="nav-btn" (click)="nextMonth($event)"><i class="bi bi-chevron-down"></i></button>
+        @if (alarmService.activeReminder(); as note) {
+            <div class="reminder-alert-view animate-fade" (click)="handleReminderClick(note)">
+                <div class="reminder-icon-ring">
+                    <i class="bi bi-calendar-check-fill"></i>
                 </div>
+                <div class="reminder-body">
+                    <h3>{{ note.title || 'Reminder' }}</h3>
+                    <p>{{ note.content }}</p>
+                </div>
+                <div class="reminder-footer-hint">Click to view note</div>
             </div>
-
-            <div class="calendar-grid sidebar-grid">
-                @for (name of ['S','M','T','W','T','F','S']; track $index) { <span class="day-name">{{name}}</span> }
-                @for (day of calendarDays(); track $index) {
-                    <span class="day-cell" [class.empty]="day === 0" [class.today]="isToday(day)" [class.selected]="selectedDay() === day" (click)="selectDay(day, $event)">
-                        {{ day !== 0 ? day : '' }}
-                        @if (day !== 0 && hasNote(day)) { <span class="note-dot" [class]="getNotePriority(day)"></span> }
-                    </span>
-                }
-            </div>
-        }
-
-        <!-- MODAL VIEW (Native Pattern) -->
-        @if (isModal) {
-            <div class="widget-modal-wrapper" [class.is-mobile]="isMobile()">
-                <div class="widget-modal-header">
-                    <div class="header-left">
-                        <i class="bi bi-calendar3 header-icon"></i>
-                        <h2>Calendar Hub</h2>
+        } @else {
+            <!-- SIDEBAR VIEW (Compact Windows Style) -->
+            @if (!isModal) {
+                <div class="calendar-nav-sidebar">
+                    <span class="month-title" (click)="resetToToday()" title="Back to Today">{{ displayDate() | date:'MMMM yyyy' }}</span>
+                    <div class="nav-controls">
+                        <button class="nav-btn" (click)="prevMonth($event)"><i class="bi bi-chevron-up"></i></button>
+                        <button class="nav-btn" (click)="nextMonth($event)"><i class="bi bi-chevron-down"></i></button>
                     </div>
-                    <button class="close-btn" (click)="closeModal()"><i class="bi bi-x-lg"></i></button>
                 </div>
 
-                <!-- MOBILE SEGMENTED CONTROL -->
-                @if (isMobile()) {
-                    <div class="mobile-tabs">
-                        <button (click)="viewMode.set('grid')" [class.active]="viewMode() === 'grid'"><i class="bi bi-grid-3x3"></i> Calendar</button>
-                        <button (click)="viewMode.set('history')" [class.active]="viewMode() === 'history'"><i class="bi bi-clock-history"></i> History</button>
-                        <button (click)="viewMode.set('editor')" [class.active]="viewMode() === 'editor'"><i class="bi bi-pencil-square"></i> Note</button>
+                <div class="calendar-grid sidebar-grid">
+                    @for (name of ['S','M','T','W','T','F','S']; track $index) { <span class="day-name">{{name}}</span> }
+                    @for (day of calendarDays(); track $index) {
+                        <span class="day-cell" [class.empty]="day === 0" [class.today]="isToday(day)" [class.selected]="selectedDay() === day" (click)="selectDay(day, $event)">
+                            {{ day !== 0 ? day : '' }}
+                            @if (day !== 0 && hasNote(day)) { <span class="note-dot" [class]="getNotePriority(day)"></span> }
+                        </span>
+                    }
+                </div>
+            }
+
+            <!-- MODAL VIEW (Native Pattern) -->
+            @if (isModal) {
+                <div class="widget-modal-wrapper" [class.is-mobile]="isMobile()">
+                    <div class="widget-modal-header">
+                        <div class="header-left">
+                            <i class="bi bi-calendar3 header-icon"></i>
+                            <h2>Calendar Hub</h2>
+                        </div>
+                        <button class="close-btn" (click)="closeModal()"><i class="bi bi-x-lg"></i></button>
                     </div>
-                }
 
-                <div class="widget-modal-body">
-                    
-                    <!-- DESKTOP SPLIT LAYOUT -->
-                    @if (!isMobile()) {
-                        <div class="modal-split-layout">
-                            <div class="layout-side left thin-scroll">
-                                <div class="side-nav-header">
-                                    <div class="calendar-nav">
-                                        <button class="nav-btn" (click)="prevMonth($event)"><i class="bi bi-chevron-left"></i></button>
-                                        <span class="month-title-modal" (click)="resetToToday()" title="Back to Today">{{ displayDate() | date:'MMMM yyyy' }}</span>
-                                        <button class="nav-btn" (click)="nextMonth($event)"><i class="bi bi-chevron-right"></i></button>
-                                    </div>
-                                    <button class="history-toggle" (click)="historyVisible.set(!historyVisible())" [class.active]="historyVisible()">
-                                        <i class="bi" [class.bi-journal-text]="!historyVisible()" [class.bi-calendar3]="historyVisible()"></i>
-                                        {{ historyVisible() ? 'Calendar' : 'History' }}
-                                    </button>
-                                </div>
-
-                                @if (!historyVisible()) {
-                                    <div class="calendar-grid modal-grid">
-                                        @for (name of ['SUN','MON','TUE','WED','THU','FRI','SAT']; track $index) { <span class="day-name">{{name}}</span> }
-                                        @for (day of calendarDays(); track $index) {
-                                            <span class="day-cell" [class.empty]="day === 0" [class.today]="isToday(day)" [class.selected]="selectedDay() === day" (click)="selectDay(day, $event)">
-                                                {{ day !== 0 ? day : '' }}
-                                                @if (day !== 0 && hasNote(day)) { <span class="note-dot" [class]="getNotePriority(day)"></span> }
-                                            </span>
-                                        }
-                                    </div>
-                                } @else {
-                                    <div class="notes-history-list thin-scroll">
-                                        @if (notes().length === 0) { <div class="empty-state">No notes found.</div> }
-                                        @for (note of sortedNotes; track note.id) {
-                                            <div class="history-item" (click)="selectHistoryNote(note)">
-                                                <div class="item-header">
-                                                    <span class="item-date">{{ note.date | date:'mediumDate' }}</span>
-                                                    <span class="note-dot small" [class]="note.priority"></span>
-                                                </div>
-                                                <div class="item-title">{{ note.title || 'Untitled Note' }}</div>
-                                            </div>
-                                        }
-                                    </div>
-                                }
-                            </div>
-
-                            <div class="layout-side right thin-scroll">
-                                <div class="editor-header">
-                                    <span class="selected-date">{{ getSelectedDateString() | date:'fullDate' }}</span>
-                                    <div class="priority-selector">
-                                        <span (click)="notePriority = 'low'" [class.active]="notePriority === 'low'" class="low" title="Low Priority"></span>
-                                        <span (click)="notePriority = 'medium'" [class.active]="notePriority === 'medium'" class="medium" title="Medium Priority"></span>
-                                        <span (click)="notePriority = 'high'" [class.active]="notePriority === 'high'" class="high" title="High Priority"></span>
-                                    </div>
-                                    @if (activeNote()) {
-                                        <button class="delete-btn" title="Delete" (click)="deleteSelectedNote()"><i class="bi bi-trash3"></i></button>
-                                    }
-                                </div>
-
-                                <div class="note-editor">
-                                    <div class="field-group">
-                                        <label>Title</label>
-                                        <input type="text" [(ngModel)]="noteTitle" placeholder="Title..." class="title-input">
-                                    </div>
-                                    <div class="field-group expand">
-                                        <label>Content</label>
-                                        <textarea [(ngModel)]="noteContent" placeholder="Write here..." rows="8"></textarea>
-                                    </div>
-                                    <div class="editor-footer">
-                                        <div class="reminder-zone">
-                                            <div class="toggle-switch-mini" [class.enabled]="noteReminderEnabled()" (click)="noteReminderEnabled.set(!noteReminderEnabled())">
-                                                <div class="switch-handle"></div>
-                                            </div>
-                                            <span class="label">Remind Me</span>
-                                            @if (noteReminderEnabled()) {
-                                                <input type="time" [(ngModel)]="noteReminderTime" class="reminder-input animate-fade">
-                                            }
-                                        </div>
-                                        <button class="save-btn" (click)="saveSelectedNote()" [disabled]="!noteContent && !noteTitle">
-                                            <i class="bi bi-check-lg"></i> Save
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- MOBILE SEGMENTED CONTROL -->
+                    @if (isMobile()) {
+                        <div class="mobile-tabs">
+                            <button (click)="viewMode.set('grid')" [class.active]="viewMode() === 'grid'"><i class="bi bi-grid-3x3"></i> Calendar</button>
+                            <button (click)="viewMode.set('history')" [class.active]="viewMode() === 'history'"><i class="bi bi-clock-history"></i> History</button>
+                            <button (click)="viewMode.set('editor')" [class.active]="viewMode() === 'editor'"><i class="bi bi-pencil-square"></i> Note</button>
                         </div>
                     }
 
-                    <!-- MOBILE NATIVE LAYOUT -->
-                    @if (isMobile()) {
-                        <div class="mobile-viewport thin-scroll">
-                            @switch (viewMode()) {
-                                @case ('grid') {
-                                    <div class="mobile-section">
-                                        <div class="side-nav-header">
-                                            <div class="calendar-nav">
-                                                <button class="nav-btn" (click)="prevMonth($event)"><i class="bi bi-chevron-left"></i></button>
-                                                <span class="month-title-modal" (click)="resetToToday()" title="Back to Today">{{ displayDate() | date:'MMMM yyyy' }}</span>
-                                                <button class="nav-btn" (click)="nextMonth($event)"><i class="bi bi-chevron-right"></i></button>
-                                            </div>
+                    <div class="widget-modal-body">
+                        
+                        <!-- DESKTOP SPLIT LAYOUT -->
+                        @if (!isMobile()) {
+                            <div class="modal-split-layout">
+                                <div class="layout-side left thin-scroll">
+                                    <div class="side-nav-header">
+                                        <div class="calendar-nav">
+                                            <button class="nav-btn" (click)="prevMonth($event)"><i class="bi bi-chevron-left"></i></button>
+                                            <span class="month-title-modal" (click)="resetToToday()" title="Back to Today">{{ displayDate() | date:'MMMM yyyy' }}</span>
+                                            <button class="nav-btn" (click)="nextMonth($event)"><i class="bi bi-chevron-right"></i></button>
                                         </div>
+                                        <button class="history-toggle" (click)="historyVisible.set(!historyVisible())" [class.active]="historyVisible()">
+                                            <i class="bi" [class.bi-journal-text]="!historyVisible()" [class.bi-calendar3]="historyVisible()"></i>
+                                            {{ historyVisible() ? 'Calendar' : 'History' }}
+                                        </button>
+                                    </div>
+
+                                    @if (!historyVisible()) {
                                         <div class="calendar-grid modal-grid">
-                                            @for (name of ['S','M','T','W','T','F','S']; track $index) { <span class="day-name">{{name}}</span> }
+                                            @for (name of ['SUN','MON','TUE','WED','THU','FRI','SAT']; track $index) { <span class="day-name">{{name}}</span> }
                                             @for (day of calendarDays(); track $index) {
                                                 <span class="day-cell" [class.empty]="day === 0" [class.today]="isToday(day)" [class.selected]="selectedDay() === day" (click)="selectDay(day, $event)">
                                                     {{ day !== 0 ? day : '' }}
@@ -160,14 +92,7 @@ import { AlarmService } from '../../core/services/ui/alarm.service';
                                                 </span>
                                             }
                                         </div>
-                                        <div class="mobile-selection-hint">
-                                            Tapped: <strong>{{ getSelectedDateString() | date:'mediumDate' }}</strong>
-                                        </div>
-                                    </div>
-                                }
-                                @case ('history') {
-                                    <div class="mobile-section">
-                                        <h3>Note History</h3>
+                                    } @else {
                                         <div class="notes-history-list thin-scroll">
                                             @if (notes().length === 0) { <div class="empty-state">No notes found.</div> }
                                             @for (note of sortedNotes; track note.id) {
@@ -180,55 +105,142 @@ import { AlarmService } from '../../core/services/ui/alarm.service';
                                                 </div>
                                             }
                                         </div>
-                                    </div>
-                                }
-                                @case ('editor') {
-                                    <div class="mobile-section">
-                                        <div class="editor-header">
-                                            <span class="selected-date">{{ getSelectedDateString() | date:'mediumDate' }}</span>
-                                            @if (activeNote()) {
-                                                <button class="delete-btn" (click)="deleteSelectedNote()"><i class="bi bi-trash3"></i></button>
-                                            }
-                                        </div>
-                                        <div class="note-editor">
-                                            <input type="text" [(ngModel)]="noteTitle" placeholder="Title..." class="title-input">
-                                            <textarea [(ngModel)]="noteContent" placeholder="Note content..." rows="12" class="thin-scroll"></textarea>
-                                            
-                                            <div class="mobile-editor-controls">
-                                                <div class="control-item">
-                                                    <label>Priority</label>
-                                                    <div class="priority-selector">
-                                                        <span (click)="notePriority = 'low'" [class.active]="notePriority === 'low'" class="low"></span>
-                                                        <span (click)="notePriority = 'medium'" [class.active]="notePriority === 'medium'" class="medium"></span>
-                                                        <span (click)="notePriority = 'high'" [class.active]="notePriority === 'high'" class="high"></span>
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="control-item">
-                                                    <label>Remind Me</label>
-                                                    <div class="reminder-zone-mobile">
-                                                        <div class="toggle-switch-mini" [class.enabled]="noteReminderEnabled()" (click)="noteReminderEnabled.set(!noteReminderEnabled())">
-                                                            <div class="switch-handle"></div>
-                                                        </div>
-                                                        @if (noteReminderEnabled()) {
-                                                            <input type="time" [(ngModel)]="noteReminderTime" class="reminder-input-mobile animate-fade">
-                                                        }
-                                                    </div>
-                                                </div>
+                                    }
+                                </div>
 
-                                                <button class="save-btn-mobile" (click)="saveSelectedNote()" [disabled]="!noteContent && !noteTitle">
-                                                    <i class="bi bi-check-lg"></i> Save Note
-                                                </button>
+                                <div class="layout-side right thin-scroll">
+                                    <div class="editor-header">
+                                        <span class="selected-date">{{ getSelectedDateString() | date:'fullDate' }}</span>
+                                        <div class="priority-selector">
+                                            <span (click)="notePriority = 'low'" [class.active]="notePriority === 'low'" class="low" title="Low Priority"></span>
+                                            <span (click)="notePriority = 'medium'" [class.active]="notePriority === 'medium'" class="medium" title="Medium Priority"></span>
+                                            <span (click)="notePriority = 'high'" [class.active]="notePriority === 'high'" class="high" title="High Priority"></span>
+                                        </div>
+                                        @if (activeNote()) {
+                                            <button class="delete-btn" title="Delete" (click)="deleteSelectedNote()"><i class="bi bi-trash3"></i></button>
+                                        }
+                                    </div>
+
+                                    <div class="note-editor">
+                                        <div class="field-group">
+                                            <label>Title</label>
+                                            <input type="text" [(ngModel)]="noteTitle" placeholder="Title..." class="title-input">
+                                        </div>
+                                        <div class="field-group expand">
+                                            <label>Content</label>
+                                            <textarea [(ngModel)]="noteContent" placeholder="Write here..." rows="8"></textarea>
+                                        </div>
+                                        <div class="editor-footer">
+                                            <div class="reminder-zone">
+                                                <div class="toggle-switch-mini" [class.enabled]="noteReminderEnabled()" (click)="noteReminderEnabled.set(!noteReminderEnabled())">
+                                                    <div class="switch-handle"></div>
+                                                </div>
+                                                <span class="label">Remind Me</span>
+                                                @if (noteReminderEnabled()) {
+                                                    <input type="time" [(ngModel)]="noteReminderTime" class="reminder-input animate-fade">
+                                                }
+                                            </div>
+                                            <button class="save-btn" (click)="saveSelectedNote()" [disabled]="!hasChanges()">
+                                                <i class="bi bi-check-lg"></i> Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- MOBILE NATIVE LAYOUT -->
+                        @if (isMobile()) {
+                            <div class="mobile-viewport thin-scroll">
+                                @switch (viewMode()) {
+                                    @case ('grid') {
+                                        <div class="mobile-section">
+                                            <div class="side-nav-header">
+                                                <div class="calendar-nav">
+                                                    <button class="nav-btn" (click)="prevMonth($event)"><i class="bi bi-chevron-left"></i></button>
+                                                    <span class="month-title-modal" (click)="resetToToday()" title="Back to Today">{{ displayDate() | date:'MMMM yyyy' }}</span>
+                                                    <button class="nav-btn" (click)="nextMonth($event)"><i class="bi bi-chevron-right"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="calendar-grid modal-grid">
+                                                @for (name of ['S','M','T','W','T','F','S']; track $index) { <span class="day-name">{{name}}</span> }
+                                                @for (day of calendarDays(); track $index) {
+                                                    <span class="day-cell" [class.empty]="day === 0" [class.today]="isToday(day)" [class.selected]="selectedDay() === day" (click)="selectDay(day, $event)">
+                                                        {{ day !== 0 ? day : '' }}
+                                                        @if (day !== 0 && hasNote(day)) { <span class="note-dot" [class]="getNotePriority(day)"></span> }
+                                                    </span>
+                                                }
+                                            </div>
+                                            <div class="mobile-selection-hint">
+                                                Tapped: <strong>{{ getSelectedDateString() | date:'mediumDate' }}</strong>
                                             </div>
                                         </div>
-                                    </div>
-                                }
-                            }
-                        </div>
-                    }
+                                    }
+                                    @case ('history') {
+                                        <div class="mobile-section">
+                                            <h3>Note History</h3>
+                                            <div class="notes-history-list thin-scroll">
+                                                @if (notes().length === 0) { <div class="empty-state">No notes found.</div> }
+                                                @for (note of sortedNotes; track note.id) {
+                                                    <div class="history-item" (click)="selectHistoryNote(note)">
+                                                        <div class="item-header">
+                                                            <span class="item-date">{{ note.date | date:'mediumDate' }}</span>
+                                                            <span class="note-dot small" [class]="note.priority"></span>
+                                                        </div>
+                                                        <div class="item-title">{{ note.title || 'Untitled Note' }}</div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                    @case ('editor') {
+                                        <div class="mobile-section">
+                                            <div class="editor-header">
+                                                <span class="selected-date">{{ getSelectedDateString() | date:'mediumDate' }}</span>
+                                                @if (activeNote()) {
+                                                    <button class="delete-btn" (click)="deleteSelectedNote()"><i class="bi bi-trash3"></i></button>
+                                                }
+                                            </div>
+                                            <div class="note-editor">
+                                                <input type="text" [(ngModel)]="noteTitle" placeholder="Title..." class="title-input">
+                                                <textarea [(ngModel)]="noteContent" placeholder="Note content..." rows="12" class="thin-scroll"></textarea>
+                                                
+                                                <div class="mobile-editor-controls">
+                                                    <div class="control-item">
+                                                        <label>Priority</label>
+                                                        <div class="priority-selector">
+                                                            <span (click)="notePriority = 'low'" [class.active]="notePriority === 'low'" class="low"></span>
+                                                            <span (click)="notePriority = 'medium'" [class.active]="notePriority === 'medium'" class="medium"></span>
+                                                            <span (click)="notePriority = 'high'" [class.active]="notePriority === 'high'" class="high"></span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="control-item">
+                                                        <label>Remind Me</label>
+                                                        <div class="reminder-zone-mobile">
+                                                            <div class="toggle-switch-mini" [class.enabled]="noteReminderEnabled()" (click)="noteReminderEnabled.set(!noteReminderEnabled())">
+                                                                <div class="switch-handle"></div>
+                                                            </div>
+                                                            @if (noteReminderEnabled()) {
+                                                                <input type="time" [(ngModel)]="noteReminderTime" class="reminder-input-mobile animate-fade">
+                                                            }
+                                                        </div>
+                                                    </div>
 
+                                                    <button class="save-btn-mobile" (click)="saveSelectedNote()" [disabled]="!hasChanges()">
+                                                        <i class="bi bi-check-lg"></i> Save Note
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        }
+
+                    </div>
                 </div>
-            </div>
+            }
         }
     </div>
 
@@ -249,7 +261,7 @@ import { AlarmService } from '../../core/services/ui/alarm.service';
   `,
     styles: [`
     :host { display: block; }
-    .calendar-container { user-select: none; }
+    .calendar-container { user-select: none; position: relative; overflow: hidden; height: 100%; min-height: 250px; }
 
     /* THIN SCROLLBAR (Optimized) */
     .thin-scroll { overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
@@ -379,6 +391,18 @@ import { AlarmService } from '../../core/services/ui/alarm.service';
     @media (max-width: 850px) {
         .widget-modal-wrapper { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; padding-bottom: env(safe-area-inset-bottom); }
     }
+
+    .reminder-alert-view {
+        position: absolute; inset: 0; background: var(--surface-main); z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; cursor: pointer;
+        .reminder-icon-ring { width: 64px; height: 64px; border-radius: 50%; background: rgba(var(--accent-rgb, 79, 163, 168), 0.1); border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; i { font-size: 1.8rem; color: var(--accent); } }
+        .reminder-body { 
+            margin-bottom: 30px; width: 100%; max-width: 280px;
+            h3 { font-size: 1.2rem; font-weight: 850; color: var(--text-main); margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; } 
+            p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; width: 100%; } 
+        }
+        .reminder-footer-hint { font-size: 0.75rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; animation: pulse 2s infinite; }
+    }
+    @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
   `]
 })
 export class SharedCalendarWidget implements OnInit {
@@ -405,10 +429,18 @@ export class SharedCalendarWidget implements OnInit {
     noteReminderEnabled = signal(false);
     noteReminderTime = '';
     confirmDeleteNote = signal(false);
+    
+    private originalNoteState = {
+        title: '',
+        content: '',
+        priority: 'low' as 'low' | 'medium' | 'high',
+        reminderEnabled: false,
+        reminderTime: ''
+    };
 
     private db = inject(DexieService);
     private modalService = inject(ModalService);
-    private alarmService = inject(AlarmService); // Injected but unused here, logic is in service
+    protected alarmService = inject(AlarmService);
     private readonly today = new Date();
 
     @HostListener('window:resize')
@@ -454,6 +486,26 @@ export class SharedCalendarWidget implements OnInit {
         this.notePriority = note?.priority || 'low';
         this.noteReminderEnabled.set(note?.reminderEnabled || false);
         this.noteReminderTime = note?.reminderTime || '';
+
+        // Capture state for change detection
+        this.originalNoteState = {
+            title: this.noteTitle,
+            content: this.noteContent,
+            priority: this.notePriority,
+            reminderEnabled: this.noteReminderEnabled(),
+            reminderTime: this.noteReminderTime
+        };
+    }
+
+    hasChanges(): boolean {
+        const hasContent = this.noteTitle.trim() || this.noteContent.trim();
+        if (!hasContent && !this.activeNote()) return false;
+        
+        return this.noteTitle !== this.originalNoteState.title ||
+               this.noteContent !== this.originalNoteState.content ||
+               this.notePriority !== this.originalNoteState.priority ||
+               this.noteReminderEnabled() !== this.originalNoteState.reminderEnabled ||
+               this.noteReminderTime !== this.originalNoteState.reminderTime;
     }
 
     isToday(day: number): boolean {
@@ -536,6 +588,11 @@ export class SharedCalendarWidget implements OnInit {
             }
         }
         this.confirmDeleteNote.set(false);
+    }
+
+    handleReminderClick(note: WidgetNote) {
+        this.alarmService.stopAlert();
+        this.selectHistoryNote(note);
     }
 
     openCalendarHub() {

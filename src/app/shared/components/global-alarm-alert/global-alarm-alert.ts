@@ -7,34 +7,17 @@ import { AlarmService } from '../../../core/services/ui/alarm.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    @if (alarmService.activeAlarm() || alarmService.activeReminder()) {
+    @if (alarmService.activeAlarm(); as alarm) {
       <div class="global-alert-overlay" (click)="stopAlert()">
-        
-        <!-- ALARM CARD -->
-        @if (alarmService.activeAlarm(); as alarm) {
-          <div class="alert-card animate-pop" (click)="$event.stopPropagation()">
-            <div class="alert-icon-ring">
-              <i class="bi bi-alarm-fill"></i>
-            </div>
-            <h2>{{ alarm.label || 'Alarm' }}</h2>
-            <div class="alert-time">{{ format12h(alarm.time) }}</div>
-            <p>Rising time. High Performance Awaits.</p>
-            <button class="dismiss-btn" (click)="stopAlert()">Stop Alarm</button>
+        <div class="alert-card animate-pop" (click)="$event.stopPropagation()">
+          <div class="alert-icon-ring">
+            <i class="bi bi-alarm-fill"></i>
           </div>
-        }
-
-        <!-- REMINDER CARD -->
-        @if (alarmService.activeReminder(); as note) {
-          <div class="alert-card reminder animate-pop" (click)="$event.stopPropagation()">
-            <div class="alert-icon-ring reminder">
-              <i class="bi bi-calendar-check-fill"></i>
-            </div>
-            <h2>{{ note.title || 'Reminder' }}</h2>
-            <p>{{ note.content || 'You have a scheduled note for today.' }}</p>
-            <button class="dismiss-btn reminder" (click)="stopAlert()">Dismiss</button>
-          </div>
-        }
-
+          <h2>{{ alarm.label || 'Alarm' }}</h2>
+          <div class="alert-time">{{ format12h(alarm.time) }}</div>
+          <p>Rising time. High Performance Awaits.</p>
+          <button class="dismiss-btn" (click)="stopAlert()">Stop Alarm</button>
+        </div>
       </div>
     }
   `,
