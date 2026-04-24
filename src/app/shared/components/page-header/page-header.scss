@@ -232,18 +232,16 @@
     width: 35px;
     height: 35px;
     background: var(--surface-alt);
-    border: 1px solid var(--border);
+    border: var(--border);
     border-radius: 10px;
     color: var(--text-muted);
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 1.1rem;
 
     &:hover {
         background: var(--bg-hover);
         color: var(--text-main);
-        border-color: var(--accent);
-        transform: translateY(-1px);
+        border-color: var(--text-main);
     }
 
     &:active {
@@ -251,10 +249,10 @@
     }
 
     &.active {
-        background: var(--surface-main);
-        color: var(--accent);
-        border-color: var(--accent);
-        box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
+        background: var(--surface);
+        color: var(--text-main);
+        border-color: var(--border);
+        box-shadow: 0 4px 12px rgba(var(--bg-rgb), 0.2);
     }
 
     @media (max-width: 768px) {
