@@ -15,7 +15,6 @@ import { ModulesSidebarService } from '../../../../services/ui/common/sidebar/mo
 import { ModalService } from '../../../../services/ui/common/modal/modal';
 import { SharedClockWidget } from '../../../../shared/widgets/clock-widget';
 import { SharedCalendarWidget } from '../../../../shared/widgets/calendar-widget';
-import { SharedAppGrid } from '../../../../shared/widgets/app-grid';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -29,8 +28,7 @@ import { CommonModule } from '@angular/common';
     TerminalComponent, 
     PageHeaderComponent,
     SharedClockWidget,
-    SharedCalendarWidget,
-    SharedAppGrid
+    SharedCalendarWidget
   ],
   templateUrl: './template.html',
   styleUrl: './template.scss',
