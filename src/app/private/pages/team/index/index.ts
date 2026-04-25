@@ -4,13 +4,15 @@ import { CommonModule } from '@angular/common';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { TeamMetricsComponent } from './metrics/metrics';
 import { ModulesSidebarService } from '../../../../services/ui/common/sidebar/modules-sidebar.service';
+import { PageHeaderActionsDirective } from '../../../../shared/components/page-header/page-header-actions.directive';
 
 @Component({
   selector: 'app-team-index',
   standalone: true,
   imports: [
     CommonModule, 
-    TeamMetricsComponent
+    TeamMetricsComponent,
+    PageHeaderActionsDirective
   ],
   templateUrl: './index.html',
   styleUrl: './index.scss',

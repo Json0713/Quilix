@@ -1,15 +1,12 @@
 <div class="dashboard-main">
-    <!-- Dashboard Toolbar -->
-    <div class="dashboard-toolbar">
-        <div class="toolbar-left">
-            <div class="toolbar-title">Dashboard</div>
-        </div>
-        <div class="toolbar-right">
-            <button class="icon-btn" title="Refresh data">
+    <!-- Header actions slotted into the parent's template header -->
+    <ng-template appPageHeaderActions>
+        <div class="header-actions">
+            <button class="icon-btn" title="Refresh Dashboard">
                 <i class="bi bi-arrow-clockwise"></i>
             </button>
         </div>
-    </div>
+    </ng-template>
 
     <!-- Scrollable content -->
     <div class="dashboard-content">
