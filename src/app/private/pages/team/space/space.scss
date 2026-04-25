@@ -1,81 +1,77 @@
 :host {
-    display: block;
-    padding: 24px;
-    max-width: 1500px; // Slightly narrower for team focus
-    margin: 0 auto;
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
     height: 100%;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
 }
 
-.space-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    gap: 2rem;
-    animation: fadeIn 0.4s ease-out;
-    min-height: 0;
+// ── Parent Container Layout Fix ───────────────────────────────────────────
+::ng-deep .team:has(app-team-space),
+::ng-deep .team:has(app-team-space) .container-fluid {
+    overflow: hidden !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
-.page-content {
+.dashboard-main {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    flex: 1;
+    min-width: 0;
     min-height: 0;
-    position: relative;
+    overflow: hidden;
+    background: var(--surface-main);
+}
+
+.dashboard-content {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--surface-main);
+}
+
+.content-wrapper {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .space-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
     padding-bottom: 2rem;
+    animation: fadeIn 0.4s ease-out;
+}
 
-    .space-card {
-        background: var(--surface-main);
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 1.5rem;
-        display: flex;
-        align-items: flex-start;
-        gap: 1.25rem;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
+// Header Actions
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
 
-        &:hover {
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border);
-        }
+.icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 10px;
+    background: var(--surface-alt);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.05rem;
 
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--surface-alt);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--action);
-            flex-shrink: 0;
-        }
-
-        .card-details {
-            flex: 1;
-            h3 { font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem; }
-            p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.4; margin: 0; }
-        }
-
-        .card-action {
-            i { font-size: 1.25rem; color: var(--text-muted); opacity: 0.5; transition: all 0.3s; }
-        }
-
-        &.placeholder-card {
-            cursor: default;
-            opacity: 0.7;
-            border-style: dashed;
-            &:hover { transform: none; box-shadow: none; border-color: var(--border); &::after { opacity: 0; } }
-        }
+    &:hover {
+        background: var(--bg-hover);
+        color: var(--accent);
+        transform: translateY(-1px);
     }
 }
 
@@ -90,7 +86,7 @@
     justify-content: center;
     
     &.maximized {
-        padding: 2px; // The requested 2px margin around the container
+        padding: 2px;
     }
 }
 
@@ -125,9 +121,7 @@
         left: 4% !important;
         top: 17.5% !important;
         border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         
-        // In mobile, we don't want it to look like a window but a clean modal
         .window-title-bar { cursor: default; }
     }
 }
@@ -152,7 +146,7 @@
         font-weight: 500;
         font-size: 0.85rem;
         color: var(--text-main);
-        min-width: 0; // Allow shrinking
+        min-width: 0;
         flex: 1;
 
         .window-icon { color: var(--action); font-size: 1.1rem; flex-shrink: 0; }
@@ -218,7 +212,6 @@
             transition: all 0.2s;
 
             &:hover {
-                background: rgba(var(--text-main-rgb), 0.05);
                 color: var(--text-main);
             }
         }
@@ -268,7 +261,6 @@
     align-items: flex-end;
     justify-content: flex-end;
     
-    // Smooth curve icon ")" in --action
     &::after {
         content: '';
         width: 12px;
@@ -295,13 +287,12 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
-// Reuse existing states
 .space-not-found, .space-loading {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 4rem 2rem;
+    padding: 6rem 2rem;
     text-align: center;
     gap: 0.75rem;
 
@@ -311,4 +302,4 @@
 }
 
 .spin { animation: spin 1s linear infinite; }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

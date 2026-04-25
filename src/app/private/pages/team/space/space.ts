@@ -9,11 +9,18 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { FileExplorerComponent } from '../../../../shared/components/space-manager/file-explorer/file-explorer';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { CommonModule } from '@angular/common';
+import { PageHeaderActionsDirective } from '../../../../shared/components/page-header/page-header-actions.directive';
+import { SpaceCardComponent } from '../../../../shared/components/space-manager/space-card/space-card';
 
 @Component({
     selector: 'app-team-space',
     standalone: true,
-    imports: [CommonModule, FileExplorerComponent],
+    imports: [
+        CommonModule, 
+        FileExplorerComponent, 
+        PageHeaderActionsDirective,
+        SpaceCardComponent
+    ],
     templateUrl: './space.html',
     styleUrl: './space.scss',
 })

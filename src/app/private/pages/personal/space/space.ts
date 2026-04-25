@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { SpaceService } from '../../../../core/services/components/space.service';
 import { Space } from '../../../../core/interfaces/space';
@@ -9,11 +9,18 @@ import { FileSystemService } from '../../../../core/services/data/file-system.se
 import { AuthService } from '../../../../core/auth/auth.service';
 import { FileExplorerComponent } from '../../../../shared/components/space-manager/file-explorer/file-explorer';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
+import { PageHeaderActionsDirective } from '../../../../shared/components/page-header/page-header-actions.directive';
+import { SpaceCardComponent } from '../../../../shared/components/space-manager/space-card/space-card';
 
 @Component({
     selector: 'app-personal-space',
     standalone: true,
-    imports: [CommonModule, FileExplorerComponent],
+    imports: [
+        CommonModule, 
+        FileExplorerComponent, 
+        PageHeaderActionsDirective,
+        SpaceCardComponent
+    ],
     templateUrl: './space.html',
     styleUrl: './space.scss',
 })
