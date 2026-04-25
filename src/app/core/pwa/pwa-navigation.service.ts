@@ -15,12 +15,18 @@ export class PwaNavigationService {
      */
     init(): void {
         // 1. Initial Boot Interceptor
-        // If we land exactly on the root landing page, check if we have a saved workplace session.
         if (window.location.pathname === '/') {
+            const params = new URLSearchParams(window.location.search);
             const lastRoute = localStorage.getItem('quilix_last_route');
+
+            // DEVELOPER / MANUAL OVERRIDE: 
+            // If explicitly requesting the home page via ?home=true, clear memory and stay here.
+            if (params.has('home')) {
+                localStorage.removeItem('quilix_last_route');
+                return;
+            }
+
             if (lastRoute && lastRoute !== '/') {
-                // Native Angular AuthGuards and MetaAuthGuards will silently catch expired sessions here.
-                // If the token is invalid, the AuthGuard will effortlessly kick them back to /login safely.
                 this.router.navigateByUrl(lastRoute, { replaceUrl: true });
             }
         }
