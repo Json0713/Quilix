@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
     templateUrl: './floating-window.html',
     styleUrl: './floating-window.scss',
 })
-export class FloatingWindowComponent implements OnInit, OnDestroy {
+export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
     @Input() storageKey!: string; // Must provide a unique key for persistence
     @Input() title: string = '';
     @Input() icon: string = 'bi-window';
@@ -29,11 +29,20 @@ export class FloatingWindowComponent implements OnInit, OnDestroy {
     private dragOffset = { x: 0, y: 0 };
     private initialSize = { width: 0, height: 0 };
     private initialPos = { x: 0, y: 0 };
+    
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['visible']?.currentValue === true) {
+            this.handleAutoMaximize();
+        }
+    }
 
     ngOnInit() {
         this.windowSize.set({ width: this.defaultWidth, height: this.defaultHeight });
         this.loadWindowState();
-        
+        this.handleAutoMaximize();
+    }
+
+    private handleAutoMaximize() {
         // Auto maximize on mobile when opened
         if (window.innerWidth < 768) {
             this.isMaximized.set(true);

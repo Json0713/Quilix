@@ -1,17 +1,198 @@
+.sheet-list-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-main);
+    color: var(--text-main);
+}
+
+.sheet-list-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-main);
+
+    .title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        color: var(--text-main);
+
+        .icon-success {
+            color: #10b981;
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+    }
+}
+
+.btn-action {
+    background: var(--action);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+
+    &:hover {
+        background: var(--action-hover, var(--action));
+        filter: brightness(1.1);
+    }
+}
+
+.sheet-list-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+        background: var(--surface-alt);
+    }
+    &::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+    }
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 3rem;
+    color: var(--text-muted);
+
+    .empty-icon {
+        font-size: 3.5rem;
+        opacity: 0.5;
+        margin-bottom: 1rem;
+    }
+
+    .empty-title {
+        color: var(--text-main);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-text {
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+}
+
+.sheet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.sheet-link {
+    text-decoration: none;
+    display: block;
+    height: 100%;
+}
+
 .sheet-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: var(--surface-main);
+    border: 1px solid var(--border);
+    border-radius: 8px; /* Reduced from 12px */
+    height: 100%;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
     cursor: pointer;
     
     &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        border-color: var(--border);
+        background: var(--surface-alt);
     }
 
-    .icon-box {
-        width: 48px;
-        height: 48px;
+    &.creating {
+        border-color: var(--action);
+        background: var(--surface-alt);
+    }
+
+    .card-body {
+        padding: 0.75rem 1rem;
+    }
+
+    .card-header {
         display: flex;
         align-items: center;
-        justify-content: center;
+        margin-bottom: 0.25rem;
+
+        .icon-box {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+
+            i {
+                font-size: 1.25rem;
+            }
+        }
+
+        .title-wrapper {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+
+            .card-title {
+                margin: 0;
+                color: var(--text-main);
+                font-size: 0.95rem;
+                font-weight: 500;
+                display: inline-block;
+                max-width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .inline-create-input {
+            flex: 1;
+            background: var(--surface-main);
+            color: var(--text-main);
+            border: 1px solid var(--action);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.9rem;
+            outline: none;
+            width: 100%;
+        }
+    }
+
+    .card-meta {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        margin-top: 0.5rem;
+
+        i {
+            margin-right: 0.25rem;
+        }
     }
 }

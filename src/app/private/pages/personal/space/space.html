@@ -49,14 +49,13 @@
                 <!-- Floating App Window (File Explorer) -->
                 <app-floating-window
                     [(visible)]="explorerVisible"
-                    title="File Explorer"
                     icon="bi-folder2-open"
                     storageKey="quilix_explorer_state">
                     
-                    <div window-header class="window-breadcrumbs" style="display:flex;align-items:center;gap:0.4rem;flex:1;">
+                    <div window-header class="window-breadcrumbs" style="display:flex;align-items:center;gap:0.2rem;flex:1;min-width:0;">
                         @for (crumb of explorerBreadcrumbs(); track i; let i = $index) {
                             <button class="crumb-link" 
-                                    style="background:transparent;border:none;padding:4px 8px;border-radius:6px;color:var(--text-muted);font-size:0.85rem;cursor:pointer;"
+                                    style="background:transparent;border:none;padding:4px 6px;border-radius:6px;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;"
                                     [class.active]="crumb.isLast"
                                     (click)="navigateToExplorerCrumb(i)"
                                     (mousedown)="$event.stopPropagation()">
@@ -88,7 +87,6 @@
                 <!-- Floating App Window (Spreadsheet) -->
                 <app-floating-window
                     [(visible)]="sheetVisible"
-                    title="Spreadsheets"
                     icon="bi-file-earmark-spreadsheet"
                     storageKey="quilix_sheet_state">
                     
@@ -114,4 +112,4 @@
         <i class="bi bi-arrow-repeat spin"></i>
     </div>
 </div>
-}
+}

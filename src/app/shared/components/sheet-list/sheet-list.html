@@ -1,36 +1,58 @@
-<div class="sheet-list-container h-100 d-flex flex-column bg-light">
+<div class="sheet-list-container">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-white">
-        <h5 class="m-0 text-dark"><i class="bi bi-file-earmark-spreadsheet text-success me-2"></i> Spreadsheets</h5>
-        <button class="btn btn-sm btn-success" (click)="createNewDoc()">
-            <i class="bi bi-plus-lg me-1"></i> Create New
+    <div class="sheet-list-toolbar">
+        <h5 class="title"><i class="bi bi-file-earmark-spreadsheet icon-success"></i> Spreadsheets</h5>
+        <button class="btn-action" (click)="createNewDoc()">
+            <i class="bi bi-plus-lg"></i> Create New
         </button>
     </div>
 
     <!-- List Content -->
-    <div class="list-content flex-grow-1 overflow-auto p-3">
-        @if (sheets().length === 0) {
-            <div class="empty-state text-center mt-5">
-                <i class="bi bi-table display-1 text-muted opacity-50 mb-3 d-block"></i>
-                <h5 class="text-muted">No Spreadsheets Yet</h5>
-                <p class="text-secondary small">Click 'Create New' to get started</p>
-                <button class="btn btn-success mt-2" (click)="createNewDoc()">Create First Spreadsheet</button>
+    <div class="sheet-list-content">
+        @if (sheets().length === 0 && !isCreating()) {
+            <div class="empty-state">
+                <i class="bi bi-table empty-icon"></i>
+                <h5 class="empty-title">No Spreadsheets Yet</h5>
+                <p class="empty-text">Click 'Create New' to get started</p>
+                <button class="btn-action mt-2" (click)="createNewDoc()">Create First Spreadsheet</button>
             </div>
         } @else {
-            <div class="row g-3">
-                @for (doc of sheets(); track doc.id) {
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <a [routerLink]="['/', routePrefix, 'spaces', spaceId, 'sheet', doc.id]" class="text-decoration-none">
-                            <div class="sheet-card card h-100 shadow-sm border-0">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="icon-box bg-success bg-opacity-10 text-success rounded p-2 me-3">
-                                            <i class="bi bi-file-earmark-spreadsheet-fill fs-4"></i>
-                                        </div>
-                                        <h6 class="card-title m-0 text-dark text-truncate">{{ doc.name }}</h6>
+            <div class="sheet-grid">
+                @if (isCreating()) {
+                    <div class="grid-item">
+                        <div class="sheet-card creating">
+                            <div class="card-body">
+                                <div class="card-header">
+                                    <div class="icon-box">
+                                        <i class="bi bi-file-earmark-spreadsheet-fill"></i>
                                     </div>
-                                    <div class="text-muted small mt-3">
-                                        <i class="bi bi-clock me-1"></i> Updated {{ doc.updatedAt | date:'short' }}
+                                    <input type="text" #createInput class="inline-create-input" 
+                                           [ngModel]="newItemName()" 
+                                           (ngModelChange)="newItemName.set($event)"
+                                           (keyup.enter)="confirmCreate()"
+                                           (keyup.escape)="cancelCreate()"
+                                           (blur)="confirmCreate()">
+                                </div>
+                                <div class="card-meta">Creating...</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @for (doc of sheets(); track doc.id) {
+                    <div class="grid-item">
+                        <a [routerLink]="['/', routePrefix, 'spaces', spaceId, 'sheet', doc.id]" class="sheet-link">
+                            <div class="sheet-card">
+                                <div class="card-body">
+                                    <div class="card-header">
+                                        <div class="icon-box">
+                                            <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                                        </div>
+                                        <div class="title-wrapper">
+                                            <h6 class="card-title" [title]="doc.name">{{ doc.name }}</h6>
+                                        </div>
+                                    </div>
+                                    <div class="card-meta">
+                                        <i class="bi bi-clock"></i> Updated {{ doc.updatedAt | date:'short' }}
                                     </div>
                                 </div>
                             </div>

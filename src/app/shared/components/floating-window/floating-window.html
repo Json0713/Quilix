@@ -12,9 +12,6 @@
             <div class="title-group">
                 <i class="bi window-icon" [ngClass]="icon"></i>
                 <ng-content select="[window-header]"></ng-content>
-                @if (title) {
-                    <span class="window-title">{{ title }}</span>
-                }
             </div>
             <div class="window-controls">
                 <ng-content select="[window-controls]"></ng-content>

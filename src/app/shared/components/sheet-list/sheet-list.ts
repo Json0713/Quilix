@@ -1,13 +1,14 @@
 import { Component, Input, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { SheetService } from '../../../core/services/components/sheet.service';
 import { SheetDocument } from '../../../core/interfaces/sheet';
 
 @Component({
     selector: 'app-sheet-list',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, FormsModule],
     templateUrl: './sheet-list.html',
     styleUrl: './sheet-list.scss'
 })
@@ -18,6 +19,8 @@ export class SheetListComponent implements OnInit, OnDestroy {
     private sheetService = inject(SheetService);
 
     sheets = signal<SheetDocument[]>([]);
+    isCreating = signal<boolean>(false);
+    newItemName = signal<string>('Untitled Spreadsheet');
     
     private sub: any;
 
@@ -29,12 +32,21 @@ export class SheetListComponent implements OnInit, OnDestroy {
         }
     }
 
-    async createNewDoc() {
-        if (!this.spaceId) return;
-        const name = prompt('Enter spreadsheet name:', 'Untitled Spreadsheet');
-        if (name) {
+    createNewDoc() {
+        this.isCreating.set(true);
+        this.newItemName.set('Untitled Spreadsheet');
+    }
+
+    async confirmCreate() {
+        const name = this.newItemName().trim();
+        if (name && this.spaceId) {
             await this.sheetService.create(this.spaceId, name);
         }
+        this.isCreating.set(false);
+    }
+
+    cancelCreate() {
+        this.isCreating.set(false);
     }
 
     ngOnDestroy() {
