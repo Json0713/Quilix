@@ -1,0 +1,166 @@
+.app-window-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 2000;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &.maximized {
+        padding: 2px;
+    }
+}
+
+.app-window {
+    position: absolute;
+    background: var(--surface-main);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    pointer-events: auto;
+    animation: windowOpen 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2001;
+
+    &.maximized {
+        position: relative;
+        width: 100% !important;
+        height: 100% !important;
+        left: 0 !important;
+        top: 0 !important;
+        border-radius: 8px;
+        transform: none !important;
+    }
+
+    @media (max-width: 768px) {
+        width: 92% !important;
+        height: 65% !important;
+        left: 4% !important;
+        top: 17.5% !important;
+        border-radius: 16px;
+        
+        .window-title-bar { cursor: default; }
+    }
+}
+
+.window-title-bar {
+    height: 48px;
+    padding: 0 1rem;
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: grab;
+    user-select: none;
+
+    &:active { cursor: grabbing; }
+
+    .title-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 500;
+        font-size: 0.85rem;
+        color: var(--text-main);
+        min-width: 0;
+        flex: 1;
+
+        .window-icon { color: var(--action); font-size: 1.1rem; flex-shrink: 0; }
+        .window-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .window-controls {
+        display: flex;
+        gap: 0.5rem;
+
+        .control-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            background-color: transparent;
+            border: none;
+            transition: all 0.2s;
+
+            &:hover {
+                color: var(--text-main);
+                background-color: var(--surface-alt-light, rgba(255,255,255,0.05));
+            }
+        }
+    }
+}
+
+.window-content {
+    flex: 1;
+    min-height: 0;
+    background: var(--surface-main);
+    position: relative;
+    overflow: hidden;
+}
+
+.window-footer {
+    height: 8px;
+    background: var(--surface-alt);
+    border-top: 1px solid var(--border);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    user-select: none;
+
+    &:active { cursor: grabbing; }
+    &:hover { background: var(--border); }
+
+    .grab-handle {
+        width: 30px;
+        height: 2px;
+        background: var(--text-muted);
+        opacity: 0.3;
+        border-radius: 2px;
+    }
+}
+
+.resizer-se {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    cursor: nwse-resize;
+    z-index: 10;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    
+    &::after {
+        content: '';
+        width: 12px;
+        height: 12px;
+        border-right: 3px solid var(--action);
+        border-bottom: 3px solid var(--action);
+        border-radius: 0 0 10px 0;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+
+    &:hover::after {
+        opacity: 1;
+    }
+}
+
+@keyframes windowOpen {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}

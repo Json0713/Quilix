@@ -1,0 +1,33 @@
+@if (!loading()) {
+<div class="dashboard-main h-100 d-flex flex-column" style="height: 100%; display: flex; flex-direction: column;">
+    <!-- Header actions slotted into the parent's template header -->
+    <ng-template appPageHeaderActions>
+        <div class="header-actions">
+            <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">
+                <i class="bi bi-arrow-left me-1"></i> Back to Space
+            </button>
+        </div>
+    </ng-template>
+
+    <div class="dashboard-content flex-grow-1 p-0 m-0" style="flex: 1; padding: 0; min-height: 0; overflow: hidden;">
+        @if (sheetId()) {
+            <app-sheet [sheetId]="sheetId()!" (sheetSelected)="onSheetSelected($event)" class="w-100 h-100 d-block"></app-sheet>
+        } @else {
+            <div class="space-not-found">
+                <i class="bi bi-file-earmark-x"></i>
+                <h3>Spreadsheet not found</h3>
+                <p>This spreadsheet may have been deleted or archived.</p>
+            </div>
+        }
+    </div>
+</div>
+}
+
+@if (loading()) {
+<div class="loading-state h-100 d-flex align-items-center justify-content-center">
+    <div class="space-loading text-muted text-center">
+        <i class="bi bi-arrow-repeat spin display-4"></i>
+        <p class="mt-2">Loading spreadsheet...</p>
+    </div>
+</div>
+}

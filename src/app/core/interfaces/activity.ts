@@ -10,7 +10,7 @@ export type ActivityType =
   | 'error' 
   | 'warning';
 
-export type ActivityCategory = 'workspace' | 'space' | 'file' | 'system';
+export type ActivityCategory = 'workspace' | 'space' | 'file' | 'system' | 'sheet';
 
 export interface ActivityRecord {
     id: string;

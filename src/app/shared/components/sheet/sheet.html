@@ -1,0 +1,177 @@
+<div class="sheet-container">
+    <!-- Top Header: Title and Menubar -->
+    <div class="sheet-header">
+        <div class="header-top">
+            @if (activeDoc()) {
+                <div class="sheet-icon d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded me-2" (click)="showDropdown.set(!showDropdown())">
+                    <i class="bi bi-file-earmark-spreadsheet-fill fs-5"></i>
+                </div>
+                
+                <div class="doc-title-container">
+                    <input type="text" class="doc-title-input" 
+                           [ngModel]="activeDoc()!.name" 
+                           (ngModelChange)="updateTitle($event)">
+                           
+                    @if (showDropdown()) {
+                        <div class="dropdown-menu show shadow border mt-1 sheet-dropdown">
+                            <h6 class="dropdown-header">Other Spreadsheets</h6>
+                            @for (doc of spaceSheets(); track doc.id) {
+                                @if (doc.id !== activeDoc()?.id) {
+                                    <button class="dropdown-item" (click)="sheetSelected.emit(doc.id); showDropdown.set(false)">
+                                        <i class="bi bi-file-earmark-spreadsheet text-muted me-2"></i>{{ doc.name }}
+                                    </button>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="sheet-menubar">
+            <div class="menu-item">File</div>
+            <div class="menu-item">Edit</div>
+            <div class="menu-item">View</div>
+            <div class="menu-item">Insert</div>
+            <div class="menu-item">Format</div>
+            <div class="menu-item">Data</div>
+            <div class="menu-item">Tools</div>
+            <div class="menubar-status">
+                <i class="bi bi-cloud-check"></i> Saved to local
+            </div>
+        </div>
+    </div>
+        
+    <!-- Formatting Toolbar -->
+    <div class="sheet-toolbar">
+        <!-- Undo / Redo mock -->
+        <button class="btn-tool" title="Undo"><i class="bi bi-arrow-90deg-left"></i></button>
+        <button class="btn-tool" title="Redo"><i class="bi bi-arrow-90deg-right"></i></button>
+        <div class="toolbar-divider"></div>
+        
+        <button class="btn-tool" title="Bold" 
+                [class.active]="getCell(selectedCell()!)?.bold"
+                (click)="toggleBold()">
+            <i class="bi bi-type-bold"></i>
+        </button>
+        <button class="btn-tool" title="Italic"
+                [class.active]="getCell(selectedCell()!)?.italic"
+                (click)="toggleItalic()">
+            <i class="bi bi-type-italic"></i>
+        </button>
+        
+        <div class="toolbar-divider"></div>
+        
+        <button class="btn-tool" title="Align Left" (click)="setAlignment('left')"
+                [class.active]="getCell(selectedCell()!)?.align === 'left'">
+            <i class="bi bi-text-left"></i>
+        </button>
+        <button class="btn-tool" title="Align Center" (click)="setAlignment('center')"
+                [class.active]="getCell(selectedCell()!)?.align === 'center'">
+            <i class="bi bi-text-center"></i>
+        </button>
+        <button class="btn-tool" title="Align Right" (click)="setAlignment('right')"
+                [class.active]="getCell(selectedCell()!)?.align === 'right'">
+            <i class="bi bi-text-right"></i>
+        </button>
+        
+        <div class="toolbar-divider"></div>
+
+        <div class="color-picker-tool btn-tool" title="Text Color">
+            <i class="bi bi-palette text-muted"></i>
+            <input type="color" class="color-input position-absolute opacity-0 w-100 h-100 cursor-pointer" 
+                   [ngModel]="getCell(selectedCell()!)?.color || '#000000'"
+                   (change)="setColor($event)">
+        </div>
+        
+        <div class="color-picker-tool btn-tool" title="Fill Color">
+            <i class="bi bi-paint-bucket"></i>
+            <input type="color" class="color-input"
+                   [ngModel]="getCell(selectedCell()!)?.bgColor || '#ffffff'"
+                   (change)="setBgColor($event)">
+        </div>
+    </div>
+    
+    <!-- Formula Bar -->
+    <div class="formula-bar-container">
+        @if (selectedCell()) {
+            <div class="formula-label">
+                {{ selectedCell() }}
+            </div>
+            <div class="toolbar-divider"></div>
+            <div class="formula-icon">fx</div>
+            <input type="text" class="formula-input" 
+                   [ngModel]="editingCell() ? editValue() : getCellValue(selectedCell()!)"
+                   [readonly]="!selectedCell()"
+                   (focus)="startEdit(selectedCell()!, false)"
+                   (ngModelChange)="editValue.set($event)"
+                   (keydown)="editingCell() ? onKeyDown($event, selectedCell()!) : null"
+                   (blur)="editingCell() ? saveCell(selectedCell()!) : null">
+        } @else {
+            <div class="formula-label empty"></div>
+        }
+    </div>
+
+    @if (activeDoc() && activeTab()) {
+        <div class="sheet-grid-wrapper">
+            <table class="sheet-grid">
+                <thead>
+                    <tr>
+                        <th class="corner-header"></th>
+                        @for (col of columns; track col) {
+                            <th class="col-header">{{ col }}</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (row of rows; track row) {
+                        <tr>
+                            <td class="row-header">{{ row }}</td>
+                            @for (col of columns; track col) {
+                                @let cellId = col + row;
+                                <td class="cell" 
+                                    [class.selected]="selectedCell() === cellId"
+                                    (click)="selectCell(cellId)"
+                                    (dblclick)="startEdit(cellId)">
+                                    
+                                    @if (editingCell() === cellId) {
+                                        <textarea class="cell-editor"
+                                               [ngModel]="editValue()"
+                                               (ngModelChange)="editValue.set($event)"
+                                               (keydown)="onKeyDown($event, cellId)"
+                                               (blur)="saveCell(cellId)"></textarea>
+                                    } @else {
+                                        @let c = getCell(cellId);
+                                        <div class="cell-content"
+                                             [style.font-weight]="c?.bold ? 'bold' : 'normal'"
+                                             [style.font-style]="c?.italic ? 'italic' : 'normal'"
+                                             [style.text-align]="c?.align || 'left'"
+                                             [style.color]="c?.color || null"
+                                             [style.background-color]="c?.bgColor || null">
+                                            {{ c?.value || '' }}
+                                        </div>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="tabs-list">
+            @for (tab of activeDoc()!.tabs; track tab.id) {
+                <div class="tab-item" 
+                     [class.active]="activeTab()?.id === tab.id"
+                     (click)="switchTab(tab)">
+                    {{ tab.name }}
+                </div>
+            }
+            <button class="btn-tool add-tab" title="Add Sheet"><i class="bi bi-plus"></i></button>
+        </div>
+    } @else {
+        <div class="empty-state">
+            <i class="bi bi-hourglass text-muted opacity-50 display-1"></i>
+            <h4 class="mt-3">Loading Spreadsheet...</h4>
+        </div>
+    }
+</div>

@@ -1,0 +1,46 @@
+@if (visible) {
+<div class="app-window-overlay" [class.maximized]="isMaximized()">
+    <div class="app-window" 
+         [class.maximized]="isMaximized()"
+         [style.left.px]="isMaximized() ? null : windowPosition().x"
+         [style.top.px]="isMaximized() ? null : windowPosition().y"
+         [style.width.px]="isMaximized() ? null : windowSize().width"
+         [style.height.px]="isMaximized() ? null : windowSize().height">
+        
+        <!-- Window Title Bar (Draggable) -->
+        <div class="window-title-bar" (mousedown)="onDragStart($event)">
+            <div class="title-group">
+                <i class="bi window-icon" [ngClass]="icon"></i>
+                <ng-content select="[window-header]"></ng-content>
+                @if (title) {
+                    <span class="window-title">{{ title }}</span>
+                }
+            </div>
+            <div class="window-controls">
+                <ng-content select="[window-controls]"></ng-content>
+                <button class="control-btn maximize-btn" (click)="toggleMaximize()" [title]="isMaximized() ? 'Restore' : 'Maximize'">
+                    <i class="bi" [class.bi-fullscreen-exit]="isMaximized()" [class.bi-fullscreen]="!isMaximized()"></i>
+                </button>
+                <button class="control-btn close-btn" (click)="close()" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Window Content -->
+        <div class="window-content">
+            <ng-content></ng-content>
+        </div>
+
+        <!-- Window Footer (Draggable Security Handle) -->
+        <div class="window-footer" (mousedown)="onDragStart($event)">
+            <div class="grab-handle"></div>
+        </div>
+
+        <!-- Single SE Resizer Handle -->
+        @if (!isMaximized()) {
+            <div class="resizer-se" (mousedown)="onResizeStart($event)"></div>
+        }
+    </div>
+</div>
+}

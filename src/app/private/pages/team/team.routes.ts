@@ -36,6 +36,10 @@ export const TEAM_ROUTES: Routes = [
       {
         path: 'spaces/:spaceId',
         loadComponent: () => import('./space/space').then(m => m.TeamSpace)
+      },
+      {
+        path: 'spaces/:spaceId/sheet/:sheetId',
+        loadComponent: () => import('../shared/sheet-page/sheet-page').then(m => m.SheetPage)
       }
     ]
   }

@@ -24,6 +24,7 @@ import { Space } from '../interfaces/space';
 import { Tab } from '../interfaces/tab';
 import { Session } from '../interfaces/session';
 import { Task } from '../interfaces/task';
+import { SheetDocument } from '../interfaces/sheet';
 import { ContactMessage, Setting, ChatSession, ChatMessage, WidgetNote, WidgetAlarm } from './dexie.models';
 
 // Re-export models so consumers can import from a single location if needed.
@@ -43,6 +44,7 @@ export class DexieService extends Dexie {
     spaces!: Table<Space, string>;
     tabs!: Table<Tab, string>;
     tasks!: Table<Task, string>;
+    sheets!: Table<SheetDocument, string>;
     virtual_entries!: Table<any, string>;
     activities!: Table<any, string>;
     chat_sessions!: Table<ChatSession, string>;
@@ -139,6 +141,11 @@ export class DexieService extends Dexie {
         // v15 – Note Reminders with OS-level notifications.
         this.version(15).stores({
             widget_notes: 'id, date, createdAt, reminderTime, reminderEnabled'
+        });
+
+        // v16 - Spreadsheet Document Storage
+        this.version(16).stores({
+            sheets: 'id, spaceId, updatedAt'
         });
 
         // Open the database connection eagerly to reduce first-operation latency.

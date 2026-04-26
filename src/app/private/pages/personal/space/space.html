@@ -38,83 +38,64 @@
                     <!-- Spread Sheets Card -->
                     <app-space-card
                         title="Spread Sheets"
-                        subtitle="Coming soon: Analyze data with powerful grids."
+                        subtitle="Analyze data with powerful grids."
                         icon="bi-file-earmark-spreadsheet"
-                        [isPlaceholder]="true"
                         indicatorColor="#10b981"
-                        previewBackground="linear-gradient(135deg, #10b981, #059669)">
+                        previewBackground="linear-gradient(135deg, #10b981, #059669)"
+                        (cardClick)="toggleSheet()">
                     </app-space-card>
                 </div>
 
                 <!-- Floating App Window (File Explorer) -->
-                @if (explorerVisible()) {
-                    <div class="app-window-overlay" [class.maximized]="isMaximized()">
-                        <div class="app-window" 
-                             [class.maximized]="isMaximized()"
-                             [style.left.px]="isMaximized() ? null : windowPosition().x"
-                             [style.top.px]="isMaximized() ? null : windowPosition().y"
-                             [style.width.px]="isMaximized() ? null : windowSize().width"
-                             [style.height.px]="isMaximized() ? null : windowSize().height">
-                            
-                            <!-- Window Title Bar (Draggable) -->
-                            <div class="window-title-bar" (mousedown)="onDragStart($event)">
-                                <div class="title-group">
-                                    <i class="bi bi-folder2-open window-icon"></i>
-                                    <div class="window-breadcrumbs">
-                                        @for (crumb of explorerBreadcrumbs(); track i; let i = $index) {
-                                            <button class="crumb-link" 
-                                                    [class.active]="crumb.isLast"
-                                                    (click)="navigateToExplorerCrumb(i)"
-                                                    (mousedown)="$event.stopPropagation()">
-                                                {{ crumb.label }}
-                                            </button>
-                                            @if (!crumb.isLast) {
-                                                <i class="bi bi-chevron-right crumb-sep"></i>
-                                            }
-                                        }
-                                    </div>
-                                </div>
-                                <div class="window-controls">
-                                    <button class="control-btn maximize-btn" (click)="toggleMaximize()" [title]="isMaximized() ? 'Restore' : 'Maximize'">
-                                        <i class="bi" [class.bi-fullscreen-exit]="isMaximized()" [class.bi-fullscreen]="!isMaximized()"></i>
-                                    </button>
-                                    <button class="control-btn close-btn" (click)="toggleExplorer()" title="Close">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Window Content -->
-                            <div class="window-content">
-                                @if (workspaceId()) {
-                                    <app-file-explorer 
-                                        [spaceId]="space()!.id"
-                                        [workspaceId]="workspaceId()!"
-                                        [rootHandle]="spaceHandle()"
-                                        [spaceName]="space()?.name || 'Space'"
-                                        (breadcrumbsChanged)="onBreadcrumbsChanged($event)"
-                                        class="w-100 h-100 d-block">
-                                    </app-file-explorer>
-                                } @else {
-                                    <div class="p-4 text-center">
-                                        <i class="bi bi-hourglass-split display-4 opacity-50"></i>
-                                        <p class="mt-2 text-muted">Awaiting workspace context...</p>
-                                    </div>
-                                }
-                            </div>
-
-                            <!-- Window Footer (Draggable Security Handle) -->
-                            <div class="window-footer" (mousedown)="onDragStart($event)">
-                                <div class="grab-handle"></div>
-                            </div>
-
-                            <!-- Single SE Resizer Handle -->
-                            @if (!isMaximized()) {
-                                <div class="resizer-se" (mousedown)="onResizeStart($event)"></div>
+                <app-floating-window
+                    [(visible)]="explorerVisible"
+                    title="File Explorer"
+                    icon="bi-folder2-open"
+                    storageKey="quilix_explorer_state">
+                    
+                    <div window-header class="window-breadcrumbs" style="display:flex;align-items:center;gap:0.4rem;flex:1;">
+                        @for (crumb of explorerBreadcrumbs(); track i; let i = $index) {
+                            <button class="crumb-link" 
+                                    style="background:transparent;border:none;padding:4px 8px;border-radius:6px;color:var(--text-muted);font-size:0.85rem;cursor:pointer;"
+                                    [class.active]="crumb.isLast"
+                                    (click)="navigateToExplorerCrumb(i)"
+                                    (mousedown)="$event.stopPropagation()">
+                                {{ crumb.label }}
+                            </button>
+                            @if (!crumb.isLast) {
+                                <i class="bi bi-chevron-right" style="font-size:0.7rem;color:var(--text-muted);opacity:0.5;"></i>
                             }
-                        </div>
+                        }
                     </div>
-                }
+
+                    @if (workspaceId()) {
+                        <app-file-explorer 
+                            [spaceId]="space()!.id"
+                            [workspaceId]="workspaceId()!"
+                            [rootHandle]="spaceHandle()"
+                            [spaceName]="space()?.name || 'Space'"
+                            (breadcrumbsChanged)="onBreadcrumbsChanged($event)"
+                            class="w-100 h-100 d-block">
+                        </app-file-explorer>
+                    } @else {
+                        <div class="p-4 text-center">
+                            <i class="bi bi-hourglass-split display-4 opacity-50"></i>
+                            <p class="mt-2 text-muted">Awaiting workspace context...</p>
+                        </div>
+                    }
+                </app-floating-window>
+
+                <!-- Floating App Window (Spreadsheet) -->
+                <app-floating-window
+                    [(visible)]="sheetVisible"
+                    title="Spreadsheets"
+                    icon="bi-file-earmark-spreadsheet"
+                    storageKey="quilix_sheet_state">
+                    
+                    @if (space()) {
+                        <app-sheet-list [spaceId]="space()!.id" routePrefix="personal" class="w-100 h-100 d-block"></app-sheet-list>
+                    }
+                </app-floating-window>
             } @else {
                 <div class="space-not-found">
                     <i class="bi bi-folder-x"></i>
