@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SheetService } from '../../../core/services/components/sheet.service';
 import { SheetDocument, SheetTab, SheetCell } from '../../../core/interfaces/sheet';
+import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
 
 @Component({
     selector: 'app-sheet',
@@ -16,6 +17,7 @@ export class SheetComponent implements OnInit, OnDestroy {
     @Output() sheetSelected = new EventEmitter<string>();
 
     private sheetService = inject(SheetService);
+    private breadcrumbService = inject(BreadcrumbService);
 
     activeDoc = signal<SheetDocument | null>(null);
     activeTab = signal<SheetTab | null>(null);
@@ -124,7 +126,9 @@ export class SheetComponent implements OnInit, OnDestroy {
         clearTimeout(this.titleTimeout);
         this.titleTimeout = setTimeout(() => {
             if (newName.trim() !== '' && newName !== doc.name) {
-                this.sheetService.update(doc.id, { name: newName.trim() });
+                const trimmed = newName.trim();
+                this.sheetService.update(doc.id, { name: trimmed });
+                this.breadcrumbService.setTitle(trimmed);
             }
         }, 500);
     }
@@ -240,6 +244,11 @@ export class SheetComponent implements OnInit, OnDestroy {
             }
             this.selectedCell.set(null);
             this.editingCell.set(null);
+        }
+
+        // Close dropdown if clicked outside
+        if (this.showDropdown() && !target.closest('.sheet-dropdown') && !target.closest('.sheet-icon')) {
+            this.showDropdown.set(false);
         }
     }
     

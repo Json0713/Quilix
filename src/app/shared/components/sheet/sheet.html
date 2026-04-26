@@ -15,12 +15,16 @@
                     @if (showDropdown()) {
                         <div class="dropdown-menu show shadow border mt-1 sheet-dropdown">
                             <h6 class="dropdown-header">Other Spreadsheets</h6>
-                            @for (doc of spaceSheets(); track doc.id) {
-                                @if (doc.id !== activeDoc()?.id) {
-                                    <button class="dropdown-item" (click)="sheetSelected.emit(doc.id); showDropdown.set(false)">
-                                        <i class="bi bi-file-earmark-spreadsheet text-muted me-2"></i>{{ doc.name }}
-                                    </button>
+                            @if (spaceSheets().length > 1) {
+                                @for (doc of spaceSheets(); track doc.id) {
+                                    @if (doc.id !== activeDoc()?.id) {
+                                        <button class="dropdown-item" (click)="sheetSelected.emit(doc.id); showDropdown.set(false)">
+                                            <i class="bi bi-file-earmark-spreadsheet text-muted me-2"></i>{{ doc.name }}
+                                        </button>
+                                    }
                                 }
+                            } @else {
+                                <div class="px-3 py-2 text-muted small">No other spreadsheets in this space.</div>
                             }
                         </div>
                     }
