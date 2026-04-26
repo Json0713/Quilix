@@ -14,7 +14,7 @@
                            
                     @if (showDropdown()) {
                         <div class="sheet-dropdown">
-                            <div class="dropdown-header">Other Spreadsheets</div>
+                            <div class="dropdown-header">Spreadsheets</div>
                             @if (spaceSheets().length > 1) {
                                 @for (doc of spaceSheets(); track doc.id) {
                                     @if (doc.id !== activeDoc()?.id) {
