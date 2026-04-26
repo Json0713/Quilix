@@ -7,10 +7,17 @@
                     <i class="bi bi-file-earmark-spreadsheet-fill"></i>
                 </div>
                 
-                <div class="doc-title-container">
+                <div class="doc-title-container" [class.is-invalid]="isTitleDuplicate()">
                     <input type="text" class="doc-title-input" 
                            [ngModel]="activeDoc()!.name" 
-                           (ngModelChange)="updateTitle($event)">
+                           (ngModelChange)="updateTitle($event)"
+                           [title]="isTitleDuplicate() ? 'This name already exists in this space' : ''">
+                           
+                    @if (isTitleDuplicate()) {
+                        <div class="invalid-indicator" title="This name already exists">
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                        </div>
+                    }
                            
                     @if (showDropdown()) {
                         <div class="sheet-dropdown">
@@ -82,7 +89,7 @@
         <div class="toolbar-divider"></div>
 
         <div class="color-picker-tool btn-tool" title="Text Color">
-            <i class="bi bi-palette text-muted"></i>
+            <i class="bi bi-palette"></i>
             <input type="color" class="color-input position-absolute opacity-0 w-100 h-100 cursor-pointer" 
                    [ngModel]="getCell(selectedCell()!)?.color || '#000000'"
                    (change)="setColor($event)">

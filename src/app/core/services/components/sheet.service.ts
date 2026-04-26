@@ -24,7 +24,34 @@ export class SheetService {
         return liveQuery(() => db.sheets.get(id));
     }
 
+    async getAvailableName(spaceId: string, baseName: string, excludeId?: string): Promise<string> {
+        const spaceSheets = await db.sheets.filter(s => s.spaceId === spaceId && s.id !== excludeId).toArray();
+        const existingNames = new Set(spaceSheets.map(s => s.name.toLowerCase()));
+        
+        if (!existingNames.has(baseName.toLowerCase())) {
+            return baseName;
+        }
+
+        let name = baseName;
+        let counter = 2;
+        
+        // Handle names that already end with (n)
+        const match = baseName.match(/(.*?)\s\((\d+)\)$/);
+        let prefix = baseName;
+        if (match) {
+            prefix = match[1];
+            counter = parseInt(match[2]) + 1;
+        }
+
+        while (existingNames.has(`${prefix} (${counter})`.toLowerCase())) {
+            counter++;
+        }
+
+        return `${prefix} (${counter})`;
+    }
+
     async create(spaceId: string, name: string): Promise<SheetDocument> {
+        const uniqueName = await this.getAvailableName(spaceId, name);
         const id = crypto.randomUUID();
         const tabId = crypto.randomUUID();
         const now = Date.now();
@@ -38,7 +65,7 @@ export class SheetService {
         const doc: SheetDocument = {
             id,
             spaceId,
-            name,
+            name: uniqueName,
             tabs: [initialTab],
             activeTabId: tabId,
             createdAt: now,
@@ -51,8 +78,8 @@ export class SheetService {
             type: 'create',
             category: 'sheet',
             entityId: id,
-            entityName: name,
-            description: `Created spreadsheet "${name}"`
+            entityName: uniqueName,
+            description: `Created spreadsheet "${uniqueName}"`
         });
 
         return doc;

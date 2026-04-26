@@ -91,7 +91,8 @@ export class SheetListComponent implements OnInit, OnDestroy {
         const doc = this.renamingDoc();
         const newName = this.renameValue().trim();
         if (doc && newName && newName !== doc.name) {
-            await this.sheetService.update(doc.id, { name: newName });
+            const finalName = await this.sheetService.getAvailableName(this.spaceId, newName, doc.id);
+            await this.sheetService.update(doc.id, { name: finalName });
         }
         this.renamingDoc.set(null);
     }

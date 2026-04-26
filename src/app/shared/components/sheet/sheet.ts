@@ -31,8 +31,9 @@ export class SheetComponent implements OnInit, OnDestroy {
     editingCell = signal<string | null>(null);
     editValue = signal<string>('');
 
-    // Dropdown toggle
+    // UI State
     showDropdown = signal<boolean>(false);
+    isTitleDuplicate = signal<boolean>(false);
 
     private saveTimeout: any;
     private titleTimeout: any;
@@ -123,14 +124,21 @@ export class SheetComponent implements OnInit, OnDestroy {
         const doc = this.activeDoc();
         if (!doc) return;
         
+        const trimmed = newName.trim();
+        
+        // Real-time duplicate check for visual feedback
+        const isDuplicate = this.spaceSheets().some(s => 
+            s.name.toLowerCase() === trimmed.toLowerCase() && s.id !== doc.id
+        );
+        this.isTitleDuplicate.set(isDuplicate);
+
         clearTimeout(this.titleTimeout);
-        this.titleTimeout = setTimeout(() => {
-            if (newName.trim() !== '' && newName !== doc.name) {
-                const trimmed = newName.trim();
-                this.sheetService.update(doc.id, { name: trimmed });
+        this.titleTimeout = setTimeout(async () => {
+            if (trimmed !== '' && trimmed !== doc.name && !isDuplicate) {
+                await this.sheetService.update(doc.id, { name: trimmed });
                 this.breadcrumbService.setTitle(trimmed);
             }
-        }, 500);
+        }, 800); // Slightly longer debounce for manual typing
     }
 
     // --- Formatting Methods ---
