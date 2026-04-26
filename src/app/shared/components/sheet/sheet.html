@@ -19,7 +19,8 @@
                                 @for (doc of spaceSheets(); track doc.id) {
                                     @if (doc.id !== activeDoc()?.id) {
                                         <button class="dropdown-item" (click)="sheetSelected.emit(doc.id); showDropdown.set(false)">
-                                            <i class="bi bi-file-earmark-spreadsheet"></i>{{ doc.name }}
+                                            <i class="bi bi-file-earmark-spreadsheet"></i>
+                                            <span>{{ doc.name }}</span>
                                         </button>
                                     }
                                 }

@@ -89,6 +89,7 @@
         left: 0;
         z-index: 1150;
         min-width: 200px;
+        max-width: 320px; /* Constrain width */
         background-color: var(--surface-main);
         border: 1px solid var(--border);
         border-radius: 10px;
@@ -98,6 +99,11 @@
         margin-top: 4px;
         max-height: 300px;
         overflow-y: auto;
+        overflow-x: hidden;
+
+        @media (max-width: 768px) {
+            max-width: 260px;
+        }
 
         .dropdown-header {
             padding: 0.25rem 0.75rem;
@@ -122,6 +128,7 @@
             transition: background-color 0.15s;
             width: 100%;
             cursor: pointer;
+            min-width: 0;
 
             &:hover {
                 background-color: var(--surface-alt);
@@ -131,6 +138,13 @@
                 font-size: 1rem;
                 margin-right: 0.75rem;
                 color: var(--text-muted);
+                flex-shrink: 0;
+            }
+
+            span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
         }
     }

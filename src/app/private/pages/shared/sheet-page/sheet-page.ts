@@ -2,14 +2,13 @@ import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SheetComponent } from '../../../../shared/components/sheet/sheet';
-import { PageHeaderActionsDirective } from '../../../../shared/components/page-header/page-header-actions.directive';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { SheetService } from '../../../../core/services/components/sheet.service';
 
 @Component({
     selector: 'app-sheet-page',
     standalone: true,
-    imports: [CommonModule, SheetComponent, PageHeaderActionsDirective],
+    imports: [CommonModule, SheetComponent],
     templateUrl: './sheet-page.html',
     styleUrl: './sheet-page.scss'
 })
@@ -49,10 +48,7 @@ export class SheetPage implements OnInit, OnDestroy {
         });
     }
 
-    goBack() {
-        // Go back to the space view
-        this.location.back();
-    }
+
 
     onSheetSelected(newSheetId: string) {
         if (this.spaceId()) {
