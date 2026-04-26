@@ -16,12 +16,38 @@
         align-items: center;
         margin-bottom: 4px;
         position: relative;
+
+        .doc-title-container {
+            position: relative;
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+        }
     }
 
     .sheet-icon {
         width: 32px;
         height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(34, 197, 94, 0.1); /* Success color transparent */
+        color: #22c55e;
+        border-radius: 8px;
         cursor: pointer;
+        transition: all 0.2s;
+        margin-right: 12px;
+        flex-shrink: 0;
+
+        &:hover {
+            background-color: rgba(34, 197, 94, 0.2);
+            transform: scale(1.05);
+        }
+
+        i {
+            font-size: 1.1rem;
+        }
     }
     
     .doc-title-input {
@@ -31,11 +57,15 @@
         font-size: 1.1rem;
         font-weight: 600;
         min-width: 200px;
+        max-width: 400px;
         background: transparent;
         color: var(--text-main);
         padding: 2px 6px;
         border-radius: 4px;
         transition: all 0.2s;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
 
         &:hover {
             border-color: var(--border);
@@ -45,6 +75,11 @@
         &:focus {
             border-color: var(--action);
             background-color: var(--surface-main);
+            max-width: none; /* Expand when focused */
+        }
+
+        @media (max-width: 768px) {
+            max-width: 180px;
         }
     }
     
@@ -52,9 +87,52 @@
         position: absolute;
         top: 100%;
         left: 0;
-        z-index: 1000;
+        z-index: 1150;
+        min-width: 200px;
+        background-color: var(--surface-main);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        padding: 4px;
+        backdrop-filter: blur(12px);
+        margin-top: 4px;
         max-height: 300px;
         overflow-y: auto;
+
+        .dropdown-header {
+            padding: 0.25rem 0.75rem;
+            margin-bottom: 0.25rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            text-align: left;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            background: transparent;
+            border: none;
+            padding: 0.6rem 0.75rem;
+            border-radius: 6px;
+            transition: background-color 0.15s;
+            width: 100%;
+            cursor: pointer;
+
+            &:hover {
+                background-color: var(--surface-alt);
+            }
+
+            i {
+                font-size: 1rem;
+                margin-right: 0.75rem;
+                color: var(--text-muted);
+            }
+        }
     }
 
     .sheet-menubar {
@@ -63,6 +141,14 @@
         color: var(--text-muted);
         font-size: 0.85rem;
         margin-left: 40px; /* Aligns with input */
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+        &::-webkit-scrollbar { display: none; }
+        
+        .menu-item {
+            flex-shrink: 0;
+        }
     }
 
     .menu-item {
@@ -130,6 +216,14 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+
+    .btn-tool, .toolbar-divider, .color-picker-tool {
+        flex-shrink: 0;
+    }
 }
 
 .color-picker-tool {
@@ -314,8 +408,13 @@
     flex-shrink: 0;
     position: relative;
     z-index: 10;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
 
     .tab-item {
+        flex-shrink: 0;
         padding: 0 16px;
         display: flex;
         align-items: center;

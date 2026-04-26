@@ -3,8 +3,8 @@
     <div class="sheet-header">
         <div class="header-top">
             @if (activeDoc()) {
-                <div class="sheet-icon d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded me-2" (click)="showDropdown.set(!showDropdown())">
-                    <i class="bi bi-file-earmark-spreadsheet-fill fs-5"></i>
+                <div class="sheet-icon" (click)="showDropdown.set(!showDropdown())">
+                    <i class="bi bi-file-earmark-spreadsheet-fill"></i>
                 </div>
                 
                 <div class="doc-title-container">
@@ -13,18 +13,18 @@
                            (ngModelChange)="updateTitle($event)">
                            
                     @if (showDropdown()) {
-                        <div class="dropdown-menu show shadow border mt-1 sheet-dropdown">
-                            <h6 class="dropdown-header">Other Spreadsheets</h6>
+                        <div class="sheet-dropdown">
+                            <div class="dropdown-header">Other Spreadsheets</div>
                             @if (spaceSheets().length > 1) {
                                 @for (doc of spaceSheets(); track doc.id) {
                                     @if (doc.id !== activeDoc()?.id) {
                                         <button class="dropdown-item" (click)="sheetSelected.emit(doc.id); showDropdown.set(false)">
-                                            <i class="bi bi-file-earmark-spreadsheet text-muted me-2"></i>{{ doc.name }}
+                                            <i class="bi bi-file-earmark-spreadsheet"></i>{{ doc.name }}
                                         </button>
                                     }
                                 }
                             } @else {
-                                <div class="px-3 py-2 text-muted small">No other spreadsheets in this space.</div>
+                                <div class="px-3 py-2 text-muted small">No other spreadsheets.</div>
                             }
                         </div>
                     }
