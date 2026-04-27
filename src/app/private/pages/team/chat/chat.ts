@@ -12,6 +12,7 @@ import { ChatMessage, ChatSession, CanvasDocument } from '../../../../core/datab
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 import { DropdownService } from '../../../../services/ui/common/dropdown/dropdown.service';
 import Quill from 'quill';
+import { Subject, debounceTime, takeUntil } from 'rxjs';
 
 
 @Component({
@@ -39,6 +40,8 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
     confirmingDeleteId = signal<string | null>(null);
     isCanvasDirty = signal(false);
     private quillInstance: Quill | null = null;
+    private autoSaveSubject = new Subject<void>();
+    private destroy$ = new Subject<void>();
 
     // ── Session context menu ──────────────────────────────────────────────
     contextMenuSessionId = signal<string | null>(null);
@@ -94,6 +97,14 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
                 this.loadQuillContent();
             });
         });
+
+        // Initialize Auto-save
+        this.autoSaveSubject.pipe(
+            debounceTime(2000),
+            takeUntil(this.destroy$)
+        ).subscribe(() => {
+            this.saveCanvasEdit();
+        });
     }
 
     async ngOnInit() {
@@ -126,6 +137,11 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     ngOnDestroy() {
+        if (this.isCanvasDirty()) {
+            this.saveCanvasEdit();
+        }
+        this.destroy$.next();
+        this.destroy$.complete();
         this.destroyQuill();
     }
 
@@ -182,6 +198,7 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
         this.quillInstance.on('text-change', (delta: any, oldDelta: any, source: string) => {
             if (source === 'user') {
                 this.isCanvasDirty.set(true);
+                this.autoSaveSubject.next();
             }
         });
 
@@ -359,8 +376,11 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
         });
     }
 
-    toggleCanvas() {
+    async toggleCanvas() {
         const willOpen = !this.showCanvas();
+        if (!willOpen && this.isCanvasDirty()) {
+            await this.saveCanvasEdit();
+        }
         this.showCanvas.set(willOpen);
         if (!willOpen) {
             this.destroyQuill();
@@ -373,7 +393,13 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
         return this.chat.canvasDocs().find(d => d.id === this.chat.activeCanvasId());
     }
 
-    selectCanvasDoc(doc: CanvasDocument): void {
+    async selectCanvasDoc(doc: CanvasDocument): Promise<void> {
+        if (this.chat.activeCanvasId() === doc.id) return;
+        
+        if (this.isCanvasDirty()) {
+            await this.saveCanvasEdit();
+        }
+
         this.chat.setActiveCanvas(doc.id);
         this.confirmingDeleteId.set(null);
         this.loadQuillContent();
