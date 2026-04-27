@@ -201,8 +201,11 @@
                 </h3>
                 <div class="canvas-header-actions">
                     @if (chat.activeCanvasId()) {
-                        <button class="canvas-save-btn" (click)="saveCanvasEdit()" title="Save changes">
-                            <i class="bi bi-check-lg"></i> Save
+                        <button class="canvas-save-btn" 
+                                [disabled]="!isCanvasDirty()"
+                                (click)="saveCanvasEdit()" 
+                                title="{{ isCanvasDirty() ? 'Save changes' : 'No changes to save' }}">
+                            <i class="bi" [class.bi-check-circle]="!isCanvasDirty()" [class.bi-check-circle-fill]="isCanvasDirty()"></i>
                         </button>
                         <button class="icon-btn" (click)="requestDeleteCanvas(chat.activeCanvasId()!)" 
                                 title="Delete document">

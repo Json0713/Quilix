@@ -37,6 +37,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
 
     // ── Canvas state ──────────────────────────────────────────────────────
     confirmingDeleteId = signal<string | null>(null);
+    isCanvasDirty = signal(false);
     private quillInstance: Quill | null = null;
 
     // ── Session context menu ──────────────────────────────────────────────
@@ -178,6 +179,12 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
             },
         });
 
+        this.quillInstance.on('text-change', (delta: any, oldDelta: any, source: string) => {
+            if (source === 'user') {
+                this.isCanvasDirty.set(true);
+            }
+        });
+
         this.loadQuillContent();
     }
 
@@ -205,6 +212,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
         } else {
             this.quillInstance.setText('');
         }
+        this.isCanvasDirty.set(false);
     }
 
     async saveCanvasEdit(): Promise<void> {
@@ -212,6 +220,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
         if (!docId || !this.quillInstance) return;
         const html = this.quillInstance.getSemanticHTML();
         await this.chat.updateCanvasDoc(docId, html);
+        this.isCanvasDirty.set(false);
     }
 
     // ── Chat actions ──────────────────────────────────────────────────────
@@ -416,5 +425,12 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
 
     trackMessage(index: number, message: ChatMessage): string {
         return message.id;
+    }
+
+    @HostListener('window:beforeunload', ['$event'])
+    unloadNotification($event: any) {
+        if (this.isCanvasDirty()) {
+            $event.returnValue = true;
+        }
     }
 }
