@@ -1,5 +1,5 @@
 import {
-    Component, OnInit, inject, signal, ViewChild,
+    Component, OnInit, OnDestroy, inject, signal, ViewChild,
     ElementRef, AfterViewChecked, HostListener, effect,
     untracked, ChangeDetectorRef
 } from '@angular/core';
@@ -7,9 +7,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { ChatService } from '../../../../core/services/components/chat.service';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { ChatMessage, ChatSession, CanvasDocument } from '../../../../core/database/dexie.models';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 import { DropdownService } from '../../../../services/ui/common/dropdown/dropdown.service';
+import Quill from 'quill';
 
 
 @Component({
@@ -19,9 +21,10 @@ import { DropdownService } from '../../../../services/ui/common/dropdown/dropdow
     templateUrl: './chat.html',
     styleUrl: './chat.scss',
 })
-export class TeamChat implements OnInit, AfterViewChecked {
+export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
     private breadcrumb = inject(BreadcrumbService);
     protected chat = inject(ChatService);
+    private auth = inject(AuthService);
     private cdr = inject(ChangeDetectorRef);
     public dropdownService = inject(DropdownService);
 
@@ -32,9 +35,9 @@ export class TeamChat implements OnInit, AfterViewChecked {
     shouldScrollToBottom = false;
     isInitializing = signal<boolean>(true);
 
-    // ── Canvas edit state ─────────────────────────────────────────────────
-    isEditingCanvas = signal<boolean>(false);
-    canvasEditBuffer = signal<string>('');
+    // ── Canvas state ──────────────────────────────────────────────────────
+    confirmingDeleteId = signal<string | null>(null);
+    private quillInstance: Quill | null = null;
 
     // ── Session context menu ──────────────────────────────────────────────
     contextMenuSessionId = signal<string | null>(null);
@@ -43,6 +46,7 @@ export class TeamChat implements OnInit, AfterViewChecked {
 
     @ViewChild('messagesContainer') messagesContainer!: ElementRef<HTMLDivElement>;
     @ViewChild('chatInput') chatInput!: ElementRef<HTMLTextAreaElement>;
+    @ViewChild('quillEditor') quillEditorRef!: ElementRef<HTMLDivElement>;
 
     // ── Suggested starters ────────────────────────────────────────────────
     readonly starters = [
@@ -54,7 +58,6 @@ export class TeamChat implements OnInit, AfterViewChecked {
 
     constructor() {
         // Automatically sync the active session to LocalStorage whenever it changes
-        // This captures both manual selections and AI auto-created sessions
         effect(() => {
             const id = this.chat.activeSessionId();
             if (id) {
@@ -68,7 +71,7 @@ export class TeamChat implements OnInit, AfterViewChecked {
             this.chat.isLoading();
             untracked(() => {
                 this.shouldScrollToBottom = true;
-                this.cdr.detectChanges(); // Ensure the flag is picked up
+                this.cdr.detectChanges();
             });
         });
 
@@ -78,36 +81,37 @@ export class TeamChat implements OnInit, AfterViewChecked {
             if (ts > 0) {
                 untracked(() => {
                     this.showCanvas.set(true);
-                    this.isEditingCanvas.set(false);
-                    this.syncCanvasEditBuffer();
+                    this.loadQuillContent();
                 });
             }
         });
 
-        // Sync edit buffer when active canvas changes
+        // Sync Quill content when active canvas changes
         effect(() => {
             this.chat.activeCanvasId();
             untracked(() => {
-                this.isEditingCanvas.set(false);
-                this.syncCanvasEditBuffer();
+                this.loadQuillContent();
             });
         });
     }
 
     async ngOnInit() {
         this.breadcrumb.setTitle('Ask Quilix');
-        
-        // Internal Navigation Check: 
-        // If the service already has an active session, we are navigating from another page
+
+        // Bind chat service to the current workspace
+        const workspace = await this.auth.getCurrentWorkspace();
+        if (workspace) {
+            this.chat.setWorkspace(workspace.id);
+        }
+
+        // Internal Navigation Check:
         const isInternalNavigation = !!this.chat.activeSessionId();
 
         await this.chat.loadSessions();
 
         if (isInternalNavigation) {
-            // Force a fresh state when navigating from Dashboard
             this.newChat();
         } else {
-            // Attempt to restore the last viewed session on Hard Refresh
             const savedSessionId = localStorage.getItem('quilix_team_active_session');
             if (savedSessionId) {
                 const sessions = this.chat.sessions();
@@ -120,10 +124,18 @@ export class TeamChat implements OnInit, AfterViewChecked {
         this.isInitializing.set(false);
     }
 
+    ngOnDestroy() {
+        this.destroyQuill();
+    }
+
     ngAfterViewChecked() {
         if (this.shouldScrollToBottom) {
             this.scrollToBottom();
             this.shouldScrollToBottom = false;
+        }
+        // Initialize Quill if the container is present but editor isn't created yet
+        if (this.quillEditorRef?.nativeElement && !this.quillInstance && this.chat.activeCanvasId()) {
+            this.initQuill();
         }
     }
 
@@ -135,6 +147,73 @@ export class TeamChat implements OnInit, AfterViewChecked {
         }
     }
 
+    // ── Quill WYSIWYG ─────────────────────────────────────────────────────
+
+    private initQuill(): void {
+        if (this.quillInstance || !this.quillEditorRef?.nativeElement) return;
+
+        // Clean up any lingering Quill elements (like toolbars from previous instances)
+        // to prevent stacking when re-initializing.
+        const container = this.quillEditorRef.nativeElement.parentElement;
+        if (container) {
+            const toolbars = container.querySelectorAll('.ql-toolbar');
+            toolbars.forEach(tb => tb.remove());
+        }
+        this.quillEditorRef.nativeElement.innerHTML = '';
+        this.quillEditorRef.nativeElement.className = '';
+
+        this.quillInstance = new Quill(this.quillEditorRef.nativeElement, {
+            theme: 'snow',
+            placeholder: 'Edit your document...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
+                    ['blockquote', 'code-block'],
+                    ['link', 'image'],
+                    ['clean']
+                ],
+            },
+        });
+
+        this.loadQuillContent();
+    }
+
+    private destroyQuill(): void {
+        if (this.quillInstance) {
+            this.quillInstance = null;
+        }
+        // Safely remove injected Quill elements from the DOM
+        if (this.quillEditorRef?.nativeElement) {
+            const container = this.quillEditorRef.nativeElement.parentElement;
+            if (container) {
+                const toolbars = container.querySelectorAll('.ql-toolbar');
+                toolbars.forEach(tb => tb.remove());
+            }
+            this.quillEditorRef.nativeElement.innerHTML = '';
+            this.quillEditorRef.nativeElement.className = '';
+        }
+    }
+
+    private loadQuillContent(): void {
+        if (!this.quillInstance) return;
+        const doc = this.getActiveCanvasDoc();
+        if (doc) {
+            this.quillInstance.clipboard.dangerouslyPasteHTML(doc.content || '');
+        } else {
+            this.quillInstance.setText('');
+        }
+    }
+
+    async saveCanvasEdit(): Promise<void> {
+        const docId = this.chat.activeCanvasId();
+        if (!docId || !this.quillInstance) return;
+        const html = this.quillInstance.getSemanticHTML();
+        await this.chat.updateCanvasDoc(docId, html);
+    }
+
     // ── Chat actions ──────────────────────────────────────────────────────
 
     async sendMessage() {
@@ -143,8 +222,7 @@ export class TeamChat implements OnInit, AfterViewChecked {
 
         this.inputText = '';
         this.shouldScrollToBottom = true;
-        
-        // Fix: Explicitly reset textarea height
+
         if (this.chatInput) {
             this.chatInput.nativeElement.value = '';
             this.resizeTextarea();
@@ -192,22 +270,21 @@ export class TeamChat implements OnInit, AfterViewChecked {
         this.chat.clearActiveSession();
         localStorage.removeItem('quilix_team_active_session');
         this.inputText = '';
-        this.isEditingCanvas.set(false);
-        this.canvasEditBuffer.set('');
+        this.destroyQuill();
+        this.confirmingDeleteId.set(null);
         setTimeout(() => this.chatInput?.nativeElement?.focus(), 100);
 
-        // Auto-close sidebar on mobile
         if (window.innerWidth <= 770) {
             this.showHistory.set(false);
         }
     }
 
     async selectSession(session: ChatSession) {
+        this.destroyQuill();
         await this.chat.setActiveSession(session.id);
         localStorage.setItem('quilix_team_active_session', session.id);
         this.shouldScrollToBottom = true;
 
-        // Auto-close sidebar on mobile
         if (window.innerWidth <= 770) {
             this.showHistory.set(false);
         }
@@ -274,51 +351,42 @@ export class TeamChat implements OnInit, AfterViewChecked {
     }
 
     toggleCanvas() {
-        this.showCanvas.update(v => !v);
+        const willOpen = !this.showCanvas();
+        this.showCanvas.set(willOpen);
+        if (!willOpen) {
+            this.destroyQuill();
+        }
     }
 
     // ── Canvas actions ────────────────────────────────────────────────────
 
-    /** Get the currently active canvas document. */
     getActiveCanvasDoc(): CanvasDocument | undefined {
         return this.chat.canvasDocs().find(d => d.id === this.chat.activeCanvasId());
     }
 
-    /** Select a canvas document and load its content into the edit buffer. */
     selectCanvasDoc(doc: CanvasDocument): void {
         this.chat.setActiveCanvas(doc.id);
-        this.isEditingCanvas.set(false);
-        this.syncCanvasEditBuffer();
+        this.confirmingDeleteId.set(null);
+        this.loadQuillContent();
     }
 
-    /** Toggle between edit and preview mode. */
-    toggleCanvasEdit(): void {
-        this.isEditingCanvas.update(v => !v);
+    /** Start delete confirmation flow. */
+    requestDeleteCanvas(docId: string): void {
+        this.confirmingDeleteId.set(docId);
     }
 
-    /** Handle edits in the canvas textarea. */
-    onCanvasEdit(value: string): void {
-        this.canvasEditBuffer.set(value);
+    /** Cancel delete confirmation. */
+    cancelDeleteCanvas(): void {
+        this.confirmingDeleteId.set(null);
     }
 
-    /** Save current edits to IndexedDB. */
-    async saveCanvasEdit(): Promise<void> {
-        const docId = this.chat.activeCanvasId();
+    /** Confirm and execute canvas deletion. */
+    async confirmDeleteCanvas(): Promise<void> {
+        const docId = this.confirmingDeleteId();
         if (!docId) return;
-        await this.chat.updateCanvasDoc(docId, this.canvasEditBuffer());
-        this.isEditingCanvas.set(false);
-    }
-
-    /** Delete a canvas document. */
-    async deleteCanvasDoc(docId: string): Promise<void> {
+        this.confirmingDeleteId.set(null);
         await this.chat.deleteCanvasDoc(docId);
-        this.syncCanvasEditBuffer();
-    }
-
-    /** Sync the edit buffer with the currently active canvas document. */
-    private syncCanvasEditBuffer(): void {
-        const doc = this.getActiveCanvasDoc();
-        this.canvasEditBuffer.set(doc?.content ?? '');
+        this.loadQuillContent();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────

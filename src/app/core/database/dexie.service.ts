@@ -154,6 +154,11 @@ export class DexieService extends Dexie {
             canvas_documents: 'id, sessionId, createdAt, [sessionId+createdAt]'
         });
 
+        // v18 – Workspace-scoped chat sessions (each session belongs to a workspace).
+        this.version(18).stores({
+            chat_sessions: 'id, workspaceId, updatedAt, [workspaceId+updatedAt]'
+        });
+
         // Open the database connection eagerly to reduce first-operation latency.
         this.open().catch(err => {
             console.error('[DexieService] Failed to open database:', err);

@@ -2,15 +2,20 @@
  * @file chat.service.ts
  * @description
  * Central service for the Quilix AI chatbot.
- * Handles session/message CRUD in IndexedDB, communication with
- * the Vercel serverless function at /api/chat, and canvas document
- * parsing/persistence for the side-panel workspace.
+ * Handles session/message CRUD in IndexedDB (scoped per workspace),
+ * communication with the Vercel serverless function at /api/chat,
+ * and canvas document parsing/persistence for the side-panel workspace.
+ *
+ * Canvas documents are stored as sanitized HTML. AI outputs markdown
+ * which is converted via `marked` + `DOMPurify` before storage.
  */
 
 import { Injectable, signal } from '@angular/core';
 import { db } from '../../database/dexie.service';
 import type { ChatSession, ChatMessage, CanvasDocument } from '../../database/dexie.models';
 import { environment } from '../../../../environments/environment';
+import { marked } from 'marked';
+import DOMPurify, { type Config as PurifyConfig } from 'dompurify';
 
 /** Maximum number of canvas documents a single AI response can create. */
 const MAX_CANVAS_PER_RESPONSE = 3;
@@ -20,6 +25,27 @@ const MAX_CANVAS_CONTENT_LENGTH = 10_000;
 
 /** Regex to match <quilix-canvas title="...">content</quilix-canvas> blocks. */
 const CANVAS_TAG_REGEX = /<quilix-canvas\s+title="([^"]{1,120})">([\s\S]*?)<\/quilix-canvas>/g;
+
+/** DOMPurify config for canvas HTML — strict allowlist matching MarkdownPipe. */
+const CANVAS_PURIFY_CONFIG: PurifyConfig = {
+    ALLOWED_TAGS: [
+        'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'del',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'ul', 'ol', 'li',
+        'blockquote',
+        'pre', 'code', 'div', 'span',
+        'a', 'img',
+        'table', 'thead', 'tbody', 'tr', 'th', 'td',
+        'hr', 'input',
+    ],
+    ALLOWED_ATTR: [
+        'class', 'href', 'target', 'rel',
+        'src', 'alt', 'width', 'height',
+        'type', 'checked', 'disabled', 'data-list',
+    ],
+    ALLOW_DATA_ATTR: false,
+    KEEP_CONTENT: true,
+};
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
@@ -32,6 +58,9 @@ export class ChatService {
     readonly error = signal<string | null>(null);
     private lastUserMessage: string | null = null;
 
+    // ── Workspace scope ───────────────────────────────────────────────────────
+    private currentWorkspaceId: string | null = null;
+
     // ── Canvas state ──────────────────────────────────────────────────────────
     readonly canvasDocs = signal<CanvasDocument[]>([]);
     readonly activeCanvasId = signal<string | null>(null);
@@ -39,30 +68,67 @@ export class ChatService {
 
     // ── API endpoint ──────────────────────────────────────────────────────────
     private get apiUrl(): string {
-        // In production, relative path works. In dev, proxy or full URL.
         if (environment.production) {
             return '/api/chat';
         }
-        // For local dev, use the Vercel dev server or deployed endpoint
         return '/api/chat';
+    }
+
+    // ── Workspace binding ─────────────────────────────────────────────────────
+
+    /**
+     * Bind the chat service to a specific workspace.
+     * Must be called when a chat component initializes, before loading sessions.
+     * This scopes all session operations to the given workspace.
+     */
+    setWorkspace(workspaceId: string): void {
+        if (this.currentWorkspaceId !== workspaceId) {
+            this.currentWorkspaceId = workspaceId;
+            // Clear state from previous workspace
+            this.activeSessionId.set(null);
+            this.messages.set([]);
+            this.canvasDocs.set([]);
+            this.activeCanvasId.set(null);
+            this.error.set(null);
+            this.lastUserMessage = null;
+        }
+    }
+
+    /** Get the current workspace ID. */
+    getWorkspaceId(): string | null {
+        return this.currentWorkspaceId;
     }
 
     // ── Session operations ────────────────────────────────────────────────────
 
-    /** Load all chat sessions sorted by most recently updated. */
+    /** Load all chat sessions for the current workspace, sorted by most recently updated. */
     async loadSessions(): Promise<void> {
+        if (!this.currentWorkspaceId) {
+            this.sessions.set([]);
+            return;
+        }
+
         const list = await db.chat_sessions
-            .orderBy('updatedAt')
+            .where('[workspaceId+updatedAt]')
+            .between(
+                [this.currentWorkspaceId, 0],
+                [this.currentWorkspaceId, Infinity]
+            )
             .reverse()
             .toArray();
         this.sessions.set(list);
     }
 
-    /** Create a new chat session and set it as active. */
+    /** Create a new chat session in the current workspace and set it as active. */
     async createSession(title: string = 'New Chat'): Promise<ChatSession> {
+        if (!this.currentWorkspaceId) {
+            throw new Error('[ChatService] No workspace bound. Call setWorkspace() first.');
+        }
+
         const now = Date.now();
         const session: ChatSession = {
             id: crypto.randomUUID(),
+            workspaceId: this.currentWorkspaceId,
             title,
             createdAt: now,
             updatedAt: now,
@@ -77,6 +143,11 @@ export class ChatService {
     async setActiveSession(sessionId: string): Promise<void> {
         this.activeSessionId.set(sessionId);
         this.error.set(null);
+
+        // Reset canvas state to prevent stale content from previous sessions
+        this.canvasDocs.set([]);
+        this.activeCanvasId.set(null);
+
         await this.loadMessages(sessionId);
         await this.loadCanvasDocs(sessionId);
     }
@@ -146,10 +217,13 @@ export class ChatService {
             .toArray();
         this.canvasDocs.set(docs);
 
-        // Auto-select the most recent document if none is selected
-        if (docs.length > 0 && !this.activeCanvasId()) {
-            this.activeCanvasId.set(docs[docs.length - 1].id);
-        } else if (docs.length === 0) {
+        // Auto-select the most recent document if the current active ID is missing or invalid
+        const currentId = this.activeCanvasId();
+        if (docs.length > 0) {
+            if (!currentId || !docs.some(d => d.id === currentId)) {
+                this.activeCanvasId.set(docs[docs.length - 1].id);
+            }
+        } else {
             this.activeCanvasId.set(null);
         }
     }
@@ -159,9 +233,12 @@ export class ChatService {
         this.activeCanvasId.set(docId);
     }
 
-    /** Save user edits to a canvas document. */
-    async updateCanvasDoc(docId: string, content: string): Promise<void> {
-        const sanitized = content.substring(0, MAX_CANVAS_CONTENT_LENGTH);
+    /** Save user edits to a canvas document (content is HTML from Quill). */
+    async updateCanvasDoc(docId: string, htmlContent: string): Promise<void> {
+        const sanitized = DOMPurify.sanitize(
+            htmlContent.substring(0, MAX_CANVAS_CONTENT_LENGTH),
+            CANVAS_PURIFY_CONFIG
+        );
         await db.canvas_documents.update(docId, {
             content: sanitized,
             updatedAt: Date.now(),
@@ -191,8 +268,9 @@ export class ChatService {
 
     /**
      * Parse <quilix-canvas> tags from an AI response.
-     * Extracts canvas documents, saves them to IndexedDB, and returns
-     * the reply with canvas blocks replaced by inline reference markers.
+     * Extracts canvas documents, converts markdown to sanitized HTML,
+     * saves them to IndexedDB, and returns the reply with canvas blocks
+     * replaced by inline reference markers.
      */
     private async parseCanvasFromReply(sessionId: string, reply: string): Promise<string> {
         const matches = [...reply.matchAll(CANVAS_TAG_REGEX)];
@@ -206,16 +284,20 @@ export class ChatService {
             if (docsCreated >= MAX_CANVAS_PER_RESPONSE) break;
 
             const [fullMatch, title, rawContent] = match;
-            const content = rawContent.trim().substring(0, MAX_CANVAS_CONTENT_LENGTH);
+            const markdownContent = rawContent.trim().substring(0, MAX_CANVAS_CONTENT_LENGTH);
 
-            if (!content) continue;
+            if (!markdownContent) continue;
+
+            // Convert markdown → HTML → sanitize
+            const rawHtml = await marked.parse(markdownContent);
+            const sanitizedHtml = DOMPurify.sanitize(rawHtml, CANVAS_PURIFY_CONFIG);
 
             const now = Date.now();
             const doc: CanvasDocument = {
                 id: crypto.randomUUID(),
                 sessionId,
                 title: title.trim(),
-                content,
+                content: sanitizedHtml,
                 createdAt: now,
                 updatedAt: now,
             };

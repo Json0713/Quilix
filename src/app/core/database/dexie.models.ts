@@ -24,6 +24,7 @@ export interface Setting {
 /** Represents a single AI chat session stored locally in IndexedDB. */
 export interface ChatSession {
     id: string;
+    workspaceId: string;   // Scopes this session to a specific Quilix workspace
     title: string;
     createdAt: number;
     updatedAt: number;
@@ -43,7 +44,7 @@ export interface CanvasDocument {
     id: string;
     sessionId: string;
     title: string;
-    content: string;      // Raw markdown content
+    content: string;      // HTML content (converted from AI markdown)
     createdAt: number;
     updatedAt: number;
 }
