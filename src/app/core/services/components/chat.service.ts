@@ -292,24 +292,38 @@ export class ChatService {
             const rawHtml = await marked.parse(markdownContent);
             const sanitizedHtml = DOMPurify.sanitize(rawHtml, CANVAS_PURIFY_CONFIG);
 
-            const now = Date.now();
-            const doc: CanvasDocument = {
-                id: crypto.randomUUID(),
-                sessionId,
-                title: title.trim(),
-                content: sanitizedHtml,
-                createdAt: now,
-                updatedAt: now,
-            };
+            // SMART UPDATE: Check if we should update the active canvas instead of creating a new one
+            const activeDoc = this.canvasDocs().find(d => d.id === this.activeCanvasId());
+            const isUpdate = activeDoc && title.trim().toLowerCase() === activeDoc.title.toLowerCase();
 
-            await db.canvas_documents.put(doc);
-            docsCreated++;
+            if (isUpdate && activeDoc) {
+                await this.updateCanvasDoc(activeDoc.id, sanitizedHtml);
+                docsCreated++;
 
-            // Replace the canvas block with a clean reference marker
-            cleanedReply = cleanedReply.replace(
-                fullMatch,
-                `\n\n📋 **Canvas: "${doc.title}"** — _Saved to your canvas panel._\n\n`
-            );
+                cleanedReply = cleanedReply.replace(
+                    fullMatch,
+                    `\n\n📋 **Canvas Updated: "${activeDoc.title}"** — _The current document has been updated._\n\n`
+                );
+            } else {
+                const now = Date.now();
+                const doc: CanvasDocument = {
+                    id: crypto.randomUUID(),
+                    sessionId,
+                    title: title.trim(),
+                    content: sanitizedHtml,
+                    createdAt: now,
+                    updatedAt: now,
+                };
+
+                await db.canvas_documents.put(doc);
+                docsCreated++;
+
+                // Replace the canvas block with a clean reference marker
+                cleanedReply = cleanedReply.replace(
+                    fullMatch,
+                    `\n\n📋 **Canvas: "${doc.title}"** — _Saved to your canvas panel._\n\n`
+                );
+            }
         }
 
         if (docsCreated > 0) {
@@ -372,6 +386,15 @@ export class ChatService {
             role: m.role,
             content: m.content,
         }));
+
+        // Inject current canvas context if active
+        const activeCanvasId = this.activeCanvasId();
+        const activeDoc = this.canvasDocs().find(d => d.id === activeCanvasId);
+        if (activeDoc) {
+            const contextMsg = `[CONTEXT: The user is currently viewing the canvas document "${activeDoc.title}". Current content: \n${activeDoc.content}\n]`;
+            // Add as a pseudo-user message context for the AI
+            history.splice(history.length - 1, 0, { role: 'user', content: contextMsg });
+        }
 
         try {
             const response = await fetch(this.apiUrl, {
