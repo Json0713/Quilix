@@ -25,10 +25,10 @@ import { Tab } from '../interfaces/tab';
 import { Session } from '../interfaces/session';
 import { Task } from '../interfaces/task';
 import { SheetDocument } from '../interfaces/sheet';
-import { ContactMessage, Setting, ChatSession, ChatMessage, WidgetNote, WidgetAlarm } from './dexie.models';
+import { ContactMessage, Setting, ChatSession, ChatMessage, CanvasDocument, WidgetNote, WidgetAlarm } from './dexie.models';
 
 // Re-export models so consumers can import from a single location if needed.
-export type { ContactMessage, Setting, ChatSession, ChatMessage, WidgetNote, WidgetAlarm };
+export type { ContactMessage, Setting, ChatSession, ChatMessage, CanvasDocument, WidgetNote, WidgetAlarm };
 
 @Injectable({ providedIn: 'root' })
 export class DexieService extends Dexie {
@@ -49,6 +49,7 @@ export class DexieService extends Dexie {
     activities!: Table<any, string>;
     chat_sessions!: Table<ChatSession, string>;
     chat_messages!: Table<ChatMessage, string>;
+    canvas_documents!: Table<CanvasDocument, string>;
     widget_notes!: Table<WidgetNote, string>;
     widget_alarms!: Table<WidgetAlarm, string>;
 
@@ -146,6 +147,11 @@ export class DexieService extends Dexie {
         // v16 - Spreadsheet Document Storage
         this.version(16).stores({
             sheets: 'id, spaceId, updatedAt'
+        });
+
+        // v17 – AI Canvas Documents (persistent side-panel artifacts per chat session).
+        this.version(17).stores({
+            canvas_documents: 'id, sessionId, createdAt, [sessionId+createdAt]'
         });
 
         // Open the database connection eagerly to reduce first-operation latency.

@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { ChatService } from '../../../../core/services/components/chat.service';
-import { ChatMessage, ChatSession } from '../../../../core/database/dexie.models';
+import { ChatMessage, ChatSession, CanvasDocument } from '../../../../core/database/dexie.models';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 import { DropdownService } from '../../../../services/ui/common/dropdown/dropdown.service';
 
@@ -29,9 +29,12 @@ export class PersonalChat implements OnInit, AfterViewChecked {
     inputText = '';
     showHistory = signal<boolean>(localStorage.getItem('quilix_personal_sidebar_open') === 'true');
     showCanvas = signal<boolean>(false);
-    canvasContent = signal<string>('');
     shouldScrollToBottom = false;
     isInitializing = signal<boolean>(true);
+
+    // ── Canvas edit state ─────────────────────────────────────────────────
+    isEditingCanvas = signal<boolean>(false);
+    canvasEditBuffer = signal<string>('');
 
     // ── Session context menu ──────────────────────────────────────────────
     contextMenuSessionId = signal<string | null>(null);
@@ -66,6 +69,27 @@ export class PersonalChat implements OnInit, AfterViewChecked {
             untracked(() => {
                 this.shouldScrollToBottom = true;
                 this.cdr.detectChanges();
+            });
+        });
+
+        // Auto-open canvas panel when a new canvas document is created
+        effect(() => {
+            const ts = this.chat.canvasUpdated();
+            if (ts > 0) {
+                untracked(() => {
+                    this.showCanvas.set(true);
+                    this.isEditingCanvas.set(false);
+                    this.syncCanvasEditBuffer();
+                });
+            }
+        });
+
+        // Sync edit buffer when active canvas changes
+        effect(() => {
+            this.chat.activeCanvasId();
+            untracked(() => {
+                this.isEditingCanvas.set(false);
+                this.syncCanvasEditBuffer();
             });
         });
     }
@@ -168,6 +192,8 @@ export class PersonalChat implements OnInit, AfterViewChecked {
         this.chat.clearActiveSession();
         localStorage.removeItem('quilix_personal_active_session');
         this.inputText = '';
+        this.isEditingCanvas.set(false);
+        this.canvasEditBuffer.set('');
         setTimeout(() => this.chatInput?.nativeElement?.focus(), 100);
 
         // Auto-close sidebar on mobile
@@ -249,6 +275,50 @@ export class PersonalChat implements OnInit, AfterViewChecked {
 
     toggleCanvas() {
         this.showCanvas.update(v => !v);
+    }
+
+    // ── Canvas actions ────────────────────────────────────────────────────
+
+    /** Get the currently active canvas document. */
+    getActiveCanvasDoc(): CanvasDocument | undefined {
+        return this.chat.canvasDocs().find(d => d.id === this.chat.activeCanvasId());
+    }
+
+    /** Select a canvas document and load its content into the edit buffer. */
+    selectCanvasDoc(doc: CanvasDocument): void {
+        this.chat.setActiveCanvas(doc.id);
+        this.isEditingCanvas.set(false);
+        this.syncCanvasEditBuffer();
+    }
+
+    /** Toggle between edit and preview mode. */
+    toggleCanvasEdit(): void {
+        this.isEditingCanvas.update(v => !v);
+    }
+
+    /** Handle edits in the canvas textarea. */
+    onCanvasEdit(value: string): void {
+        this.canvasEditBuffer.set(value);
+    }
+
+    /** Save current edits to IndexedDB. */
+    async saveCanvasEdit(): Promise<void> {
+        const docId = this.chat.activeCanvasId();
+        if (!docId) return;
+        await this.chat.updateCanvasDoc(docId, this.canvasEditBuffer());
+        this.isEditingCanvas.set(false);
+    }
+
+    /** Delete a canvas document. */
+    async deleteCanvasDoc(docId: string): Promise<void> {
+        await this.chat.deleteCanvasDoc(docId);
+        this.syncCanvasEditBuffer();
+    }
+
+    /** Sync the edit buffer with the currently active canvas document. */
+    private syncCanvasEditBuffer(): void {
+        const doc = this.getActiveCanvasDoc();
+        this.canvasEditBuffer.set(doc?.content ?? '');
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────

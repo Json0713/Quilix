@@ -196,19 +196,76 @@
     @if (showCanvas()) {
         <aside class="chat-canvas">
             <div class="canvas-header">
-                <h3 class="canvas-title">Canvas</h3>
-                <button class="icon-btn" (click)="toggleCanvas()" title="Close canvas">
-                    <i class="bi bi-x-lg"></i>
-                </button>
+                <h3 class="canvas-title">
+                    {{ getActiveCanvasDoc()?.title || 'Canvas' }}
+                </h3>
+                <div class="canvas-header-actions">
+                    @if (chat.activeCanvasId()) {
+                        <button class="icon-btn" (click)="deleteCanvasDoc(chat.activeCanvasId()!)" 
+                                title="Delete document">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    }
+                    <button class="icon-btn" (click)="toggleCanvas()" title="Close canvas">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
             </div>
+
+            @if (chat.canvasDocs().length > 1) {
+                <div class="canvas-tabs">
+                    @for (doc of chat.canvasDocs(); track doc.id) {
+                        <button class="canvas-tab" 
+                                [class.active]="chat.activeCanvasId() === doc.id"
+                                (click)="selectCanvasDoc(doc)">
+                            <i class="bi bi-file-text"></i>
+                            <span>{{ doc.title }}</span>
+                        </button>
+                    }
+                </div>
+            }
+
             <div class="canvas-body">
-                @if (canvasContent()) {
-                    <div class="canvas-content">{{ canvasContent() }}</div>
+                @if (chat.activeCanvasId()) {
+                    <div class="canvas-editor">
+                        @if (isEditingCanvas()) {
+                            <textarea class="canvas-textarea"
+                                      [value]="canvasEditBuffer()"
+                                      (input)="onCanvasEdit($any($event.target).value)"
+                                      maxlength="10000"
+                                      placeholder="Edit your document..."></textarea>
+                            <div class="canvas-edit-actions">
+                                <span class="char-count">
+                                    {{ canvasEditBuffer().length | number }} / 10,000
+                                </span>
+                                <button class="canvas-save-btn" (click)="saveCanvasEdit()">
+                                    <i class="bi bi-check-lg"></i> Save
+                                </button>
+                            </div>
+                        } @else {
+                            <div class="canvas-rendered" 
+                                 [innerHTML]="canvasEditBuffer() | markdown">
+                            </div>
+                        }
+                    </div>
+                    <div class="canvas-footer">
+                        <button class="canvas-mode-btn" (click)="toggleCanvasEdit()">
+                            <i class="bi" [class.bi-pencil]="!isEditingCanvas()" 
+                                          [class.bi-eye]="isEditingCanvas()"></i>
+                            {{ isEditingCanvas() ? 'Preview' : 'Edit' }}
+                        </button>
+                    </div>
+                } @else if (chat.canvasDocs().length > 0) {
+                    <div class="canvas-empty">
+                        <i class="bi bi-file-text"></i>
+                        <span>Select a document</span>
+                        <p>Choose a canvas document from the tabs above.</p>
+                    </div>
                 } @else {
                     <div class="canvas-empty">
                         <i class="bi bi-easel"></i>
-                        <span>Canvas content will appear here</span>
-                        <p>Tools and generated artifacts will be displayed in this panel.</p>
+                        <span>No canvas documents yet</span>
+                        <p>Ask Quilix to create notes, to-do lists, code, or any structured content and it will appear here.</p>
                     </div>
                 }
             </div>

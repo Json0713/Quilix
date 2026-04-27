@@ -2,14 +2,24 @@
  * @file chat.service.ts
  * @description
  * Central service for the Quilix AI chatbot.
- * Handles session/message CRUD in IndexedDB and communication with
- * the Vercel serverless function at /api/chat.
+ * Handles session/message CRUD in IndexedDB, communication with
+ * the Vercel serverless function at /api/chat, and canvas document
+ * parsing/persistence for the side-panel workspace.
  */
 
 import { Injectable, signal } from '@angular/core';
 import { db } from '../../database/dexie.service';
-import type { ChatSession, ChatMessage } from '../../database/dexie.models';
+import type { ChatSession, ChatMessage, CanvasDocument } from '../../database/dexie.models';
 import { environment } from '../../../../environments/environment';
+
+/** Maximum number of canvas documents a single AI response can create. */
+const MAX_CANVAS_PER_RESPONSE = 3;
+
+/** Maximum character length for a single canvas document's content. */
+const MAX_CANVAS_CONTENT_LENGTH = 10_000;
+
+/** Regex to match <quilix-canvas title="...">content</quilix-canvas> blocks. */
+const CANVAS_TAG_REGEX = /<quilix-canvas\s+title="([^"]{1,120})">([\s\S]*?)<\/quilix-canvas>/g;
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
@@ -21,6 +31,11 @@ export class ChatService {
     readonly isLoading = signal<boolean>(false);
     readonly error = signal<string | null>(null);
     private lastUserMessage: string | null = null;
+
+    // ── Canvas state ──────────────────────────────────────────────────────────
+    readonly canvasDocs = signal<CanvasDocument[]>([]);
+    readonly activeCanvasId = signal<string | null>(null);
+    readonly canvasUpdated = signal<number>(0);
 
     // ── API endpoint ──────────────────────────────────────────────────────────
     private get apiUrl(): string {
@@ -58,11 +73,12 @@ export class ChatService {
         return session;
     }
 
-    /** Switch active session and load its messages. */
+    /** Switch active session and load its messages + canvas docs. */
     async setActiveSession(sessionId: string): Promise<void> {
         this.activeSessionId.set(sessionId);
         this.error.set(null);
         await this.loadMessages(sessionId);
+        await this.loadCanvasDocs(sessionId);
     }
 
     /** Rename a session. */
@@ -71,15 +87,18 @@ export class ChatService {
         await this.loadSessions();
     }
 
-    /** Delete a session and all its messages. */
+    /** Delete a session and all its messages + canvas documents. */
     async deleteSession(sessionId: string): Promise<void> {
         await db.chat_messages.where('sessionId').equals(sessionId).delete();
+        await db.canvas_documents.where('sessionId').equals(sessionId).delete();
         await db.chat_sessions.delete(sessionId);
 
         // If deleting the active session, clear the view
         if (this.activeSessionId() === sessionId) {
             this.activeSessionId.set(null);
             this.messages.set([]);
+            this.canvasDocs.set([]);
+            this.activeCanvasId.set(null);
         }
         await this.loadSessions();
     }
@@ -115,6 +134,114 @@ export class ChatService {
         await db.chat_sessions.update(sessionId, { updatedAt: Date.now() });
 
         return msg;
+    }
+
+    // ── Canvas operations ─────────────────────────────────────────────────────
+
+    /** Load all canvas documents for a session, ordered by creation time. */
+    async loadCanvasDocs(sessionId: string): Promise<void> {
+        const docs = await db.canvas_documents
+            .where('[sessionId+createdAt]')
+            .between([sessionId, 0], [sessionId, Infinity])
+            .toArray();
+        this.canvasDocs.set(docs);
+
+        // Auto-select the most recent document if none is selected
+        if (docs.length > 0 && !this.activeCanvasId()) {
+            this.activeCanvasId.set(docs[docs.length - 1].id);
+        } else if (docs.length === 0) {
+            this.activeCanvasId.set(null);
+        }
+    }
+
+    /** Set the currently viewed canvas document. */
+    setActiveCanvas(docId: string | null): void {
+        this.activeCanvasId.set(docId);
+    }
+
+    /** Save user edits to a canvas document. */
+    async updateCanvasDoc(docId: string, content: string): Promise<void> {
+        const sanitized = content.substring(0, MAX_CANVAS_CONTENT_LENGTH);
+        await db.canvas_documents.update(docId, {
+            content: sanitized,
+            updatedAt: Date.now(),
+        });
+
+        // Update local signal
+        this.canvasDocs.update(docs =>
+            docs.map(d => d.id === docId
+                ? { ...d, content: sanitized, updatedAt: Date.now() }
+                : d
+            )
+        );
+    }
+
+    /** Delete a canvas document. */
+    async deleteCanvasDoc(docId: string): Promise<void> {
+        await db.canvas_documents.delete(docId);
+
+        this.canvasDocs.update(docs => docs.filter(d => d.id !== docId));
+
+        // If we deleted the active doc, select another or clear
+        if (this.activeCanvasId() === docId) {
+            const remaining = this.canvasDocs();
+            this.activeCanvasId.set(remaining.length > 0 ? remaining[remaining.length - 1].id : null);
+        }
+    }
+
+    /**
+     * Parse <quilix-canvas> tags from an AI response.
+     * Extracts canvas documents, saves them to IndexedDB, and returns
+     * the reply with canvas blocks replaced by inline reference markers.
+     */
+    private async parseCanvasFromReply(sessionId: string, reply: string): Promise<string> {
+        const matches = [...reply.matchAll(CANVAS_TAG_REGEX)];
+
+        if (matches.length === 0) return reply;
+
+        let cleanedReply = reply;
+        let docsCreated = 0;
+
+        for (const match of matches) {
+            if (docsCreated >= MAX_CANVAS_PER_RESPONSE) break;
+
+            const [fullMatch, title, rawContent] = match;
+            const content = rawContent.trim().substring(0, MAX_CANVAS_CONTENT_LENGTH);
+
+            if (!content) continue;
+
+            const now = Date.now();
+            const doc: CanvasDocument = {
+                id: crypto.randomUUID(),
+                sessionId,
+                title: title.trim(),
+                content,
+                createdAt: now,
+                updatedAt: now,
+            };
+
+            await db.canvas_documents.put(doc);
+            docsCreated++;
+
+            // Replace the canvas block with a clean reference marker
+            cleanedReply = cleanedReply.replace(
+                fullMatch,
+                `\n\n📋 **Canvas: "${doc.title}"** — _Saved to your canvas panel._\n\n`
+            );
+        }
+
+        if (docsCreated > 0) {
+            // Reload canvas docs and auto-select the newest one
+            await this.loadCanvasDocs(sessionId);
+            const docs = this.canvasDocs();
+            if (docs.length > 0) {
+                this.activeCanvasId.set(docs[docs.length - 1].id);
+            }
+            // Signal the UI to auto-open the canvas panel
+            this.canvasUpdated.set(Date.now());
+        }
+
+        return cleanedReply;
     }
 
     // ── Send message to AI ────────────────────────────────────────────────────
@@ -183,7 +310,12 @@ export class ChatService {
             }
 
             const data = await response.json();
-            await this.addMessage(sessionId, 'model', data.reply || 'No response.');
+            const rawReply = data.reply || 'No response.';
+
+            // Parse canvas documents from the AI response
+            const cleanReply = await this.parseCanvasFromReply(sessionId, rawReply);
+
+            await this.addMessage(sessionId, 'model', cleanReply);
 
             // Refresh sessions list to update ordering
             await this.loadSessions();
@@ -201,6 +333,8 @@ export class ChatService {
         this.messages.set([]);
         this.error.set(null);
         this.lastUserMessage = null;
+        this.canvasDocs.set([]);
+        this.activeCanvasId.set(null);
     }
 
     /** Re-send the last message if an error occurred. */
