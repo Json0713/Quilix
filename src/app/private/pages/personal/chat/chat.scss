@@ -1336,48 +1336,64 @@
 
 // ── Delete confirmation overlay ───────────────────────────────────────────
 .canvas-confirm-delete {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 40px 24px;
-    text-align: center;
+    justify-content: center;
+    padding: 24px;
     background: var(--surface);
+    z-index: 100;
+    text-align: center;
+    animation: fadeIn 0.2s ease-out;
 
     i {
-        font-size: 2rem;
+        font-size: 2.2rem;
         color: var(--danger);
-        margin-bottom: 4px;
+        margin-bottom: 12px;
     }
 
     span {
-        font-size: 0.9rem;
-        font-weight: 600;
+        font-size: 1rem;
+        font-weight: 700;
         color: var(--text-main);
+        margin-bottom: 8px;
     }
 
     p {
-        font-size: 0.78rem;
+        font-size: 0.85rem;
         color: var(--text-muted);
         margin: 0;
+        max-width: 280px;
+        line-height: 1.5;
     }
 
     .confirm-actions {
         display: flex;
-        gap: 8px;
-        margin-top: 12px;
+        gap: 12px;
+        margin-top: 24px;
+        width: 100%;
+        max-width: 240px;
+    }
+
+    .confirm-cancel, .confirm-delete {
+        flex: 1;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
     .confirm-cancel {
-        padding: 7px 16px;
         border: 1px solid var(--border);
-        border-radius: 8px;
         background: transparent;
         color: var(--text-main);
-        font-size: 0.8rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
 
         &:hover {
             background: var(--bg-hover);
@@ -1385,24 +1401,18 @@
     }
 
     .confirm-delete {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        padding: 7px 16px;
         border: none;
-        border-radius: 8px;
         background: var(--danger);
         color: #fff;
-        font-size: 0.8rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
 
         &:hover {
             opacity: 0.9;
         }
     }
 }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
 
 .canvas-empty {
     display: flex;

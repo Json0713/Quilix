@@ -233,28 +233,26 @@
                 @if (confirmingDeleteId()) {
                     <div class="canvas-confirm-delete">
                         <i class="bi bi-exclamation-triangle"></i>
-                        <span>Delete this document?</span>
-                        <p>This action cannot be undone.</p>
+                        <span>Delete Document?</span>
+                        <p>This action will permanently remove this document from your canvas.</p>
                         <div class="confirm-actions">
                             <button class="confirm-cancel" (click)="cancelDeleteCanvas()">Cancel</button>
-                            <button class="confirm-delete" (click)="confirmDeleteCanvas()">
-                                <i class="bi bi-trash3"></i> Delete
-                            </button>
+                            <button class="confirm-delete" (click)="confirmDeleteCanvas()">Delete</button>
                         </div>
                     </div>
                 }
 
-                @if (chat.activeCanvasId() && !confirmingDeleteId()) {
+                @if (chat.activeCanvasId()) {
                     <div class="canvas-editor">
                         <div #quillEditor></div>
                     </div>
-                } @else if (chat.canvasDocs().length > 0 && !confirmingDeleteId()) {
+                } @else if (chat.canvasDocs().length > 0) {
                     <div class="canvas-empty">
                         <i class="bi bi-file-text"></i>
                         <span>Select a document</span>
                         <p>Choose a canvas document from the tabs above.</p>
                     </div>
-                } @else if (!confirmingDeleteId()) {
+                } @else {
                     <div class="canvas-empty">
                         <i class="bi bi-easel"></i>
                         <span>No canvas documents yet</span>
