@@ -224,4 +224,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
   }
+
+  // Fallback to satisfy TypeScript compiler
+  return res.status(500).json({ error: 'server_error', message: 'An unexpected error occurred.' });
 }
