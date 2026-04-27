@@ -4,16 +4,20 @@
  * Vercel Serverless Function — Quilix AI Chat Endpoint.
  *
  * Security guarantees:
- *  - GEMINI_API_KEY lives exclusively in Vercel env vars (never sent to the browser).
- *  - CORS is locked to the allowed origins only.
- *  - IP-based rate limiting via Upstash Redis: 100 requests / 24 hours per IP.
- *  - System instructions are never leaked to the user.
+ * - GEMINI_API_KEY lives exclusively in Vercel env vars (never sent to the browser).
+ * - CORS is locked to the allowed origins only.
+ * - IP-based rate limiting via Upstash Redis: 100 requests / 24 hours per IP.
+ * - System instructions are never leaked to the user.
+ * - Implements Exponential Backoff for Gemini 503 Traffic Spikes.
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenAI } from '@google/genai';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
@@ -132,38 +136,81 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'messages[] is required.' });
   }
 
-  // ── Call Gemini ─────────────────────────────────────────────────────────
+  // ── Payload size guard ──────────────────────────────────────────────────
+  const MAX_MESSAGES = 50;
+  const MAX_CONTENT_LENGTH = 4000;
+
+  if (messages.length > MAX_MESSAGES) {
+    return res.status(400).json({ error: 'Too many messages in conversation.' });
+  }
+
+  for (const msg of messages) {
+    if (typeof msg.content !== 'string' || msg.content.length > MAX_CONTENT_LENGTH) {
+      return res.status(400).json({ error: 'Message content exceeds maximum length.' });
+    }
+  }
+
+  // ── Call Gemini (With Exponential Backoff) ──────────────────────────────
   const apiKey = process.env['GEMINI_API_KEY'];
   if (!apiKey) {
     console.error('[chat] GEMINI_API_KEY is not set.');
     return res.status(500).json({ error: 'Server misconfigured.' });
   }
 
-  try {
-    const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({ apiKey });
+  const contents = messages.map((m: { role: string; content: string }) => ({
+    role: m.role === 'user' ? 'user' : 'model',
+    parts: [{ text: m.content }],
+  }));
 
-    // Build contents array for multi-turn conversation
-    const contents = messages.map((m: { role: string; content: string }) => ({
-      role: m.role === 'user' ? 'user' : 'model',
-      parts: [{ text: m.content }],
-    }));
+  const MAX_RETRIES = 3;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-flash-lite-latest',
-      contents,
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        maxOutputTokens: 512,
-        temperature: 0.7,
-        topP: 0.9,
-      },
-    });
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-flash-lite-latest',
+        contents,
+        config: {
+          systemInstruction: SYSTEM_INSTRUCTION,
+          maxOutputTokens: 512,
+          temperature: 0.7,
+          topP: 0.9,
+        },
+      });
 
-    const reply = response.text ?? '';
+      const reply = response.text ?? '';
+      
+      // Success! Return the response immediately
+      return res.status(200).json({ reply });
 
-    return res.status(200).json({ reply });
-  } catch (err: any) {
-    console.error('[chat] Gemini error:', err?.message || err);
-    return res.status(500).json({ error: 'Failed to generate response.' });
+    } catch (err: any) {
+      const errorMessage = err?.message || JSON.stringify(err);
+      
+      // Check if it's the specific Gemini traffic error
+      const is503 = err?.status === 503 || errorMessage.includes('503') || errorMessage.includes('UNAVAILABLE') || errorMessage.includes('high demand');
+
+      if (is503 && attempt < MAX_RETRIES - 1) {
+        const waitTime = Math.pow(2, attempt + 1) * 1000; // 2s, then 4s
+        console.log(`[chat] 503 Traffic spike. Retrying attempt ${attempt + 2} in ${waitTime}ms...`);
+        await delay(waitTime);
+        continue; 
+      }
+
+      // Log the final failure
+      console.error(`[chat] Gemini error on attempt ${attempt + 1}:`, errorMessage);
+
+      // Return a clean error code based on the failure type
+      if (is503) {
+        return res.status(503).json({ 
+          error: 'high_traffic', 
+          message: 'The AI is currently experiencing high demand. Please try again in a moment.' 
+        });
+      } else {
+        return res.status(500).json({ 
+          error: 'server_error',
+          message: 'Failed to generate response.' 
+        });
+      }
+    }
   }
 }

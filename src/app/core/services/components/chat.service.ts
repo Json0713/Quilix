@@ -205,6 +205,7 @@ export class ChatService {
 
     /** Re-send the last message if an error occurred. */
     async retry(): Promise<void> {
+        if (this.isLoading()) return;
         const sessionId = this.activeSessionId();
         if (sessionId && this.lastUserMessage) {
             await this.callChatApi(sessionId);

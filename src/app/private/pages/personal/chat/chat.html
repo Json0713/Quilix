@@ -179,6 +179,7 @@
                           (keydown)="onKeydown($event)"
                           (input)="onInput()"
                           rows="1"
+                          maxlength="4000"
                           [disabled]="chat.isLoading()"></textarea>
                 <button class="send-btn"
                         [disabled]="!inputText.trim() || chat.isLoading()"
