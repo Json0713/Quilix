@@ -1030,6 +1030,7 @@
     .chat-history,
     .messages-container,
     .ql-container,
+    .ql-editor,
     .canvas-body,
     .canvas-tabs {
         scrollbar-width: thin !important;
@@ -1291,9 +1292,10 @@
                 font-style: italic !important;
             }
 
-            pre.ql-syntax {
-                background: #1a1b26 !important;
-                color: #d5e3e6 !important;
+            pre.ql-syntax,
+            .ql-code-block-container {
+                background: var(--surface) !important;
+                color: var(--text-main) !important;
                 border-radius: 12px !important;
                 padding: 16px !important;
                 font-size: 0.85rem !important;
@@ -1453,9 +1455,6 @@
 }
 
 @media (max-width: 770px) {
-    .chat-layout {
-        // Redundant properties removed as base class now covers full-screen layout
-    }
 
     .chat-history {
         position: fixed;
