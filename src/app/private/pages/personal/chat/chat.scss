@@ -1035,25 +1035,6 @@
     .canvas-tabs {
         scrollbar-width: thin !important;
         scrollbar-color: var(--border) transparent !important;
-
-        &::-webkit-scrollbar {
-            width: 6px !important;
-            height: 6px !important;
-        }
-
-        &::-webkit-scrollbar-track {
-            background: transparent !important;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background: var(--border) !important;
-            border-radius: 10px !important;
-            transition: background 0.2s ease !important;
-        }
-
-        &::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted) !important;
-        }
     }
     // ── Quill Toolbar Custom Icons ──────────────────────────────────────────
     .ql-toolbar {
@@ -1075,12 +1056,11 @@
         }
 
         button.ql-copy::before {
-            content: "\F268" !important; // bi-clipboard
+            content: "\F290" !important; // bi-clipboard
         }
 
         button.ql-copy.ql-success::before {
-            content: "\F261" !important; // bi-clipboard-check
-            color: var(--success, #28a745) !important;
+            content: "\F28B" !important; // bi-clipboard-check
         }
     }
 }
