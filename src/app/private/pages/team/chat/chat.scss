@@ -1055,6 +1055,34 @@
             background: var(--text-muted) !important;
         }
     }
+    // ── Quill Toolbar Custom Icons ──────────────────────────────────────────
+    .ql-toolbar {
+        button.ql-copy {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            
+            &::before {
+                font-family: "bootstrap-icons" !important;
+                font-size: 1rem;
+                color: var(--text-muted);
+                transition: color 0.2s ease;
+            }
+
+            &:hover::before {
+                color: var(--accent);
+            }
+        }
+
+        button.ql-copy::before {
+            content: "\F268" !important; // bi-clipboard
+        }
+
+        button.ql-copy.ql-success::before {
+            content: "\F261" !important; // bi-clipboard-check
+            color: var(--success, #28a745) !important;
+        }
+    }
 }
 
 // ── Right Aside — Canvas ──────────────────────────────────────────────────

@@ -183,15 +183,37 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
             theme: 'snow',
             placeholder: 'Edit your document...',
             modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ 'color': [] }, { 'background': [] }],
-                    [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
-                    ['blockquote', 'code-block'],
-                    ['link', 'image'],
-                    ['clean']
-                ],
+                toolbar: {
+                    container: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
+                        ['blockquote', 'code-block'],
+                        ['link', 'image'],
+                        ['copy', 'clean'],
+                    ],
+                    handlers: {
+                        'copy': () => {
+                            if (!this.quillInstance) return;
+                            const html = this.quillInstance.getSemanticHTML();
+                            const text = this.quillInstance.getText();
+                            const blobHtml = new Blob([html], { type: 'text/html' });
+                            const blobText = new Blob([text], { type: 'text/plain' });
+                            const data = [new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })];
+                            navigator.clipboard.write(data).then(() => {
+                                const toolbar = this.quillEditorRef.nativeElement.parentElement?.querySelector('.ql-toolbar');
+                                const btn = toolbar?.querySelector('.ql-copy');
+                                if (btn) {
+                                    btn.classList.add('ql-success');
+                                    setTimeout(() => btn.classList.remove('ql-success'), 2000);
+                                }
+                            }).catch(() => {
+                                navigator.clipboard.writeText(text);
+                            });
+                        },
+                    }
+                }
             },
         });
 
@@ -203,6 +225,12 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
         });
 
         this.loadQuillContent();
+
+        // Add tooltips to custom buttons
+        const toolbar = this.quillEditorRef.nativeElement.parentElement?.querySelector('.ql-toolbar');
+        if (toolbar) {
+            toolbar.querySelector('.ql-copy')?.setAttribute('title', 'Copy Canvas (HTML)');
+        }
     }
 
     private destroyQuill(): void {
