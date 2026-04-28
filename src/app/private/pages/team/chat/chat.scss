@@ -1090,7 +1090,7 @@
     transition: background 0.2s ease;
 
     &:hover, &:active {
-        background: var(--accent);
+        background: var(--border);
         opacity: 0.4;
     }
 }
