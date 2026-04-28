@@ -39,6 +39,10 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
     // ── Canvas state ──────────────────────────────────────────────────────
     confirmingDeleteId = signal<string | null>(null);
     isCanvasDirty = signal(false);
+    canvasWidth = signal(380);
+    isResizing = false;
+    private startX = 0;
+    private startWidth = 0;
     private quillInstance: Quill | null = null;
     private autoSaveSubject = new Subject<void>();
     private destroy$ = new Subject<void>();
@@ -154,6 +158,43 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
         if (this.quillEditorRef?.nativeElement && !this.quillInstance && this.chat.activeCanvasId()) {
             this.initQuill();
         }
+    }
+
+    @HostListener('document:mousemove', ['$event'])
+    onMouseMove(event: MouseEvent): void {
+        if (!this.isResizing) return;
+        
+        const deltaX = this.startX - event.clientX;
+        let newWidth = this.startWidth + deltaX;
+        
+        // Constraints
+        const minWidth = 320;
+        const maxWidth = Math.min(window.innerWidth * 0.8, 800);
+        
+        if (newWidth < minWidth) newWidth = minWidth;
+        if (newWidth > maxWidth) newWidth = maxWidth;
+        
+        this.canvasWidth.set(newWidth);
+    }
+
+    @HostListener('document:mouseup')
+    onMouseUp(): void {
+        if (this.isResizing) {
+            this.isResizing = false;
+            document.body.style.cursor = 'default';
+            document.body.style.userSelect = 'auto';
+        }
+    }
+
+    startResizing(event: MouseEvent): void {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isResizing = true;
+        this.startX = event.clientX;
+        this.startWidth = this.canvasWidth();
+        
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
     }
 
     @HostListener('document:click')

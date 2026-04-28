@@ -194,7 +194,8 @@
 
     <!-- ═══════════════ RIGHT ASIDE — Canvas ═══════════════ -->
     @if (showCanvas()) {
-        <aside class="chat-canvas">
+        <aside class="chat-canvas" [style.width.px]="canvasWidth()">
+            <div class="canvas-resizer" (mousedown)="startResizing($event)"></div>
             <div class="canvas-header">
                 <h3 class="canvas-title">
                     {{ getActiveCanvasDoc()?.title || 'Canvas' }}
