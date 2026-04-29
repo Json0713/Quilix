@@ -376,6 +376,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
 
     async selectSession(session: ChatSession) {
         this.destroyQuill();
+        this.confirmingDeleteId.set(null);
         await this.chat.setActiveSession(session.id);
         localStorage.setItem('quilix_personal_active_session', session.id);
         this.shouldScrollToBottom = true;
