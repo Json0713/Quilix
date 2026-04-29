@@ -143,7 +143,7 @@
             }
 
             <!-- Typing indicator -->
-            @if (chat.isLoading()) {
+            @if (chat.isLoading() && chat.loadingSessionId() === chat.activeSessionId()) {
                 <div class="message-row model">
                     <div class="message-bubble typing-bubble">
                         <div class="typing-indicator">
@@ -180,9 +180,9 @@
                           (input)="onInput()"
                           rows="1"
                           maxlength="4000"
-                          [disabled]="chat.isLoading()"></textarea>
+                          [disabled]="chat.isLoading() && chat.loadingSessionId() === chat.activeSessionId()"></textarea>
                 <button class="send-btn"
-                        [disabled]="!inputText.trim() || chat.isLoading()"
+                        [disabled]="!inputText.trim() || (chat.isLoading() && chat.loadingSessionId() === chat.activeSessionId())"
                         (click)="sendMessage()"
                         title="Send message">
                     <i class="bi bi-arrow-up"></i>

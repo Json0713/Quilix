@@ -55,6 +55,7 @@ export class ChatService {
     readonly activeSessionId = signal<string | null>(null);
     readonly messages = signal<ChatMessage[]>([]);
     readonly isLoading = signal<boolean>(false);
+    readonly loadingSessionId = signal<string | null>(null);
     readonly error = signal<string | null>(null);
     private lastUserMessage: string | null = null;
 
@@ -199,7 +200,11 @@ export class ChatService {
             timestamp: Date.now(),
         };
         await db.chat_messages.put(msg);
-        this.messages.update(prev => [...prev, msg]);
+
+        // Only update the local reactive messages if this message belongs to the currently viewed session
+        if (sessionId === this.activeSessionId()) {
+            this.messages.update(prev => [...prev, msg]);
+        }
 
         // Touch session's updatedAt
         await db.chat_sessions.update(sessionId, { updatedAt: Date.now() });
@@ -380,6 +385,7 @@ export class ChatService {
     private async callChatApi(sessionId: string): Promise<void> {
         this.error.set(null);
         this.isLoading.set(true);
+        this.loadingSessionId.set(sessionId);
 
         // Build conversation history for the API
         const history = this.messages().map(m => ({
@@ -429,6 +435,7 @@ export class ChatService {
             this.error.set('Could not reach the server. Check your connection.');
         } finally {
             this.isLoading.set(false);
+            this.loadingSessionId.set(null);
         }
     }
 
