@@ -220,16 +220,20 @@ export class ChatService {
             .where('[sessionId+createdAt]')
             .between([sessionId, 0], [sessionId, Infinity])
             .toArray();
-        this.canvasDocs.set(docs);
 
-        // Auto-select the most recent document if the current active ID is missing or invalid
-        const currentId = this.activeCanvasId();
-        if (docs.length > 0) {
-            if (!currentId || !docs.some(d => d.id === currentId)) {
-                this.activeCanvasId.set(docs[docs.length - 1].id);
+        // Only update local signals if this session is the one currently being viewed
+        if (sessionId === this.activeSessionId()) {
+            this.canvasDocs.set(docs);
+
+            // Auto-select the most recent document if the current active ID is missing or invalid
+            const currentId = this.activeCanvasId();
+            if (docs.length > 0) {
+                if (!currentId || !docs.some(d => d.id === currentId)) {
+                    this.activeCanvasId.set(docs[docs.length - 1].id);
+                }
+            } else {
+                this.activeCanvasId.set(null);
             }
-        } else {
-            this.activeCanvasId.set(null);
         }
     }
 
@@ -332,14 +336,13 @@ export class ChatService {
         }
 
         if (docsCreated > 0) {
-            // Reload canvas docs and auto-select the newest one
+            // Reload canvas docs in DB and refresh local signals if session is active
             await this.loadCanvasDocs(sessionId);
-            const docs = this.canvasDocs();
-            if (docs.length > 0) {
-                this.activeCanvasId.set(docs[docs.length - 1].id);
+
+            // Only signal the UI to auto-open if this is the active session
+            if (sessionId === this.activeSessionId()) {
+                this.canvasUpdated.set(Date.now());
             }
-            // Signal the UI to auto-open the canvas panel
-            this.canvasUpdated.set(Date.now());
         }
 
         return cleanedReply;
