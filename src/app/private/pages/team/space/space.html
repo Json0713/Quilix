@@ -1,5 +1,4 @@
 
-@if (!loading()) {
 <div class="dashboard-main">
     <!-- Header actions slotted into the parent's template header -->
     <ng-template appPageHeaderActions>
@@ -12,7 +11,13 @@
 
     <div class="dashboard-content">
         <div class="content-wrapper">
-            @if (space()) {
+            @if (loading()) {
+                <div class="loading-state">
+                    <div class="space-loading">
+                        <i class="bi bi-arrow-repeat spin"></i>
+                    </div>
+                </div>
+            } @else if (space()) {
                 <!-- Space View Grid -->
                 <div class="space-grid">
                     <!-- File Manager App Card -->
@@ -104,12 +109,4 @@
         </div>
     </div>
 </div>
-}
 
-@if (loading()) {
-<div class="loading-state">
-    <div class="space-loading">
-        <i class="bi bi-arrow-repeat spin"></i>
-    </div>
-</div>
-}
