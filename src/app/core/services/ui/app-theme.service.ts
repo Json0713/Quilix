@@ -67,7 +67,7 @@ export class AppThemeService {
     if (!meta) return;
 
     meta.content = mode === 'light'
-      ? '#a2c2c2'
-      : '#2b2a2a';
+      ? '#9ccaca'
+      : '#1c1d1d';
   }
 }
