@@ -31,6 +31,8 @@
     flex: 1;
     overflow-y: auto;
     background: var(--surface-main);
+
+    scrollbar-width: thin;
 }
 
 .content-wrapper {
