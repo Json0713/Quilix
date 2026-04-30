@@ -118,6 +118,8 @@
     min-width: 0;
     min-height: 0;
     overflow-y: auto;
+
+    scrollbar-width: thin;
   }
 }
 
@@ -189,16 +191,6 @@
   gap: 16px;
 
   scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-
-  &::-webkit-scrollbar {
-    width: 1px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 10px;
-  }
 }
 
 .aside-section-label {
