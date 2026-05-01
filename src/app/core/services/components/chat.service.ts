@@ -301,17 +301,20 @@ export class ChatService {
             const rawHtml = await marked.parse(markdownContent);
             const sanitizedHtml = DOMPurify.sanitize(rawHtml, CANVAS_PURIFY_CONFIG);
 
-            // SMART UPDATE: Check if we should update the active canvas instead of creating a new one
-            const activeDoc = this.canvasDocs().find(d => d.id === this.activeCanvasId());
-            const isUpdate = activeDoc && title.trim().toLowerCase() === activeDoc.title.toLowerCase();
+            // SMART UPDATE: Check if a canvas with this title already exists in the session to update it
+            const existingDoc = this.canvasDocs().find(d => title.trim().toLowerCase() === d.title.toLowerCase());
 
-            if (isUpdate && activeDoc) {
-                await this.updateCanvasDoc(activeDoc.id, sanitizedHtml);
+            if (existingDoc) {
+                await this.updateCanvasDoc(existingDoc.id, sanitizedHtml);
                 docsCreated++;
+
+                if (sessionId === this.activeSessionId()) {
+                    this.setActiveCanvas(existingDoc.id);
+                }
 
                 cleanedReply = cleanedReply.replace(
                     fullMatch,
-                    `\n\n📋 **Canvas Updated: "${activeDoc.title}"** — _The current document has been updated._\n\n`
+                    `\n\n📋 **Canvas Updated: "${existingDoc.title}"** — _The document has been updated._\n\n`
                 );
             } else {
                 const now = Date.now();
@@ -326,6 +329,10 @@ export class ChatService {
 
                 await db.canvas_documents.put(doc);
                 docsCreated++;
+
+                if (sessionId === this.activeSessionId()) {
+                    this.setActiveCanvas(doc.id);
+                }
 
                 // Replace the canvas block with a clean reference marker
                 cleanedReply = cleanedReply.replace(
