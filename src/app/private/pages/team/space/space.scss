@@ -8,7 +8,7 @@
     overflow: hidden;
 }
 
-// ── Parent Container Layout Fix ───────────────────────────────────────────
+// ── Parent Container Layout ───────────────────────────────────────────
 ::ng-deep .team:has(app-team-space),
 ::ng-deep .team:has(app-team-space) .container-fluid {
     overflow: hidden !important;
