@@ -298,6 +298,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
         } else {
             this.quillInstance.setText('');
         }
+        this.quillInstance.blur();
         this.isCanvasDirty.set(false);
     }
 
