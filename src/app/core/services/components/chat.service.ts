@@ -449,6 +449,29 @@ export class ChatService {
         }
     }
 
+    /** Delete a specific message from IndexedDB and local state. */
+    async deleteMessage(messageId: string): Promise<void> {
+        await db.chat_messages.delete(messageId);
+        // Update local signal if active
+        this.messages.update(msgs => msgs.filter(m => m.id !== messageId));
+    }
+
+    /** Delete a specific message and all subsequent messages in the current session. */
+    async deleteMessageAndSubsequent(messageId: string): Promise<void> {
+        const msgs = this.messages();
+        const targetIndex = msgs.findIndex(m => m.id === messageId);
+        if (targetIndex === -1) return;
+
+        // Get all messages from this one onwards
+        const messagesToDelete = msgs.slice(targetIndex);
+        const idsToDelete = messagesToDelete.map(m => m.id);
+
+        await db.chat_messages.bulkDelete(idsToDelete);
+        
+        // Update local signal to only keep messages before the deleted one
+        this.messages.update(current => current.slice(0, targetIndex));
+    }
+
     /** Clear the active session view without deleting data. */
     clearActiveSession(): void {
         this.activeSessionId.set(null);
@@ -459,11 +482,27 @@ export class ChatService {
         this.activeCanvasId.set(null);
     }
 
-    /** Re-send the last message if an error occurred. */
+    /** Re-send the last message if an error occurred or user wants to regenerate. */
     async retry(): Promise<void> {
         if (this.isLoading()) return;
         const sessionId = this.activeSessionId();
-        if (sessionId && this.lastUserMessage) {
+        if (!sessionId) return;
+
+        const msgs = this.messages();
+        if (msgs.length === 0) return;
+
+        const lastMsg = msgs[msgs.length - 1];
+
+        // If the last message is an AI message, delete it so we can regenerate
+        if (lastMsg.role === 'model') {
+            await this.deleteMessage(lastMsg.id);
+        }
+
+        const currentMsgs = this.messages();
+        const lastUserMsg = [...currentMsgs].reverse().find(m => m.role === 'user');
+        
+        if (lastUserMsg) {
+            this.lastUserMessage = lastUserMsg.content;
             await this.callChatApi(sessionId);
         }
     }

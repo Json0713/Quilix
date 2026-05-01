@@ -31,6 +31,9 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
 
     // ── UI state ──────────────────────────────────────────────────────────
     inputText = '';
+    editingMessageId: string | null = null;
+    editingContent = '';
+    originalEditingContent = '';
     showHistory = signal<boolean>(localStorage.getItem('quilix_team_sidebar_open') === 'true');
     showCanvas = signal<boolean>(false);
     shouldScrollToBottom = false;
@@ -71,6 +74,14 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
             if (id) {
                 localStorage.setItem('quilix_team_active_session', id);
             }
+        });
+
+        // Auto-close edit mode when session changes
+        effect(() => {
+            this.chat.activeSessionId();
+            untracked(() => {
+                this.cancelEdit();
+            });
         });
 
         // Auto-scroll whenever messages change or AI starts thinking
@@ -493,6 +504,46 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
         this.confirmingDeleteId.set(null);
         await this.chat.deleteCanvasDoc(docId);
         this.loadQuillContent();
+    }
+
+    // ── Message Actions ───────────────────────────────────────────────────
+
+    async copyMessage(content: string) {
+        try {
+            await navigator.clipboard.writeText(content);
+        } catch (err) {
+            console.error('Failed to copy text', err);
+        }
+    }
+
+    editMessage(message: ChatMessage) {
+        if (this.chat.isLoading()) return;
+        this.editingMessageId = message.id;
+        this.editingContent = message.content;
+        this.originalEditingContent = message.content;
+    }
+
+    cancelEdit() {
+        this.editingMessageId = null;
+        this.editingContent = '';
+        this.originalEditingContent = '';
+    }
+
+    async submitEdit(messageId: string) {
+        if (!this.editingContent.trim() || this.chat.isLoading()) return;
+        
+        const contentToSend = this.editingContent;
+        this.cancelEdit();
+
+        // Delete the original message and all subsequent messages
+        await this.chat.deleteMessageAndSubsequent(messageId);
+
+        // Send the new edited content
+        await this.chat.send(contentToSend);
+    }
+
+    retryMessage() {
+        this.chat.retry();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────

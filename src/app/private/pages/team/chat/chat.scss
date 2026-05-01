@@ -1600,3 +1600,127 @@
         i { color: var(--text-main); }
     }
 }
+
+// ── Message Actions (Action Bar) ──────────────────────────────────────────
+.message-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    opacity: 0.6; // Always visible but subtle
+    transition: opacity 0.2s ease;
+
+    .user & {
+        justify-content: flex-end;
+    }
+
+    .model & {
+        justify-content: flex-start;
+    }
+}
+
+.message-bubble:hover .message-actions {
+    opacity: 1;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+
+    &:hover:not(:disabled) {
+        background: rgba(128, 128, 128, 0.1);
+        color: var(--text-main);
+    }
+
+    &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+}
+
+// ── Inline Edit Mode ──────────────────────────────────────────────────────
+.inline-edit-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    min-width: 260px;
+    max-width: 100%;
+}
+
+.inline-edit-textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    background: var(--surface-main);
+    border: 1px solid var(--accent);
+    color: var(--text-main);
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+    min-height: 80px;
+
+    scrollbar-width: thin;
+
+    &:focus {
+        box-shadow: 0 0 0 2px rgba(79, 163, 168, 0.15);
+    }
+}
+
+.inline-edit-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.inline-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+
+    &.cancel {
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+
+        &:hover {
+            background: var(--bg-hover);
+            color: var(--text-main);
+        }
+    }
+
+    &.save {
+        background: var(--accent);
+        color: #fff;
+
+        &:hover:not(:disabled) {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+}

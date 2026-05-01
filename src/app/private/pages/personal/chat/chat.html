@@ -136,8 +136,34 @@
             @for (message of chat.messages(); track trackMessage($index, message)) {
                 <div class="message-row" [class.user]="message.role === 'user'" [class.model]="message.role === 'model'">
                     <div class="message-bubble">
-                        <div class="message-content" [innerHTML]="message.content | markdown"></div>
-                        <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+                        @if (editingMessageId === message.id) {
+                            <div class="inline-edit-container">
+                                <textarea [(ngModel)]="editingContent" class="inline-edit-textarea" rows="4"></textarea>
+                                <div class="inline-edit-actions">
+                                    <button class="inline-btn cancel" (click)="cancelEdit()">Cancel</button>
+                                    <button class="inline-btn save" (click)="submitEdit(message.id)" [disabled]="chat.isLoading() || !editingContent.trim() || editingContent === originalEditingContent">Send</button>
+                                </div>
+                            </div>
+                        } @else {
+                            <div class="message-content" [innerHTML]="message.content | markdown"></div>
+                            <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+                            <div class="message-actions">
+                                <button class="action-btn" (click)="copyMessage(message.content)" title="Copy">
+                                    <i class="bi bi-copy"></i>
+                                </button>
+                                <button class="action-btn" (click)="editMessage(message)" title="Edit" [disabled]="chat.isLoading()">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                @if ($last) {
+                                    <button class="action-btn" (click)="retryMessage()" title="Retry" [disabled]="chat.isLoading()">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                }
+                                <button class="action-btn" title="More options">
+                                    <i class="bi bi-three-dots"></i>
+                                </button>
+                            </div>
+                        }
                     </div>
                 </div>
             }
