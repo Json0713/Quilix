@@ -3,7 +3,11 @@
  * @description
  * Lightweight local dev server that wraps the Vercel serverless function
  * so it can be tested during `ng serve` development.
- *
+ * 
+ * Make sure to set the GEMINI_API_KEY env var before running:
+ * export GEMINI_API_KEY="YOUR_KEY_HERE"
+ * npm run dev:api
+ * 
  * Run with: npx tsx api/dev-server.ts
  * Angular's proxy.conf.json forwards /api/* → http://localhost:3001
  */
