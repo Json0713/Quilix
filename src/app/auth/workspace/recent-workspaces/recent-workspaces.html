@@ -31,7 +31,6 @@
                 <div class="empty-state">
                     <i class="bi bi-clock-history"></i>
                     <p>No recent workspaces found.</p>
-                    <button class="create-first-btn" routerLink="/create-workspace">Create your first workspace</button>
                 </div>
                 } @else {
                 <ul class="workspace-list">
@@ -67,9 +66,13 @@
             </div>
 
             <div class="footer-actions">
-                <button class="add-new-btn" routerLink="/create-workspace">
+                <button class="add-new-btn" [class.primary]="workspaces.length === 0" routerLink="/create-workspace">
+                    @if (workspaces.length === 0) {
+                    <span>Create Workspace</span>
+                    } @else {
                     <i class="bi bi-plus-lg"></i>
                     <span>New Workspace</span>
+                    }
                 </button>
             </div>
 
