@@ -1,0 +1,60 @@
+<section class="step-terms" aria-label="Terms & Privacy Policy">
+
+  <div class="step-header">
+    <div class="step-icon">
+      <i class="bi bi-shield-check"></i>
+    </div>
+    <h2>Terms & Privacy</h2>
+    <p>Please review and accept our terms before continuing.</p>
+  </div>
+
+  <div class="terms-scroll-area">
+    <div class="terms-content">
+
+      <h3>Terms of Service</h3>
+      <p>
+        By using Quilix, you agree to use the application in accordance with applicable laws
+        and regulations. Quilix is provided "as is" without warranties of any kind, either
+        express or implied. The service is primarily an offline-first productivity application
+        that stores data locally on your device.
+      </p>
+
+      <h3>Data & Privacy</h3>
+      <p>
+        Quilix values your privacy. When using the local workspace mode (Quilix Workspace),
+        all your data remains on your device and is never transmitted to external servers.
+        We do not collect, share, or sell personal information. When using the optional cloud
+        features (Quilix Meta), minimal account information is securely stored for
+        authentication purposes only.
+      </p>
+
+      <h3>Local Storage</h3>
+      <p>
+        Your workspace data is stored using browser IndexedDB or the File System Access API
+        (if enabled). Clearing browser data or revoking file system permissions may result in
+        data loss. We recommend regular backups using the built-in export functionality.
+      </p>
+
+      <h3>Open Source</h3>
+      <p>
+        Quilix is committed to transparency and community-driven development. Contributions,
+        feedback, and issue reports are welcome and encouraged.
+      </p>
+
+    </div>
+  </div>
+
+  <label class="terms-checkbox">
+    <input
+      type="checkbox"
+      [checked]="accepted()"
+      (change)="toggleAccepted()" />
+    <span class="checkbox-custom">
+      @if (accepted()) {
+        <i class="bi bi-check-lg"></i>
+      }
+    </span>
+    <span class="checkbox-label">I agree to the Terms of Service and Privacy Policy</span>
+  </label>
+
+</section>

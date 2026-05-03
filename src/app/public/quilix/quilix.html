@@ -1,0 +1,95 @@
+<div class="quilix-setup">
+  
+  <!-- ═══════════════ Left: Step Content (Interactive) ═══════════════ -->
+  <main class="step-content" aria-live="polite">
+    <div class="step-content-inner">
+      <div class="step-card">
+        @switch (currentStep()) {
+          @case (1) { <app-step-welcome /> }
+          @case (2) { <app-step-preferences /> }
+          @case (3) { <app-step-notifications /> }
+          @case (4) { <app-step-storage /> }
+          @case (5) { <app-step-terms (acceptedChange)="termsAccepted.set($event)" /> }
+          @case (6) { <app-step-launchpad /> }
+        }
+      </div>
+    </div>
+
+    <!-- Step Navigation (Bottom Bar) -->
+    <div class="step-nav">
+      <div class="nav-left">
+        @if (currentStep() > 1 && currentStep() < 6) {
+          <button class="nav-btn secondary" (click)="prevStep()">
+            <i class="bi bi-chevron-left"></i>
+            <span>Back</span>
+          </button>
+        }
+      </div>
+      
+      <div class="nav-right">
+        @if (currentStep() < 6) {
+          <button 
+            class="nav-btn primary" 
+            (click)="nextStep()"
+            [disabled]="currentStep() === 5 && !termsAccepted()">
+            <span>
+              {{ 
+                currentStep() === 1 ? 'Get Started' : 
+                currentStep() === 5 ? 'Accept & Continue' : 
+                'Continue' 
+              }}
+            </span>
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        }
+      </div>
+    </div>
+  </main>
+
+  <!-- ═══════════════ Right: Stepper Rail (Visual/Progress) ═══════════════ -->
+  <aside class="stepper-rail" aria-label="Setup progress">
+    <div class="stepper-rail-inner">
+      
+      <div class="stepper-brand">
+        <i class="bi bi-feather"></i>
+        <span>Quilix Setup</span>
+      </div>
+
+      <div class="stepper-list">
+        @for (step of steps; track step.id) {
+          <div class="stepper-item" [class.active]="isActive(step.id)" [class.completed]="isCompleted(step.id)">
+            
+            <div class="step-marker-line">
+              <div class="step-marker">
+                @if (isCompleted(step.id)) {
+                  <i class="bi bi-check-lg"></i>
+                } @else {
+                  <i class="bi {{ step.icon }}"></i>
+                }
+              </div>
+              @if (step.id < steps.length) {
+                <div class="connector" [class.filled]="isCompleted(step.id)"></div>
+              }
+            </div>
+
+            <div class="step-text">
+              <span class="step-label">{{ step.label }}</span>
+              <span class="step-desc">{{ step.description }}</span>
+            </div>
+
+          </div>
+        }
+      </div>
+
+      <!-- Mobile Progress Bar (Visible only on small screens) -->
+      <div class="mobile-progress" aria-hidden="true">
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="progress()"></div>
+        </div>
+        <span class="progress-text">Step {{ currentStep() }} of {{ steps.length }}</span>
+      </div>
+
+    </div>
+  </aside>
+
+</div>

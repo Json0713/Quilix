@@ -1,0 +1,60 @@
+<section class="step-notifications" aria-label="Notification Settings">
+
+  <div class="step-header">
+    <div class="step-icon">
+      <i class="bi bi-bell"></i>
+    </div>
+    <h2>Notifications</h2>
+    <p>Stay updated with workspace activity, alarms, and system events.</p>
+  </div>
+
+  <div class="notification-card">
+    <div class="notif-visual">
+      <div class="notif-mock">
+        <div class="notif-mock-icon">
+          <i class="bi bi-feather"></i>
+        </div>
+        <div class="notif-mock-text">
+          <span class="notif-mock-title">Quilix</span>
+          <span class="notif-mock-body">Your workspace is ready!</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="permission-status">
+      @switch (permissionState()) {
+        @case ('granted') {
+          <div class="status-badge granted">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Notifications enabled</span>
+          </div>
+        }
+        @case ('denied') {
+          <div class="status-badge denied">
+            <i class="bi bi-x-circle-fill"></i>
+            <span>Notifications blocked by browser</span>
+          </div>
+        }
+        @default {
+          <div class="status-badge default">
+            <i class="bi bi-info-circle"></i>
+            <span>Permission not yet requested</span>
+          </div>
+        }
+      }
+    </div>
+
+    @if (permissionState() !== 'granted') {
+      <button
+        class="enable-btn"
+        (click)="requestPermission()"
+        [disabled]="permissionState() === 'denied'">
+        <i class="bi bi-bell-fill"></i>
+        <span>{{ permissionState() === 'denied' ? 'Blocked in Browser Settings' : 'Enable Notifications' }}</span>
+      </button>
+    }
+  </div>
+
+
+
+</section>

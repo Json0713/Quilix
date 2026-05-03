@@ -1,0 +1,338 @@
+/* ================================================================
+   QUILIX SETUP WIZARD — Split Screen Auth Style
+   ================================================================ */
+
+:host {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.quilix-setup {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+
+  @media (min-width: 900px) {
+    grid-template-columns: 1.2fr 1fr;
+  }
+}
+
+/* ================================================================
+   LEFT PANEL: STEP CONTENT (Interactive)
+   ================================================================ */
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-main);
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.step-content-inner {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  overflow-y: auto;
+}
+
+.step-card {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Bottom Navigation ── */
+.step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 3rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  min-height: 70px;
+  z-index: 10;
+
+  @media (max-width: 899px) {
+    padding: 1rem 1.5rem;
+    min-height: 60px;
+  }
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+
+  i {
+    font-size: 1.1rem;
+  }
+
+  &.primary {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: var(--text-white);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  &.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-main);
+
+    &:hover {
+      background: var(--bg-hover);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+}
+
+/* ================================================================
+   RIGHT PANEL: STEPPER RAIL (Visual)
+   ================================================================ */
+
+.stepper-rail {
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+
+  /* Abstract background pattern (optional, mimicking Quilix style) */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+    background-size: 40px 40px;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 899px) {
+    order: -1;
+    padding: 1.5rem;
+    background: var(--surface);
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
+.stepper-rail-inner {
+  width: 100%;
+  max-width: 380px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+
+  @media (max-width: 899px) {
+    max-width: 100%;
+    gap: 1rem;
+  }
+}
+
+.stepper-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.03em;
+
+  i {
+    font-size: 2rem;
+    color: var(--action);
+  }
+
+  @media (max-width: 899px) {
+    font-size: 1.1rem;
+    color: var(--text-main);
+
+    i {
+      font-size: 1.4rem;
+    }
+  }
+}
+
+.stepper-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.stepper-item {
+  display: flex;
+  gap: 1.25rem;
+  padding: 0.5rem 0;
+  position: relative;
+
+  &.active {
+    .step-marker {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--text-white);
+      box-shadow: 0 0 0 4px rgba(49, 107, 111, 0.3);
+    }
+
+    .step-label {
+      color: var(--text-main);
+    }
+  }
+
+  &.completed {
+    .step-marker {
+      background: var(--success);
+      border-color: var(--success);
+      color: var(--text-white);
+    }
+
+    .step-label {
+      color: var(--text-alt);
+    }
+  }
+
+  @media (max-width: 899px) {
+    display: none;
+    /* Hide on mobile stepper */
+  }
+}
+
+.step-marker-line {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.step-marker {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+  font-size: 1rem;
+
+  @media (max-width: 899px) {
+    display: none;
+  }
+}
+
+.connector {
+  width: 2px;
+  flex: 1;
+  min-height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 4px 0;
+
+  &.filled {
+    background: var(--success);
+  }
+}
+
+.step-text {
+  display: flex;
+  flex-direction: column;
+  padding-top: 4px;
+}
+
+.step-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-alt);
+  transition: color 0.3s;
+}
+
+.step-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ── Mobile Progress ── */
+.mobile-progress {
+  display: none;
+
+  @media (max-width: 899px) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+.progress-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transition: width 0.4s ease;
+}
+
+.progress-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

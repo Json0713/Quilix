@@ -1,0 +1,160 @@
+.step-launchpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem 1.5rem;
+  animation: fadeInStep 0.4s ease forwards;
+}
+
+/* ── Header ── */
+.step-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.step-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+
+  i {
+    font-size: 1.5rem;
+    color: #fff;
+  }
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-alt);
+  max-width: 380px;
+  line-height: 1.5;
+}
+
+/* ── Launch Cards ── */
+.launch-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 460px;
+}
+
+.launch-card {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  padding: 1.35rem 1.5rem;
+  border-radius: 16px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+
+    .launch-arrow {
+      transform: translateX(4px);
+      color: var(--accent);
+    }
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+}
+
+.launch-card-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  i {
+    font-size: 1.5rem;
+    color: #fff;
+  }
+}
+
+.workspace-icon {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+.meta-icon {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.launch-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  strong {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  span {
+    font-size: 0.82rem;
+    color: var(--text-alt);
+    line-height: 1.45;
+  }
+}
+
+.launch-arrow {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+@keyframes fadeInStep {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .launch-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .launch-arrow {
+    display: none;
+  }
+}

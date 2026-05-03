@@ -1,0 +1,64 @@
+<section class="step-storage" aria-label="Storage Configuration">
+
+  <div class="step-header">
+    <div class="step-icon">
+      <i class="bi bi-hdd"></i>
+    </div>
+    <h2>Storage</h2>
+    <p>Choose where Quilix stores your workspace data.</p>
+  </div>
+
+  <div class="storage-options">
+
+    <!-- IndexedDB (Default) -->
+    <button
+      class="storage-card"
+      [class.active]="storageMode() === 'indexeddb'"
+      (click)="selectIndexedDB()">
+      <div class="card-icon">
+        <i class="bi bi-database"></i>
+      </div>
+      <div class="card-info">
+        <strong>Browser Storage</strong>
+        <span>IndexedDB — works everywhere, no setup needed</span>
+      </div>
+      <div class="card-badge default-badge">Default</div>
+    </button>
+
+    <!-- Local File System -->
+    <button
+      class="storage-card"
+      [class.active]="storageMode() === 'filesystem'"
+      [class.unsupported]="!isFileSystemSupported"
+      (click)="selectFileSystem()"
+      [disabled]="!isFileSystemSupported">
+      <div class="card-icon">
+        <i class="bi bi-folder2-open"></i>
+      </div>
+      <div class="card-info">
+        <strong>Local File System</strong>
+        @if (isFileSystemSupported) {
+          <span>Real files on disk — sync with your tools</span>
+        } @else {
+          <span>Not supported in this browser</span>
+        }
+      </div>
+      @if (fsConnected()) {
+        <div class="card-badge connected-badge">
+          <i class="bi bi-check-circle-fill"></i> Connected
+        </div>
+      }
+    </button>
+
+  </div>
+
+  @if (storageMode() === 'filesystem' && !fsConnected()) {
+    <button class="connect-btn" (click)="connectFolder()">
+      <i class="bi bi-folder-plus"></i>
+      <span>Choose Folder</span>
+    </button>
+  }
+
+
+
+</section>

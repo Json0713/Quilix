@@ -1,78 +1,8 @@
-/* ---------- LAYOUT ---------- */
+/* ── Public Index — hosts the Quilix setup wizard ── */
+:host {
+  display: block;
+}
+
 .container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-
-  padding: 0.5rem 0.9rem;
-  gap: 1.75rem;
-
-  min-height: 0;
-}
-
-.content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-
-  min-height: 0;
-}
-
-/* CTA */
-.primary-action {
-  display: inline-flex;
-  justify-content: center;
-  width: auto;
-  background: var(--surface);
-  color: var(--text-main);
-  padding: 0.75rem 1.75rem;
-  border-radius: 999px;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-.primary-action:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.225);
-}
-
-/* Footer */
-.footer {
-  margin-top: auto;
-}
-
-/* Responsive */
-/* Mobile */
-@media (max-width: 600px) {
-  .primary-action {
-    width: 100%;
-  }
-}
-
-/* Tablet and up */
-@media (min-width: 768px) {
-  .workspace-start-button {
-    max-width: 610px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-/* Desktop and up */
-@media (min-width: 1024px) {
-
-  .brand h1 {
-    font-size: 2rem;
-  }
-
-  .brand-subtitle {
-    font-size: 1rem;
-  }
+  display: block;
 }

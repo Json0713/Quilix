@@ -1,0 +1,76 @@
+<section class="step-preferences" aria-label="Appearance Preferences">
+
+  <div class="step-header">
+    <div class="step-icon">
+      <i class="bi bi-palette"></i>
+    </div>
+    <h2>Appearance</h2>
+    <p>Choose how Quilix looks to you. You can always change this later in settings.</p>
+  </div>
+
+  <div class="theme-options">
+
+    <button
+      class="theme-card"
+      [class.active]="theme.isLight()"
+      (click)="theme.apply('light')"
+      aria-label="Light theme">
+      <div class="theme-preview light-preview">
+        <div class="preview-bar"></div>
+        <div class="preview-sidebar"></div>
+        <div class="preview-content">
+          <div class="preview-line"></div>
+          <div class="preview-line short"></div>
+        </div>
+      </div>
+      <div class="theme-label">
+        <i class="bi bi-sun"></i>
+        <span>Light</span>
+      </div>
+    </button>
+
+    <button
+      class="theme-card"
+      [class.active]="theme.isDark()"
+      (click)="theme.apply('dark')"
+      aria-label="Dark theme">
+      <div class="theme-preview dark-preview">
+        <div class="preview-bar"></div>
+        <div class="preview-sidebar"></div>
+        <div class="preview-content">
+          <div class="preview-line"></div>
+          <div class="preview-line short"></div>
+        </div>
+      </div>
+      <div class="theme-label">
+        <i class="bi bi-moon-stars"></i>
+        <span>Dark</span>
+      </div>
+    </button>
+
+    <button
+      class="theme-card"
+      [class.active]="theme.isSystem()"
+      (click)="theme.apply('system')"
+      aria-label="System theme">
+      <div class="theme-preview system-preview">
+        <div class="preview-split">
+          <div class="split-light">
+            <div class="preview-line"></div>
+          </div>
+          <div class="split-dark">
+            <div class="preview-line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="theme-label">
+        <i class="bi bi-laptop"></i>
+        <span>System</span>
+      </div>
+    </button>
+
+  </div>
+
+
+
+</section>

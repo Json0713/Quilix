@@ -1,0 +1,45 @@
+<section class="step-launchpad" aria-label="Choose Your Path">
+
+  <div class="step-header">
+    <div class="step-icon">
+      <i class="bi bi-rocket-takeoff"></i>
+    </div>
+    <h2>Launchpad</h2>
+    <p>You're all set! Choose how you'd like to start.</p>
+  </div>
+
+  <div class="launch-options">
+
+    <!-- Quilix Workspace (Local) -->
+    <a class="launch-card" routerLink="/login" (click)="onLaunch()">
+      <div class="launch-card-icon workspace-icon">
+        <i class="bi bi-mortarboard"></i>
+      </div>
+      <div class="launch-card-content">
+        <strong>Quilix Workspace</strong>
+        <span>Personal offline workspace for focused productivity.
+          Create and manage local projects with full privacy.</span>
+      </div>
+      <div class="launch-arrow">
+        <i class="bi bi-arrow-right"></i>
+      </div>
+    </a>
+
+    <!-- Quilix Meta (Cloud) -->
+    <a class="launch-card" routerLink="/meta" (click)="onLaunch()">
+      <div class="launch-card-icon meta-icon">
+        <i class="bi bi-globe2"></i>
+      </div>
+      <div class="launch-card-content">
+        <strong>Quilix Meta</strong>
+        <span>Cloud-powered social workspace for team collaboration.
+          Connect, communicate, and build together.</span>
+      </div>
+      <div class="launch-arrow">
+        <i class="bi bi-arrow-right"></i>
+      </div>
+    </a>
+
+  </div>
+
+</section>

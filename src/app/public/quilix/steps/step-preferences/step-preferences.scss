@@ -1,0 +1,257 @@
+.step-preferences {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem 1.5rem;
+  animation: fadeInStep 0.4s ease forwards;
+}
+
+/* ── Header ── */
+.step-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.step-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+
+  i {
+    font-size: 1.5rem;
+    color: var(--accent);
+  }
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-alt);
+  max-width: 380px;
+  line-height: 1.5;
+}
+
+/* ── Theme Cards ── */
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 460px;
+}
+
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem;
+  border-radius: 14px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  &.active {
+    border-color: var(--accent);
+    background: var(--bg-hover);
+    box-shadow: 0 0 0 3px rgba(49, 107, 111, 0.12);
+  }
+}
+
+/* ── Preview Panels ── */
+.theme-preview {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.light-preview {
+  background: #f4f8f9;
+
+  .preview-bar {
+    height: 14%;
+    background: #e0eaec;
+  }
+
+  .preview-sidebar {
+    position: absolute;
+    top: 14%;
+    left: 0;
+    width: 28%;
+    height: 86%;
+    background: #eaf1f2;
+  }
+
+  .preview-content {
+    position: absolute;
+    top: 26%;
+    left: 36%;
+    right: 10%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .preview-line {
+    height: 6px;
+    border-radius: 3px;
+    background: #ccdfe2;
+
+    &.short { width: 60%; }
+  }
+}
+
+.dark-preview {
+  background: #1a1a1f;
+
+  .preview-bar {
+    height: 14%;
+    background: #2a2a30;
+  }
+
+  .preview-sidebar {
+    position: absolute;
+    top: 14%;
+    left: 0;
+    width: 28%;
+    height: 86%;
+    background: #222228;
+  }
+
+  .preview-content {
+    position: absolute;
+    top: 26%;
+    left: 36%;
+    right: 10%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .preview-line {
+    height: 6px;
+    border-radius: 3px;
+    background: #3a3a42;
+
+    &.short { width: 60%; }
+  }
+}
+
+.system-preview {
+  .preview-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100%;
+  }
+
+  .split-light {
+    background: #f4f8f9;
+    padding: 20% 12%;
+    display: flex;
+    align-items: center;
+
+    .preview-line {
+      height: 6px;
+      width: 100%;
+      border-radius: 3px;
+      background: #ccdfe2;
+    }
+  }
+
+  .split-dark {
+    background: #1a1a1f;
+    padding: 20% 12%;
+    display: flex;
+    align-items: center;
+
+    .preview-line {
+      height: 6px;
+      width: 100%;
+      border-radius: 3px;
+      background: #3a3a42;
+    }
+  }
+}
+
+/* ── Label ── */
+.theme-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+
+  i { font-size: 1rem; }
+}
+
+/* ── Continue Button ── */
+.continue-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 2rem;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+@keyframes fadeInStep {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .theme-options {
+    grid-template-columns: 1fr;
+    max-width: 260px;
+  }
+}
