@@ -31,7 +31,7 @@ export interface SetupStep {
 export class Quilix implements OnInit {
 
   readonly steps: SetupStep[] = [
-    { id: 1, label: 'Welcome',       icon: 'bi-hand-wave',    description: 'Get started with Quilix' },
+    { id: 1, label: 'Welcome',       icon: 'bi-feather',    description: 'Get started with Quilix' },
     { id: 2, label: 'Preferences',   icon: 'bi-palette',      description: 'Customize your experience' },
     { id: 3, label: 'Notifications', icon: 'bi-bell',         description: 'Stay in the loop' },
     { id: 4, label: 'Storage',       icon: 'bi-hdd',          description: 'Configure data storage' },
