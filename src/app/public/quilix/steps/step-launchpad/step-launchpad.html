@@ -9,37 +9,70 @@
   </div>
 
   <div class="launch-options">
-
     <!-- Quilix Workspace (Local) -->
     <a class="launch-card" routerLink="/login" (click)="onLaunch()">
-      <div class="launch-card-icon workspace-icon">
-        <i class="bi bi-mortarboard"></i>
+      <div class="launch-preview workspace-preview">
+        <div class="preview-inner">
+          <i class="bi bi-pc-display"></i>
+          <div class="preview-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
       </div>
-      <div class="launch-card-content">
-        <strong>Quilix Workspace</strong>
-        <span>Personal offline workspace for focused productivity.
-          Create and manage local projects with full privacy.</span>
+      <div class="launch-card-body">
+        <div class="launch-card-title">
+          <i class="bi bi-mortarboard"></i>
+          <strong>Workspace</strong>
+        </div>
+        <p>Offline personal workspace for focused local productivity.</p>
       </div>
-      <div class="launch-arrow">
+      <div class="launch-card-footer">
+        <span>Enter Workspace</span>
         <i class="bi bi-arrow-right"></i>
       </div>
     </a>
 
-    <!-- Quilix Meta (Cloud) -->
+    <!-- Quilix Meta (Social/Team) -->
+    <a class="launch-card" routerLink="/meta/login" (click)="onLaunch()">
+      <div class="launch-preview meta-preview">
+        <div class="preview-inner">
+          <i class="bi bi-people-fill"></i>
+          <div class="preview-line"></div>
+        </div>
+      </div>
+      <div class="launch-card-body">
+        <div class="launch-card-title">
+          <i class="bi bi-globe2"></i>
+          <strong>Meta</strong>
+        </div>
+        <p>Social cloud workspace for team collaboration and community.</p>
+      </div>
+      <div class="launch-card-footer">
+        <span>Go to Meta</span>
+        <i class="bi bi-arrow-right"></i>
+      </div>
+    </a>
+
+    <!-- Quilix Site (Public/Portal) -->
     <a class="launch-card" routerLink="/meta" (click)="onLaunch()">
-      <div class="launch-card-icon meta-icon">
-        <i class="bi bi-globe2"></i>
+      <div class="launch-preview site-preview">
+        <div class="preview-inner">
+          <i class="bi bi-browser-safari"></i>
+          <div class="preview-rect"></div>
+        </div>
       </div>
-      <div class="launch-card-content">
-        <strong>Quilix Meta</strong>
-        <span>Cloud-powered social workspace for team collaboration.
-          Connect, communicate, and build together.</span>
+      <div class="launch-card-body">
+        <div class="launch-card-title">
+          <i class="bi bi-command"></i>
+          <strong>Site</strong>
+        </div>
+        <p>Public portal and community hub for the Quilix framework.</p>
       </div>
-      <div class="launch-arrow">
+      <div class="launch-card-footer">
+        <span>Visit Site</span>
         <i class="bi bi-arrow-right"></i>
       </div>
     </a>
-
   </div>
 
 </section>
