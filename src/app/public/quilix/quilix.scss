@@ -198,6 +198,14 @@
 .stepper-brand {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
   gap: 0.75rem;
   font-size: 1.5rem;
   font-weight: 800;
@@ -211,11 +219,36 @@
 
   @media (max-width: 899px) {
     font-size: 1.1rem;
-    color: var(--text-main);
+    gap: 0.5rem;
 
     i {
       font-size: 1.4rem;
     }
+  }
+}
+
+.mobile-back-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  padding: 0.4rem;
+  margin-right: -0.5rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+
+  i {
+    font-size: 1.25rem;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
+
+  @media (max-width: 899px) {
+    display: flex;
   }
 }
 
@@ -230,6 +263,30 @@
   gap: 1.25rem;
   padding: 0.5rem 0;
   position: relative;
+  cursor: pointer;
+  outline: none;
+
+  &:hover {
+    .step-marker {
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .step-label {
+      color: var(--text-main);
+    }
+  }
+
+  &:focus-visible {
+    .step-marker {
+      box-shadow: 0 0 0 4px rgba(49, 107, 111, 0.3);
+    }
+  }
+
+  &.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 
   &.active {
     .step-marker {

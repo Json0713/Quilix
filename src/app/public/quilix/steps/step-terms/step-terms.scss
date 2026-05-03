@@ -135,8 +135,8 @@ input:checked + .checkbox-custom {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.85rem 2rem;
-  border-radius: 12px;
+  padding: 0.85rem 2.5rem;
+  border-radius: 999px;
   border: none;
   background: linear-gradient(135deg, var(--primary), var(--accent));
   color: #fff;

@@ -56,5 +56,13 @@
     </span>
     <span class="checkbox-label">I agree to the Terms of Service and Privacy Policy</span>
   </label>
+  
+  <button 
+    class="continue-btn" 
+    (click)="continue.emit()"
+    [disabled]="!accepted()">
+    <span>Accept & Continue</span>
+    <i class="bi bi-arrow-right"></i>
+  </button>
 
 </section>

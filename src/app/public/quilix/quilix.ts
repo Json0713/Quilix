@@ -57,7 +57,27 @@ export class Quilix implements OnInit {
   }
 
   goToStep(stepId: number): void {
-    this.currentStep.set(stepId);
+    if (this.canNavigateTo(stepId)) {
+      this.currentStep.set(stepId);
+    }
+  }
+
+  canNavigateTo(stepId: number): boolean {
+    // Current step is always "navigatable" (though redundant)
+    if (stepId === this.currentStep()) return true;
+
+    // Allow going back to any previous step
+    if (stepId < this.currentStep()) return true;
+
+    // Allow going forward only if the step is already completed
+    // (This handles cases where a user went back and now wants to return to their furthest progress)
+    if (this.isCompleted(stepId)) {
+      // Special check for Launchpad: must have terms accepted
+      if (stepId === 6 && !this.termsAccepted()) return false;
+      return true;
+    }
+
+    return false;
   }
 
   nextStep(): void {
