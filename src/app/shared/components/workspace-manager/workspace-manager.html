@@ -137,7 +137,7 @@
         <div class="ws-section">
             <div class="ws-section-header">
                 <span class="ws-section-title">WORKSPACES TRACK</span>
-                <span class="ws-count">{{ otherWorkspaces().length }}</span>
+                <span class="ws-count">{{ totalWorkspaces }}</span>
             </div>
 
             @if (isLoading()) {
@@ -145,10 +145,10 @@
                 <i class="bi bi-arrow-repeat spin"></i>
                 <span>Optimizing workspace view...</span>
             </div>
-            } @else if (otherWorkspaces().length === 0) {
+            } @else if (totalWorkspaces === 0) {
             <div class="empty-state">
                 <i class="bi bi-inbox"></i>
-                <p>No other workspaces found.</p>
+                <p>No workspaces found.</p>
             </div>
             } @else {
             <div class="workspace-table" cdkDropList cdkDropListOrientation="mixed"
@@ -162,6 +162,17 @@
                     <div class="col-size">Size</div>
                     <div class="col-actions">Action</div>
                 </div>
+
+                @if (currentWorkspace(); as ws) {
+                <app-workspace-card [workspace]="ws" [isCurrent]="true"
+                    [isFileSystemMode]="isFileSystemMode()" [isSelectionMode]="selectionMode()"
+                    [isSelected]="isSelected(ws.id)" [isMenuOpen]="openMenuId() === 'track-' + ws.id"
+                    [viewMode]="viewMode()" (restoreWorkspace)="restoreWorkspace($event)"
+                    (trashWorkspace)="trashWorkspace($event)" (switchWorkspace)="switchToWorkspace($event)"
+                    (renameWorkspace)="renameWorkspace($event)" (toggleSelect)="toggleSelect($event)"
+                    (toggleMenu)="toggleMenu('track-' + ws.id, $event)">
+                </app-workspace-card>
+                }
 
                 @for (ws of otherWorkspaces(); track ws.id) {
                 <app-workspace-card cdkDrag [workspace]="ws"

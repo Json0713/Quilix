@@ -15,6 +15,7 @@ export class WorkspaceCardComponent implements OnChanges {
     @Input() isFileSystemMode = false;
     @Input() isSelectionMode = false;
     @Input() isSelected = false;
+    @Input() isCurrent = false;
     @Input() isMenuOpen = false;
     @Input() viewMode: 'list' | 'card' = 'list';
 

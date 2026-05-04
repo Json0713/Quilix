@@ -1,5 +1,5 @@
 <div class="workspace-row" [class.view-card]="viewMode === 'card'" [class.missing]="workspace.isMissingOnDisk"
-    [class.selected]="isSelected" [class.in-select-mode]="isSelectionMode" [class.menu-open]="isMenuOpen"
+    [class.selected]="isSelected" [class.current]="isCurrent" [class.in-select-mode]="isSelectionMode" [class.menu-open]="isMenuOpen"
     (click)="isSelectionMode ? toggleSelect.emit(workspace.id) : null">
 
     <!-- Col: Name / Identifier -->
@@ -9,7 +9,9 @@
             <i class="bi" [class.bi-check-square-fill]="isSelected" [class.bi-square]="!isSelected"></i>
         </div>
         } @else if (!isSelectionMode) {
+        @if (!isCurrent) {
         <ng-content select="[dragHandle]"></ng-content>
+        }
         }
 
         <div class="icon-wrapper">
@@ -17,6 +19,12 @@
         </div>
 
         <span class="workspace-title" [title]="workspace.name">{{ workspace.name }}</span>
+
+        @if (isCurrent) {
+        <span class="current-badge">
+            <i class="bi bi-broadcast"></i> CURRENT
+        </span>
+        }
     </div>
 
     <div class="col-metadata">
@@ -50,7 +58,7 @@
 
             @if (isMenuOpen) {
             <div class="workspace-dropdown" [class.dropdown-up]="isDropdownUp">
-                @if (!workspace.isMissingOnDisk) {
+                @if (!workspace.isMissingOnDisk && !isCurrent) {
                 <button class="dropdown-item switch-item" (click)="switchWorkspace.emit(workspace)">
                     <i class="bi bi-box-arrow-in-right"></i>
                     <span>Switch Workspace</span>
@@ -74,6 +82,7 @@
                 </button>
                 }
 
+                @if (!isCurrent) {
                 <button class="dropdown-item trash-item" (click)="trashWorkspace.emit(workspace)"
                     [disabled]="workspace.isTrashing">
                     @if (workspace.isTrashing) {
@@ -83,6 +92,7 @@
                     }
                     <span>Move to Trash</span>
                 </button>
+                }
             </div>
             }
         </div>
