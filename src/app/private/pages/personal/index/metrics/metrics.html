@@ -45,7 +45,7 @@
         <i class="bi bi-folder2"></i>
       </div>
       <div class="stat-text">
-        <span class="label">Current Workspace Spaces</span>
+        <span class="label">Current Spaces</span>
         <div class="value-row">
           @for (m of [metrics()]; track m?.usage) {
           <span class="value roll-up">{{ m?.totalSpaces || 0 }}</span>
