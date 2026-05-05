@@ -33,12 +33,9 @@
 
     &.current {
         border-left: 3px solid var(--bs-primary) !important;
+        background: linear-gradient(360deg, rgba(var(--bs-primary-rgb), 0.08) 0%, transparent 100%) !important;
         padding-left: 10px;
         margin-left: -2px;
-
-        &:hover {
-            background: linear-gradient(360deg, rgba(var(--bs-primary-rgb), 0.08) 0%, transparent 100%) !important;
-        }
 
         .icon-wrapper i {
             filter: drop-shadow(0 0 8px rgba(var(--bs-primary-rgb), 0.5));
