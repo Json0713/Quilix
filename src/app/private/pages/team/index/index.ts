@@ -5,6 +5,7 @@ import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/bre
 import { TeamMetricsComponent } from './metrics/metrics';
 import { ModulesSidebarService } from '../../../../services/ui/common/sidebar/modules-sidebar.service';
 import { PageHeaderActionsDirective } from '../../../../shared/components/page-header/page-header-actions.directive';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-team-index',
@@ -20,9 +21,11 @@ import { PageHeaderActionsDirective } from '../../../../shared/components/page-h
 export class TeamIndex implements OnInit {
   private breadcrumbService = inject(BreadcrumbService);
   private modulesSidebarService = inject(ModulesSidebarService);
+  private authService = inject(AuthService);
 
-  ngOnInit() {
-    this.breadcrumbService.setTitle('Team Home');
+  async ngOnInit() {
+    const currentWs = await this.authService.getCurrentWorkspace();
+    this.breadcrumbService.setTitle(currentWs?.name || 'Team Home');
     
     // Smooth initialization transition handled by template level service
     setTimeout(() => this.modulesSidebarService.setInitializing(false), 300);

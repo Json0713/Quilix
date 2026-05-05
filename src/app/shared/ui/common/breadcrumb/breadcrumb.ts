@@ -28,6 +28,13 @@ import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/bre
       margin: 0;
       white-space: nowrap;
       letter-spacing: -0.01em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 1040px;
+
+      @media (max-width: 768px) {
+        max-width:140px;
+      }
     }
 
     .hairline {
