@@ -9,12 +9,12 @@
                 @if (missingFolders > 0) {
                     <i class="bi bi-exclamation-triangle-fill"></i> Action Required
                 } @else {
-                    <i class="bi bi-shield-check"></i> Optimal
+                    <i class="bi bi-folder-check"></i> Synced
                 }
             </div>
         } @else {
             <div class="health-status">
-                <i class="bi bi-cloud-slash"></i> Offline Mode
+                <i class="bi bi-floppy"></i> 
             </div>
         }
     </div>
@@ -32,7 +32,7 @@
         <div class="metrics-row">
             <div class="metric-item">
                 <span class="value">{{ totalWorkspaces }}</span>
-                <span class="label">Total Environments</span>
+                <span class="label">Workspaces</span>
             </div>
             <div class="metric-item highlight">
                 <span class="value success">{{ syncedFolders }}</span>
@@ -46,7 +46,7 @@
             }
             <div class="metric-item">
                 <span class="value">{{ totalSpaces }}</span>
-                <span class="label">Active Directories</span>
+                <span class="label">Spaces</span>
             </div>
         </div>
     } @else {
@@ -54,11 +54,11 @@
         <div class="metrics-row basic-mode">
             <div class="metric-item">
                 <span class="value">{{ totalWorkspaces }}</span>
-                <span class="label">Total Environments</span>
+                <span class="label">Workspaces</span>
             </div>
             <div class="metric-item">
                 <span class="value">{{ totalSpaces }}</span>
-                <span class="label">Active Entries</span>
+                <span class="label">Spaces</span>
             </div>
         </div>
     }
