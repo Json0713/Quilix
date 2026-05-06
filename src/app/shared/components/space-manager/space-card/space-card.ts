@@ -70,7 +70,7 @@ import { CommonModule } from '@angular/common';
 
         .card-preview {
             aspect-ratio: 16 / 10;
-            background: var(--surface-alt);
+            background: var(--surface);
             padding: 20px;
             display: flex;
             align-items: center;
@@ -97,7 +97,7 @@ import { CommonModule } from '@angular/common';
 
         .card-footer {
             padding: 12px 14px;
-            background: var(--surface-main);
+            background: var(--surface-alt);
             display: flex;
             align-items: center;
             justify-content: space-between;
