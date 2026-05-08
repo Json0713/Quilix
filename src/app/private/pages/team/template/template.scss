@@ -158,9 +158,18 @@
     overflow: hidden;
     flex-shrink: 0;
 
+    // Content fade transition
+    & > * {
+        transition: opacity 0.25s ease;
+    }
+
     &:not(.open) {
         width: 0;
         border-left: none;
+
+        & > * {
+            opacity: 0;
+        }
     }
 }
 
