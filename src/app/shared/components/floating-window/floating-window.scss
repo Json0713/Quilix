@@ -8,7 +8,7 @@
     justify-content: center;
     
     &.maximized {
-        padding: 2px;
+        padding: 0;
     }
 }
 
@@ -26,21 +26,25 @@
     z-index: 2001;
 
     &.maximized {
-        position: relative;
+        position: fixed; // Fixed is safer for "full screen" behavior
         width: 100% !important;
         height: 100% !important;
         left: 0 !important;
         top: 0 !important;
-        border-radius: 8px;
+        border-radius: 0 !important;
+        border: none !important;
         transform: none !important;
+        margin: 0 !important;
     }
 
     @media (max-width: 768px) {
-        width: 92% !important;
-        height: 65% !important;
-        left: 4% !important;
-        top: 17.5% !important;
-        border-radius: 16px;
+        &:not(.maximized) {
+            width: 92% !important;
+            height: 65% !important;
+            left: 4% !important;
+            top: 17.5% !important;
+            border-radius: 16px;
+        }
         
         .window-title-bar { cursor: default; }
     }
