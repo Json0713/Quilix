@@ -1,0 +1,95 @@
+<div class="note-list-container">
+    <!-- Header -->
+    <div class="note-list-toolbar">
+        <h5 class="title"><i class="bi bi-journal-text icon-warning"></i> Notes</h5>
+        <button class="btn-action" (click)="createNewDoc()">
+            <i class="bi bi-plus-lg"></i> Create New
+        </button>
+    </div>
+
+    <!-- List Content -->
+    <div class="note-list-content">
+        @if (notes().length === 0 && !isCreating()) {
+            <div class="empty-state">
+                <i class="bi bi-journal empty-icon"></i>
+                <h5 class="empty-title">No Notes Yet</h5>
+                <p class="empty-text">Click 'Create New' to get started</p>
+                <button class="btn-action mt-2" (click)="createNewDoc()">Create First Note</button>
+            </div>
+        } @else {
+            <div class="note-grid">
+                @if (isCreating()) {
+                    <div class="grid-item">
+                        <div class="note-card creating">
+                            <div class="card-body">
+                                <div class="card-header">
+                                    <div class="icon-box">
+                                        <i class="bi bi-journal-text"></i>
+                                    </div>
+                                    <input type="text" #createInput class="inline-create-input" 
+                                           [ngModel]="newItemName()" 
+                                           (ngModelChange)="newItemName.set($event)"
+                                           (keyup.enter)="confirmCreate()"
+                                           (keyup.escape)="cancelCreate()"
+                                           (blur)="confirmCreate()">
+                                </div>
+                                <div class="card-meta">Creating...</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @for (doc of notes(); track doc.id) {
+                    <div class="grid-item">
+                        <a [routerLink]="['/', routePrefix, 'spaces', spaceId, 'note', doc.id]" class="note-link">
+                            <div class="note-card">
+                                <div class="card-body">
+                                    <div class="card-header">
+                                        <div class="icon-box">
+                                            <i class="bi bi-journal-text"></i>
+                                        </div>
+                                        <div class="title-wrapper">
+                                            @if (renamingDoc()?.id === doc.id) {
+                                                <input type="text" #renameInput class="inline-rename-input w-100" 
+                                                       [ngModel]="renameValue()" 
+                                                       (ngModelChange)="renameValue.set($event)" 
+                                                       (keyup.enter)="confirmRename()"
+                                                       (keyup.escape)="cancelRename()"
+                                                       (blur)="confirmRename()"
+                                                       (click)="$event.stopPropagation(); $event.preventDefault()">
+                                            } @else {
+                                                <h6 class="card-title" [title]="doc.name">{{ doc.name }}</h6>
+                                            }
+                                        </div>
+                                        <div class="dropdown-container" (click)="$event.stopPropagation(); $event.preventDefault()">
+                                            <button class="btn-item-action" (click)="toggleMenu(doc.id, $event)">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            
+                                            @if (activeMenuId() === doc.id) {
+                                                <div class="custom-ctx-menu shadow-sm">
+                                                    <div class="ctx-header">
+                                                        <small class="ctx-title">{{doc.name}}</small>
+                                                    </div>
+                                                    <button class="ctx-item" (click)="startRename(doc, $event)">
+                                                        <i class="bi bi-pencil-square text-primary me-2"></i> Rename
+                                                    </button>
+                                                    <div class="ctx-divider"></div>
+                                                    <button class="ctx-item text-danger" (click)="deleteDoc(doc, $event)">
+                                                        <i class="bi bi-trash3 me-2"></i> Delete
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="card-meta">
+                                        <i class="bi bi-clock"></i> Updated {{ doc.updatedAt | date:'short' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

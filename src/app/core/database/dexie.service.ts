@@ -25,6 +25,7 @@ import { Tab } from '../interfaces/tab';
 import { Session } from '../interfaces/session';
 import { Task } from '../interfaces/task';
 import { SheetDocument } from '../interfaces/sheet';
+import { NoteDocument } from '../interfaces/note';
 import { ContactMessage, Setting, ChatSession, ChatMessage, CanvasDocument, WidgetNote, WidgetAlarm } from './dexie.models';
 
 // Re-export models so consumers can import from a single location if needed.
@@ -45,6 +46,7 @@ export class DexieService extends Dexie {
     tabs!: Table<Tab, string>;
     tasks!: Table<Task, string>;
     sheets!: Table<SheetDocument, string>;
+    notes!: Table<NoteDocument, string>;
     virtual_entries!: Table<any, string>;
     activities!: Table<any, string>;
     chat_sessions!: Table<ChatSession, string>;
@@ -157,6 +159,11 @@ export class DexieService extends Dexie {
         // v18 – Workspace-scoped chat sessions (each session belongs to a workspace).
         this.version(18).stores({
             chat_sessions: 'id, workspaceId, updatedAt, [workspaceId+updatedAt]'
+        });
+
+        // v19 - Note Document Storage
+        this.version(19).stores({
+            notes: 'id, spaceId, updatedAt'
         });
 
         // Open the database connection eagerly to reduce first-operation latency.

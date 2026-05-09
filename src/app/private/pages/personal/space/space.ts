@@ -13,6 +13,7 @@ import { PageHeaderActionsDirective } from '../../../../shared/components/page-h
 import { SpaceCardComponent } from '../../../../shared/components/space-manager/space-card/space-card';
 import { FloatingWindowComponent } from '../../../../shared/components/floating-window/floating-window';
 import { SheetListComponent } from '../../../../shared/components/sheet-list/sheet-list';
+import { NoteListComponent } from '../../../../shared/components/note-list/note-list';
 
 @Component({
     selector: 'app-personal-space',
@@ -23,7 +24,8 @@ import { SheetListComponent } from '../../../../shared/components/sheet-list/she
         PageHeaderActionsDirective,
         SpaceCardComponent,
         FloatingWindowComponent,
-        SheetListComponent
+        SheetListComponent,
+        NoteListComponent
     ],
     templateUrl: './space.html',
     styleUrl: './space.scss',
@@ -45,6 +47,7 @@ export class PersonalSpace implements OnInit, OnDestroy {
     // App Windows
     explorerVisible = signal<boolean>(false);
     sheetVisible = signal<boolean>(false);
+    noteVisible = signal<boolean>(false);
 
     @ViewChild(FileExplorerComponent) explorer!: FileExplorerComponent;
     explorerBreadcrumbs = signal<any[]>([]);
@@ -74,6 +77,7 @@ export class PersonalSpace implements OnInit, OnDestroy {
             // Auto-close app windows when switching spaces
             this.explorerVisible.set(false);
             this.sheetVisible.set(false);
+            this.noteVisible.set(false);
 
             // Tear down previous live subscription
             this.spaceSub?.unsubscribe();
@@ -140,6 +144,10 @@ export class PersonalSpace implements OnInit, OnDestroy {
 
     toggleSheet() {
         this.sheetVisible.update(v => !v);
+    }
+
+    toggleNote() {
+        this.noteVisible.update(v => !v);
     }
 
     ngOnDestroy() {

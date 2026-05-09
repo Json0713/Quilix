@@ -40,6 +40,10 @@ export const PERSONAL_ROUTES: Routes = [
       {
         path: 'spaces/:spaceId/sheet/:sheetId',
         loadComponent: () => import('../shared/sheet-page/sheet-page').then(m => m.SheetPage)
+      },
+      {
+        path: 'spaces/:spaceId/note/:noteId',
+        loadComponent: () => import('../shared/note-page/note-page').then(m => m.NotePage)
       }
     ]
   }

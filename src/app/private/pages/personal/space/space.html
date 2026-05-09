@@ -33,11 +33,11 @@
                     <!-- Notes Card -->
                     <app-space-card
                         title="Notes"
-                        subtitle="Coming soon: Capture and organize your ideas."
+                        subtitle="Capture and organize your ideas."
                         icon="bi-journal-text"
-                        [isPlaceholder]="true"
                         indicatorColor="#eab308"
-                        previewBackground="linear-gradient(135deg, #eab308, #ca8a04)">
+                        previewBackground="linear-gradient(135deg, #eab308, #ca8a04)"
+                        (cardClick)="toggleNote()">
                     </app-space-card>
 
                     <!-- Spread Sheets Card -->
@@ -97,6 +97,17 @@
                     
                     @if (space()) {
                         <app-sheet-list [spaceId]="space()!.id" routePrefix="personal" class="w-100 h-100 d-block"></app-sheet-list>
+                    }
+                </app-floating-window>
+
+                <!-- Floating App Window (Notes) -->
+                <app-floating-window
+                    [(visible)]="noteVisible"
+                    icon="bi-journal-text"
+                    storageKey="quilix_note_state">
+                    
+                    @if (space()) {
+                        <app-note-list [spaceId]="space()!.id" routePrefix="personal" class="w-100 h-100 d-block"></app-note-list>
                     }
                 </app-floating-window>
             } @else {
