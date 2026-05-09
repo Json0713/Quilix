@@ -47,6 +47,25 @@
     gap: 20px;
     padding-bottom: 2rem;
     animation: fadeIn 0.4s ease-out;
+
+    &.icon-layout {
+        align-content: flex-start;
+
+        &.size-sm {
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 24px 16px;
+        }
+
+        &.size-md {
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 36px 24px;
+        }
+
+        &.size-lg {
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 48px 32px;
+        }
+    }
 }
 
 // Header Actions

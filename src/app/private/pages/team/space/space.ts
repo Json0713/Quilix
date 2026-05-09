@@ -14,6 +14,8 @@ import { SpaceCardComponent } from '../../../../shared/components/space-manager/
 import { FloatingWindowComponent } from '../../../../shared/components/floating-window/floating-window';
 import { SheetListComponent } from '../../../../shared/components/sheet-list/sheet-list';
 import { NoteListComponent } from '../../../../shared/components/note-list/note-list';
+import { SpaceSettingsComponent } from '../../../../shared/components/space-settings/space-settings';
+import { SpacePreferences, DEFAULT_SPACE_PREFERENCES } from '../../../../core/interfaces/space-preferences';
 
 @Component({
     selector: 'app-team-space',
@@ -25,7 +27,8 @@ import { NoteListComponent } from '../../../../shared/components/note-list/note-
         SpaceCardComponent,
         FloatingWindowComponent,
         SheetListComponent,
-        NoteListComponent
+        NoteListComponent,
+        SpaceSettingsComponent
     ],
     templateUrl: './space.html',
     styleUrl: './space.scss',
@@ -48,6 +51,9 @@ export class TeamSpace implements OnInit, OnDestroy {
     explorerVisible = signal<boolean>(false);
     sheetVisible = signal<boolean>(false);
     noteVisible = signal<boolean>(false);
+    settingsVisible = signal<boolean>(false);
+
+    preferences = signal<SpacePreferences>({ ...DEFAULT_SPACE_PREFERENCES });
 
     @ViewChild(FileExplorerComponent) explorer!: FileExplorerComponent;
     explorerBreadcrumbs = signal<any[]>([]);
@@ -69,6 +75,15 @@ export class TeamSpace implements OnInit, OnDestroy {
         const mode = await this.fileSystem.getStorageMode();
         this.isFileSystemMode.set(mode === 'filesystem');
 
+        const savedPrefs = localStorage.getItem('quilix_space_prefs');
+        if (savedPrefs) {
+            try {
+                this.preferences.set({ ...DEFAULT_SPACE_PREFERENCES, ...JSON.parse(savedPrefs) });
+            } catch (e) {
+                console.warn('Failed to parse space preferences:', e);
+            }
+        }
+
         this.paramSub = this.route.params.subscribe(async params => {
             const spaceId = params['spaceId'];
             this.loading.set(true);
@@ -78,6 +93,7 @@ export class TeamSpace implements OnInit, OnDestroy {
             this.explorerVisible.set(false);
             this.sheetVisible.set(false);
             this.noteVisible.set(false);
+            this.settingsVisible.set(false);
 
             this.spaceSub?.unsubscribe();
 
@@ -146,6 +162,15 @@ export class TeamSpace implements OnInit, OnDestroy {
 
     toggleNote() {
         this.noteVisible.update(v => !v);
+    }
+
+    toggleSettings() {
+        this.settingsVisible.update(v => !v);
+    }
+
+    onPreferencesChange(prefs: SpacePreferences) {
+        this.preferences.set(prefs);
+        localStorage.setItem('quilix_space_prefs', JSON.stringify(prefs));
     }
 
     ngOnDestroy() {

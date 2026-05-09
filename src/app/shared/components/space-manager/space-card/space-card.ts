@@ -6,34 +6,48 @@ import { CommonModule } from '@angular/common';
     standalone: true,
     imports: [CommonModule],
     template: `
-        <div class="space-card" [class.placeholder]="isPlaceholder" (click)="onCardClick()">
-            <!-- Preview Area -->
-            <div class="card-preview">
-                <div class="preview-inner" [style.background]="previewBackground">
-                    @if (icon) {
-                        <i class="bi" [class]="icon"></i>
-                    }
+        <div class="space-card" [class.placeholder]="isPlaceholder" [class.icon-mode]="layoutMode === 'icon'" (click)="onCardClick()">
+            @if (layoutMode === 'card') {
+                <!-- Preview Area -->
+                <div class="card-preview">
+                    <div class="preview-inner" [style.background]="previewBackground">
+                        @if (icon) {
+                            <i class="bi" [class]="icon"></i>
+                        }
+                    </div>
                 </div>
-            </div>
 
-            <!-- Footer Details -->
-            <div class="card-footer">
-                <div class="footer-left">
-                    <div class="icon-indicator" [style.background-color]="indicatorColor">
-                        <i class="bi" [class]="icon"></i>
+                <!-- Footer Details -->
+                <div class="card-footer">
+                    <div class="footer-left">
+                        <div class="icon-indicator" [style.background-color]="indicatorColor">
+                            <i class="bi" [class]="icon"></i>
+                        </div>
+                        <div class="text-details">
+                            <h3 class="card-title">{{ title }}</h3>
+                            <p class="card-subtitle">{{ subtitle }}</p>
+                        </div>
                     </div>
-                    <div class="text-details">
-                        <h3 class="card-title">{{ title }}</h3>
-                        <p class="card-subtitle">{{ subtitle }}</p>
+                    
+                    <div class="footer-right">
+                        <button class="options-btn" (click)="$event.stopPropagation()">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
                     </div>
                 </div>
-                
-                <div class="footer-right">
-                    <button class="options-btn" (click)="$event.stopPropagation()">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
+            } @else {
+                <!-- App Icon Mode -->
+                <div class="app-icon-wrapper" [ngClass]="['size-' + iconSize]">
+                    <div class="app-icon-inner" 
+                         [ngClass]="['radius-' + borderRadius]"
+                         [style.background]="previewBackground">
+                        @if (icon) {
+                            <i class="bi" [class]="icon" [ngClass]="['icon-' + iconSize]"></i>
+                        }
+                    </div>
                 </div>
-            </div>
+                <div class="app-icon-title" [ngClass]="['text-' + iconSize]">{{ title }}</div>
+            }
         </div>
     `,
     styles: [`
@@ -48,14 +62,28 @@ import { CommonModule } from '@angular/common';
             border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
             height: 100%;
             display: flex;
             flex-direction: column;
 
-            &:hover {
+            &:not(.icon-mode):hover {
                 border-color: var(--accent);
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            }
+
+            &.icon-mode {
+                background: transparent;
+                border: none;
+                box-shadow: none;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 8px;
+                
+                &:hover .app-icon-inner {
+                    transform: scale(1.05);
+                    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+                }
             }
 
             &.placeholder {
@@ -168,6 +196,53 @@ import { CommonModule } from '@angular/common';
                 color: var(--text-main);
             }
         }
+
+        .app-icon-wrapper {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &.size-sm { padding: 16px; }
+            &.size-md { padding: 8px; }
+            &.size-lg { padding: 0px; }
+        }
+
+        .app-icon-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s, border-radius 0.2s;
+
+            &.radius-rounded { border-radius: 12px; }
+            &.radius-squircle { border-radius: 22%; }
+            &.radius-circle { border-radius: 50%; }
+
+            i {
+                color: white;
+                &.icon-sm { font-size: 2rem; }
+                &.icon-md { font-size: 2.8rem; }
+                &.icon-lg { font-size: 3.5rem; }
+            }
+        }
+
+        .app-icon-title {
+            font-weight: 500;
+            color: var(--text-main);
+            text-align: center;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &.text-sm { font-size: 0.75rem; margin-top: 4px; }
+            &.text-md { font-size: 0.85rem; }
+            &.text-lg { font-size: 0.95rem; }
+        }
     `]
 })
 export class SpaceCardComponent {
@@ -177,6 +252,9 @@ export class SpaceCardComponent {
     @Input() isPlaceholder = false;
     @Input() previewBackground = 'var(--accent)';
     @Input() indicatorColor = 'var(--accent)';
+    @Input() layoutMode: 'card' | 'icon' = 'card';
+    @Input() iconSize: 'sm' | 'md' | 'lg' = 'md';
+    @Input() borderRadius: 'rounded' | 'squircle' | 'circle' = 'squircle';
 
     @Output() cardClick = new EventEmitter<void>();
 

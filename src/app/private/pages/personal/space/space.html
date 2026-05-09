@@ -19,7 +19,11 @@
                 </div>
             } @else if (space()) {
                 <!-- Space View Grid -->
-                <div class="space-grid">
+                <div class="space-grid" 
+                     [class.icon-layout]="preferences().layoutMode === 'icon'"
+                     [class.size-sm]="preferences().iconSize === 'sm'"
+                     [class.size-md]="preferences().iconSize === 'md'"
+                     [class.size-lg]="preferences().iconSize === 'lg'">
                     <!-- File Manager App Card -->
                     <app-space-card
                         title="File Manager"
@@ -27,6 +31,9 @@
                         icon="bi-folder2-open"
                         indicatorColor="#f59e0b"
                         previewBackground="linear-gradient(135deg, #f59e0b, #d97706)"
+                        [layoutMode]="preferences().layoutMode"
+                        [iconSize]="preferences().iconSize"
+                        [borderRadius]="preferences().borderRadius"
                         (cardClick)="toggleExplorer()">
                     </app-space-card>
 
@@ -37,6 +44,9 @@
                         icon="bi-journal-text"
                         indicatorColor="#eab308"
                         previewBackground="linear-gradient(135deg, #eab308, #ca8a04)"
+                        [layoutMode]="preferences().layoutMode"
+                        [iconSize]="preferences().iconSize"
+                        [borderRadius]="preferences().borderRadius"
                         (cardClick)="toggleNote()">
                     </app-space-card>
 
@@ -47,7 +57,23 @@
                         icon="bi-file-earmark-spreadsheet"
                         indicatorColor="#10b981"
                         previewBackground="linear-gradient(135deg, #10b981, #059669)"
+                        [layoutMode]="preferences().layoutMode"
+                        [iconSize]="preferences().iconSize"
+                        [borderRadius]="preferences().borderRadius"
                         (cardClick)="toggleSheet()">
+                    </app-space-card>
+
+                    <!-- Settings Card -->
+                    <app-space-card
+                        title="Settings"
+                        subtitle="Manage space preferences and layout."
+                        icon="bi-gear"
+                        indicatorColor="#64748b"
+                        previewBackground="linear-gradient(135deg, #64748b, #475569)"
+                        [layoutMode]="preferences().layoutMode"
+                        [iconSize]="preferences().iconSize"
+                        [borderRadius]="preferences().borderRadius"
+                        (cardClick)="toggleSettings()">
                     </app-space-card>
                 </div>
 
@@ -109,6 +135,19 @@
                     @if (space()) {
                         <app-note-list [spaceId]="space()!.id" routePrefix="personal" class="w-100 h-100 d-block"></app-note-list>
                     }
+                </app-floating-window>
+
+                <!-- Floating App Window (Settings) -->
+                <app-floating-window
+                    [(visible)]="settingsVisible"
+                    icon="bi-gear"
+                    storageKey="quilix_settings_state">
+                    
+                    <app-space-settings 
+                        [preferences]="preferences()" 
+                        (preferencesChange)="onPreferencesChange($event)"
+                        class="w-100 h-100 d-block">
+                    </app-space-settings>
                 </app-floating-window>
             } @else {
                 <div class="space-not-found">

@@ -1,0 +1,109 @@
+<div class="settings-wrapper">
+    <!-- Header -->
+    <div class="settings-header">
+        @if (currentView() !== 'menu') {
+            <button class="back-btn" (click)="navigateTo('menu')">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <h4 class="settings-title">
+                {{ currentView() === 'appearance' ? 'Appearance' : 'General' }}
+            </h4>
+        } @else {
+            <div class="header-spacer"></div>
+            <h4 class="settings-title">Settings</h4>
+        }
+    </div>
+
+    <!-- View Container -->
+    <div class="settings-content">
+        <!-- Main Menu -->
+        @if (currentView() === 'menu') {
+            <div class="menu-list">
+                <button class="menu-item" (click)="navigateTo('general')">
+                    <div class="item-icon general"><i class="bi bi-gear-fill"></i></div>
+                    <span class="item-label">General</span>
+                    <i class="bi bi-chevron-right chevron"></i>
+                </button>
+                <button class="menu-item" (click)="navigateTo('appearance')">
+                    <div class="item-icon appearance"><i class="bi bi-palette-fill"></i></div>
+                    <span class="item-label">Appearance</span>
+                    <i class="bi bi-chevron-right chevron"></i>
+                </button>
+            </div>
+        }
+
+        <!-- General Settings -->
+        @if (currentView() === 'general') {
+            <div class="sub-view text-center" style="padding-top: 4rem;">
+                <i class="bi bi-cone-striped display-4 text-muted opacity-50 mb-3 d-block"></i>
+                <p class="text-muted">General settings coming soon.</p>
+            </div>
+        }
+
+        <!-- Appearance Settings -->
+        @if (currentView() === 'appearance') {
+            <div class="sub-view p-3">
+                
+                <div class="setting-group mb-4">
+                    <label class="setting-label">Layout Mode</label>
+                    <div class="segmented-control">
+                        <button class="segment" 
+                                [class.active]="preferences.layoutMode === 'card'"
+                                (click)="updatePreference('layoutMode', 'card')">
+                            <i class="bi bi-card-heading"></i> Card
+                        </button>
+                        <button class="segment" 
+                                [class.active]="preferences.layoutMode === 'icon'"
+                                (click)="updatePreference('layoutMode', 'icon')">
+                            <i class="bi bi-grid-fill"></i> App Icon
+                        </button>
+                    </div>
+                </div>
+
+                @if (preferences.layoutMode === 'icon') {
+                    <div class="setting-group mb-4">
+                        <label class="setting-label">Grid Size</label>
+                        <div class="segmented-control">
+                            <button class="segment" 
+                                    [class.active]="preferences.iconSize === 'sm'"
+                                    (click)="updatePreference('iconSize', 'sm')">
+                                Small
+                            </button>
+                            <button class="segment" 
+                                    [class.active]="preferences.iconSize === 'md'"
+                                    (click)="updatePreference('iconSize', 'md')">
+                                Medium
+                            </button>
+                            <button class="segment" 
+                                    [class.active]="preferences.iconSize === 'lg'"
+                                    (click)="updatePreference('iconSize', 'lg')">
+                                Large
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group mb-4">
+                        <label class="setting-label">Border Radius</label>
+                        <div class="segmented-control">
+                            <button class="segment" 
+                                    [class.active]="preferences.borderRadius === 'rounded'"
+                                    (click)="updatePreference('borderRadius', 'rounded')">
+                                Rounded
+                            </button>
+                            <button class="segment" 
+                                    [class.active]="preferences.borderRadius === 'squircle'"
+                                    (click)="updatePreference('borderRadius', 'squircle')">
+                                Squircle
+                            </button>
+                            <button class="segment" 
+                                    [class.active]="preferences.borderRadius === 'circle'"
+                                    (click)="updatePreference('borderRadius', 'circle')">
+                                Circle
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
