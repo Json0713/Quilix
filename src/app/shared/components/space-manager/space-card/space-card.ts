@@ -221,6 +221,7 @@ import { CommonModule } from '@angular/common';
             &.radius-rounded { border-radius: 12px; }
             &.radius-squircle { border-radius: 22%; }
             &.radius-circle { border-radius: 50%; }
+            &.radius-square { border-radius: 4px; }
 
             i {
                 color: white;
@@ -254,7 +255,7 @@ export class SpaceCardComponent {
     @Input() indicatorColor = 'var(--accent)';
     @Input() layoutMode: 'card' | 'icon' = 'card';
     @Input() iconSize: 'sm' | 'md' | 'lg' = 'md';
-    @Input() borderRadius: 'rounded' | 'squircle' | 'circle' = 'squircle';
+    @Input() borderRadius: 'rounded' | 'squircle' | 'circle' | 'square' = 'squircle';
 
     @Output() cardClick = new EventEmitter<void>();
 

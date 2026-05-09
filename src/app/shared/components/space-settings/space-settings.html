@@ -96,6 +96,11 @@
                                 Squircle
                             </button>
                             <button class="segment" 
+                                    [class.active]="preferences.borderRadius === 'square'"
+                                    (click)="updatePreference('borderRadius', 'square')">
+                                Square
+                            </button>
+                            <button class="segment" 
                                     [class.active]="preferences.borderRadius === 'circle'"
                                     (click)="updatePreference('borderRadius', 'circle')">
                                 Circle
