@@ -16,6 +16,7 @@ import { SheetListComponent } from '../../../../shared/components/sheet-list/she
 import { NoteListComponent } from '../../../../shared/components/note-list/note-list';
 import { SpaceSettingsComponent } from '../../../../shared/components/space-settings/space-settings';
 import { SpacePreferences, DEFAULT_SPACE_PREFERENCES } from '../../../../core/interfaces/space-preferences';
+import { WindowManagerService } from '../../../../services/ui/window-manager/window-manager.service';
 
 @Component({
     selector: 'app-personal-space',
@@ -39,6 +40,7 @@ export class PersonalSpace implements OnInit, OnDestroy {
     private fileSystem = inject(FileSystemService);
     private authService = inject(AuthService);
     private breadcrumbService = inject(BreadcrumbService);
+    private windowManager = inject(WindowManagerService);
 
     space = signal<Space | null>(null);
     loading = signal(true);
@@ -155,19 +157,29 @@ export class PersonalSpace implements OnInit, OnDestroy {
 
     // Window Actions
     toggleExplorer() {
-        this.explorerVisible.update(v => !v);
+        this.handleWindowToggle(this.explorerVisible, 'quilix_explorer_state');
     }
 
     toggleSheet() {
-        this.sheetVisible.update(v => !v);
+        this.handleWindowToggle(this.sheetVisible, 'quilix_sheet_state');
     }
 
     toggleNote() {
-        this.noteVisible.update(v => !v);
+        this.handleWindowToggle(this.noteVisible, 'quilix_note_state');
     }
 
     toggleSettings() {
-        this.settingsVisible.update(v => !v);
+        this.handleWindowToggle(this.settingsVisible, 'quilix_settings_state');
+    }
+
+    private handleWindowToggle(visibilitySignal: any, id: string) {
+        if (!visibilitySignal()) {
+            visibilitySignal.set(true);
+        } else if (!this.windowManager.isActive(id)) {
+            this.windowManager.bringToFront(id);
+        } else {
+            visibilitySignal.set(false);
+        }
     }
 
     onPreferencesChange(prefs: SpacePreferences) {

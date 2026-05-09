@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, OnChanges, SimpleChanges, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { WindowManagerService } from '../../../services/ui/window-manager/window-manager.service';
 
 @Component({
     selector: 'app-floating-window',
@@ -30,9 +31,18 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
     private initialSize = { width: 0, height: 0 };
     private initialPos = { x: 0, y: 0 };
     
+    private windowManager = inject(WindowManagerService);
+    
+    zIndex = computed(() => this.windowManager.getZIndex(this.storageKey || 'default'));
+
     ngOnChanges(changes: SimpleChanges) {
-        if (changes['visible']?.currentValue === true) {
-            this.handleAutoMaximize();
+        if (changes['visible']) {
+            if (changes['visible'].currentValue === true) {
+                this.handleAutoMaximize();
+                this.windowManager.register(this.storageKey || 'default');
+            } else {
+                this.windowManager.unregister(this.storageKey || 'default');
+            }
         }
     }
 
@@ -51,11 +61,13 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
 
     ngOnDestroy() {
         this.saveWindowState();
+        this.windowManager.unregister(this.storageKey || 'default');
     }
 
     close() {
         this.visible = false;
         this.visibleChange.emit(this.visible);
+        this.windowManager.unregister(this.storageKey || 'default');
         if (!this.visible) {
             this.isMaximized.set(false);
         }
@@ -63,6 +75,11 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
 
     toggleMaximize() {
         this.isMaximized.update(v => !v);
+        this.focus();
+    }
+
+    focus() {
+        this.windowManager.bringToFront(this.storageKey || 'default');
     }
 
     // --- Window Interaction (Drag & Resize) ---

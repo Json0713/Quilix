@@ -1,14 +1,15 @@
 @if (visible) {
-<div class="app-window-overlay" [class.maximized]="isMaximized()">
+<div class="app-window-overlay" [class.maximized]="isMaximized()" [style.z-index]="zIndex()">
     <div class="app-window" 
          [class.maximized]="isMaximized()"
+         (mousedown)="focus()"
          [style.left.px]="isMaximized() ? null : windowPosition().x"
          [style.top.px]="isMaximized() ? null : windowPosition().y"
          [style.width.px]="isMaximized() ? null : windowSize().width"
          [style.height.px]="isMaximized() ? null : windowSize().height">
         
         <!-- Window Title Bar (Draggable) -->
-        <div class="window-title-bar" (mousedown)="onDragStart($event)">
+        <div class="window-title-bar" (mousedown)="onDragStart($event); focus()">
             <div class="title-group">
                 <i class="bi window-icon" [ngClass]="icon"></i>
                 <ng-content select="[window-header]"></ng-content>
