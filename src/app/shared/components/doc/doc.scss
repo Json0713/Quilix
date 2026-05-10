@@ -1,0 +1,216 @@
+@import 'quill/dist/quill.snow.css';
+
+:host { display: block; height: 100%; }
+
+.doc-editor-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-main);
+    color: var(--text-main);
+    overflow: hidden;
+}
+
+// ═══ Title Bar ═══
+.doc-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.4rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+
+    .title-left { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 0; }
+    .doc-icon { font-size: 1.3rem; color: #3b82f6; flex-shrink: 0; }
+
+    .doc-title-input {
+        outline: none; box-shadow: none;
+        border: 1px solid transparent;
+        font-size: 1.1rem; font-weight: 600;
+        min-width: 120px; max-width: 500px;
+        background: transparent; color: var(--text-main);
+        padding: 2px 6px; border-radius: 4px;
+        transition: all 0.2s; text-overflow: ellipsis;
+        &:hover { border-color: var(--border); background: var(--surface-alt); }
+        &:focus { border-color: var(--action); background: var(--surface-main); max-width: none; }
+    }
+    .title-right { flex-shrink: 0; }
+    .save-status { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; }
+
+// ═══ Ribbon ═══
+.ribbon { flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--surface); }
+.ribbon-tabs { display: flex; padding: 0 0.75rem; border-bottom: 1px solid var(--border); }
+.ribbon-tab {
+    background: transparent; border: none;
+    padding: 0.4rem 1rem; font-size: 0.82rem; font-weight: 500;
+    color: var(--text-muted); cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all 0.15s; margin-bottom: -1px;
+    &:hover { color: var(--text-main); background: var(--surface-alt); }
+    &.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+}
+.ribbon-panel {
+    display: flex; align-items: stretch;
+    padding: 0.4rem 0.75rem; min-height: 68px; overflow-x: auto;
+    &::-webkit-scrollbar { height: 3px; }
+    &::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+}
+.ribbon-separator { width: 1px; background: var(--border); margin: 0 0.5rem; flex-shrink: 0; }
+.ribbon-group { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+.ribbon-group-content { display: flex; flex-direction: column; gap: 2px; flex: 1; &.vertical { flex-direction: row; align-items: center; gap: 0.25rem; } }
+.ribbon-row { display: flex; align-items: center; gap: 2px; }
+.ribbon-group-label { font-size: 0.65rem; color: var(--text-muted); text-align: center; white-space: nowrap; margin-top: auto; padding-top: 2px; }
+
+.ribbon-btn {
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; border: 1px solid transparent;
+    border-radius: 4px; width: 28px; height: 28px;
+    cursor: pointer; color: var(--text-main); font-size: 0.9rem;
+    transition: all 0.12s; flex-shrink: 0;
+    &:hover { background: var(--surface-alt); border-color: var(--border); }
+    &.active { background: rgba(59, 130, 246, 0.12); border-color: rgba(59, 130, 246, 0.3); color: #3b82f6; }
+    &.tall { width: auto; height: auto; flex-direction: column; gap: 0.2rem; padding: 0.35rem 0.7rem; font-size: 0.75rem; i { font-size: 1.2rem; } }
+}
+.ribbon-select {
+    background: var(--surface-main); color: var(--text-main);
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 2px 4px; font-size: 0.78rem; height: 28px; cursor: pointer; outline: none;
+    &:focus { border-color: #3b82f6; }
+    &.font-family { width: 100px; } &.font-size { width: 72px; } &.style-select { width: 110px; } &.layout-select { width: 140px; }
+}
+.ribbon-color-btn {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 4px; cursor: pointer;
+    border: 1px solid transparent; transition: all 0.12s;
+    &:hover { background: var(--surface-alt); border-color: var(--border); }
+    .color-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: none; padding: 0; }
+    i { font-size: 0.9rem; color: var(--text-main); pointer-events: none; }
+}
+.orientation-btn { width: 36px !important; i { font-size: 1.1rem; } }
+.layout-info { font-size: 0.7rem; color: var(--text-muted); gap: 0.3rem !important; i { font-size: 0.75rem; } }
+.zoom-row { gap: 0.4rem; }
+.zoom-display { font-size: 0.82rem; font-weight: 500; color: var(--text-main); min-width: 38px; text-align: center; }
+
+// ═══ Editor Workspace ═══
+.editor-workspace {
+    flex: 1;
+    overflow: auto;
+    background: var(--surface-alt);
+    display: flex;
+    justify-content: center;
+    min-height: 0;
+}
+
+.page-wrapper {
+    padding: 24px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100%;
+}
+
+// ═══ PAGE SURFACE — Clean Page Dividers ═══
+//
+// Instead of creating gaps between pages (which causes content to
+// appear in the "gap" zone), we use a continuous white surface with
+// subtle divider lines at each page boundary. Content flows
+// naturally. The divider lines visually indicate where page breaks
+// would occur when printed — the same approach used by Notion,
+// Confluence, and OnlyOffice web editors.
+//
+.page-surface {
+    --page-h: 1056px;
+
+    position: relative;
+    background: var(--surface-main);
+
+    // A subtle repeating divider line at each page boundary
+    background-image:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent calc(var(--page-h) - 1px),
+            var(--border) calc(var(--page-h) - 1px),
+            var(--border) var(--page-h)
+        );
+
+    // Outer shadow for the paper look
+    box-shadow:
+        0 1px 4px rgba(0,0,0,0.08),
+        0 4px 16px rgba(0,0,0,0.06);
+
+    @media (max-width: 900px) {
+        box-shadow: none;
+    }
+}
+
+// ═══ Quill Overrides ═══
+.ql-toolbar.ql-snow { display: none !important; }
+
+.ql-container.ql-snow {
+    border: none;
+    font-family: inherit;
+    font-size: 1rem;
+    background: transparent;
+}
+
+.ql-editor {
+    // Dimensions & padding set dynamically by applyPageStyles()
+    background: transparent !important; // Let page-surface show through
+    color: var(--text-main);
+    line-height: 1.8;
+    overflow: visible !important;
+
+    &.ql-blank::before {
+        color: var(--text-muted);
+        font-style: italic;
+        pointer-events: none;
+    }
+
+    h1 { font-size: 2rem; margin: 0.8em 0 0.4em; }
+    h2 { font-size: 1.6rem; margin: 0.7em 0 0.35em; }
+    h3 { font-size: 1.3rem; margin: 0.6em 0 0.3em; }
+    h4 { font-size: 1.1rem; margin: 0.5em 0 0.25em; }
+    h5 { font-size: 0.95rem; margin: 0.5em 0 0.25em; }
+    h6 { font-size: 0.85rem; margin: 0.5em 0 0.2em; }
+    p { margin: 0 0 0.5em; }
+
+    blockquote {
+        border-left: 4px solid #3b82f6;
+        padding-left: 1em;
+        margin: 0.8em 0;
+        color: var(--text-muted);
+    }
+
+    pre.ql-syntax {
+        background: var(--surface-alt);
+        color: var(--text-main);
+        border-radius: 6px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        border: 1px solid var(--border);
+        overflow-x: auto;
+    }
+
+    img { max-width: 100%; border-radius: 4px; }
+
+    @media (max-width: 900px) {
+        width: 100% !important;
+        min-height: auto !important;
+        padding: 48px 32px !important;
+    }
+}
+
+// ═══ Status Bar ═══
+.doc-status-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.3rem 1rem; border-top: 1px solid var(--border);
+    background: var(--surface); flex-shrink: 0;
+    .status-left, .status-right { display: flex; align-items: center; gap: 0.5rem; }
+    .status-item { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; i { font-size: 0.8rem; } }
+    .status-divider { color: var(--border); font-size: 0.7rem; }
+    .zoom-status { cursor: pointer; border-radius: 3px; padding: 0 4px; &:hover { background: var(--surface-alt); color: var(--text-main); } }
+}

@@ -50,6 +50,19 @@
                         (cardClick)="toggleNote()">
                     </app-space-card>
 
+                    <!-- Docs Card -->
+                    <app-space-card
+                        title="Docs"
+                        subtitle="Create rich team documents with full formatting."
+                        icon="bi-file-earmark-text"
+                        indicatorColor="#3b82f6"
+                        previewBackground="linear-gradient(135deg, #3b82f6, #2563eb)"
+                        [layoutMode]="preferences().layoutMode"
+                        [iconSize]="preferences().iconSize"
+                        [borderRadius]="preferences().borderRadius"
+                        (cardClick)="toggleDoc()">
+                    </app-space-card>
+
                     <!-- Spread Sheets Card -->
                     <app-space-card
                         title="Spread Sheets"
@@ -134,6 +147,17 @@
                     
                     @if (space()) {
                         <app-note-list [spaceId]="space()!.id" routePrefix="team" class="w-100 h-100 d-block"></app-note-list>
+                    }
+                </app-floating-window>
+
+                <!-- Floating App Window (Docs) -->
+                <app-floating-window
+                    [(visible)]="docVisible"
+                    icon="bi-file-earmark-text"
+                    storageKey="quilix_doc_state">
+                    
+                    @if (space()) {
+                        <app-doc-list [spaceId]="space()!.id" routePrefix="team" class="w-100 h-100 d-block"></app-doc-list>
                     }
                 </app-floating-window>
 

@@ -14,6 +14,7 @@ import { SpaceCardComponent } from '../../../../shared/components/space-manager/
 import { FloatingWindowComponent } from '../../../../shared/components/floating-window/floating-window';
 import { SheetListComponent } from '../../../../shared/components/sheet-list/sheet-list';
 import { NoteListComponent } from '../../../../shared/components/note-list/note-list';
+import { DocListComponent } from '../../../../shared/components/doc-list/doc-list';
 import { SpaceSettingsComponent } from '../../../../shared/components/space-settings/space-settings';
 import { SpacePreferences, DEFAULT_SPACE_PREFERENCES } from '../../../../core/interfaces/space-preferences';
 import { WindowManagerService } from '../../../../services/ui/window-manager/window-manager.service';
@@ -29,6 +30,7 @@ import { WindowManagerService } from '../../../../services/ui/window-manager/win
         FloatingWindowComponent,
         SheetListComponent,
         NoteListComponent,
+        DocListComponent,
         SpaceSettingsComponent
     ],
     templateUrl: './space.html',
@@ -53,6 +55,7 @@ export class PersonalSpace implements OnInit, OnDestroy {
     explorerVisible = signal<boolean>(false);
     sheetVisible = signal<boolean>(false);
     noteVisible = signal<boolean>(false);
+    docVisible = signal<boolean>(false);
     settingsVisible = signal<boolean>(false);
 
     preferences = signal<SpacePreferences>({ ...DEFAULT_SPACE_PREFERENCES });
@@ -95,6 +98,7 @@ export class PersonalSpace implements OnInit, OnDestroy {
             this.explorerVisible.set(false);
             this.sheetVisible.set(false);
             this.noteVisible.set(false);
+            this.docVisible.set(false);
             this.settingsVisible.set(false);
 
             // Tear down previous live subscription
@@ -166,6 +170,10 @@ export class PersonalSpace implements OnInit, OnDestroy {
 
     toggleNote() {
         this.handleWindowToggle(this.noteVisible, 'quilix_note_state');
+    }
+
+    toggleDoc() {
+        this.handleWindowToggle(this.docVisible, 'quilix_doc_state');
     }
 
     toggleSettings() {
