@@ -1,4 +1,4 @@
-<div class="doc-editor-container">
+<div class="doc-editor-container" [class]="'doc-editor-container margin-' + pageLayout().margins">
     <!-- ═══ Title Bar ═══ -->
     <div class="doc-title-bar">
         <div class="title-left">
@@ -7,8 +7,8 @@
         </div>
         <div class="title-right">
             <div class="save-status">
-                @if (isSaving()) { <i class="bi bi-arrow-repeat spin"></i> Saving... }
-                @else { <i class="bi bi-cloud-check"></i> Saved }
+                @if (isSaving()) { <i class="bi bi-arrow-repeat spin"></i> <span class="hide-mobile">Saving...</span> }
+                @else { <i class="bi bi-cloud-check"></i> <span class="hide-mobile">Saved</span> }
             </div>
         </div>
     </div>
@@ -118,15 +118,15 @@
     <!-- ═══ Status Bar ═══ -->
     <div class="doc-status-bar">
         <div class="status-left">
-            <span class="status-item"><i class="bi bi-file-earmark"></i> Page {{ currentPage() }} of {{ totalPages() }}</span>
-            <span class="status-divider">|</span>
-            <span class="status-item">{{ pageLayout().pageSize | uppercase }} · {{ pageLayout().orientation }}</span>
+            <span class="status-item"><i class="bi bi-file-earmark"></i> <span class="hide-mobile">Page </span>{{ currentPage() }} / {{ totalPages() }}</span>
+            <span class="status-divider hide-mobile">|</span>
+            <span class="status-item hide-mobile">{{ pageLayout().pageSize | uppercase }} · {{ pageLayout().orientation }}</span>
         </div>
         <div class="status-right">
-            <span class="status-item">{{ wordCount() }} words</span>
-            <span class="status-divider">|</span>
-            <span class="status-item">{{ charCount() }} characters</span>
-            <span class="status-divider">|</span>
+            <span class="status-item">{{ wordCount() }} <span class="hide-mobile">words</span></span>
+            <span class="status-divider hide-mobile">|</span>
+            <span class="status-item hide-mobile">{{ charCount() }} characters</span>
+            <span class="status-divider hide-mobile">|</span>
             <span class="status-item zoom-status" (click)="resetZoom()">{{ zoom() }}%</span>
         </div>
     </div>

@@ -146,6 +146,7 @@ export class DocComponent implements OnInit, OnDestroy {
     private ensureFullPages() {
         const pageH = this.getPageHeight();
         const root = this.quill.root;
+        const isMobile = window.innerWidth <= 768;
 
         // Read natural content height (min-height set to 1 page prevents collapse)
         root.style.minHeight = `${pageH}px`;
@@ -155,8 +156,14 @@ export class DocComponent implements OnInit, OnDestroy {
             ? 1
             : Math.ceil(contentH / pageH);
 
-        // Set min-height to fill complete pages
-        root.style.minHeight = `${pages * pageH}px`;
+        // On desktop, we fill complete pages for the "paper" look.
+        // On mobile, we avoid massive blank space by only ensuring the minimum content height.
+        if (!isMobile) {
+            root.style.minHeight = `${pages * pageH}px`;
+        } else {
+            // Mobile: allow natural growth but ensure at least 1 page worth of space
+            root.style.minHeight = `${pageH}px`;
+        }
 
         this.totalPages.set(pages);
         this.pagesArray.set(Array.from({ length: pages }, (_, i) => i + 1));
@@ -230,7 +237,11 @@ export class DocComponent implements OnInit, OnDestroy {
 
     onWorkspaceScroll(event: Event) {
         const el = event.target as HTMLElement;
-        const unit = (this.getPageHeight() + this.PAGE_GAP) * (this.zoom() / 100);
+        const isMobile = window.innerWidth <= 768;
+        const zoomScale = isMobile ? 1 : (this.zoom() / 100);
+        
+        // Seamless layout: page boundary is exactly at pageHeight intervals.
+        const unit = this.getPageHeight() * zoomScale;
         this.currentPage.set(Math.max(1, Math.min(Math.floor(el.scrollTop / unit) + 1, this.totalPages())));
     }
 

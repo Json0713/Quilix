@@ -141,10 +141,6 @@
     box-shadow:
         0 1px 4px rgba(0,0,0,0.08),
         0 4px 16px rgba(0,0,0,0.06);
-
-    @media (max-width: 900px) {
-        box-shadow: none;
-    }
 }
 
 // ═══ Quill Overrides ═══
@@ -196,12 +192,6 @@
     }
 
     img { max-width: 100%; border-radius: 4px; }
-
-    @media (max-width: 900px) {
-        width: 100% !important;
-        min-height: auto !important;
-        padding: 48px 32px !important;
-    }
 }
 
 // ═══ Status Bar ═══
@@ -213,4 +203,91 @@
     .status-item { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; i { font-size: 0.8rem; } }
     .status-divider { color: var(--border); font-size: 0.7rem; }
     .zoom-status { cursor: pointer; border-radius: 3px; padding: 0 4px; &:hover { background: var(--surface-alt); color: var(--text-main); } }
+}
+
+// ═══ Mobile Responsiveness ═══
+@media (max-width: 768px) {
+    .hide-mobile { display: none !important; }
+
+    .doc-title-bar {
+        padding: 0.3rem 0.6rem;
+        .doc-title-input { font-size: 1rem; min-width: 80px; }
+    }
+
+    .ribbon-tab { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+    .ribbon-panel {
+        padding: 0.3rem 0.5rem;
+        min-height: 60px;
+        gap: 0.25rem;
+    }
+    .ribbon-group { gap: 1px; }
+    .ribbon-group-label { font-size: 0.6rem; }
+    .ribbon-btn {
+        width: 26px; height: 26px; font-size: 0.85rem;
+        &.tall { padding: 0.25rem 0.5rem; i { font-size: 1.1rem; } }
+    }
+    .ribbon-select {
+        height: 26px; font-size: 0.75rem;
+        &.font-family { width: 85px; }
+        &.font-size { width: 60px; }
+        &.style-select { width: 90px; }
+        &.layout-select { width: 110px; }
+    }
+
+    .editor-workspace {
+        background: var(--surface-main); // Use main surface to blend better on mobile
+        display: block; // Remove flex centering on mobile to ensure width: 100% works easily
+    }
+
+    .page-wrapper {
+        width: 100%;
+        padding: 8px; // Minimal padding on mobile
+        zoom: 1 !important; // Reset zoom on mobile to ensure readable text
+        display: block; // Ensure it fills the width
+    }
+
+    .page-surface {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background-image: 
+            repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent calc(var(--page-h) - 1px),
+                var(--border) calc(var(--page-h) - 1px),
+                var(--border) var(--page-h)
+            ) !important;
+        
+        // On mobile, the page divider should be more like a subtle guide
+        &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.2; // Very subtle grid or similar? No, let's stick to the line.
+        }
+    }
+
+    .ql-editor {
+        width: 100% !important;
+        min-height: calc(100vh - 180px) !important;
+        font-size: 16px !important; // Standard mobile font size to prevent iOS zoom
+        
+        // Explicitly override inline padding from TS to prevent text being "pushed to middle"
+        padding-top: 24px !important;
+        padding-bottom: 24px !important;
+
+        .margin-normal & { padding-left: 20px !important; padding-right: 20px !important; }
+        .margin-narrow & { padding-left: 12px !important; padding-right: 12px !important; }
+        .margin-wide & { padding-left: 36px !important; padding-right: 36px !important; }
+    }
+
+    .doc-status-bar {
+        padding: 0.3rem 0.6rem;
+        .status-left, .status-right { gap: 0.35rem; }
+    }
 }
