@@ -123,6 +123,8 @@
 //
 .page-surface {
     --page-h: 1056px;
+    width: 816px; // Default Letter portrait width
+    min-height: 1056px;
 
     position: relative;
     background: var(--surface-main);
@@ -155,6 +157,10 @@
 
 .ql-editor {
     // Dimensions & padding set dynamically by applyPageStyles()
+    // Defaults provided here to prevent layout shift/vertical text on load
+    width: 816px; 
+    min-height: 1056px;
+    
     background: transparent !important; // Let page-surface show through
     color: var(--text-main);
     line-height: 1.8;
@@ -172,6 +178,7 @@
         font-family: inherit;
         font-size: inherit;
         line-height: inherit;
+        white-space: nowrap;
     }
 
     h1 { font-size: 2rem; margin: 0.8em 0 0.4em; }

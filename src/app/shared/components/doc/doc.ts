@@ -107,7 +107,7 @@ export class DocComponent implements OnInit, OnDestroy {
             this.updateActiveFormats();
         });
         this.quill.on('selection-change', () => this.updateActiveFormats());
-        setTimeout(() => this.applyPageStyles(), 0);
+        this.applyPageStyles();
     }
 
     /**
