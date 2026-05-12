@@ -3,7 +3,7 @@
     <div #windowElement class="app-window" 
          [class.maximized]="isMaximized()"
          [class.is-detached]="isDetached()"
-         (mousedown)="focus()"
+         (mousedown)="!isDetached() && focus()"
          [attr.data-window-id]="storageKey"
          [style.left.px]="(isMaximized() || isDetached()) ? null : windowPosition().x"
          [style.top.px]="(isMaximized() || isDetached()) ? null : windowPosition().y"

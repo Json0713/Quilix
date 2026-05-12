@@ -277,10 +277,13 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
 
         try {
             const size = this.windowSize();
+            const width = Math.max(size.width, 770);
+            const height = size.height;
+
             // @ts-ignore
             this.pipWindow = await window.documentPictureInPicture.requestWindow({
-                width: size.width,
-                height: size.height,
+                width: width,
+                height: height,
             });
 
             this.isDetached.set(true);
@@ -345,6 +348,12 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
         // Also copy body background and theme variables
         pipWindow.document.body.style.background = getComputedStyle(document.body).backgroundColor;
         pipWindow.document.body.style.margin = '0';
+        pipWindow.document.body.style.padding = '0';
+        pipWindow.document.body.style.overflow = 'hidden';
+        pipWindow.document.body.style.height = '100vh';
+        pipWindow.document.body.style.display = 'flex';
+        pipWindow.document.body.style.flexDirection = 'column';
+
         pipWindow.document.documentElement.className = document.documentElement.className;
         
         // Copy all CSS variables from root
