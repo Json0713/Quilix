@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, OnChanges, SimpleChanges, inject, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, OnChanges, SimpleChanges, inject, computed, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WindowManagerService } from '../../../services/ui/window-manager/window-manager.service';
 
@@ -21,19 +21,31 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
     @Input() visible: boolean = false;
     @Output() visibleChange = new EventEmitter<boolean>();
 
+    @ViewChild('windowElement') windowElement!: ElementRef<HTMLDivElement>;
+    @ViewChild('overlayElement') overlayElement!: ElementRef<HTMLDivElement>;
+
     isMaximized = signal<boolean>(false);
+    isDetached = signal<boolean>(false);
+    canDetach = !!(window as any).documentPictureInPicture;
+
     windowSize = signal<{ width: number, height: number }>({ width: 800, height: 580 });
     windowPosition = signal<{ x: number, y: number }>({ x: 0, y: 0 });
     
     isDragging = false;
     isResizing = false;
+    private resizeDirection: string = '';
     private dragOffset = { x: 0, y: 0 };
     private initialSize = { width: 0, height: 0 };
     private initialPos = { x: 0, y: 0 };
+    private initialWindowPos = { x: 0, y: 0 };
     
     private windowManager = inject(WindowManagerService);
+    private pipWindow: any = null;
     
-    zIndex = computed(() => this.windowManager.getZIndex(this.storageKey || 'default'));
+    zIndex = computed(() => {
+        if (this.isDetached()) return 9999;
+        return this.windowManager.getZIndex(this.storageKey || 'default');
+    });
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['visible']) {
@@ -65,11 +77,15 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     close() {
+        if (this.isDetached() && this.pipWindow) {
+            this.pipWindow.close();
+        }
         this.visible = false;
         this.visibleChange.emit(this.visible);
         this.windowManager.unregister(this.storageKey || 'default');
         if (!this.visible) {
             this.isMaximized.set(false);
+            this.isDetached.set(false);
         }
     }
 
@@ -100,9 +116,16 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
     onDragMove = (event: MouseEvent) => {
         if (!this.isDragging) return;
         requestAnimationFrame(() => {
+            const newX = event.clientX - this.dragOffset.x;
+            const newY = event.clientY - this.dragOffset.y;
+            
+            // Viewport Containment
+            const maxX = window.innerWidth - this.windowSize().width;
+            const maxY = window.innerHeight - this.windowSize().height;
+            
             this.windowPosition.set({
-                x: event.clientX - this.dragOffset.x,
-                y: event.clientY - this.dragOffset.y
+                x: Math.max(0, Math.min(newX, maxX)),
+                y: Math.max(0, Math.min(newY, maxY))
             });
         });
     }
@@ -114,16 +137,18 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
         this.saveWindowState();
     }
 
-    // SE Corner Resizing
-    onResizeStart(event: MouseEvent) {
+    // --- Resizing ---
+    onResizeStart(event: MouseEvent, direction: string) {
         if (this.isMaximized() || window.innerWidth < 768) return;
         
         event.stopPropagation();
         event.preventDefault();
         
         this.isResizing = true;
+        this.resizeDirection = direction;
         this.initialPos = { x: event.clientX, y: event.clientY };
         this.initialSize = { ...this.windowSize() };
+        this.initialWindowPos = { ...this.windowPosition() };
 
         window.addEventListener('mousemove', this.onResizeMove);
         window.addEventListener('mouseup', this.onResizeEnd);
@@ -135,11 +160,52 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
         requestAnimationFrame(() => {
             const deltaX = event.clientX - this.initialPos.x;
             const deltaY = event.clientY - this.initialPos.y;
+            
+            let newWidth = this.initialSize.width;
+            let newHeight = this.initialSize.height;
+            let newX = this.initialWindowPos.x;
+            let newY = this.initialWindowPos.y;
 
-            this.windowSize.set({
-                width: Math.max(this.minWidth, this.initialSize.width + deltaX),
-                height: Math.max(this.minHeight, this.initialSize.height + deltaY)
-            });
+            // Handle Horizontal Resize
+            if (this.resizeDirection.includes('e')) {
+                newWidth = Math.max(this.minWidth, this.initialSize.width + deltaX);
+            } else if (this.resizeDirection.includes('w')) {
+                const requestedWidth = this.initialSize.width - deltaX;
+                if (requestedWidth >= this.minWidth) {
+                    newWidth = requestedWidth;
+                    newX = this.initialWindowPos.x + deltaX;
+                } else {
+                    newWidth = this.minWidth;
+                    newX = this.initialWindowPos.x + (this.initialSize.width - this.minWidth);
+                }
+            }
+
+            // Handle Vertical Resize
+            if (this.resizeDirection.includes('s')) {
+                newHeight = Math.max(this.minHeight, this.initialSize.height + deltaY);
+            } else if (this.resizeDirection.includes('n')) {
+                const requestedHeight = this.initialSize.height - deltaY;
+                if (requestedHeight >= this.minHeight) {
+                    newHeight = requestedHeight;
+                    newY = this.initialWindowPos.y + deltaY;
+                } else {
+                    newHeight = this.minHeight;
+                    newY = this.initialWindowPos.y + (this.initialSize.height - this.minHeight);
+                }
+            }
+
+            // Viewport clamping during resize
+            const maxX = window.innerWidth - newX;
+            const maxY = window.innerHeight - newY;
+            newWidth = Math.min(newWidth, maxX);
+            newHeight = Math.min(newHeight, maxY);
+            
+            // Position clamping (prevent moving past 0 during n/w resize)
+            newX = Math.max(0, newX);
+            newY = Math.max(0, newY);
+
+            this.windowSize.set({ width: newWidth, height: newHeight });
+            this.windowPosition.set({ x: newX, y: newY });
         });
     }
 
@@ -197,5 +263,100 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
             x: Math.max(0, (window.innerWidth - size.width) / 2),
             y: Math.max(0, (window.innerHeight - size.height) / 2)
         });
+    }
+
+    async toggleDetach() {
+        if (!this.canDetach) return;
+
+        if (this.isDetached()) {
+            if (this.pipWindow) {
+                this.pipWindow.close();
+            }
+            return;
+        }
+
+        try {
+            const size = this.windowSize();
+            // @ts-ignore
+            this.pipWindow = await window.documentPictureInPicture.requestWindow({
+                width: size.width,
+                height: size.height,
+            });
+
+            this.isDetached.set(true);
+            this.isMaximized.set(false);
+
+            // Copy styles to PiP window
+            this.copyStylesToPip(this.pipWindow);
+
+            // Move the window element to the PiP window
+            const windowEl = this.windowElement.nativeElement;
+            if (windowEl) {
+                this.pipWindow.document.body.append(windowEl);
+            }
+
+            // Handle PiP window closing
+            this.pipWindow.addEventListener('pagehide', () => {
+                this.isDetached.set(false);
+                this.pipWindow = null;
+                
+                // Move back to original container
+                const overlay = this.overlayElement.nativeElement;
+                if (overlay && windowEl) {
+                    overlay.append(windowEl);
+                }
+            });
+
+        } catch (error) {
+            console.error('[FloatingWindow] Failed to detach window:', error);
+            this.isDetached.set(false);
+        }
+    }
+
+    private copyStylesToPip(pipWindow: any) {
+        const allStyleSheets = Array.from(document.styleSheets);
+        
+        allStyleSheets.forEach((styleSheet: any) => {
+            try {
+                if (styleSheet.cssRules) {
+                    const newStyle = pipWindow.document.createElement('style');
+                    const rules = Array.from(styleSheet.cssRules)
+                        .map((rule: any) => rule.cssText)
+                        .join('');
+                    newStyle.textContent = rules;
+                    pipWindow.document.head.appendChild(newStyle);
+                } else if (styleSheet.href) {
+                    const newLink = pipWindow.document.createElement('link');
+                    newLink.rel = 'stylesheet';
+                    newLink.href = styleSheet.href;
+                    pipWindow.document.head.appendChild(newLink);
+                }
+            } catch (e) {
+                // Fallback for cross-origin stylesheets
+                if (styleSheet.href) {
+                    const newLink = pipWindow.document.createElement('link');
+                    newLink.rel = 'stylesheet';
+                    newLink.href = styleSheet.href;
+                    pipWindow.document.head.appendChild(newLink);
+                }
+            }
+        });
+
+        // Also copy body background and theme variables
+        pipWindow.document.body.style.background = getComputedStyle(document.body).backgroundColor;
+        pipWindow.document.body.style.margin = '0';
+        pipWindow.document.documentElement.className = document.documentElement.className;
+        
+        // Copy all CSS variables from root
+        const rootStyles = getComputedStyle(document.documentElement);
+        const pipRoot = pipWindow.document.documentElement.style;
+        
+        // This is a bit heavy, but ensures theme consistency
+        for (let i = 0; i < rootStyles.length; i++) {
+            const prop = rootStyles[i];
+            if (prop.startsWith('--')) {
+                pipRoot.setProperty(prop, rootStyles.getPropertyValue(prop));
+            }
+        }
     }
 }

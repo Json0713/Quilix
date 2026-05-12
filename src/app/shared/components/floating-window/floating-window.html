@@ -1,12 +1,14 @@
 @if (visible) {
-<div class="app-window-overlay" [class.maximized]="isMaximized()" [style.z-index]="zIndex()">
-    <div class="app-window" 
+<div #overlayElement class="app-window-overlay" [class.maximized]="isMaximized()" [class.is-detached]="isDetached()" [style.z-index]="zIndex()" [attr.data-overlay-id]="storageKey">
+    <div #windowElement class="app-window" 
          [class.maximized]="isMaximized()"
+         [class.is-detached]="isDetached()"
          (mousedown)="focus()"
-         [style.left.px]="isMaximized() ? null : windowPosition().x"
-         [style.top.px]="isMaximized() ? null : windowPosition().y"
-         [style.width.px]="isMaximized() ? null : windowSize().width"
-         [style.height.px]="isMaximized() ? null : windowSize().height">
+         [attr.data-window-id]="storageKey"
+         [style.left.px]="(isMaximized() || isDetached()) ? null : windowPosition().x"
+         [style.top.px]="(isMaximized() || isDetached()) ? null : windowPosition().y"
+         [style.width.px]="(isMaximized() || isDetached()) ? null : windowSize().width"
+         [style.height.px]="(isMaximized() || isDetached()) ? null : windowSize().height">
         
         <!-- Window Title Bar (Draggable) -->
         <div class="window-title-bar" (mousedown)="onDragStart($event); focus()">
@@ -16,9 +18,18 @@
             </div>
             <div class="window-controls">
                 <ng-content select="[window-controls]"></ng-content>
-                <button class="control-btn maximize-btn" (click)="toggleMaximize()" [title]="isMaximized() ? 'Restore' : 'Maximize'">
-                    <i class="bi" [class.bi-fullscreen-exit]="isMaximized()" [class.bi-fullscreen]="!isMaximized()"></i>
-                </button>
+                
+                @if (canDetach) {
+                    <button class="control-btn detach-btn" (click)="toggleDetach()" [title]="isDetached() ? 'Re-attach Window' : 'Detach Window'">
+                        <i class="bi" [class.bi-box-arrow-in-down-left]="isDetached()" [class.bi-box-arrow-up-right]="!isDetached()"></i>
+                    </button>
+                }
+
+                @if (!isDetached()) {
+                    <button class="control-btn maximize-btn" (click)="toggleMaximize()" [title]="isMaximized() ? 'Restore' : 'Maximize'">
+                        <i class="bi" [class.bi-fullscreen-exit]="isMaximized()" [class.bi-fullscreen]="!isMaximized()"></i>
+                    </button>
+                }
                 <button class="control-btn close-btn" (click)="close()" title="Close">
                     <i class="bi bi-x-lg"></i>
                 </button>
@@ -31,13 +42,22 @@
         </div>
 
         <!-- Window Footer (Draggable Security Handle) -->
-        <div class="window-footer" (mousedown)="onDragStart($event)">
-            <div class="grab-handle"></div>
-        </div>
+        @if (!isDetached()) {
+            <div class="window-footer" (mousedown)="onDragStart($event)">
+                <div class="grab-handle"></div>
+            </div>
+        }
 
-        <!-- Single SE Resizer Handle -->
-        @if (!isMaximized()) {
-            <div class="resizer-se" (mousedown)="onResizeStart($event)"></div>
+        <!-- Resizer Handles -->
+        @if (!isMaximized() && !isDetached()) {
+            <div class="resizer-n" (mousedown)="onResizeStart($event, 'n')"></div>
+            <div class="resizer-s" (mousedown)="onResizeStart($event, 's')"></div>
+            <div class="resizer-e" (mousedown)="onResizeStart($event, 'e')"></div>
+            <div class="resizer-w" (mousedown)="onResizeStart($event, 'w')"></div>
+            <div class="resizer-nw" (mousedown)="onResizeStart($event, 'nw')"></div>
+            <div class="resizer-ne" (mousedown)="onResizeStart($event, 'ne')"></div>
+            <div class="resizer-sw" (mousedown)="onResizeStart($event, 'sw')"></div>
+            <div class="resizer-se" (mousedown)="onResizeStart($event, 'se')"></div>
         }
     </div>
 </div>

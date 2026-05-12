@@ -9,6 +9,10 @@
     &.maximized {
         padding: 0;
     }
+
+    &.is-detached {
+        display: none; /* Hide the overlay in the main window when detached */
+    }
 }
 
 .app-window {
@@ -34,6 +38,23 @@
         border: none !important;
         transform: none !important;
         margin: 0 !important;
+    }
+
+    &.is-detached {
+        position: fixed;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        animation: none !important;
+        margin: 0 !important;
+
+        .window-title-bar {
+            cursor: default;
+        }
     }
 
     @media (max-width: 768px) {
@@ -135,14 +156,28 @@
     }
 }
 
-.resizer-se {
+// --- Resizer Handles ---
+[class^="resizer-"] {
     position: absolute;
-    bottom: 4px;
-    right: 4px;
-    width: 20px;
-    height: 20px;
+    z-index: 100;
+}
+
+// Edge Resizers
+.resizer-n { top: 0; left: 10px; right: 10px; height: 6px; cursor: ns-resize; }
+.resizer-s { bottom: 0; left: 10px; right: 10px; height: 6px; cursor: ns-resize; }
+.resizer-e { top: 10px; bottom: 10px; right: 0; width: 6px; cursor: ew-resize; }
+.resizer-w { top: 10px; bottom: 10px; left: 0; width: 6px; cursor: ew-resize; }
+
+// Corner Resizers
+.resizer-nw { top: 0; left: 0; width: 12px; height: 12px; cursor: nwse-resize; }
+.resizer-ne { top: 0; right: 0; width: 12px; height: 12px; cursor: nesw-resize; }
+.resizer-sw { bottom: 0; left: 0; width: 12px; height: 12px; cursor: nesw-resize; }
+.resizer-se { 
+    bottom: 2px; 
+    right: 2px; 
+    width: 24px; 
+    height: 24px; 
     cursor: nwse-resize;
-    z-index: 10;
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
@@ -154,8 +189,9 @@
         border-right: 3px solid var(--action);
         border-bottom: 3px solid var(--action);
         border-radius: 0 0 10px 0;
-        opacity: 0.8;
+        opacity: 0.6;
         transition: opacity 0.2s;
+        margin: 4px;
     }
 
     &:hover::after {
