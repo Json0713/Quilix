@@ -47,7 +47,9 @@
             "allowedCommonJsDependencies": [
               "dompurify",
               "prismjs",
-              "quill"
+              "quill",
+              "mammoth",
+              "xlsx"
             ]
           },
           "configurations": {

@@ -18,6 +18,8 @@ import { DocListComponent } from '../../../../shared/components/doc-list/doc-lis
 import { SpaceSettingsComponent } from '../../../../shared/components/space-settings/space-settings';
 import { SpacePreferences, DEFAULT_SPACE_PREFERENCES } from '../../../../core/interfaces/space-preferences';
 import { WindowManagerService } from '../../../../services/ui/window-manager/window-manager.service';
+import { PreviewService } from '../../../../services/ui/common/preview/preview.service';
+import { OfficeViewerComponent } from '../../../../shared/components/space-manager/office-viewer/office-viewer';
 
 @Component({
     selector: 'app-team-space',
@@ -31,7 +33,8 @@ import { WindowManagerService } from '../../../../services/ui/window-manager/win
         SheetListComponent,
         NoteListComponent,
         DocListComponent,
-        SpaceSettingsComponent
+        SpaceSettingsComponent,
+        OfficeViewerComponent
     ],
     templateUrl: './space.html',
     styleUrl: './space.scss',
@@ -43,6 +46,7 @@ export class TeamSpace implements OnInit, OnDestroy {
     private authService = inject(AuthService);
     private breadcrumbService = inject(BreadcrumbService);
     private windowManager = inject(WindowManagerService);
+    readonly preview = inject(PreviewService);
 
     space = signal<Space | null>(null);
     loading = signal(true);

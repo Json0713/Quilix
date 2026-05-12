@@ -10,6 +10,7 @@ import { db } from '../../../../core/database/dexie.service';
 import { Space } from '../../../../core/interfaces/space';
 import { SpaceService } from '../../../../core/services/components/space.service';
 import { Subscription } from 'rxjs';
+import { PreviewService } from '../../../../services/ui/common/preview/preview.service';
 
 @Component({
     selector: 'app-file-explorer',
@@ -25,6 +26,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     private snackbar = inject(SnackbarService);
     private router = inject(Router);
     readonly modals = inject(ModalService);
+    readonly preview = inject(PreviewService);
 
     private spaceSub?: any;
 
@@ -351,38 +353,43 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
 
         // 1. Internal Routing for .quilix docs
         if (entry.name.endsWith('.quilix')) {
-            // If it's a virtual entry, we likely have an ID
             if (entry.id) {
                 this.router.navigate(['/docs', entry.id]);
                 return;
             }
-            // If it's a native file, we might need to parse its ID or handle it specially
-            // For now, assume .quilix files are primarily virtual or have a resolvable ID
         }
 
-        // 2. Native Gateway Routing (PDF, Images, Text, etc.)
-        try {
-            const blob = await this.fileManager.getFileBlob(entry);
-            if (!blob) {
-                this.snackbar.error('Could not read file data.');
-                return;
-            }
+        // 2. Universal Preview Gateway (In-App Window)
+        const ext = entry.name.split('.').pop()?.toLowerCase() || '';
+        const previewable = [
+            'pdf', 'docx', 'doc', 'xlsx', 'xls', 'pptx', 'ppt', 
+            'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp',
+            'txt', 'md', 'json', 'js', 'ts', 'html', 'css', 'scss'
+        ];
 
-            const url = URL.createObjectURL(blob);
-            
-            // Open in a new tab. For PDF/Images, this uses the high-fidelity browser/OS viewer.
-            // For others, it triggers a download-like "Open" prompt.
-            const win = window.open(url, '_blank');
-            
-            if (!win) {
-                this.snackbar.warning('Pop-up blocked. Please allow pop-ups to open files.');
-            }
+        if (previewable.includes(ext)) {
+            this.preview.open(entry);
+        } else {
+            // Fallback for truly unknown types
+            try {
+                if (entry.sizeBytes && entry.sizeBytes > 5 * 1024 * 1024) {
+                    this.snackbar.info('Preparing file...');
+                }
 
-            // Cleanup the URL after a delay to ensure the browser has loaded it
-            setTimeout(() => URL.revokeObjectURL(url), 10000);
-        } catch (err) {
-            console.error('[FileExplorer] Open failed:', err);
-            this.snackbar.error('Failed to open file.');
+                const blob = await this.fileManager.getFileBlob(entry);
+                if (!blob) {
+                    this.snackbar.error('Could not read file data.');
+                    return;
+                }
+
+                const url = URL.createObjectURL(blob);
+                const win = window.open(url, '_blank');
+                if (!win) this.snackbar.warning('Pop-up blocked.');
+                setTimeout(() => URL.revokeObjectURL(url), 10000);
+            } catch (err) {
+                console.error('[FileExplorer] Open failed:', err);
+                this.snackbar.error('Failed to open file.');
+            }
         }
     }
 

@@ -1,0 +1,44 @@
+<div class="office-viewer-container">
+    @if (loading()) {
+        <div class="viewer-status">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Preparing preview...</p>
+        </div>
+    } @else if (error()) {
+        <div class="viewer-status error">
+            <i class="bi bi-exclamation-triangle"></i>
+            <p>{{ error() }}</p>
+        </div>
+    } @else {
+        <div class="preview-content" [ngClass]="viewType()">
+            @switch (viewType()) {
+                @case ('pdf') {
+                    <iframe [src]="safeUrl" class="pdf-frame"></iframe>
+                }
+                @case ('docx') {
+                    <div class="document-page" [innerHTML]="safeContent"></div>
+                }
+                @case ('xlsx') {
+                    <div class="spreadsheet-container" [innerHTML]="safeContent"></div>
+                }
+                @case ('image') {
+                    <div class="image-viewer">
+                        <img [src]="safeUrl" alt="Preview">
+                    </div>
+                }
+                @case ('text') {
+                    <div class="text-viewer">
+                        <pre><code>{{ textContent }}</code></pre>
+                    </div>
+                }
+                @case ('unsupported') {
+                    <div class="viewer-status">
+                        <i class="bi bi-file-earmark-lock"></i>
+                        <p>Preview not available for this file type.</p>
+                        <p class="small text-muted">Please open it in your OS to view or edit.</p>
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>
