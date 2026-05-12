@@ -2,6 +2,8 @@ import { Component, Input, OnChanges, SimpleChanges, inject, signal, OnDestroy }
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { FileExplorerEntry, FileManagerService } from '../../../../core/services/components/file-manager.service';
+import { Subject, from, of } from 'rxjs';
+import { switchMap, takeUntil, catchError, tap } from 'rxjs/operators';
 import * as mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
 
@@ -18,135 +20,166 @@ export class OfficeViewerComponent implements OnChanges, OnDestroy {
 
     @Input({ required: true }) entry: FileExplorerEntry | null = null;
 
+    // View State
     viewType = signal<'pdf' | 'docx' | 'xlsx' | 'image' | 'text' | 'unsupported'>('unsupported');
     loading = signal<boolean>(false);
     error = signal<string | null>(null);
+    isTruncated = signal<boolean>(false);
 
-    // Excel specific
+    // Content State
     workbook: XLSX.WorkBook | null = null;
     sheetNames = signal<string[]>([]);
     activeSheet = signal<string>('');
-
     safeContent: SafeHtml | null = null;
     safeUrl: SafeResourceUrl | null = null;
     textContent: string | null = null;
-    isTruncated = signal<boolean>(false);
 
+    // Reactive Pipeline
+    private loadRequest$ = new Subject<FileExplorerEntry>();
+    private destroy$ = new Subject<void>();
     private activeObjectURL: string | null = null;
 
-    async ngOnChanges(changes: SimpleChanges) {
-        if (changes['entry'] && this.entry) {
-            await this.loadPreview();
+    constructor() {
+        this.initLoadPipeline();
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['entry']) {
+            this.loadRequest$.next(this.entry!);
         }
     }
 
-    private async loadPreview() {
-        if (!this.entry) return;
+    private initLoadPipeline() {
+        this.loadRequest$.pipe(
+            // Use switchMap to cancel previous loads automatically
+            switchMap(entry => {
+                this.resetState();
+                if (!entry) return of(null);
+                return from(this.processEntry(entry)).pipe(
+                    catchError(err => {
+                        console.error('[OfficeViewer] Pipeline error:', err);
+                        this.error.set(err.message || 'Failed to load preview.');
+                        return of(null);
+                    })
+                );
+            }),
+            takeUntil(this.destroy$)
+        ).subscribe();
+    }
 
+    private resetState() {
         this.loading.set(true);
         this.error.set(null);
         this.viewType.set('unsupported');
-        this.safeContent = null;
-        this.safeUrl = null;
-        this.textContent = null;
-        this.workbook = null;
-        this.sheetNames.set([]);
-        this.activeSheet.set('');
         this.isTruncated.set(false);
+        this.cleanupResources();
+    }
 
-        this.cleanupObjectURL();
+    private async processEntry(entry: FileExplorerEntry) {
+        const blob = await this.fileManager.getFileBlob(entry);
+        if (!blob) throw new Error('File data unavailable.');
 
-        try {
-            const blob = await this.fileManager.getFileBlob(this.entry);
-            if (!blob) throw new Error('Could not retrieve file data.');
-
-            const ext = this.entry.name.split('.').pop()?.toLowerCase() || '';
-
-            if (ext === 'pdf') {
-                this.viewType.set('pdf');
-                this.activeObjectURL = URL.createObjectURL(blob);
-                this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.activeObjectURL);
-            } 
-            else if (['docx', 'doc'].includes(ext)) {
-                this.viewType.set('docx');
-                const arrayBuffer = await blob.arrayBuffer();
-                const result = await mammoth.convertToHtml({ arrayBuffer });
-                this.safeContent = this.sanitizer.bypassSecurityTrustHtml(result.value);
-            } 
-            else if (['xlsx', 'xls', 'csv'].includes(ext)) {
-                this.viewType.set('xlsx');
-                const arrayBuffer = await blob.arrayBuffer();
-                this.workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                this.sheetNames.set(this.workbook.SheetNames);
-                if (this.workbook.SheetNames.length > 0) {
-                    this.switchSheet(this.workbook.SheetNames[0]);
-                }
-            } 
-            else if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(ext)) {
-                this.viewType.set('image');
-                this.activeObjectURL = URL.createObjectURL(blob);
-                this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.activeObjectURL);
-            }
-            else if (['txt', 'md', 'json', 'js', 'ts', 'html', 'css', 'scss'].includes(ext)) {
-                this.viewType.set('text');
-                
-                // PERFORMANCE: Prevent browser crash with massive text files
-                const TEXT_PREVIEW_LIMIT = 512 * 1024; // 512KB
-                if (blob.size > TEXT_PREVIEW_LIMIT) {
-                    const slice = blob.slice(0, TEXT_PREVIEW_LIMIT);
-                    this.textContent = await slice.text();
-                    this.isTruncated.set(true);
-                } else {
-                    this.textContent = await blob.text();
-                }
-            }
-            else {
+        const ext = entry.name.split('.').pop()?.toLowerCase() || '';
+        
+        switch (true) {
+            case ext === 'pdf':
+                this.renderPdf(blob);
+                break;
+            case ['docx', 'doc'].includes(ext):
+                await this.renderDocx(blob);
+                break;
+            case ['xlsx', 'xls', 'csv'].includes(ext):
+                await this.renderXlsx(blob);
+                break;
+            case ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(ext):
+                this.renderImage(blob);
+                break;
+            case ['txt', 'md', 'json', 'js', 'ts', 'html', 'css', 'scss'].includes(ext):
+                await this.renderText(blob);
+                break;
+            default:
                 this.viewType.set('unsupported');
-            }
+        }
+        this.loading.set(false);
+    }
 
-        } catch (err: any) {
-            console.error('[OfficeViewer] Error loading preview:', err);
-            this.error.set(err.message || 'An error occurred while loading the preview.');
-        } finally {
-            this.loading.set(false);
+    // --- Specific Renderers ---
+
+    private renderPdf(blob: Blob) {
+        this.viewType.set('pdf');
+        this.activeObjectURL = URL.createObjectURL(blob);
+        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.activeObjectURL);
+    }
+
+    private async renderDocx(blob: Blob) {
+        this.viewType.set('docx');
+        const buffer = await blob.arrayBuffer();
+        const result = await mammoth.convertToHtml({ arrayBuffer: buffer });
+        this.safeContent = this.sanitizer.bypassSecurityTrustHtml(result.value);
+    }
+
+    private async renderXlsx(blob: Blob) {
+        this.viewType.set('xlsx');
+        const buffer = await blob.arrayBuffer();
+        this.workbook = XLSX.read(buffer, { type: 'array' });
+        this.sheetNames.set(this.workbook.SheetNames);
+        if (this.workbook.SheetNames.length > 0) {
+            this.switchSheet(this.workbook.SheetNames[0]);
         }
     }
+
+    private renderImage(blob: Blob) {
+        this.viewType.set('image');
+        this.activeObjectURL = URL.createObjectURL(blob);
+        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.activeObjectURL);
+    }
+
+    private async renderText(blob: Blob) {
+        this.viewType.set('text');
+        const LIMIT = 512 * 1024;
+        if (blob.size > LIMIT) {
+            this.textContent = await blob.slice(0, LIMIT).text();
+            this.isTruncated.set(true);
+        } else {
+            this.textContent = await blob.text();
+        }
+    }
+
+    // --- Utility Methods ---
 
     switchSheet(name: string) {
         if (!this.workbook) return;
         this.activeSheet.set(name);
-        const worksheet = this.workbook.Sheets[name];
+        const ws = this.workbook.Sheets[name];
         
-        // PERFORMANCE: Truncate massive spreadsheets to prevent DOM lag
-        const ref = worksheet['!ref'];
+        // Performance Guard for large sheets
+        const ref = ws['!ref'];
         if (ref) {
             const range = XLSX.utils.decode_range(ref);
-            const totalCells = (range.e.r - range.s.r + 1) * (range.e.c - range.s.c + 1);
-            
-            // Limit to ~20k cells for preview
-            if (totalCells > 20000) {
-                range.e.r = Math.min(range.e.r, range.s.r + 1000); // Limit to 1000 rows
-                range.e.c = Math.min(range.e.c, range.s.c + 20);   // Limit to 20 columns
-                worksheet['!ref'] = XLSX.utils.encode_range(range);
+            const cells = (range.e.r - range.s.r + 1) * (range.e.c - range.s.c + 1);
+            if (cells > 20000) {
+                range.e.r = Math.min(range.e.r, range.s.r + 1000);
+                range.e.c = Math.min(range.e.c, range.s.c + 20);
+                ws['!ref'] = XLSX.utils.encode_range(range);
                 this.isTruncated.set(true);
-            } else {
-                this.isTruncated.set(false);
             }
         }
 
-        const html = XLSX.utils.sheet_to_html(worksheet);
-        const styledHtml = `<div class="table-wrapper">${html}</div>`;
-        this.safeContent = this.sanitizer.bypassSecurityTrustHtml(styledHtml);
+        const html = XLSX.utils.sheet_to_html(ws);
+        this.safeContent = this.sanitizer.bypassSecurityTrustHtml(`<div class="table-wrapper">${html}</div>`);
     }
 
-    private cleanupObjectURL() {
-        if (this.activeObjectURL) {
-            URL.revokeObjectURL(this.activeObjectURL);
-            this.activeObjectURL = null;
-        }
+    private cleanupResources() {
+        if (this.activeObjectURL) URL.revokeObjectURL(this.activeObjectURL);
+        this.activeObjectURL = null;
+        this.workbook = null;
+        this.safeContent = null;
+        this.textContent = null;
     }
 
     ngOnDestroy() {
-        this.cleanupObjectURL();
+        this.destroy$.next();
+        this.destroy$.complete();
+        this.cleanupResources();
     }
 }
