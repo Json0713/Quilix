@@ -3,9 +3,16 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    background: var(--surface-alt);
+    background: #f1f5f9; // Professional Light Grey Desktop Background
     overflow: hidden;
     position: relative;
+    color: var(--text-main);
+
+    // Dynamic backgrounds based on view
+    &.pdf { background: #525659; }
+    &.docx, &.text { background: #e2e8f0; }
+    &.xlsx { background: white; }
+    &.image { background: #1a1a1a; }
 }
 
 .viewer-status {
@@ -14,128 +21,256 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
+    gap: 1.5rem;
     color: var(--text-muted);
+    background: var(--surface-main);
 
-    i { font-size: 3rem; opacity: 0.5; }
+    i { font-size: 4rem; opacity: 0.3; }
+    p { font-size: 1.1rem; font-weight: 500; }
     
     &.error {
         color: #ef4444;
-        i { opacity: 1; }
+        i { opacity: 1; color: #ef4444; }
     }
 }
 
-.preview-content {
+.preview-viewport {
     flex: 1;
     overflow: auto;
-    padding: 2rem;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    position: relative;
+}
 
-    &.pdf, &.image { padding: 0; }
+.preview-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: min-content; // Ensures background covers everything
+}
 
-    // PDF Frame
-    .pdf-frame {
-        width: 100%;
-        height: 100%;
-        border: none;
-    }
+// PDF View
+.pdf-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    flex: 1;
+}
 
-    // Word Document Page Style
-    .document-page {
-        background: white;
-        width: 100%;
-        max-width: 850px;
-        min-height: 100%;
-        padding: 4rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        color: #333;
-        font-family: 'Inter', 'Segoe UI', serif;
-        line-height: 1.6;
+// Word Document (A4 Style)
+.document-page {
+    background: white;
+    width: 100%;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 60px 80px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    border-radius: 2px;
+    color: #1a1a1a;
+    font-family: 'Inter', 'Segoe UI', serif;
+    line-height: 1.65;
 
-        ::ng-deep {
-            h1, h2, h3 { margin-top: 1.5rem; margin-bottom: 1rem; color: #111; }
-            p { margin-bottom: 1rem; }
-            table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
-            th, td { border: 1px solid #ddd; padding: 8px; }
-            img { max-width: 100%; height: auto; }
-        }
-    }
-
-    // Spreadsheet Style
-    .spreadsheet-container {
-        background: white;
-        padding: 1rem;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        overflow: auto;
-        max-width: 100%;
+    ::ng-deep {
+        h1, h2, h3, h4 { margin-top: 2rem; margin-bottom: 1rem; color: #000; font-weight: 700; }
+        h1 { font-size: 2.2rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
+        p { margin-bottom: 1.2rem; font-size: 1.05rem; }
         
-        ::ng-deep {
-            table {
-                border-collapse: collapse;
-                background: white;
-                font-size: 0.9rem;
-            }
-            th, td {
-                border: 1px solid #e2e8f0;
-                padding: 6px 12px;
-                min-width: 80px;
-                white-space: nowrap;
-            }
-            th {
-                background: #f8fafc;
-                font-weight: 600;
-                color: #475569;
-            }
+        table { 
+            border-collapse: collapse; 
+            width: 100% !important; 
+            margin: 1.5rem 0;
+            border: 1px solid #ddd;
         }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 10px 14px; 
+            text-align: left;
+        }
+        th { background: #f8fafc; }
+        img { max-width: 100%; height: auto; border-radius: 4px; }
+        ul, ol { margin-bottom: 1.2rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+    }
+}
+
+// Spreadsheet View
+.spreadsheet-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+.spreadsheet-container {
+    flex: 1;
+    overflow: auto;
+    padding: 0;
+    
+    ::ng-deep {
+        .table-wrapper {
+            padding: 0;
+        }
+        table {
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 100%;
+            background: white;
+        }
+        tr { height: 28px; }
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 4px 10px;
+            min-width: 100px;
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #374151;
+        }
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-align: center;
+        }
+        tr:nth-child(even) { background: #f9fafb; }
+        tr:hover { background: #f3f4f6; }
+    }
+}
+
+.spreadsheet-footer {
+    height: 40px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    z-index: 20;
+
+    .sheet-tabs {
+        display: flex;
+        gap: 0.25rem;
+        height: 100%;
+        align-items: flex-end;
     }
 
-    // Image Viewer
-    .image-viewer {
+    .sheet-tab {
+        border: 1px solid transparent;
+        border-bottom: none;
+        background: transparent;
+        padding: 4px 16px;
+        font-size: 0.85rem;
+        color: #64748b;
+        cursor: pointer;
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        padding: 2rem;
-        
-        img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 4px;
-            box-shadow: 0 4px 30px rgba(0,0,0,0.15);
-        }
-    }
+        gap: 0.5rem;
+        border-radius: 4px 4px 0 0;
+        transition: all 0.2s;
+        height: 32px;
 
-    // Text/Code Viewer
-    .text-viewer {
-        background: var(--surface-main);
-        width: 100%;
-        max-width: 900px;
-        padding: 2rem;
-        border-radius: 8px;
-        border: 1px solid var(--border);
-        
-        pre {
-            margin: 0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Fira Code', 'Consolas', monospace;
-            font-size: 0.9rem;
-            color: var(--text-main);
+        i { font-size: 0.9rem; }
+
+        &:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        &.active {
+            background: white;
+            border-color: #e2e8f0;
+            color: #2563eb;
+            font-weight: 600;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.02);
         }
     }
+}
+
+// Text & Code Viewer
+.text-viewer {
+    background: #1e293b; // Deep Dark Professional background
+    color: #e2e8f0;
+    margin: 30px auto;
+    width: 95%;
+    max-width: 1000px;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    flex: 1;
+    
+    pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+}
+
+// Image Viewer
+.image-viewer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    
+    img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+        border: 4px solid #333;
+    }
+}
+
+.truncation-warning {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 243, 205, 0.9);
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 100;
+    backdrop-filter: blur(4px);
+    
+    i { font-size: 1rem; color: #d39e00; }
+}
+
+// Spreadsheet View specific adjustments
+.xlsx .truncation-warning {
+    bottom: 60px;
 }
 
 // Mobile Adjustments
 @media (max-width: 768px) {
-    .preview-content {
-        padding: 0.5rem;
-        
-        .document-page {
-            padding: 1.5rem;
-        }
+    .document-page {
+        margin: 0;
+        padding: 2rem 1.5rem;
+        box-shadow: none;
+    }
+    
+    .text-viewer {
+        margin: 0;
+        width: 100%;
+        border-radius: 0;
+        padding: 1.5rem;
+    }
+
+    .truncation-warning {
+        width: 90%;
+        bottom: 20px;
+        border-radius: 8px;
     }
 }

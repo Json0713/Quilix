@@ -1,4 +1,4 @@
-<div class="office-viewer-container">
+<div class="office-viewer-container" [ngClass]="viewType()">
     @if (loading()) {
         <div class="viewer-status">
             <div class="spinner-border text-primary" role="status"></div>
@@ -10,35 +10,61 @@
             <p>{{ error() }}</p>
         </div>
     } @else {
-        <div class="preview-content" [ngClass]="viewType()">
-            @switch (viewType()) {
-                @case ('pdf') {
-                    <iframe [src]="safeUrl" class="pdf-frame"></iframe>
+        <div class="preview-viewport">
+            <div class="preview-content-wrapper">
+                @switch (viewType()) {
+                    @case ('pdf') {
+                        <iframe [src]="safeUrl" class="pdf-frame"></iframe>
+                    }
+                    @case ('docx') {
+                        <div class="document-page" [innerHTML]="safeContent"></div>
+                    }
+                    @case ('xlsx') {
+                        <div class="spreadsheet-view">
+                            <div class="spreadsheet-container" [innerHTML]="safeContent"></div>
+                        </div>
+                    }
+                    @case ('image') {
+                        <div class="image-viewer">
+                            <img [src]="safeUrl" alt="Preview">
+                        </div>
+                    }
+                    @case ('text') {
+                        <div class="text-viewer">
+                            <pre><code>{{ textContent }}</code></pre>
+                        </div>
+                    }
+                    @case ('unsupported') {
+                        <div class="viewer-status">
+                            <i class="bi bi-file-earmark-lock"></i>
+                            <p>Preview not available for this file type.</p>
+                            <p class="small text-muted">Please open it in your OS to view or edit.</p>
+                        </div>
+                    }
                 }
-                @case ('docx') {
-                    <div class="document-page" [innerHTML]="safeContent"></div>
-                }
-                @case ('xlsx') {
-                    <div class="spreadsheet-container" [innerHTML]="safeContent"></div>
-                }
-                @case ('image') {
-                    <div class="image-viewer">
-                        <img [src]="safeUrl" alt="Preview">
-                    </div>
-                }
-                @case ('text') {
-                    <div class="text-viewer">
-                        <pre><code>{{ textContent }}</code></pre>
-                    </div>
-                }
-                @case ('unsupported') {
-                    <div class="viewer-status">
-                        <i class="bi bi-file-earmark-lock"></i>
-                        <p>Preview not available for this file type.</p>
-                        <p class="small text-muted">Please open it in your OS to view or edit.</p>
-                    </div>
-                }
-            }
+            </div>
         </div>
+
+        @if (isTruncated()) {
+            <div class="truncation-warning">
+                <i class="bi bi-info-circle-fill"></i>
+                <span>File is too large. Showing a partial preview for performance.</span>
+            </div>
+        }
+
+        @if (viewType() === 'xlsx' && sheetNames().length > 1) {
+            <div class="spreadsheet-footer">
+                <div class="sheet-tabs">
+                    @for (sheet of sheetNames(); track sheet) {
+                        <button class="sheet-tab" 
+                                [class.active]="activeSheet() === sheet"
+                                (click)="switchSheet(sheet)">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                            {{ sheet }}
+                        </button>
+                    }
+                </div>
+            </div>
+        }
     }
 </div>

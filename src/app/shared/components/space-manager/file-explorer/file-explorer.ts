@@ -362,7 +362,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
         // 2. Universal Preview Gateway (In-App Window)
         const ext = entry.name.split('.').pop()?.toLowerCase() || '';
         const previewable = [
-            'pdf', 'docx', 'doc', 'xlsx', 'xls', 'pptx', 'ppt', 
+            'pdf', 'docx', 'doc', 'xlsx', 'xls', 'csv', 'pptx', 'ppt', 
             'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp',
             'txt', 'md', 'json', 'js', 'ts', 'html', 'css', 'scss'
         ];
