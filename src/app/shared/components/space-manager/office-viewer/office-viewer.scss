@@ -34,13 +34,20 @@
     display: flex;
     flex-direction: column;
     position: relative;
+
+    .xlsx & {
+        overflow: hidden;
+    }
 }
 
 .preview-content-wrapper {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: min-content; // Ensures background covers everything
+    
+    &:not(.xlsx *) {
+        min-height: min-content; 
+    }
 }
 
 // PDF View
@@ -89,7 +96,11 @@
 
 // Spreadsheet View
 .spreadsheet-view {
-    flex: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
     background: white;
@@ -135,13 +146,16 @@
 }
 
 .spreadsheet-footer {
-    height: 40px;
+    height: 42px;
     background: #f8fafc;
     border-top: 1px solid #e2e8f0;
     display: flex;
     align-items: center;
     padding: 0 1rem;
     z-index: 20;
+    
+    // Add space for the parent window-footer/grab-handle
+    margin-bottom: 2px;
 
     .sheet-tabs {
         display: flex;
