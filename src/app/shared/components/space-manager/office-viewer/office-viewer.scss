@@ -38,6 +38,7 @@
     .xlsx & {
         overflow: hidden;
     }
+    scrollbar-width: thin;
 }
 
 .preview-content-wrapper {
@@ -111,6 +112,8 @@
     overflow: auto;
     padding: 0;
     
+    scrollbar-width: thin;
+
     ::ng-deep {
         .table-wrapper {
             padding: 0;
