@@ -166,11 +166,20 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     }
 
     @HostListener('window:focus')
-    onWindowFocus() {
+    async onWindowFocus() {
         // Refresh directory silently
         if (!this.renamingEntry() && !this.isCreatingFolder() && !this.isCreatingFile() && !this.searchQuery()) {
-            this.loadCurrentDirectory(false);
+            console.log('[FileExplorer] Window focused, syncing with disk...');
+            await this.loadCurrentDirectory(false);
         }
+    }
+
+    /**
+     * Manual trigger to re-read the directory from disk/database.
+     */
+    async refresh() {
+        await this.loadCurrentDirectory(true);
+        this.snackbar.info('Explorer refreshed.');
     }
 
     async loadCurrentDirectory(showLoader = true): Promise<void> {
@@ -330,9 +339,56 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
             await this.loadCurrentDirectory();
             this.emitBreadcrumbs();
         } else {
-            // It's a file, try to open it natively?
-            this.snackbar.info(`File preview coming soon. (${entry.name})`);
+            // It's a file, open it
+            await this.openFile(entry);
         }
+    }
+
+    async openFile(entry: FileExplorerEntry) {
+        if (entry.kind === 'directory') return;
+
+        this.openMenuId.set(null);
+
+        // 1. Internal Routing for .quilix docs
+        if (entry.name.endsWith('.quilix')) {
+            // If it's a virtual entry, we likely have an ID
+            if (entry.id) {
+                this.router.navigate(['/docs', entry.id]);
+                return;
+            }
+            // If it's a native file, we might need to parse its ID or handle it specially
+            // For now, assume .quilix files are primarily virtual or have a resolvable ID
+        }
+
+        // 2. Native Gateway Routing (PDF, Images, Text, etc.)
+        try {
+            const blob = await this.fileManager.getFileBlob(entry);
+            if (!blob) {
+                this.snackbar.error('Could not read file data.');
+                return;
+            }
+
+            const url = URL.createObjectURL(blob);
+            
+            // Open in a new tab. For PDF/Images, this uses the high-fidelity browser/OS viewer.
+            // For others, it triggers a download-like "Open" prompt.
+            const win = window.open(url, '_blank');
+            
+            if (!win) {
+                this.snackbar.warning('Pop-up blocked. Please allow pop-ups to open files.');
+            }
+
+            // Cleanup the URL after a delay to ensure the browser has loaded it
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
+        } catch (err) {
+            console.error('[FileExplorer] Open failed:', err);
+            this.snackbar.error('Failed to open file.');
+        }
+    }
+
+    onDoubleClick(entry: FileExplorerEntry, event: MouseEvent) {
+        event.stopPropagation();
+        this.navigateInto(entry);
     }
 
     async navigateBack() {

@@ -593,4 +593,11 @@ export class FileSystemService {
             return null;
         }
     }
+
+    /**
+     * Extract a native File object from a file handle.
+     */
+    async getFileFromHandle(handle: FileSystemFileHandle): Promise<File> {
+        return await handle.getFile();
+    }
 }

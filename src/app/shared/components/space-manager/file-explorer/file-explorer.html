@@ -14,7 +14,7 @@
                 <button class="nav-btn" [class.disabled]="forwardHistory().length === 0" (click)="navigateForward()" title="Forward">
                     <i class="bi bi-arrow-right"></i>
                 </button>
-                <button class="nav-btn" (click)="loadCurrentDirectory(true)" title="Refresh">
+                <button class="nav-btn" (click)="refresh()" title="Refresh">
                     <i class="bi bi-arrow-clockwise"></i>
                 </button>
             </div>
@@ -242,7 +242,7 @@
                     <div class="file-card"
                          [class.selected]="(selectedEntry()?.id && selectedEntry()?.id === entry.id) || (selectedEntry()?.handle && selectedEntry()?.handle === entry.handle) || (!entry.id && !entry.handle && selectedEntry()?.name === entry.name)"
                          (click)="toggleSelection(entry, $event)"
-                         (dblclick)="navigateInto(entry)"
+                         (dblclick)="onDoubleClick(entry, $event)"
                          (contextmenu)="openContextMenu(entry, $event)">
                         
                         <!-- GRID VIEW METADATA -->
@@ -340,7 +340,9 @@
                 <div class="ctx-header">
                      <small class="ctx-title">{{entry.name}}</small>
                 </div>
-                <button class="btn ctx-item" (click)="navigateInto(entry)"><i class="bi bi-box-arrow-in-right me-2"></i> Open</button>
+                <button class="btn ctx-item" (click)="entry.kind === 'directory' ? navigateInto(entry) : openFile(entry)">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Open
+                </button>
                 <button class="btn ctx-item" (click)="startRename(entry)"><i class="bi bi-cursor-text me-2"></i> Rename</button>
                 <div class="ctx-divider"></div>
                 <button class="btn ctx-item" (click)="copy(entry)"><i class="bi bi-files me-2"></i> Copy</button>

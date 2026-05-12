@@ -438,6 +438,27 @@ export class FileManagerService {
         }
     }
 
+    /**
+     * Polymorphic File Data Retriever
+     */
+    async getFileBlob(entry: FileExplorerEntry): Promise<Blob | null> {
+        const mode = await this.fileSystem.getStorageMode();
+
+        if (mode === 'filesystem' && entry.handle && entry.kind === 'file') {
+            try {
+                return await (entry.handle as FileSystemFileHandle).getFile();
+            } catch (err) {
+                console.error('[FileManager] Failed to read native file:', err);
+                return null;
+            }
+        } else if (entry.id) {
+            const virtualFile = await db.virtual_entries.get(entry.id);
+            return virtualFile?.content || null;
+        }
+
+        return null;
+    }
+
     private async resolveUniqueName(context: { parentHandle?: FileSystemDirectoryHandle, spaceId: string, parentId: string | null }, baseName: string, isDirectory: boolean): Promise<string> {
         const mode = await this.fileSystem.getStorageMode();
 
