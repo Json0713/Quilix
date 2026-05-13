@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, OnChanges, SimpleChanges, inject, computed, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, OnChanges, SimpleChanges, inject, computed, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WindowManagerService } from '../../../services/ui/window-manager/window-manager.service';
 
@@ -40,6 +40,7 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
     private initialWindowPos = { x: 0, y: 0 };
     
     private windowManager = inject(WindowManagerService);
+    private ngZone = inject(NgZone);
     private pipWindow: any = null;
     
     zIndex = computed(() => {
@@ -79,6 +80,7 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
     close() {
         if (this.isDetached() && this.pipWindow) {
             this.pipWindow.close();
+            // The pagehide listener will handle the cleanup
         }
         this.visible = false;
         this.visibleChange.emit(this.visible);
@@ -100,7 +102,7 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
 
     // --- Window Interaction (Drag & Resize) ---
     onDragStart(event: MouseEvent) {
-        if (this.isMaximized() || window.innerWidth < 768) return;
+        if (this.isMaximized() || this.isDetached() || window.innerWidth < 768) return;
         
         this.isDragging = true;
         this.dragOffset = {
@@ -139,7 +141,7 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
 
     // --- Resizing ---
     onResizeStart(event: MouseEvent, direction: string) {
-        if (this.isMaximized() || window.innerWidth < 768) return;
+        if (this.isMaximized() || this.isDetached() || window.innerWidth < 768) return;
         
         event.stopPropagation();
         event.preventDefault();
@@ -300,14 +302,19 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
 
             // Handle PiP window closing
             this.pipWindow.addEventListener('pagehide', () => {
-                this.isDetached.set(false);
-                this.pipWindow = null;
-                
-                // Move back to original container
-                const overlay = this.overlayElement.nativeElement;
-                if (overlay && windowEl) {
-                    overlay.append(windowEl);
-                }
+                this.ngZone.run(() => {
+                    if (!this.isDetached()) return;
+
+                    this.isDetached.set(false);
+                    this.isDragging = false;
+                    this.isResizing = false;
+                    this.pipWindow = null;
+                    
+                    // Move back to original container if component is still active and visible
+                    if (this.overlayElement && this.overlayElement.nativeElement && windowEl) {
+                        this.overlayElement.nativeElement.append(windowEl);
+                    }
+                });
             });
 
         } catch (error) {
