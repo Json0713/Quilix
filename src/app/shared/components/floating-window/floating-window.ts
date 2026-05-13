@@ -26,7 +26,8 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
 
     isMaximized = signal<boolean>(false);
     isDetached = signal<boolean>(false);
-    canDetach = !!(window as any).documentPictureInPicture;
+    // Support PiP if available, otherwise allow standard popup windows for detachment
+    canDetach = true; 
 
     windowSize = signal<{ width: number, height: number }>({ width: 800, height: 580 });
     windowPosition = signal<{ x: number, y: number }>({ x: 0, y: 0 });
@@ -50,10 +51,15 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['visible']) {
-            if (changes['visible'].currentValue === true) {
+            const isVisible = changes['visible'].currentValue;
+            if (isVisible === true) {
                 this.handleAutoMaximize();
                 this.windowManager.register(this.storageKey || 'default');
             } else {
+                // If the window is hidden from the outside, ensure the detached window is also closed
+                if (this.isDetached() && this.pipWindow) {
+                    this.pipWindow.close();
+                }
                 this.windowManager.unregister(this.storageKey || 'default');
             }
         }
@@ -282,11 +288,38 @@ export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
             const width = Math.max(size.width, 770);
             const height = size.height;
 
-            // @ts-ignore
-            this.pipWindow = await window.documentPictureInPicture.requestWindow({
-                width: width,
-                height: height,
-            });
+            const pipApi = (window as any).documentPictureInPicture;
+            
+            // Strategy: Use Document PiP for the first window (if supported), 
+            // and fallback to window.open for subsequent windows or non-supported browsers.
+            if (pipApi && !pipApi.window) {
+                this.pipWindow = await pipApi.requestWindow({
+                    width: width,
+                    height: height,
+                });
+            } else {
+                const left = window.screenX + (window.innerWidth - width) / 2;
+                const top = window.screenY + (window.innerHeight - height) / 2;
+                
+                // Use a unique name per window storage key to allow multiple independent windows
+                const windowName = `quilix_window_${this.storageKey.replace(/[^a-zA-Z0-9]/g, '_')}`;
+                this.pipWindow = window.open('', windowName, 
+                    `width=${width},height=${height},left=${left},top=${top},menubar=no,status=no,location=no,toolbar=no`);
+                
+                if (!this.pipWindow) {
+                    alert('Detachment blocked. Please allow popups for this site to enable multiple windows.');
+                    return;
+                }
+
+                // Wait for the new window document to be ready
+                if (this.pipWindow.document.readyState !== 'complete') {
+                    await new Promise(resolve => {
+                        this.pipWindow!.onload = resolve;
+                        // Safety timeout
+                        setTimeout(resolve, 500);
+                    });
+                }
+            }
 
             this.isDetached.set(true);
             this.isMaximized.set(false);
