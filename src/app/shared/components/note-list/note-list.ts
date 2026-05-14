@@ -57,11 +57,12 @@ export class NoteListComponent implements OnInit, OnDestroy {
     }
 
     async confirmCreate() {
+        if (!this.isCreating()) return;
+        this.isCreating.set(false);
         const name = this.newItemName().trim();
         if (name && this.spaceId) {
             await this.noteService.create(this.spaceId, name);
         }
-        this.isCreating.set(false);
     }
 
     cancelCreate() {
@@ -89,12 +90,14 @@ export class NoteListComponent implements OnInit, OnDestroy {
 
     async confirmRename() {
         const doc = this.renamingDoc();
+        if (!doc) return;
+        this.renamingDoc.set(null);
+        
         const newName = this.renameValue().trim();
-        if (doc && newName && newName !== doc.name) {
+        if (newName && newName !== doc.name) {
             const finalName = await this.noteService.getAvailableName(this.spaceId, newName, doc.id);
             await this.noteService.update(doc.id, { name: finalName });
         }
-        this.renamingDoc.set(null);
     }
 
     cancelRename() {

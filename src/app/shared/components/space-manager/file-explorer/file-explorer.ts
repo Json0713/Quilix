@@ -504,12 +504,16 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     async confirmRename() {
         const entry = this.renamingEntry();
         if (!entry) return;
-
+        
         const newName = this.renameValue().trim();
         if (!newName || newName === entry.name) {
             this.cancelRename();
             return;
         }
+
+        // Clear state early to prevent duplicate triggers
+        this.renamingEntry.set(null);
+        this.renameValue.set('');
 
         try {
             const node = this.currentNode();
@@ -548,7 +552,6 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
             console.error(err);
             this.snackbar.error(err.message || 'Failed to rename.');
         } finally {
-            this.cancelRename();
             await this.loadCurrentDirectory(false);
         }
     }
@@ -608,10 +611,18 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
 
     async confirmCreateItem() {
         const name = this.newItemName().trim();
+        const isFolder = this.isCreatingFolder();
+        const isFile = this.isCreatingFile();
+
         if (!name) {
             this.cancelCreateItem();
             return;
         }
+
+        if (!isFolder && !isFile) return;
+
+        // Clear state early to prevent duplicate triggers
+        this.cancelCreateItem();
 
         try {
             const node = this.currentNode();
@@ -622,10 +633,10 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
                 parentId: node.id || null
             };
 
-            if (this.isCreatingFolder()) {
+            if (isFolder) {
                 await this.fileManager.createFolder(context, name);
                 this.snackbar.success('Folder created.');
-            } else if (this.isCreatingFile()) {
+            } else if (isFile) {
                 await this.fileManager.createFile(context, name);
                 this.snackbar.success('File created.');
             }
@@ -633,7 +644,6 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
             console.error(err);
             this.snackbar.error('Failed to create item.');
         } finally {
-            this.cancelCreateItem();
             await this.loadCurrentDirectory(false);
         }
     }
