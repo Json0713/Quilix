@@ -278,6 +278,10 @@
     gap: 16px;
     align-content: start;
     padding: 0.5rem;
+
+    @media (max-width: 770px) {
+        padding-bottom: 90px; // Clearance for Mobile FAB
+    }
 }
 
 .file-list {
@@ -285,6 +289,10 @@
     flex-direction: column;
     gap: 6px;
     padding: 0.5rem;
+
+    @media (max-width: 770px) {
+        padding-bottom: 90px; // Clearance for Mobile FAB
+    }
 
     .list-header {
         display: grid;
@@ -302,18 +310,10 @@
         .col-header {
             display: flex;
             align-items: center;
-
-            @media (max-width: 800px) {
-                &:not(:first-child):not(:last-child) {
-                    display: none;
-                }
-            }
         }
-    }
 
-    @media (max-width: 800px) {
-        .list-header {
-            grid-template-columns: 1fr 50px;
+        @media (max-width: 770px) {
+            display: none;
         }
     }
 }
