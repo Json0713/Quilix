@@ -10,7 +10,7 @@ import { WindowManagerService } from '../../../services/ui/window-manager/window
     styleUrl: './floating-window.scss',
 })
 export class FloatingWindowComponent implements OnInit, OnDestroy, OnChanges {
-    @Input() storageKey!: string; // Must provide a unique key for persistence
+    @Input() storageKey!: string;
     @Input() title: string = '';
     @Input() icon: string = 'bi-window';
     @Input() defaultWidth: number = 800;
