@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal, computed, HostListener, inject, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, signal, computed, HostListener, inject, OnDestroy, Output, EventEmitter, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -83,9 +83,38 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     // Global clipboard state exposed for UI
     clipboardHasItem = computed(() => this.fileManager.clipboard() !== null);
 
-    constructor() { }
+    private readonly PREFS_KEY = 'quilix_explorer_prefs';
+
+    constructor() {
+        // Automatically persist view and sort preferences
+        effect(() => {
+            const state = {
+                viewMode: this.viewMode(),
+                sortBy: this.sortBy(),
+                sortAscending: this.sortAscending()
+            };
+            try {
+                localStorage.setItem(this.PREFS_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.warn('Failed to save explorer preferences', e);
+            }
+        });
+    }
 
     ngOnInit() {
+        // Load persisted preferences
+        try {
+            const saved = localStorage.getItem(this.PREFS_KEY);
+            if (saved) {
+                const prefs = JSON.parse(saved);
+                if (prefs.viewMode) this.viewMode.set(prefs.viewMode);
+                if (prefs.sortBy) this.sortBy.set(prefs.sortBy);
+                if (prefs.sortAscending !== undefined) this.sortAscending.set(prefs.sortAscending);
+            }
+        } catch (e) {
+            console.warn('Failed to load explorer preferences', e);
+        }
+
         this.reactiveSpaceName.set(this.spaceName);
         this.monitorSpaceDetails();
 
