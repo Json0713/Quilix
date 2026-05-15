@@ -73,8 +73,6 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
     private authSub: any;
 
     async ngOnInit() {
-        await this.loadWorkspace();
-
         this.workspaceSub = this.workspaceService.workspaces$.subscribe(ws => {
             this.hasMissingWorkspaces.set(ws.some(w => w.isMissingOnDisk && w.role === 'personal'));
             
@@ -88,23 +86,33 @@ export class PersonalSidebarComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.authSub = this.authService.authEvents$.subscribe(async (event) => {
-            if (event === 'LOGIN') {
-                await this.loadWorkspace();
+        // ── Reactive Workspace State ──
+        // This subscription handles initial load AND workspace switching.
+        // It ensures that when a workspace ID changes, the UI resets immediately.
+        this.authSub = this.authService.currentWorkspace$.subscribe(async (workspace) => {
+            const previousId = this.activeWorkspace()?.id;
+            const newId = workspace?.id;
+
+            if (workspace) {
+                this.activeWorkspace.set(workspace);
+                
+                // If the workspace ID actually changed (not just a name rename), 
+                // we clear the spaces immediately to prevent showing stale data.
+                if (previousId !== newId) {
+                    this.spaceSub?.unsubscribe();
+                    this.spaces.set([]); 
+                    this.spaceSub = this.spaceService.liveSpaces$(workspace.id).subscribe(
+                        (list: Space[]) => this.spaces.set(list)
+                    );
+                }
+            } else {
+                this.activeWorkspace.set(null);
+                this.spaces.set([]);
+                this.spaceSub?.unsubscribe();
             }
         });
     }
 
-    private async loadWorkspace() {
-        const workspace = await this.authService.getCurrentWorkspace();
-        if (workspace) {
-            this.activeWorkspace.set(workspace);
-            this.spaceSub?.unsubscribe();
-            this.spaceSub = this.spaceService.liveSpaces$(workspace.id).subscribe(
-                (list: Space[]) => this.spaces.set(list)
-            );
-        }
-    }
 
     ngOnDestroy() {
         this.spaceSub?.unsubscribe();

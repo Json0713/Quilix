@@ -79,14 +79,10 @@ export class PersonalTemplate implements OnDestroy {
     // Initialize Modules Sidebar Context
     this.modulesSidebarService.setContext('personal');
 
-    // Initial tab load
-    this.loadWorkspaceTabs();
-
-    // Re-load tabs when switching workspaces of the same role (personal→personal)
-    // Angular doesn't reinitialize the template when the route stays the same
-    this.authSub = this.authService.authEvents$.subscribe(event => {
-      if (event === 'LOGIN') {
-        this.loadWorkspaceTabs();
+    // ── Reactive Workspace State ──
+    this.authSub = this.authService.currentWorkspace$.subscribe(ws => {
+      if (ws) {
+        this.loadWorkspaceTabs(ws.id);
       }
     });
 
@@ -98,10 +94,10 @@ export class PersonalTemplate implements OnDestroy {
     this.sidebarService.closeMobile();
   }
 
-  private async loadWorkspaceTabs(): Promise<void> {
-    const ws = await this.authService.getCurrentWorkspace();
-    if (ws) {
-      await this.tabService.loadTabs(ws.id);
+  private async loadWorkspaceTabs(workspaceId?: string): Promise<void> {
+    const wsId = workspaceId || (await this.authService.getCurrentWorkspace())?.id;
+    if (wsId) {
+      await this.tabService.loadTabs(wsId);
       // Navigate to the last active tab's route to restore workspace state
       const activeTab = this.tabService.activeTab();
       if (activeTab && activeTab.route && activeTab.route !== './') {

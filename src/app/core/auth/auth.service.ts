@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
+import { liveQuery } from 'dexie';
 import { Workspace, WorkspaceRole } from '../interfaces/workspace';
 import { WorkspaceService } from '../services/components/workspace.service';
 import { db } from '../database/dexie.service';
@@ -16,6 +17,12 @@ export class AuthService {
   private readonly _authEvents = new Subject<'LOGIN' | 'LOGOUT'>();
   /** Observable of internal auth events (for sync service) */
   authEvents$ = this._authEvents.asObservable();
+
+  /** 
+   * Reactive source of truth for the currently active workspace.
+   * Emits whenever the session changes or the workspace metadata is updated.
+   */
+  readonly currentWorkspace$ = liveQuery(() => this.getCurrentWorkspace());
 
   constructor(
     private workspaces: WorkspaceService
