@@ -51,7 +51,7 @@ export class OfficeViewerComponent implements OnChanges, OnDestroy {
 
     private initLoadPipeline() {
         this.loadRequest$.pipe(
-            // Use switchMap to cancel previous loads automatically
+            // Use switchMap to cancel previous loads when a new entry is selected
             switchMap(entry => {
                 this.resetState();
                 if (!entry) return of(null);
