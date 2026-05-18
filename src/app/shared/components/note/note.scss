@@ -56,10 +56,11 @@
             font-size: 0.8rem;
             color: var(--text-muted);
             opacity: 0.8;
-            
+
             i {
                 margin-right: 4px;
             }
+
             .spin {
                 animation: spin 1s linear infinite;
             }
@@ -226,38 +227,43 @@
     padding: 1.5rem 2rem 4rem;
     line-height: 1.7;
     overflow-y: auto;
-    
+
     &.ql-blank::before {
         color: var(--text-muted);
         font-style: normal;
         left: 2rem;
         opacity: 0.6;
     }
-    
-    h1, h2, h3 {
+
+    h1,
+    h2,
+    h3 {
         font-weight: 600;
         color: var(--text-main);
         margin-top: 1.5em;
         margin-bottom: 0.5em;
     }
-    
+
     p {
-        margin-bottom: 0.8em;
+        margin-bottom: 0;
     }
-    
+
     /* OS Native style scrollbar */
     &::-webkit-scrollbar {
         width: 14px;
         height: 14px;
     }
+
     &::-webkit-scrollbar-track {
         background: transparent;
     }
+
     &::-webkit-scrollbar-thumb {
         background: var(--border);
         border-radius: 7px;
         border: 4px solid var(--surface-main);
     }
+
     &::-webkit-scrollbar-thumb:hover {
         background: var(--text-muted);
     }
@@ -268,7 +274,7 @@
     width: 120px;
 }
 
-.ql-snow.ql-toolbar button, 
+.ql-snow.ql-toolbar button,
 .ql-snow .ql-toolbar button {
     height: 32px;
     width: 32px;
@@ -277,7 +283,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &:hover {
         background-color: var(--surface-alt);
     }
@@ -288,7 +294,8 @@
     stroke-width: 1.5;
 }
 
-.ql-snow .ql-fill, .ql-snow .ql-stroke.ql-fill {
+.ql-snow .ql-fill,
+.ql-snow .ql-stroke.ql-fill {
     fill: var(--text-main);
 }
 
@@ -300,7 +307,7 @@
 .ql-snow .ql-picker-options {
     background-color: var(--surface);
     border: 1px solid var(--border);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     padding: 0.5rem 0;
     margin-top: 4px;
 }
@@ -308,7 +315,7 @@
 .ql-snow .ql-picker-item {
     padding: 0.35rem 1rem;
     transition: background-color 0.2s;
-    
+
     &:hover {
         background-color: var(--surface-alt);
     }
@@ -360,7 +367,11 @@
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
+    from {
+        transform: rotate(0deg);
+    }
 
+    to {
+        transform: rotate(360deg);
+    }
+}
