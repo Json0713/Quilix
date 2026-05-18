@@ -140,6 +140,7 @@ export class NoteComponent implements OnInit, OnDestroy {
         this.quill = new Quill(this.editorContainer.nativeElement, {
             theme: 'snow',
             placeholder: 'Start writing...',
+            bounds: this.editorContainer.nativeElement,
             modules: {
                 toolbar: [
                     [{ 'header': [1, 2, 3, false] }],

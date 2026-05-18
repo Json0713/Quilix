@@ -375,3 +375,83 @@
         transform: rotate(360deg);
     }
 }
+
+/* ═══ Link Tooltip Enhancements ═══ */
+.ql-snow .ql-tooltip {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: var(--text-main);
+    z-index: 1200 !important;
+    /* Ensure it floats above everything */
+    transform: translateY(4px);
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+
+    /* Styling the preview state */
+    a.ql-preview {
+        color: var(--action);
+        text-decoration: none;
+        max-width: 250px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        font-size: 1rem;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    /* Actions (Edit / Save) */
+    a.ql-action {
+        color: var(--text-muted);
+        margin-left: 8px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: color 0.2s;
+
+        &:hover {
+            color: var(--text-main);
+        }
+    }
+
+    /* Action (Remove) */
+    a.ql-remove {
+        color: var(--danger);
+        margin-left: 2px;
+        font-weight: 500;
+        font-size: 0.9rem;
+
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+
+    /* Editing state input */
+    input[type=text] {
+        background: var(--surface-main);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        border-radius: 4px;
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.2s;
+        width: 250px;
+
+        &:focus {
+            border-color: var(--action);
+        }
+    }
+
+    &[data-mode="link"]::before {
+        content: "URL:";
+        color: var(--text-muted);
+        margin-right: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+}
