@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { NoteService } from '../../../core/services/components/note.service';
 import { NoteDocument } from '../../../core/interfaces/note';
 import { ModalService } from '../../../services/ui/common/modal/modal';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-note-list',
@@ -32,7 +33,7 @@ export class NoteListComponent implements OnInit, OnDestroy {
     @ViewChildren('renameInput') renameInputs!: QueryList<ElementRef>;
     @ViewChildren('createInput') createInputs!: QueryList<ElementRef>;
 
-    private sub: any;
+    private sub?: { unsubscribe: () => void };
 
     ngOnInit() {
         if (this.spaceId) {

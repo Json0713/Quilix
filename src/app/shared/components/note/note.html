@@ -1,16 +1,48 @@
 <div class="note-editor-container">
     <div class="note-header">
-        <div class="header-content">
-            <div class="doc-title-container">
-                <input type="text" class="doc-title-input" 
-                       [ngModel]="noteTitle()" 
-                       (ngModelChange)="updateTitle($event)">
-            </div>
-            <div class="save-status">
+        <div class="header-top">
+            @if (activeDoc()) {
+                <div class="note-icon" (click)="showDropdown.set(!showDropdown())">
+                    <i class="bi bi-journal-text"></i>
+                </div>
+                
+                <div class="doc-title-container" [class.is-invalid]="isTitleDuplicate()">
+                    <input type="text" class="doc-title-input" 
+                           [ngModel]="noteTitle()" 
+                           (ngModelChange)="updateTitle($event)"
+                           [title]="isTitleDuplicate() ? 'This name already exists in this space' : ''"
+                           placeholder="Untitled Note">
+                           
+                    @if (isTitleDuplicate()) {
+                        <div class="invalid-indicator" title="This name already exists">
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                        </div>
+                    }
+                           
+                    @if (showDropdown()) {
+                        <div class="note-dropdown">
+                            <div class="dropdown-header">Notes</div>
+                            @if (spaceNotes().length > 1) {
+                                @for (doc of spaceNotes(); track doc.id) {
+                                    @if (doc.id !== activeDoc()?.id) {
+                                        <button class="dropdown-item" (click)="noteSelected.emit(doc.id); showDropdown.set(false)">
+                                            <i class="bi bi-journal-text"></i>
+                                            <span>{{ doc.name }}</span>
+                                        </button>
+                                    }
+                                }
+                            } @else {
+                                <div class="px-3 py-2 text-muted small">No other notes.</div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            <div class="menubar-status">
                 @if (isSaving()) {
-                    <i class="bi bi-arrow-repeat spin"></i> Saving...
+                    <i class="bi bi-arrow-repeat spin"></i> {{ saveStatus() }}
                 } @else {
-                    <i class="bi bi-cloud-check"></i> Saved to space
+                    <i class="bi bi-cloud-check"></i> {{ saveStatus() }}
                 }
             </div>
         </div>
