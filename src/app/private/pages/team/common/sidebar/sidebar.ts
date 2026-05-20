@@ -17,7 +17,15 @@ import { DropdownService } from '../../../../../services/ui/common/dropdown/drop
 @Component({
     selector: 'app-team-sidebar',
     standalone: true,
-    imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, DragDropModule, SettingsKitComponent, TeamProfileMenuComponent],
+    imports: [
+        RouterLink, 
+        RouterLinkActive, 
+        CommonModule, 
+        FormsModule, 
+        DragDropModule, 
+        SettingsKitComponent, 
+        TeamProfileMenuComponent
+    ],
     templateUrl: './sidebar.html',
     styleUrl: './sidebar.scss',
 })
