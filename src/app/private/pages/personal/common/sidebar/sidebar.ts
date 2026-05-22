@@ -17,7 +17,14 @@ import { DropdownService } from '../../../../../services/ui/common/dropdown/drop
 @Component({
     selector: 'app-personal-sidebar',
     standalone: true,
-    imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, DragDropModule, SettingsKitComponent, PersonalProfileMenuComponent],
+    imports: [
+        RouterLink, 
+        RouterLinkActive, 
+        CommonModule, FormsModule, 
+        DragDropModule, 
+        SettingsKitComponent, 
+        PersonalProfileMenuComponent
+    ],
     templateUrl: './sidebar.html',
     styleUrl: './sidebar.scss',
 })
