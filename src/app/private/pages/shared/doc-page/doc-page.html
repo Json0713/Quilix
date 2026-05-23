@@ -7,7 +7,7 @@
             </div>
         </div>
     } @else if (docId() && spaceId()) {
-        <app-doc [docId]="docId()!" class="w-100 h-100 d-block"></app-doc>
+        <app-doc [docId]="docId()!" (docSelected)="onDocSelected($event)" class="w-100 h-100 d-block"></app-doc>
     } @else {
         <div class="error-state">
             <i class="bi bi-exclamation-triangle"></i>

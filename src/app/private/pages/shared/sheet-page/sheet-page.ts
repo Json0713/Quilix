@@ -50,7 +50,21 @@ export class SheetPage implements OnInit, OnDestroy {
 
 
 
+    goBack() {
+        if (this.spaceId()) {
+            const isTeam = this.router.url.includes('/team/');
+            const prefix = isTeam ? 'team' : 'personal';
+            this.router.navigate(['/', prefix, 'spaces', this.spaceId()]);
+        } else {
+            this.location.back();
+        }
+    }
+
     onSheetSelected(newSheetId: string) {
+        if (!newSheetId) {
+            this.goBack();
+            return;
+        }
         if (this.spaceId()) {
             // Determine if personal or team based on current route
             const isTeam = this.router.url.includes('/team/');

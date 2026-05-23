@@ -211,7 +211,7 @@ export class FileManagerService {
             });
         }
 
-        // Clean up linked notes
+        // Clean up linked assets (notes, docs, sheets) on deletion
         try {
             const linkedNotes = await db.notes
                 .filter(n => n.linkedDirectoryId === parentDirId && n.linkedFileName === entry.name)
@@ -222,8 +222,28 @@ export class FileManagerService {
                     linkedFileName: undefined
                 });
             }
+
+            const linkedDocs = await db.docs
+                .filter(d => d.linkedDirectoryId === parentDirId && d.linkedFileName === entry.name)
+                .toArray();
+            for (const doc of linkedDocs) {
+                await db.docs.update(doc.id, {
+                    linkedDirectoryId: undefined,
+                    linkedFileName: undefined
+                });
+            }
+
+            const linkedSheets = await db.sheets
+                .filter(s => s.linkedDirectoryId === parentDirId && s.linkedFileName === entry.name)
+                .toArray();
+            for (const sheet of linkedSheets) {
+                await db.sheets.update(sheet.id, {
+                    linkedDirectoryId: undefined,
+                    linkedFileName: undefined
+                });
+            }
         } catch (e) {
-            console.error('[FileManager] Failed to clean up linked notes on deletion', e);
+            console.error('[FileManager] Failed to clean up linked assets on deletion', e);
         }
 
         await this.activityService.log({
@@ -283,7 +303,7 @@ export class FileManagerService {
         }
 
         if (renamed) {
-            // Update linked notes
+            // Update linked assets (notes, docs, sheets) on rename
             const parentDirId = context.parentId || 'root';
             try {
                 const linkedNotes = await db.notes
@@ -294,8 +314,26 @@ export class FileManagerService {
                         linkedFileName: resolvedName
                     });
                 }
+
+                const linkedDocs = await db.docs
+                    .filter(d => d.linkedDirectoryId === parentDirId && d.linkedFileName === entry.name)
+                    .toArray();
+                for (const doc of linkedDocs) {
+                    await db.docs.update(doc.id, {
+                        linkedFileName: resolvedName
+                    });
+                }
+
+                const linkedSheets = await db.sheets
+                    .filter(s => s.linkedDirectoryId === parentDirId && s.linkedFileName === entry.name)
+                    .toArray();
+                for (const sheet of linkedSheets) {
+                    await db.sheets.update(sheet.id, {
+                        linkedFileName: resolvedName
+                    });
+                }
             } catch (e) {
-                console.error('[FileManager] Failed to update linked notes on rename', e);
+                console.error('[FileManager] Failed to update linked assets on rename', e);
             }
         }
 
@@ -561,6 +599,167 @@ export class FileManagerService {
             const testName = `${name} (${counter})${ext}`;
             if (!(await nameExists(testName))) return testName;
             counter++;
+        }
+    }
+
+    /**
+     * Get list of all sub-directories in a space (recursively build human-readable paths)
+     */
+    async getSpaceFolders(spaceId: string): Promise<{ id: string | null; path: string }[]> {
+        const folders = await db.virtual_entries
+            .where('spaceId')
+            .equals(spaceId)
+            .filter(e => e.kind === 'directory')
+            .toArray();
+            
+        const folderMap = new Map(folders.map(f => [f.id, f]));
+        const result: { id: string | null; path: string }[] = [{ id: null, path: '/' }];
+        
+        for (const folder of folders) {
+            let path = '/' + folder.name;
+            let parentId = folder.parentId;
+            while (parentId && parentId !== 'root') {
+                const parent = folderMap.get(parentId);
+                if (parent) {
+                    path = '/' + parent.name + path;
+                    parentId = parent.parentId;
+                } else {
+                    break;
+                }
+            }
+            result.push({ id: folder.id, path });
+        }
+        
+        return result.sort((a, b) => a.path.localeCompare(b.path));
+    }
+
+    /**
+     * Get list of all files in a space, walking directory handles recursively for native mode,
+     * or querying db.virtual_entries in virtual mode.
+     */
+    async getSpaceFiles(spaceId: string, workspaceName: string, spaceFolderName: string): Promise<{ name: string; path: string; handle?: FileSystemFileHandle; virtualId?: string; parentId: string }[]> {
+        const mode = await this.fileSystem.getStorageMode();
+        const result: { name: string; path: string; handle?: FileSystemFileHandle; virtualId?: string; parentId: string }[] = [];
+
+        if (mode === 'filesystem') {
+            const wsHandle = await this.fileSystem.getOrCreateWorkspaceFolder(workspaceName);
+            if (!wsHandle) return [];
+            const spaceHandle = await wsHandle.getDirectoryHandle(spaceFolderName, { create: false }).catch(() => null);
+            if (!spaceHandle) return [];
+
+            const traverse = async (dirHandle: FileSystemDirectoryHandle, currentPath: string, parentId: string) => {
+                for await (const entry of (dirHandle as any).values()) {
+                    if (entry.name.startsWith('.quilix')) continue;
+                    if (entry.kind === 'file') {
+                        result.push({
+                            name: entry.name,
+                            path: currentPath + '/' + entry.name,
+                            handle: entry as FileSystemFileHandle,
+                            parentId
+                        });
+                    } else if (entry.kind === 'directory') {
+                        const res = await this.fileSystem.readDirectoryId(entry as FileSystemDirectoryHandle);
+                        const subdirId = res?.id || 'unknown';
+                        await traverse(entry as FileSystemDirectoryHandle, currentPath + '/' + entry.name, subdirId);
+                    }
+                }
+            };
+            await traverse(spaceHandle, '', 'root');
+        } else {
+            const allItems = await db.virtual_entries.where('spaceId').equals(spaceId).toArray();
+            const itemMap = new Map(allItems.map(i => [i.id, i]));
+            const files = allItems.filter(i => i.kind === 'file');
+
+            for (const file of files) {
+                let path = '/' + file.name;
+                let parentId = file.parentId;
+                while (parentId && parentId !== 'root') {
+                    const parent = itemMap.get(parentId);
+                    if (parent) {
+                        path = '/' + parent.name + path;
+                        parentId = parent.parentId;
+                    } else {
+                        break;
+                    }
+                }
+                result.push({
+                    name: file.name,
+                    path,
+                    virtualId: file.id,
+                    parentId: file.parentId
+                });
+            }
+        }
+        
+        return result.sort((a, b) => a.path.localeCompare(b.path));
+    }
+
+    /**
+     * Resolve a DirectoryHandle recursively given its space ID and virtual entry ID
+     */
+    async resolvePathFromDirId(
+        spaceHandle: FileSystemDirectoryHandle,
+        spaceId: string,
+        entryId: string
+    ): Promise<FileSystemDirectoryHandle | null> {
+        const chain: string[] = [];
+        let currentId: string | null = entryId;
+
+        while (currentId) {
+            const entry: any = await db.virtual_entries.get(currentId);
+            if (!entry || entry.kind !== 'directory') break;
+            chain.unshift(entry.name);
+            currentId = entry.parentId === 'root' ? null : entry.parentId;
+        }
+
+        let handle: FileSystemDirectoryHandle = spaceHandle;
+        for (const name of chain) {
+            try {
+                handle = await handle.getDirectoryHandle(name, { create: false });
+            } catch {
+                return null;
+            }
+        }
+        return handle;
+    }
+
+    /**
+     * Resolve the full virtual path of a linked file
+     */
+    async resolveLinkedFilePath(spaceId: string, directoryId: string, fileName: string): Promise<string> {
+        if (directoryId === 'root') {
+            return '/' + fileName;
+        }
+        
+        try {
+            const folder = await db.virtual_entries.get(directoryId);
+            if (!folder) {
+                return '/' + fileName;
+            }
+            
+            let path = '/' + folder.name;
+            let parentId = folder.parentId;
+            
+            const folders = await db.virtual_entries
+                .where('spaceId')
+                .equals(spaceId)
+                .filter(e => e.kind === 'directory')
+                .toArray();
+            const folderMap = new Map(folders.map(f => [f.id, f]));
+            
+            while (parentId && parentId !== 'root') {
+                const parent = folderMap.get(parentId);
+                if (parent) {
+                    path = '/' + parent.name + path;
+                    parentId = parent.parentId;
+                } else {
+                    break;
+                }
+            }
+            
+            return path + '/' + fileName;
+        } catch (e) {
+            return '/' + fileName;
         }
     }
 }

@@ -40,4 +40,6 @@ export interface DocDocument {
     pageLayout?: DocPageLayout;
     createdAt: number;
     updatedAt: number;
+    linkedDirectoryId?: string;
+    linkedFileName?: string;
 }

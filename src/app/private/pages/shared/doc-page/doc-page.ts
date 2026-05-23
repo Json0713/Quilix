@@ -58,6 +58,16 @@ export class DocPage implements OnInit, OnDestroy {
         }
     }
 
+    onDocSelected(selectedDocId: string) {
+        if (!selectedDocId) {
+            this.goBack();
+        } else {
+            const isTeam = this.router.url.includes('/team/');
+            const prefix = isTeam ? 'team' : 'personal';
+            this.router.navigate(['/', prefix, 'spaces', this.spaceId(), 'doc', selectedDocId]);
+        }
+    }
+
     ngOnDestroy() {
         this.paramSub?.unsubscribe();
     }

@@ -40,15 +40,139 @@
             }
         </div>
         <div class="sheet-menubar">
-            <div class="menu-item">File</div>
-            <div class="menu-item">Edit</div>
-            <div class="menu-item">View</div>
-            <div class="menu-item">Insert</div>
-            <div class="menu-item">Format</div>
-            <div class="menu-item">Data</div>
-            <div class="menu-item">Tools</div>
+            <div class="menu-container">
+                <div class="menu-item" [class.active]="activeMenu() === 'File'" (click)="toggleMenu('File', $event)">File</div>
+                @if (activeMenu() === 'File') {
+                    <div class="menu-dropdown">
+                        <button class="dropdown-item" (click)="createNewSheet()">
+                            <i class="bi bi-file-earmark-plus"></i> New Spreadsheet
+                        </button>
+                        <button class="dropdown-item" (click)="openOpenModal()">
+                            <i class="bi bi-folder2-open"></i> Open File...
+                        </button>
+                        <button class="dropdown-item" (click)="openSaveAsModal()">
+                            <i class="bi bi-file-earmark-arrow-down"></i> Save As File...
+                        </button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" (click)="exportAsJson(); closeMenu()">
+                            <i class="bi bi-file-earmark-code"></i> Export as JSON (.json)
+                        </button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item text-danger" (click)="deleteSheet(); closeMenu()">
+                            <i class="bi bi-trash"></i> Delete Spreadsheet
+                        </button>
+                    </div>
+                }
+            </div>
+            <div class="menu-container">
+                <div class="menu-item" [class.active]="activeMenu() === 'Edit'" (click)="toggleMenu('Edit', $event)">Edit</div>
+                @if (activeMenu() === 'Edit') {
+                    <div class="menu-dropdown">
+                        <button class="dropdown-item" (click)="undo(); closeMenu()">
+                            <i class="bi bi-arrow-90deg-left"></i> Undo
+                        </button>
+                        <button class="dropdown-item" (click)="redo(); closeMenu()">
+                            <i class="bi bi-arrow-90deg-right"></i> Redo
+                        </button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" (click)="clearSelectedCell(); closeMenu()">
+                            <i class="bi bi-eraser"></i> Clear Selected Cell
+                        </button>
+                    </div>
+                }
+            </div>
+            <div class="menu-container">
+                <div class="menu-item" [class.active]="activeMenu() === 'View'" (click)="toggleMenu('View', $event)">View</div>
+                @if (activeMenu() === 'View') {
+                    <div class="menu-dropdown">
+                        <button class="dropdown-item" (click)="showStats(); closeMenu()">
+                            <i class="bi bi-bar-chart-line"></i> Spreadsheet Stats
+                        </button>
+                    </div>
+                }
+            </div>
+            <div class="menu-container">
+                <div class="menu-item" [class.active]="activeMenu() === 'Insert'" (click)="toggleMenu('Insert', $event)">Insert</div>
+                @if (activeMenu() === 'Insert') {
+                    <div class="menu-dropdown">
+                        <button class="dropdown-item" (click)="addTab(); closeMenu()">
+                            <i class="bi bi-plus-circle"></i> Add New Sheet
+                        </button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" (click)="insertRow(); closeMenu()">
+                            <i class="bi bi-list-nested"></i> Insert Row
+                        </button>
+                        <button class="dropdown-item" (click)="insertColumn(); closeMenu()">
+                            <i class="bi bi-layout-three-columns"></i> Insert Column
+                        </button>
+                    </div>
+                }
+            </div>
+            <div class="menu-container">
+                <div class="menu-item" [class.active]="activeMenu() === 'Format'" (click)="toggleMenu('Format', $event)">Format</div>
+                @if (activeMenu() === 'Format') {
+                    <div class="menu-dropdown">
+                        <button class="dropdown-item" (click)="toggleBold(); closeMenu()">
+                            <i class="bi bi-type-bold"></i> Bold
+                        </button>
+                        <button class="dropdown-item" (click)="toggleItalic(); closeMenu()">
+                            <i class="bi bi-type-italic"></i> Italic
+                        </button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" (click)="setAlignment('left'); closeMenu()">
+                            <i class="bi bi-text-left"></i> Align Left
+                        </button>
+                        <button class="dropdown-item" (click)="setAlignment('center'); closeMenu()">
+                            <i class="bi bi-text-center"></i> Align Center
+                        </button>
+                        <button class="dropdown-item" (click)="setAlignment('right'); closeMenu()">
+                            <i class="bi bi-text-right"></i> Align Right
+                        </button>
+                    </div>
+                }
+            </div>
+            <div class="menu-container">
+                <div class="menu-item" [class.active]="activeMenu() === 'Data'" (click)="toggleMenu('Data', $event)">Data</div>
+                @if (activeMenu() === 'Data') {
+                    <div class="menu-dropdown">
+                        <div class="dropdown-header">Space Spreadsheets</div>
+                        @if (spaceSheets().length > 1) {
+                            @for (doc of spaceSheets(); track doc.id) {
+                                @if (doc.id !== activeDoc()?.id) {
+                                    <button class="dropdown-item" (click)="sheetSelected.emit(doc.id); closeMenu()">
+                                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                                        <span>{{ doc.name }}</span>
+                                    </button>
+                                }
+                            }
+                        } @else {
+                            <div class="px-3 py-2 text-muted small">No other spreadsheets.</div>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="menu-container">
+                <div class="menu-item" [class.active]="activeMenu() === 'Tools'" (click)="toggleMenu('Tools', $event)">Tools</div>
+                @if (activeMenu() === 'Tools') {
+                    <div class="menu-dropdown">
+                        <button class="dropdown-item" (click)="printSheet(); closeMenu()">
+                            <i class="bi bi-printer"></i> Print Spreadsheet
+                        </button>
+                    </div>
+                }
+            </div>
             <div class="menubar-status">
-                <i class="bi bi-cloud-check"></i> Saved to local
+                @if (linkedFilePath()) {
+                    <div class="linked-file-badge" [title]="'Linked to: ' + linkedFilePath()">
+                        <i class="bi bi-file-earmark-fill"></i>
+                        <span>{{ linkedFilePath() }}</span>
+                    </div>
+                }
+                @if (isSaving()) {
+                    <i class="bi bi-arrow-repeat spin animate-spin"></i> Saving...
+                } @else {
+                    <i class="bi bi-cloud-check"></i> {{ linkedFilePath() ? 'Saved to space & file' : 'Saved to space' }}
+                }
             </div>
         </div>
     </div>
@@ -178,12 +302,77 @@
                     {{ tab.name }}
                 </div>
             }
-            <button class="btn-tool add-tab" title="Add Sheet"><i class="bi bi-plus"></i></button>
+            <button class="btn-tool add-tab" title="Add Sheet" (click)="addTab()"><i class="bi bi-plus"></i></button>
         </div>
     } @else {
         <div class="empty-state">
             <i class="bi bi-hourglass text-muted opacity-50 display-1"></i>
             <h4 class="mt-3">Loading Spreadsheet...</h4>
+        </div>
+    }
+
+    <!-- ── SAVE AS MODAL ── -->
+    @if (showSaveAsModal()) {
+        <div class="note-modal-overlay">
+            <div class="note-modal-card">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-file-earmark-arrow-down-fill text-primary me-2"></i>Save Sheet As File</h5>
+                    <button class="btn-close-modal" (click)="showSaveAsModal.set(false)"><i class="bi bi-x"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold uppercase">File Name</label>
+                        <input type="text" class="form-control" [ngModel]="saveAsFileName()" (ngModelChange)="saveAsFileName.set($event)" placeholder="sheet.json">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold uppercase">Save Directory</label>
+                        <select class="form-select" [ngModel]="selectedFolderId()" (ngModelChange)="selectedFolderId.set($event)">
+                            @for (folder of foldersList(); track folder.path) {
+                                <option [value]="folder.id || 'root'">{{ folder.path }}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" (click)="showSaveAsModal.set(false)">Cancel</button>
+                    <button class="btn btn-primary" (click)="confirmSaveAs()">Save File</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ── OPEN FILE MODAL ── -->
+    @if (showOpenModal()) {
+        <div class="note-modal-overlay">
+            <div class="note-modal-card">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-folder2-open-fill text-primary me-2"></i>Open File as Spreadsheet</h5>
+                    <button class="btn-close-modal" (click)="showOpenModal.set(false)"><i class="bi bi-x"></i></button>
+                </div>
+                <div class="modal-body file-list-container">
+                    @if (spaceFiles().length === 0) {
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-file-earmark opacity-30 display-4"></i>
+                            <p class="mt-3 mb-0">No files available to open in this space.</p>
+                        </div>
+                    } @else {
+                        <div class="file-list-group">
+                            @for (file of spaceFiles(); track file.path) {
+                                <button class="file-item-btn" (click)="openFile(file)">
+                                    <div class="file-item-info">
+                                        <i class="bi bi-file-earmark-code-fill file-icon"></i>
+                                        <span class="file-name-label">{{ file.path }}</span>
+                                    </div>
+                                    <i class="bi bi-chevron-right arrow-icon"></i>
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" (click)="showOpenModal.set(false)">Close</button>
+                </div>
+            </div>
         </div>
     }
 </div>

@@ -26,4 +26,6 @@ export interface SheetDocument {
     activeTabId: string;
     createdAt: number;
     updatedAt: number;
+    linkedDirectoryId?: string;
+    linkedFileName?: string;
 }
