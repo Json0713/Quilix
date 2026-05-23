@@ -58,6 +58,16 @@ export class NotePage implements OnInit, OnDestroy {
         }
     }
 
+    onNoteSelected(selectedNoteId: string) {
+        if (!selectedNoteId) {
+            this.goBack();
+        } else {
+            const isTeam = this.router.url.includes('/team/');
+            const prefix = isTeam ? 'team' : 'personal';
+            this.router.navigate(['/', prefix, 'spaces', this.spaceId(), 'note', selectedNoteId]);
+        }
+    }
+
     ngOnDestroy() {
         this.paramSub?.unsubscribe();
     }

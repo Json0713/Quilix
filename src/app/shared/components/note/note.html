@@ -39,6 +39,12 @@
                 </div>
             }
             <div class="menubar-status">
+                @if (linkedFilePath()) {
+                    <div class="linked-file-badge" [title]="'Linked to: ' + linkedFilePath()">
+                        <i class="bi bi-file-earmark-fill"></i>
+                        <span>{{ linkedFilePath() }}</span>
+                    </div>
+                }
                 @if (isSaving()) {
                     <i class="bi bi-arrow-repeat spin"></i> {{ saveStatus() }}
                 } @else {
@@ -53,6 +59,16 @@
                     <div class="menu-item" [class.active]="activeMenu() === 'File'" (click)="toggleMenu('File', $event)">File</div>
                     @if (activeMenu() === 'File') {
                         <div class="menu-dropdown">
+                            <button class="dropdown-item" (click)="createNewNote()">
+                                <i class="bi bi-file-earmark-plus"></i> New Note
+                            </button>
+                            <button class="dropdown-item" (click)="openOpenModal()">
+                                <i class="bi bi-folder2-open"></i> Open File...
+                            </button>
+                            <button class="dropdown-item" (click)="openSaveAsModal()">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Save As File...
+                            </button>
+                            <div class="dropdown-divider"></div>
                             <button class="dropdown-item" (click)="exportAsTxt(); closeMenu()">
                                 <i class="bi bi-file-earmark-text"></i> Export as Text (.txt)
                             </button>
@@ -172,5 +188,71 @@
     <div class="editor-wrapper">
         <div #editorContainer class="quill-container"></div>
     </div>
+
+    <!-- ── SAVE AS MODAL ── -->
+    @if (showSaveAsModal()) {
+        <div class="note-modal-overlay">
+            <div class="note-modal-card">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-file-earmark-arrow-down-fill text-primary me-2"></i>Save Note As File</h5>
+                    <button class="btn-close-modal" (click)="showSaveAsModal.set(false)"><i class="bi bi-x"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold uppercase">File Name</label>
+                        <input type="text" class="form-control" [ngModel]="saveAsFileName()" (ngModelChange)="saveAsFileName.set($event)" placeholder="note.html">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold uppercase">Save Directory</label>
+                        <select class="form-select" [ngModel]="selectedFolderId()" (ngModelChange)="selectedFolderId.set($event)">
+                            @for (folder of foldersList(); track folder.path) {
+                                <option [value]="folder.id || 'root'">{{ folder.path }}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" (click)="showSaveAsModal.set(false)">Cancel</button>
+                    <button class="btn btn-primary" (click)="confirmSaveAs()">Save File</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ── OPEN FILE MODAL ── -->
+    @if (showOpenModal()) {
+        <div class="note-modal-overlay">
+            <div class="note-modal-card">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-folder2-open-fill text-primary me-2"></i>Open File as Note</h5>
+                    <button class="btn-close-modal" (click)="showOpenModal.set(false)"><i class="bi bi-x"></i></button>
+                </div>
+                <div class="modal-body file-list-container">
+                    @if (spaceFiles().length === 0) {
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-file-earmark opacity-30 display-4"></i>
+                            <p class="mt-3 mb-0">No files available to open in this space.</p>
+                        </div>
+                    } @else {
+                        <div class="file-list-group">
+                            @for (file of spaceFiles(); track file.path) {
+                                <button class="file-item-btn" (click)="openFile(file)">
+                                    <div class="file-item-info">
+                                        <i class="bi bi-file-earmark-code-fill file-icon"></i>
+                                        <span class="file-name-label">{{ file.path }}</span>
+                                    </div>
+                                    <i class="bi bi-chevron-right arrow-icon"></i>
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" (click)="showOpenModal.set(false)">Close</button>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
 

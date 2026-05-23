@@ -5,4 +5,6 @@ export interface NoteDocument {
     content: string; // HTML string stored from Quill
     createdAt: number;
     updatedAt: number;
+    linkedDirectoryId?: string;
+    linkedFileName?: string;
 }

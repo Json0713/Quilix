@@ -191,6 +191,15 @@ export class FileManagerService {
     async deleteEntry(context: { parentHandle?: FileSystemDirectoryHandle }, entry: FileExplorerEntry): Promise<void> {
         const mode = await this.fileSystem.getStorageMode();
 
+        // Resolve containing directory ID to clear note links
+        let parentDirId = entry.parentId || 'root';
+        if (mode === 'filesystem' && context.parentHandle) {
+            const res = await this.fileSystem.readDirectoryId(context.parentHandle);
+            if (res) {
+                parentDirId = res.id;
+            }
+        }
+
         if (mode === 'filesystem' && context.parentHandle && entry.handle) {
             await (context.parentHandle as any).removeEntry(entry.name, { recursive: entry.kind === 'directory' });
         } else if (entry.id) {
@@ -200,6 +209,21 @@ export class FileManagerService {
                 }
                 await db.virtual_entries.delete(entry.id!);
             });
+        }
+
+        // Clean up linked notes
+        try {
+            const linkedNotes = await db.notes
+                .filter(n => n.linkedDirectoryId === parentDirId && n.linkedFileName === entry.name)
+                .toArray();
+            for (const note of linkedNotes) {
+                await db.notes.update(note.id, {
+                    linkedDirectoryId: undefined,
+                    linkedFileName: undefined
+                });
+            }
+        } catch (e) {
+            console.error('[FileManager] Failed to clean up linked notes on deletion', e);
         }
 
         await this.activityService.log({
@@ -236,12 +260,12 @@ export class FileManagerService {
         );
 
         const mode = await this.fileSystem.getStorageMode();
+        let renamed = false;
 
         if (mode === 'filesystem' && entry.handle) {
             if (!context.parentHandle) return false;
             // Native Move (Internal move() or fallback copy-delete)
-            const renamed = await this.fileSystem.safeRenameFolder(context.parentHandle, entry.name, resolvedName);
-            return renamed;
+            renamed = await this.fileSystem.safeRenameFolder(context.parentHandle, entry.name, resolvedName);
         } else if (entry.id) {
             const oldName = entry.name;
             await db.virtual_entries.update(entry.id, { name: resolvedName, lastModified: Date.now() });
@@ -255,10 +279,27 @@ export class FileManagerService {
                 newName: resolvedName,
                 description: `Renamed ${entry.kind} from "${oldName}" to "${resolvedName}"`
             });
-
-            return true;
+            renamed = true;
         }
-        return false;
+
+        if (renamed) {
+            // Update linked notes
+            const parentDirId = context.parentId || 'root';
+            try {
+                const linkedNotes = await db.notes
+                    .filter(n => n.linkedDirectoryId === parentDirId && n.linkedFileName === entry.name)
+                    .toArray();
+                for (const note of linkedNotes) {
+                    await db.notes.update(note.id, {
+                        linkedFileName: resolvedName
+                    });
+                }
+            } catch (e) {
+                console.error('[FileManager] Failed to update linked notes on rename', e);
+            }
+        }
+
+        return renamed;
     }
 
     /**
@@ -457,6 +498,31 @@ export class FileManagerService {
         }
 
         return null;
+    }
+
+    /**
+     * Polymorphic File Content Writer
+     */
+    async updateFileContent(entry: FileExplorerEntry, content: string | Blob): Promise<void> {
+        const mode = await this.fileSystem.getStorageMode();
+        const blob = typeof content === 'string' ? new Blob([content], { type: 'text/html' }) : content;
+
+        if (mode === 'filesystem' && entry.handle && entry.kind === 'file') {
+            try {
+                const writable = await (entry.handle as any).createWritable();
+                await writable.write(blob);
+                await writable.close();
+            } catch (err) {
+                console.error('[FileManager] Failed to write native file:', err);
+                throw err;
+            }
+        } else if (entry.id) {
+            await db.virtual_entries.update(entry.id, {
+                content: blob,
+                sizeBytes: blob.size,
+                lastModified: Date.now()
+            });
+        }
     }
 
     private async resolveUniqueName(context: { parentHandle?: FileSystemDirectoryHandle, spaceId: string, parentId: string | null }, baseName: string, isDirectory: boolean): Promise<string> {
