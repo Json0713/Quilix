@@ -46,9 +46,131 @@
                 }
             </div>
         </div>
+
+        @if (activeDoc()) {
+            <div class="note-menubar">
+                <div class="menu-container">
+                    <div class="menu-item" [class.active]="activeMenu() === 'File'" (click)="toggleMenu('File', $event)">File</div>
+                    @if (activeMenu() === 'File') {
+                        <div class="menu-dropdown">
+                            <button class="dropdown-item" (click)="exportAsTxt(); closeMenu()">
+                                <i class="bi bi-file-earmark-text"></i> Export as Text (.txt)
+                            </button>
+                            <button class="dropdown-item" (click)="exportAsHtml(); closeMenu()">
+                                <i class="bi bi-filetype-html"></i> Export as HTML (.html)
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item text-danger" (click)="deleteNote(); closeMenu()">
+                                <i class="bi bi-trash"></i> Delete Note
+                            </button>
+                        </div>
+                    }
+                </div>
+                
+                <div class="menu-container">
+                    <div class="menu-item" [class.active]="activeMenu() === 'Edit'" (click)="toggleMenu('Edit', $event)">Edit</div>
+                    @if (activeMenu() === 'Edit') {
+                        <div class="menu-dropdown">
+                            <button class="dropdown-item" (click)="undo(); closeMenu()">
+                                <i class="bi bi-arrow-90deg-left"></i> Undo
+                            </button>
+                            <button class="dropdown-item" (click)="redo(); closeMenu()">
+                                <i class="bi bi-arrow-90deg-right"></i> Redo
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" (click)="selectAll(); closeMenu()">
+                                <i class="bi bi-cursor"></i> Select All
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                <div class="menu-container">
+                    <div class="menu-item" [class.active]="activeMenu() === 'View'" (click)="toggleMenu('View', $event)">View</div>
+                    @if (activeMenu() === 'View') {
+                        <div class="menu-dropdown">
+                            <button class="dropdown-item" (click)="showStats(); closeMenu()">
+                                <i class="bi bi-bar-chart-line"></i> Note Statistics
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                <div class="menu-container">
+                    <div class="menu-item" [class.active]="activeMenu() === 'Insert'" (click)="toggleMenu('Insert', $event)">Insert</div>
+                    @if (activeMenu() === 'Insert') {
+                        <div class="menu-dropdown">
+                            <button class="dropdown-item" (click)="insertLink(); closeMenu()">
+                                <i class="bi bi-link-45deg"></i> Link
+                            </button>
+                            <button class="dropdown-item" (click)="insertDateTime(); closeMenu()">
+                                <i class="bi bi-calendar-event"></i> Date and Time
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                <div class="menu-container">
+                    <div class="menu-item" [class.active]="activeMenu() === 'Format'" (click)="toggleMenu('Format', $event)">Format</div>
+                    @if (activeMenu() === 'Format') {
+                        <div class="menu-dropdown">
+                            <button class="dropdown-item" (click)="formatText('bold'); closeMenu()">
+                                <i class="bi bi-type-bold"></i> Bold
+                            </button>
+                            <button class="dropdown-item" (click)="formatText('italic'); closeMenu()">
+                                <i class="bi bi-type-italic"></i> Italic
+                            </button>
+                            <button class="dropdown-item" (click)="formatText('underline'); closeMenu()">
+                                <i class="bi bi-type-underline"></i> Underline
+                            </button>
+                            <button class="dropdown-item" (click)="formatText('strike'); closeMenu()">
+                                <i class="bi bi-type-strikethrough"></i> Strikethrough
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" (click)="clearFormatting(); closeMenu()">
+                                <i class="bi bi-x-circle"></i> Clear Formatting
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                <div class="menu-container">
+                    <div class="menu-item" [class.active]="activeMenu() === 'Data'" (click)="toggleMenu('Data', $event)">Data</div>
+                    @if (activeMenu() === 'Data') {
+                        <div class="menu-dropdown">
+                            <div class="dropdown-header">Space Notes</div>
+                            @if (spaceNotes().length > 1) {
+                                @for (doc of spaceNotes(); track doc.id) {
+                                    @if (doc.id !== activeDoc()?.id) {
+                                        <button class="dropdown-item" (click)="noteSelected.emit(doc.id); closeMenu()">
+                                            <i class="bi bi-journal-text"></i>
+                                            <span>{{ doc.name }}</span>
+                                        </button>
+                                    }
+                                }
+                            } @else {
+                                <div class="px-3 py-2 text-muted small">No other notes.</div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <div class="menu-container">
+                    <div class="menu-item" [class.active]="activeMenu() === 'Tools'" (click)="toggleMenu('Tools', $event)">Tools</div>
+                    @if (activeMenu() === 'Tools') {
+                        <div class="menu-dropdown">
+                            <button class="dropdown-item" (click)="printNote(); closeMenu()">
+                                <i class="bi bi-printer"></i> Print Note
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
     </div>
     
     <div class="editor-wrapper">
         <div #editorContainer class="quill-container"></div>
     </div>
 </div>
+
