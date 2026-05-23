@@ -1,4 +1,15 @@
-import { Component, inject, signal, OnInit, OnDestroy, ElementRef, ViewChild, ViewChildren, QueryList, HostListener } from '@angular/core';
+import { 
+    Component, 
+    inject, 
+    signal, 
+    OnInit, 
+    OnDestroy, 
+    ElementRef, 
+    ViewChild, 
+    ViewChildren, 
+    QueryList, 
+    HostListener 
+} from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
