@@ -1,85 +1,102 @@
-.sheet-container {
-    display: flex;
-    flex-direction: column;
+// ─────────────────────────────────────────────
+// Host & Root Container
+// ─────────────────────────────────────────────
+:host {
+    display: block;
     height: 100%;
-    width: 100%;
-    background: var(--surface-main);
 }
 
-.sheet-header {
-    background-color: var(--surface-main);
-    padding: 8px 16px 4px 16px;
-    border-bottom: 1px solid var(--border);
+.sheet-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-main);
+    color: var(--text-main);
+    overflow: hidden; // Contain all children — only the grid scrolls
+}
 
+// ─────────────────────────────────────────────
+// Sheet Header (title row + menubar row)
+// Never scrolls — flex-shrink: 0
+// ─────────────────────────────────────────────
+.sheet-header {
+    flex-shrink: 0;
+    background-color: var(--surface-main);
+    padding: 8px 16px 4px;
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    min-width: 0;
+
+    // ── Top Row: Icon + Title + Status ──
     .header-top {
         display: flex;
         align-items: center;
         margin-bottom: 4px;
         position: relative;
-
-        .doc-title-container {
-            position: relative;
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            align-items: center;
-
-            &.is-invalid {
-                .doc-title-input {
-                    border-color: var(--danger) !important;
-                    color: var(--danger);
-                }
-            }
-        }
-
-        .invalid-indicator {
-            position: absolute;
-            right: 8px;
-            color: var(--danger);
-            font-size: 0.9rem;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-        }
+        min-width: 0;
     }
 
     .sheet-icon {
         width: 32px;
         height: 32px;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: rgba(34, 197, 94, 0.1); /* Success color transparent */
+        background-color: rgba(34, 197, 94, 0.1);
         color: #22c55e;
         border-radius: 8px;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: background-color 0.2s, transform 0.2s;
         margin-right: 12px;
-        flex-shrink: 0;
 
         &:hover {
             background-color: rgba(34, 197, 94, 0.2);
             transform: scale(1.05);
         }
 
-        i {
-            font-size: 1.1rem;
+        i { font-size: 1.1rem; }
+    }
+
+    // ── Title ──
+    .doc-title-container {
+        position: relative;
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+
+        &.is-invalid .doc-title-input {
+            border-color: var(--danger) !important;
+            color: var(--danger);
         }
     }
-    
+
+    .invalid-indicator {
+        position: absolute;
+        right: 8px;
+        color: var(--danger);
+        font-size: 0.9rem;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+    }
+
     .doc-title-input {
         outline: none;
         box-shadow: none;
         border: 1px solid transparent;
         font-size: 1.1rem;
         font-weight: 600;
-        min-width: 200px;
+        width: 100%;
+        min-width: 0;
         max-width: 400px;
         background: transparent;
         color: var(--text-main);
         padding: 2px 6px;
         border-radius: 4px;
-        transition: all 0.2s;
+        transition: border-color 0.2s, background-color 0.2s;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
@@ -92,35 +109,31 @@
         &:focus {
             border-color: var(--action);
             background-color: var(--surface-main);
-            max-width: none; /* Expand when focused */
+            max-width: none;
         }
 
         @media (max-width: 768px) {
             max-width: 180px;
         }
     }
-    
+
+    // ── Sheet Switcher Dropdown (from icon click) ──
     .sheet-dropdown {
         position: absolute;
-        top: 100%;
+        top: calc(100% + 4px);
         left: 0;
         z-index: 1150;
         min-width: 200px;
-        max-width: 320px; /* Constrain width */
+        max-width: min(320px, calc(100vw - 32px));
         background-color: var(--surface-main);
         border: 1px solid var(--border);
         border-radius: 10px;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         padding: 4px;
         backdrop-filter: blur(12px);
-        margin-top: 4px;
         max-height: 300px;
         overflow-y: auto;
         overflow-x: hidden;
-
-        @media (max-width: 768px) {
-            max-width: 260px;
-        }
 
         .dropdown-header {
             padding: 0.25rem 0.75rem;
@@ -130,6 +143,7 @@
             font-size: 0.7rem;
             text-transform: uppercase;
             font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         .dropdown-item {
@@ -147,9 +161,7 @@
             cursor: pointer;
             min-width: 0;
 
-            &:hover {
-                background-color: var(--surface-alt);
-            }
+            &:hover { background-color: var(--surface-alt); }
 
             i {
                 font-size: 1rem;
@@ -166,125 +178,157 @@
         }
     }
 
-    .sheet-menubar {
-        display: flex;
-        gap: 4px;
-        color: var(--text-muted);
-        font-size: 0.85rem;
-        margin-left: 40px; /* Aligns with input */
-        overflow: visible;
-        white-space: nowrap;
-        
-        .menu-item {
-            flex-shrink: 0;
-        }
-    }
-
-    .menu-item {
-        cursor: pointer;
-        padding: 4px 8px;
-        border-radius: 4px;
-        
-        &:hover {
-            background-color: var(--bg-hover);
-        }
-    }
-
+    // ── Save Status ──
     .menubar-status {
         margin-left: auto;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
+        gap: 4px;
         font-size: 0.8rem;
         color: var(--text-muted);
         opacity: 0.8;
-        
-        i {
-            margin-right: 4px;
+        white-space: nowrap;
+        padding-left: 12px;
+
+        i { flex-shrink: 0; }
+    }
+
+    // ── Menu Bar Row ──
+    // Contained within header — scrolls horizontally if needed, never bleeds out
+    .sheet-menubar {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-left: 44px; // Visual alignment under the title
+        padding: 2px 0;
+        overflow-x: auto;
+        overflow-y: visible;
+        scrollbar-width: none;
+        &::-webkit-scrollbar { display: none; }
+
+        .menu-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .menu-item {
+            cursor: pointer;
+            padding: 3px 8px;
+            border-radius: 4px;
+            transition: background-color 0.15s, color 0.15s;
+            user-select: none;
+            white-space: nowrap;
+
+            &:hover,
+            &.active {
+                background-color: var(--bg-hover);
+                color: var(--text-main);
+            }
+        }
+
+        // Menu dropdowns — position:fixed so they never clip inside any overflow:hidden ancestor
+        .menu-dropdown {
+            position: fixed;
+            z-index: 1200;
+            min-width: 180px;
+            background-color: var(--surface-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            padding: 4px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+
+            .dropdown-header {
+                padding: 0.25rem 0.75rem;
+                margin-bottom: 0.25rem;
+                border-bottom: 1px solid var(--border);
+                color: var(--text-muted);
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+            }
+
+            .dropdown-divider {
+                height: 1px;
+                background-color: var(--border);
+                margin: 4px 0;
+            }
+
+            .dropdown-item {
+                display: flex;
+                align-items: center;
+                text-align: left;
+                color: var(--text-main);
+                font-size: 0.85rem;
+                background: transparent;
+                border: none;
+                padding: 0.5rem 0.75rem;
+                border-radius: 6px;
+                transition: background-color 0.15s;
+                width: 100%;
+                cursor: pointer;
+                white-space: nowrap;
+
+                &:hover { background-color: var(--surface-alt); }
+
+                &.text-danger { color: var(--danger); }
+
+                i {
+                    font-size: 1rem;
+                    margin-right: 0.75rem;
+                    color: var(--text-muted);
+                    flex-shrink: 0;
+                }
+
+                span {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
         }
     }
 }
 
-.btn-tool {
-    background: transparent;
-    border: none;
-    color: var(--text-main);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-        background-color: var(--bg-hover);
-    }
-    
-    &.active {
-        background-color: var(--action-light, rgba(0, 120, 212, 0.1));
-        color: var(--action);
-    }
-
-    i {
-        font-size: 1.1rem;
-    }
-}
-
-.toolbar-divider {
-    width: 1px;
-    height: 16px;
-    background-color: var(--border);
-    margin: 0 4px;
-}
-
+// ─────────────────────────────────────────────
+// Formatting Toolbar — non-scrolling flex sibling
+// ─────────────────────────────────────────────
 .sheet-toolbar {
+    flex-shrink: 0;
     background-color: var(--surface-main);
     border-bottom: 1px solid var(--border);
     padding: 4px 16px;
     display: flex;
-    gap: 8px;
+    gap: 4px;
     align-items: center;
     overflow-x: auto;
-    white-space: nowrap;
+    overflow-y: hidden;
     scrollbar-width: none;
     &::-webkit-scrollbar { display: none; }
-
-    .btn-tool, .toolbar-divider, .color-picker-tool {
-        flex-shrink: 0;
-    }
 }
 
-.color-picker-tool {
-    position: relative;
-    display: flex;
-    align-items: center;
-    padding: 0;
-    overflow: hidden;
-
-    i {
-        pointer-events: none;
-    }
-    
-    input[type="color"] {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        cursor: pointer;
-    }
-}
-
+// ─────────────────────────────────────────────
+// Formula Bar — non-scrolling flex sibling
+// ─────────────────────────────────────────────
 .formula-bar-container {
+    flex-shrink: 0;
     background-color: var(--surface-main);
     border-bottom: 1px solid var(--border);
     padding: 4px 16px;
     display: flex;
     align-items: center;
     gap: 8px;
+    min-height: 32px;
 
     .formula-label {
-        min-width: 50px;
+        flex-shrink: 0;
+        min-width: 52px;
         font-weight: 600;
         color: var(--text-muted);
         background-color: var(--surface-alt);
@@ -292,50 +336,59 @@
         border-radius: 4px;
         padding: 2px 8px;
         text-align: center;
-        
+        font-size: 0.85rem;
+
         &.empty {
-            border: 1px solid transparent;
+            border-color: transparent;
             background-color: transparent;
         }
     }
-    
+
     .formula-icon {
+        flex-shrink: 0;
         color: var(--text-muted);
         font-weight: bold;
         font-style: italic;
+        font-size: 0.9rem;
     }
 
     .formula-input {
         flex: 1;
+        min-width: 0;
         border: none;
         background: transparent;
         padding: 0 8px;
         outline: none;
         color: var(--text-main);
+        font-size: 0.9rem;
     }
 }
 
+// ─────────────────────────────────────────────
+// Grid Wrapper — the ONLY scrollable area
+// ─────────────────────────────────────────────
 .sheet-grid-wrapper {
-    flex: 1;
+    flex: 1 1 0;
+    min-height: 0; // Critical for flex shrink below content
     overflow: auto;
     background: var(--surface-main);
-    
+
     &::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
     }
-    &::-webkit-scrollbar-track {
-        background: var(--surface-alt);
-    }
+    &::-webkit-scrollbar-track { background: var(--surface-alt); }
     &::-webkit-scrollbar-thumb {
         background: var(--border);
-        border-radius: 4px;
-    }
-    &::-webkit-scrollbar-thumb:hover {
-        background: var(--text-muted);
+        border-radius: 5px;
+        border: 2px solid var(--surface-alt);
+        &:hover { background: var(--text-muted); }
     }
 }
 
+// ─────────────────────────────────────────────
+// Sheet Grid Table
+// ─────────────────────────────────────────────
 .sheet-grid {
     border-collapse: collapse;
     table-layout: fixed;
@@ -391,7 +444,7 @@
         max-width: 100px;
         cursor: cell;
         vertical-align: top;
-        
+
         .cell-content {
             padding: 2px 4px;
             font-size: 0.85rem;
@@ -411,10 +464,9 @@
 
         .cell-editor {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
-            min-height: 100%;
             border: none;
             outline: 2px solid var(--action);
             outline-offset: -2px;
@@ -429,16 +481,19 @@
     }
 }
 
+// ─────────────────────────────────────────────
+// Tabs List — pinned at bottom as flex sibling
+// flex-shrink: 0 keeps it always visible below the grid
+// ─────────────────────────────────────────────
 .tabs-list {
+    flex-shrink: 0;
     display: flex;
+    align-items: stretch;
     background: var(--surface-alt);
     border-top: 1px solid var(--border);
-    height: 32px;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 10;
+    height: 34px;
     overflow-x: auto;
-    white-space: nowrap;
+    overflow-y: hidden;
     scrollbar-width: none;
     &::-webkit-scrollbar { display: none; }
 
@@ -452,85 +507,111 @@
         border-right: 1px solid var(--border);
         cursor: pointer;
         background: var(--surface-alt);
+        transition: background-color 0.15s, color 0.15s;
+        white-space: nowrap;
+        user-select: none;
 
         &.active {
             background: var(--surface-main);
             color: var(--text-main);
             font-weight: 500;
-            border-bottom: 2px solid var(--action);
+            box-shadow: inset 0 -2px 0 var(--action);
         }
 
         &:hover:not(.active) {
             background: var(--bg-hover);
+            color: var(--text-main);
+        }
+    }
+
+    .add-tab {
+        flex-shrink: 0;
+        width: 34px;
+        height: 100%;
+        border-radius: 0;
+        border-right: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 1rem;
+        transition: background-color 0.15s, color 0.15s;
+
+        &:hover {
+            background-color: var(--bg-hover);
+            color: var(--text-main);
         }
     }
 }
 
+// ─────────────────────────────────────────────
+// Shared Toolbar Atoms
+// ─────────────────────────────────────────────
+.btn-tool {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.15s, color 0.15s;
+
+    &:hover { background-color: var(--bg-hover); }
+
+    &.active {
+        background-color: var(--action-light, rgba(0, 120, 212, 0.1));
+        color: var(--action);
+    }
+
+    i { font-size: 1.1rem; }
+}
+
+.toolbar-divider {
+    flex-shrink: 0;
+    width: 1px;
+    height: 18px;
+    background-color: var(--border);
+    margin: 0 4px;
+}
+
+.color-picker-tool {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    i { pointer-events: none; }
+
+    input[type="color"] {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+}
+
+// ─────────────────────────────────────────────
+// Empty State
+// ─────────────────────────────────────────────
 .empty-state {
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
     padding: 2rem;
     text-align: center;
+    color: var(--text-muted);
 }
 
-/* ── Menubar Dropdown Styles ── */
-.menu-container {
-    position: relative;
-}
-
-.menu-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1150;
-    min-width: 180px;
-    background-color: var(--surface-main);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    padding: 4px;
-    backdrop-filter: blur(12px);
-    margin-top: 4px;
-    display: flex;
-    flex-direction: column;
-
-    .dropdown-divider {
-        height: 1px;
-        background-color: var(--border);
-        margin: 4px 0;
-    }
-
-    .dropdown-item {
-        display: flex;
-        align-items: center;
-        text-align: left;
-        color: var(--text-main);
-        font-size: 0.85rem;
-        background: transparent;
-        border: none;
-        padding: 0.5rem 0.75rem;
-        border-radius: 6px;
-        transition: background-color 0.15s;
-        width: 100%;
-        cursor: pointer;
-        white-space: nowrap;
-
-        &:hover {
-            background-color: var(--surface-alt);
-        }
-
-        i {
-            font-size: 1rem;
-            margin-right: 0.75rem;
-            color: var(--text-muted);
-        }
-    }
-}
-
-/* ── Linked File Badge ── */
+// ─────────────────────────────────────────────
+// Linked File Badge
+// ─────────────────────────────────────────────
 .linked-file-badge {
     display: inline-flex;
     align-items: center;
@@ -546,12 +627,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     border: 1px solid rgba(0, 120, 212, 0.15);
-    margin-right: 12px;
-    transition: all 0.2s ease;
+    margin-right: 8px;
+    transition: max-width 0.2s ease, background-color 0.2s;
 
-    i {
-        font-size: 0.9rem;
-    }
+    i { font-size: 0.9rem; }
 
     &:hover {
         background-color: var(--action-light-hover, rgba(0, 120, 212, 0.15));
@@ -559,13 +638,12 @@
     }
 }
 
-/* ── Note Modals Design ── */
+// ─────────────────────────────────────────────
+// Modals (shared with note page pattern)
+// ─────────────────────────────────────────────
 .note-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    inset: 0;
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(8px);
     z-index: 2000;
@@ -614,7 +692,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s;
+            transition: background-color 0.15s, color 0.15s;
 
             &:hover {
                 background-color: var(--bg-hover);
@@ -634,7 +712,8 @@
             letter-spacing: 0.5px;
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             width: 100%;
             padding: 8px 12px;
             background-color: var(--surface-alt);
@@ -645,9 +724,7 @@
             font-size: 0.9rem;
             transition: border-color 0.2s;
 
-            &:focus {
-                border-color: var(--action);
-            }
+            &:focus { border-color: var(--action); }
         }
     }
 
@@ -672,7 +749,7 @@
             padding: 10px 12px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: background-color 0.15s, border-color 0.15s;
 
             &:hover {
                 background-color: var(--surface-alt);
@@ -688,6 +765,7 @@
                 .file-icon {
                     font-size: 1.1rem;
                     color: var(--action);
+                    flex-shrink: 0;
                 }
 
                 .file-name-label {
@@ -704,12 +782,11 @@
                 font-size: 0.8rem;
                 color: var(--text-muted);
                 opacity: 0;
+                flex-shrink: 0;
                 transition: opacity 0.15s;
             }
 
-            &:hover .arrow-icon {
-                opacity: 1;
-            }
+            &:hover .arrow-icon { opacity: 1; }
         }
     }
 
@@ -728,8 +805,8 @@
             font-weight: 500;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.15s;
             border: 1px solid transparent;
+            transition: background-color 0.15s, filter 0.15s;
         }
 
         .btn-outline {
@@ -737,18 +814,34 @@
             border-color: var(--border);
             color: var(--text-main);
 
-            &:hover {
-                background-color: var(--bg-hover);
-            }
+            &:hover { background-color: var(--bg-hover); }
         }
 
         .btn-primary {
             background-color: var(--action);
             color: white;
 
-            &:hover {
-                filter: brightness(1.1);
-            }
+            &:hover { filter: brightness(1.1); }
         }
     }
 }
+
+// ─────────────────────────────────────────────
+// Animations
+// ─────────────────────────────────────────────
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(16px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.spin { animation: spin 1s linear infinite; }

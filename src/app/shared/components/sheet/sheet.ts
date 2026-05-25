@@ -45,6 +45,7 @@ export class SheetComponent implements OnInit, OnDestroy, OnChanges {
     showDropdown = signal<boolean>(false);
     isTitleDuplicate = signal<boolean>(false);
     activeMenu = signal<string | null>(null);
+    dropdownPos = signal<{ top: number; left: number }>({ top: 0, left: 0 });
 
     // Save As and Open File Modal signals
     showSaveAsModal = signal<boolean>(false);
@@ -448,6 +449,12 @@ export class SheetComponent implements OnInit, OnDestroy, OnChanges {
         if (this.activeMenu() === menu) {
             this.activeMenu.set(null);
         } else {
+            // Compute viewport-relative position so fixed dropdown appears below the trigger
+            const trigger = event.currentTarget as HTMLElement;
+            const rect = trigger.getBoundingClientRect();
+            const dropdownWidth = 200;
+            const left = Math.min(rect.left, window.innerWidth - dropdownWidth - 8);
+            this.dropdownPos.set({ top: rect.bottom + 4, left });
             this.activeMenu.set(menu);
         }
     }
