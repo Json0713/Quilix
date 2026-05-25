@@ -69,6 +69,7 @@ export class NoteComponent implements OnInit, OnDestroy, OnChanges {
     showDropdown = signal<boolean>(false);
     isTitleDuplicate = signal<boolean>(false);
     activeMenu = signal<string | null>(null);
+    dropdownPos = signal<{ top: number; left: number }>({ top: 0, left: 0 });
 
     // Save As and Open File Modal signals
     showSaveAsModal = signal<boolean>(false);
@@ -326,6 +327,13 @@ export class NoteComponent implements OnInit, OnDestroy, OnChanges {
         if (this.activeMenu() === menu) {
             this.activeMenu.set(null);
         } else {
+            // Calculate position so the fixed dropdown appears below the clicked menu item
+            const trigger = (event.currentTarget as HTMLElement);
+            const rect = trigger.getBoundingClientRect();
+            const dropdownWidth = 200; // approximate min-width
+            // Clamp to the right edge of the viewport
+            const left = Math.min(rect.left, window.innerWidth - dropdownWidth - 8);
+            this.dropdownPos.set({ top: rect.bottom + 4, left });
             this.activeMenu.set(menu);
         }
     }

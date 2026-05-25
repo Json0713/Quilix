@@ -1,5 +1,8 @@
 @import 'quill/dist/quill.snow.css';
 
+// ─────────────────────────────────────────────
+// Host & Root Container
+// ─────────────────────────────────────────────
 :host {
     display: block;
     height: 100%;
@@ -11,68 +14,34 @@
     flex-direction: column;
     background: var(--surface-main);
     color: var(--text-main);
+    overflow: hidden; // Prevent any child from bleeding out
 }
 
+// ─────────────────────────────────────────────
+// Note Header (sticky, never scrolls)
+// ─────────────────────────────────────────────
 .note-header {
+    flex-shrink: 0; // Never shrink — height is always respected
     background-color: var(--surface-main);
-    padding: 8px 16px 4px 16px;
+    padding: 8px 16px 4px;
     border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
     z-index: 100;
+    min-width: 0; // Prevent overflow from flex children
 
+    // ── Top Row: Icon + Title + Status ──
     .header-top {
         display: flex;
         align-items: center;
         margin-bottom: 4px;
         position: relative;
-
-        .doc-title-container {
-            position: relative;
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            align-items: center;
-
-            &.is-invalid {
-                .doc-title-input {
-                    border-color: var(--danger) !important;
-                    color: var(--danger);
-                }
-            }
-        }
-
-        .invalid-indicator {
-            position: absolute;
-            right: 8px;
-            color: var(--danger);
-            font-size: 0.9rem;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .menubar-status {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            opacity: 0.8;
-
-            i {
-                margin-right: 4px;
-            }
-
-            .spin {
-                animation: spin 1s linear infinite;
-            }
-        }
+        gap: 0;
+        min-width: 0;
     }
 
     .note-icon {
         width: 32px;
         height: 32px;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -80,18 +49,39 @@
         color: #0ea5e9;
         border-radius: 8px;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: background-color 0.2s, transform 0.2s;
         margin-right: 12px;
-        flex-shrink: 0;
 
         &:hover {
             background-color: rgba(14, 165, 233, 0.2);
             transform: scale(1.05);
         }
 
-        i {
-            font-size: 1.1rem;
+        i { font-size: 1.1rem; }
+    }
+
+    // ── Title Container ──
+    .doc-title-container {
+        position: relative;
+        flex: 1;
+        min-width: 0; // Allow shrink below content width
+        display: flex;
+        align-items: center;
+
+        &.is-invalid .doc-title-input {
+            border-color: var(--danger) !important;
+            color: var(--danger);
         }
+    }
+
+    .invalid-indicator {
+        position: absolute;
+        right: 8px;
+        color: var(--danger);
+        font-size: 0.9rem;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
     }
 
     .doc-title-input {
@@ -100,13 +90,14 @@
         border: 1px solid transparent;
         font-size: 1.1rem;
         font-weight: 600;
-        min-width: 200px;
+        width: 100%;       // Fill the container
+        min-width: 0;
         max-width: 400px;
         background: transparent;
         color: var(--text-main);
         padding: 2px 6px;
         border-radius: 4px;
-        transition: all 0.2s;
+        transition: border-color 0.2s, background-color 0.2s;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
@@ -127,27 +118,23 @@
         }
     }
 
+    // ── Note Switcher Dropdown (from icon click) ──
     .note-dropdown {
         position: absolute;
-        top: 100%;
+        top: calc(100% + 4px);
         left: 0;
         z-index: 1150;
         min-width: 200px;
-        max-width: 320px;
+        max-width: min(320px, calc(100vw - 32px)); // Never bleed off-screen
         background-color: var(--surface-main);
         border: 1px solid var(--border);
         border-radius: 10px;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         padding: 4px;
         backdrop-filter: blur(12px);
-        margin-top: 4px;
         max-height: 300px;
         overflow-y: auto;
         overflow-x: hidden;
-
-        @media (max-width: 768px) {
-            max-width: 260px;
-        }
 
         .dropdown-header {
             padding: 0.25rem 0.75rem;
@@ -157,6 +144,7 @@
             font-size: 0.7rem;
             text-transform: uppercase;
             font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         .dropdown-item {
@@ -174,9 +162,7 @@
             cursor: pointer;
             min-width: 0;
 
-            &:hover {
-                background-color: var(--surface-alt);
-            }
+            &:hover { background-color: var(--surface-alt); }
 
             i {
                 font-size: 1rem;
@@ -193,48 +179,67 @@
         }
     }
 
+    // ── Save Status Badge ──
+    .menubar-status {
+        margin-left: auto;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        opacity: 0.8;
+        white-space: nowrap;
+        padding-left: 12px;
+    }
+
+    // ── Menu Bar Row ──
+    // FIX 1: Contained within header — no overflow outside
     .note-menubar {
         display: flex;
-        gap: 8px;
+        align-items: center;
+        gap: 2px;
         color: var(--text-muted);
         font-size: 0.85rem;
-        margin-left: 44px; /* Aligns with note title */
-        overflow: visible;
-        white-space: nowrap;
-        padding-top: 4px;
-        padding-bottom: 2px;
-        
+        margin-left: 44px; // Visually aligns under the title
+        padding: 2px 0;
+        // Scroll horizontally if items overflow — but never bleed out of the header
+        overflow-x: auto;
+        overflow-y: visible;
+        scrollbar-width: none; // Firefox
+        &::-webkit-scrollbar { display: none; } // Chrome/Safari
+
         .menu-container {
             position: relative;
+            flex-shrink: 0;
         }
 
         .menu-item {
-            flex-shrink: 0;
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 3px 8px;
             border-radius: 4px;
-            transition: all 0.15s ease;
+            transition: background-color 0.15s, color 0.15s;
             user-select: none;
-            
-            &:hover, &.active {
+            white-space: nowrap;
+
+            &:hover,
+            &.active {
                 background-color: var(--bg-hover);
                 color: var(--text-main);
             }
         }
 
+        // FIX 2: Menu dropdowns are anchored to their trigger and clamped to the viewport
         .menu-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            z-index: 1150;
+            position: fixed; // Use fixed so it escapes any overflow:hidden ancestor
+            z-index: 1200;
             min-width: 180px;
             background-color: var(--surface-main);
             border: 1px solid var(--border);
             border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
             padding: 4px;
             backdrop-filter: blur(12px);
-            margin-top: 4px;
             display: flex;
             flex-direction: column;
 
@@ -246,6 +251,7 @@
                 font-size: 0.7rem;
                 text-transform: uppercase;
                 font-weight: 600;
+                letter-spacing: 0.5px;
             }
 
             .dropdown-divider {
@@ -269,9 +275,7 @@
                 cursor: pointer;
                 white-space: nowrap;
 
-                &:hover {
-                    background-color: var(--surface-alt);
-                }
+                &:hover { background-color: var(--surface-alt); }
 
                 &.active {
                     background-color: var(--action-light, rgba(0, 120, 212, 0.1));
@@ -279,54 +283,68 @@
                     font-weight: 500;
                 }
 
+                &.text-danger { color: var(--danger); }
+
                 i {
                     font-size: 1rem;
                     margin-right: 0.75rem;
                     color: var(--text-muted);
+                    flex-shrink: 0;
                 }
             }
         }
     }
 }
 
+// ─────────────────────────────────────────────
+// Editor Wrapper — FIX 3: Toolbar inside, stable layout
+// ─────────────────────────────────────────────
+// The editor-wrapper is flex column and grows to fill remaining space.
+// The ql-toolbar becomes a natural flex child — no sticky hacks needed.
+// Only the ql-editor scrolls, so the toolbar never "jerks".
 .editor-wrapper {
-    flex-grow: 1;
+    flex: 1 1 0;     // Grow to fill, but don't let overflow push the header
+    min-height: 0;   // Critical: allows flex child to shrink below content height
     display: flex;
     flex-direction: column;
+    overflow: hidden; // Contain everything — only ql-editor scrolls internally
 }
 
-/* Quill Theme Overrides for Quilix */
+// ─────────────────────────────────────────────
+// Quill Theme Overrides
+// ─────────────────────────────────────────────
 .ql-toolbar.ql-snow {
+    flex-shrink: 0;   // Never shrink — always full height
     border: none;
     border-bottom: 1px solid var(--border);
     background: var(--surface-main);
-    padding: 0.5rem 0.5rem 0.5rem;
+    padding: 6px 8px;
     display: flex;
-    gap: 0.25rem;
     flex-wrap: wrap;
+    gap: 0.25rem;
     align-items: center;
-    position: sticky;
-    top: 77px;
-    z-index: 99;
+    // No position:sticky needed — it's a non-scrolling flex sibling
 }
 
 .ql-container.ql-snow {
     border: none;
-    flex-grow: 1;
+    flex: 1 1 0;
+    min-height: 0;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-size: 1.1rem;
     background: var(--surface-main);
     color: var(--text-main);
     display: flex;
     flex-direction: column;
-    height: 100%;
 }
 
 .ql-editor {
-    flex-grow: 1;
+    flex: 1 1 0;
+    min-height: 0;
     padding: 1.5rem 2rem 4rem;
     line-height: 1.7;
-    overflow-y: auto;
+    overflow-y: auto;  // Only THIS scrolls
+    overflow-x: hidden;
 
     &.ql-blank::before {
         color: var(--text-muted);
@@ -335,41 +353,32 @@
         opacity: 0.6;
     }
 
-    h1,
-    h2,
-    h3 {
+    h1, h2, h3 {
         font-weight: 600;
         color: var(--text-main);
         margin-top: 1.5em;
         margin-bottom: 0.5em;
     }
 
-    p {
-        margin-bottom: 0;
-    }
+    p { margin-bottom: 0; }
 
-    /* OS Native style scrollbar */
+    // Styled scrollbar
     &::-webkit-scrollbar {
         width: 14px;
         height: 14px;
     }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
+    &::-webkit-scrollbar-track { background: transparent; }
     &::-webkit-scrollbar-thumb {
         background: var(--border);
         border-radius: 7px;
         border: 4px solid var(--surface-main);
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-        background: var(--text-muted);
+        &:hover { background: var(--text-muted); }
     }
 }
 
-/* Toolbar Buttons Theming - Minimalist OS Style */
+// ─────────────────────────────────────────────
+// Toolbar Button Theming
+// ─────────────────────────────────────────────
 .ql-snow .ql-picker.ql-header {
     width: 120px;
 }
@@ -379,14 +388,12 @@
     height: 32px;
     width: 32px;
     border-radius: 6px;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s, transform 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
 
-    &:hover {
-        background-color: var(--surface-alt);
-    }
+    &:hover { background-color: var(--surface-alt); }
 }
 
 .ql-snow .ql-stroke {
@@ -407,20 +414,20 @@
 .ql-snow .ql-picker-options {
     background-color: var(--surface);
     border: 1px solid var(--border);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
     padding: 0.5rem 0;
     margin-top: 4px;
 }
 
 .ql-snow .ql-picker-item {
     padding: 0.35rem 1rem;
-    transition: background-color 0.2s;
+    transition: background-color 0.15s;
 
-    &:hover {
-        background-color: var(--surface-alt);
-    }
+    &:hover { background-color: var(--surface-alt); }
 }
 
+// Active / hover states for toolbar
 .ql-snow.ql-toolbar button:hover .ql-stroke,
 .ql-snow .ql-toolbar button:hover .ql-stroke,
 .ql-snow.ql-toolbar button.ql-active .ql-stroke,
@@ -466,31 +473,21 @@
     color: var(--action);
 }
 
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* ═══ Link Tooltip Enhancements ═══ */
+// ─────────────────────────────────────────────
+// Link Tooltip
+// ─────────────────────────────────────────────
 .ql-snow .ql-tooltip {
     background-color: var(--surface);
     border: 1px solid var(--border);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
     color: var(--text-main);
     z-index: 1200 !important;
-    /* Ensure it floats above everything */
     transform: translateY(4px);
     transition: opacity 0.2s ease;
     white-space: nowrap;
 
-    /* Styling the preview state */
     a.ql-preview {
         color: var(--action);
         text-decoration: none;
@@ -500,12 +497,9 @@
         display: inline-block;
         font-size: 1rem;
 
-        &:hover {
-            text-decoration: underline;
-        }
+        &:hover { text-decoration: underline; }
     }
 
-    /* Actions (Edit / Save) */
     a.ql-action {
         color: var(--text-muted);
         margin-left: 8px;
@@ -513,24 +507,18 @@
         font-size: 0.9rem;
         transition: color 0.2s;
 
-        &:hover {
-            color: var(--text-main);
-        }
+        &:hover { color: var(--text-main); }
     }
 
-    /* Action (Remove) */
     a.ql-remove {
         color: var(--danger);
         margin-left: 2px;
         font-weight: 500;
         font-size: 0.9rem;
 
-        &:hover {
-            opacity: 0.8;
-        }
+        &:hover { opacity: 0.8; }
     }
 
-    /* Editing state input */
     input[type=text] {
         background: var(--surface-main);
         border: 1px solid var(--border);
@@ -542,9 +530,7 @@
         transition: border-color 0.2s;
         width: 250px;
 
-        &:focus {
-            border-color: var(--action);
-        }
+        &:focus { border-color: var(--action); }
     }
 
     &[data-mode="link"]::before {
@@ -556,7 +542,9 @@
     }
 }
 
-/* ── Linked File Badge ── */
+// ─────────────────────────────────────────────
+// Linked File Badge
+// ─────────────────────────────────────────────
 .linked-file-badge {
     display: inline-flex;
     align-items: center;
@@ -572,12 +560,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     border: 1px solid rgba(0, 120, 212, 0.15);
-    margin-right: 12px;
-    transition: all 0.2s ease;
+    margin-right: 8px;
+    transition: max-width 0.2s ease, background-color 0.2s;
 
-    i {
-        font-size: 0.9rem;
-    }
+    i { font-size: 0.9rem; }
 
     &:hover {
         background-color: var(--action-light-hover, rgba(0, 120, 212, 0.15));
@@ -585,13 +571,12 @@
     }
 }
 
-/* ── Note Modals Design ── */
+// ─────────────────────────────────────────────
+// Modals
+// ─────────────────────────────────────────────
 .note-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    inset: 0;
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(8px);
     z-index: 2000;
@@ -640,7 +625,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s;
+            transition: background-color 0.15s, color 0.15s;
 
             &:hover {
                 background-color: var(--bg-hover);
@@ -660,7 +645,8 @@
             letter-spacing: 0.5px;
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             width: 100%;
             padding: 8px 12px;
             background-color: var(--surface-alt);
@@ -671,9 +657,7 @@
             font-size: 0.9rem;
             transition: border-color 0.2s;
 
-            &:focus {
-                border-color: var(--action);
-            }
+            &:focus { border-color: var(--action); }
         }
     }
 
@@ -698,7 +682,7 @@
             padding: 10px 12px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: background-color 0.15s, border-color 0.15s;
 
             &:hover {
                 background-color: var(--surface-alt);
@@ -714,6 +698,7 @@
                 .file-icon {
                     font-size: 1.1rem;
                     color: var(--action);
+                    flex-shrink: 0;
                 }
 
                 .file-name-label {
@@ -730,12 +715,11 @@
                 font-size: 0.8rem;
                 color: var(--text-muted);
                 opacity: 0;
+                flex-shrink: 0;
                 transition: opacity 0.15s;
             }
 
-            &:hover .arrow-icon {
-                opacity: 1;
-            }
+            &:hover .arrow-icon { opacity: 1; }
         }
     }
 
@@ -754,7 +738,7 @@
             font-weight: 500;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: background-color 0.15s, filter 0.15s;
             border: 1px solid transparent;
         }
 
@@ -763,28 +747,34 @@
             border-color: var(--border);
             color: var(--text-main);
 
-            &:hover {
-                background-color: var(--bg-hover);
-            }
+            &:hover { background-color: var(--bg-hover); }
         }
 
         .btn-primary {
             background-color: var(--action);
             color: white;
 
-            &:hover {
-                filter: brightness(1.1);
-            }
+            &:hover { filter: brightness(1.1); }
         }
     }
 }
 
+// ─────────────────────────────────────────────
+// Animations
+// ─────────────────────────────────────────────
 @keyframes fadeIn {
     from { opacity: 0; }
-    to { opacity: 1; }
+    to   { opacity: 1; }
 }
 
 @keyframes slideUp {
     from { transform: translateY(16px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    to   { transform: translateY(0);    opacity: 1; }
 }
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.spin { animation: spin 1s linear infinite; }

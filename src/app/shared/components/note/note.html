@@ -58,7 +58,7 @@
                 <div class="menu-container">
                     <div class="menu-item" [class.active]="activeMenu() === 'File'" (click)="toggleMenu('File', $event)">File</div>
                     @if (activeMenu() === 'File') {
-                        <div class="menu-dropdown">
+                        <div class="menu-dropdown" [style.top.px]="dropdownPos().top" [style.left.px]="dropdownPos().left">
                             <button class="dropdown-item" (click)="createNewNote()">
                                 <i class="bi bi-file-earmark-plus"></i> New Note
                             </button>
@@ -86,7 +86,7 @@
                 <div class="menu-container">
                     <div class="menu-item" [class.active]="activeMenu() === 'Edit'" (click)="toggleMenu('Edit', $event)">Edit</div>
                     @if (activeMenu() === 'Edit') {
-                        <div class="menu-dropdown">
+                        <div class="menu-dropdown" [style.top.px]="dropdownPos().top" [style.left.px]="dropdownPos().left">
                             <button class="dropdown-item" (click)="undo(); closeMenu()">
                                 <i class="bi bi-arrow-90deg-left"></i> Undo
                             </button>
@@ -104,7 +104,7 @@
                 <div class="menu-container">
                     <div class="menu-item" [class.active]="activeMenu() === 'View'" (click)="toggleMenu('View', $event)">View</div>
                     @if (activeMenu() === 'View') {
-                        <div class="menu-dropdown">
+                        <div class="menu-dropdown" [style.top.px]="dropdownPos().top" [style.left.px]="dropdownPos().left">
                             <button class="dropdown-item" (click)="showStats(); closeMenu()">
                                 <i class="bi bi-bar-chart-line"></i> Note Statistics
                             </button>
@@ -115,7 +115,7 @@
                 <div class="menu-container">
                     <div class="menu-item" [class.active]="activeMenu() === 'Insert'" (click)="toggleMenu('Insert', $event)">Insert</div>
                     @if (activeMenu() === 'Insert') {
-                        <div class="menu-dropdown">
+                        <div class="menu-dropdown" [style.top.px]="dropdownPos().top" [style.left.px]="dropdownPos().left">
                             <button class="dropdown-item" (click)="insertLink(); closeMenu()">
                                 <i class="bi bi-link-45deg"></i> Link
                             </button>
@@ -129,7 +129,7 @@
                 <div class="menu-container">
                     <div class="menu-item" [class.active]="activeMenu() === 'Format'" (click)="toggleMenu('Format', $event)">Format</div>
                     @if (activeMenu() === 'Format') {
-                        <div class="menu-dropdown">
+                        <div class="menu-dropdown" [style.top.px]="dropdownPos().top" [style.left.px]="dropdownPos().left">
                             <button class="dropdown-item" (click)="formatText('bold'); closeMenu()">
                                 <i class="bi bi-type-bold"></i> Bold
                             </button>
@@ -153,7 +153,7 @@
                 <div class="menu-container">
                     <div class="menu-item" [class.active]="activeMenu() === 'Data'" (click)="toggleMenu('Data', $event)">Data</div>
                     @if (activeMenu() === 'Data') {
-                        <div class="menu-dropdown">
+                        <div class="menu-dropdown" [style.top.px]="dropdownPos().top" [style.left.px]="dropdownPos().left">
                             <div class="dropdown-header">Space Notes</div>
                             @if (spaceNotes().length > 1) {
                                 @for (doc of spaceNotes(); track doc.id) {
@@ -174,7 +174,7 @@
                 <div class="menu-container">
                     <div class="menu-item" [class.active]="activeMenu() === 'Tools'" (click)="toggleMenu('Tools', $event)">Tools</div>
                     @if (activeMenu() === 'Tools') {
-                        <div class="menu-dropdown">
+                        <div class="menu-dropdown" [style.top.px]="dropdownPos().top" [style.left.px]="dropdownPos().left">
                             <button class="dropdown-item" (click)="printNote(); closeMenu()">
                                 <i class="bi bi-printer"></i> Print Note
                             </button>
