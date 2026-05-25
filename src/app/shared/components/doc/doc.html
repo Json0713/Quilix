@@ -1,9 +1,13 @@
 <div class="doc-editor-container" [class]="'doc-editor-container margin-' + pageLayout().margins">
+
     <!-- ═══ Title Bar ═══ -->
     <div class="doc-title-bar">
         <div class="title-left">
             <i class="bi bi-file-earmark-text doc-icon"></i>
-            <input type="text" class="doc-title-input" [ngModel]="docTitle()" (ngModelChange)="updateTitle($event)">
+            <input type="text" class="doc-title-input"
+                   [ngModel]="docTitle()"
+                   (ngModelChange)="updateTitle($event)"
+                   placeholder="Untitled Document">
         </div>
         <div class="title-right">
             @if (linkedFilePath()) {
@@ -13,8 +17,13 @@
                 </div>
             }
             <div class="save-status">
-                @if (isSaving()) { <i class="bi bi-arrow-repeat spin"></i> <span class="hide-mobile">Saving...</span> }
-                @else { <i class="bi bi-cloud-check"></i> <span class="hide-mobile">Saved</span> }
+                @if (isSaving()) {
+                    <i class="bi bi-arrow-repeat spin"></i>
+                    <span class="hide-mobile">Saving...</span>
+                } @else {
+                    <i class="bi bi-cloud-check"></i>
+                    <span class="hide-mobile">Saved</span>
+                }
             </div>
         </div>
     </div>
@@ -22,113 +31,221 @@
     <!-- ═══ Ribbon ═══ -->
     <div class="ribbon">
         <div class="ribbon-tabs">
-            <button class="ribbon-tab" [class.active]="activeTab() === 'file'" (click)="activeTab.set('file')">File</button>
-            <button class="ribbon-tab" [class.active]="activeTab() === 'home'" (click)="activeTab.set('home')">Home</button>
+            <button class="ribbon-tab" [class.active]="activeTab() === 'file'"   (click)="activeTab.set('file')">File</button>
+            <button class="ribbon-tab" [class.active]="activeTab() === 'home'"   (click)="activeTab.set('home')">Home</button>
             <button class="ribbon-tab" [class.active]="activeTab() === 'insert'" (click)="activeTab.set('insert')">Insert</button>
             <button class="ribbon-tab" [class.active]="activeTab() === 'layout'" (click)="activeTab.set('layout')">Layout</button>
-            <button class="ribbon-tab" [class.active]="activeTab() === 'view'" (click)="activeTab.set('view')">View</button>
+            <button class="ribbon-tab" [class.active]="activeTab() === 'view'"   (click)="activeTab.set('view')">View</button>
         </div>
+
         <div class="ribbon-panel">
+
+            <!-- ── File Tab ── -->
             @if (activeTab() === 'file') {
                 <div class="ribbon-group">
                     <div class="ribbon-group-content vertical">
-                        <button class="ribbon-btn tall" (click)="createNewDoc()" title="New Document"><i class="bi bi-file-earmark-plus"></i><span>New</span></button>
-                        <button class="ribbon-btn tall" (click)="openOpenModal()" title="Open File"><i class="bi bi-folder2-open"></i><span>Open</span></button>
-                        <button class="ribbon-btn tall" (click)="openSaveAsModal()" title="Save As File"><i class="bi bi-file-earmark-arrow-down"></i><span>Save As</span></button>
+                        <button class="ribbon-btn tall" (click)="createNewDoc()"    title="New Document">  <i class="bi bi-file-earmark-plus"></i>         <span>New</span>    </button>
+                        <button class="ribbon-btn tall" (click)="openOpenModal()"   title="Open File">     <i class="bi bi-folder2-open"></i>               <span>Open</span>   </button>
+                        <button class="ribbon-btn tall" (click)="openSaveAsModal()" title="Save As File">  <i class="bi bi-file-earmark-arrow-down"></i>    <span>Save As</span></button>
                         <div class="ribbon-separator"></div>
-                        <button class="ribbon-btn tall" (click)="exportAsTxt()" title="Export Text"><i class="bi bi-file-earmark-text"></i><span>TXT</span></button>
-                        <button class="ribbon-btn tall" (click)="exportAsHtml()" title="Export HTML"><i class="bi bi-filetype-html"></i><span>HTML</span></button>
+                        <button class="ribbon-btn tall" (click)="exportAsTxt()"     title="Export Text">   <i class="bi bi-file-earmark-text"></i>          <span>TXT</span>    </button>
+                        <button class="ribbon-btn tall" (click)="exportAsHtml()"    title="Export HTML">   <i class="bi bi-filetype-html"></i>              <span>HTML</span>   </button>
                         <div class="ribbon-separator"></div>
-                        <button class="ribbon-btn tall text-danger" (click)="deleteDoc()" title="Delete Document"><i class="bi bi-trash"></i><span>Delete</span></button>
+                        <button class="ribbon-btn tall text-danger" (click)="deleteDoc()" title="Delete Document"><i class="bi bi-trash"></i>              <span>Delete</span> </button>
                     </div>
                     <span class="ribbon-group-label">Document Operations</span>
                 </div>
             }
+
+            <!-- ── Home Tab ── -->
             @if (activeTab() === 'home') {
-                <div class="ribbon-group"><div class="ribbon-group-content">
-                    <button class="ribbon-btn" (click)="undo()" title="Undo"><i class="bi bi-arrow-counterclockwise"></i></button>
-                    <button class="ribbon-btn" (click)="redo()" title="Redo"><i class="bi bi-arrow-clockwise"></i></button>
-                </div><span class="ribbon-group-label">Clipboard</span></div>
+                <div class="ribbon-group">
+                    <div class="ribbon-group-content">
+                        <div class="ribbon-row">
+                            <button class="ribbon-btn" (click)="undo()" title="Undo"><i class="bi bi-arrow-counterclockwise"></i></button>
+                            <button class="ribbon-btn" (click)="redo()" title="Redo"><i class="bi bi-arrow-clockwise"></i></button>
+                        </div>
+                    </div>
+                    <span class="ribbon-group-label">Clipboard</span>
+                </div>
+
                 <div class="ribbon-separator"></div>
-                <div class="ribbon-group font-group"><div class="ribbon-group-content">
-                    <div class="ribbon-row">
-                        <select class="ribbon-select font-family" [ngModel]="currentFormats()['font'] || ''" (ngModelChange)="setFont($event)"><option value="">Sans Serif</option><option value="serif">Serif</option><option value="monospace">Monospace</option></select>
-                        <select class="ribbon-select font-size" [ngModel]="currentFormats()['size'] || ''" (ngModelChange)="setFontSize($event)"><option value="small">Small</option><option value="">Normal</option><option value="large">Large</option><option value="huge">Huge</option></select>
+
+                <div class="ribbon-group font-group">
+                    <div class="ribbon-group-content">
+                        <div class="ribbon-row">
+                            <select class="ribbon-select font-family" [ngModel]="currentFormats()['font'] || ''" (ngModelChange)="setFont($event)">
+                                <option value="">Sans Serif</option>
+                                <option value="serif">Serif</option>
+                                <option value="monospace">Monospace</option>
+                            </select>
+                            <select class="ribbon-select font-size" [ngModel]="currentFormats()['size'] || ''" (ngModelChange)="setFontSize($event)">
+                                <option value="small">Small</option>
+                                <option value="">Normal</option>
+                                <option value="large">Large</option>
+                                <option value="huge">Huge</option>
+                            </select>
+                        </div>
+                        <div class="ribbon-row">
+                            <button class="ribbon-btn" [class.active]="currentFormats()['bold']"      (click)="toggleFormat('bold')"      title="Bold">        <i class="bi bi-type-bold"></i></button>
+                            <button class="ribbon-btn" [class.active]="currentFormats()['italic']"    (click)="toggleFormat('italic')"    title="Italic">      <i class="bi bi-type-italic"></i></button>
+                            <button class="ribbon-btn" [class.active]="currentFormats()['underline']" (click)="toggleFormat('underline')" title="Underline">   <i class="bi bi-type-underline"></i></button>
+                            <button class="ribbon-btn" [class.active]="currentFormats()['strike']"    (click)="toggleFormat('strike')"    title="Strikethrough"><i class="bi bi-type-strikethrough"></i></button>
+                            <button class="ribbon-btn" [class.active]="currentFormats()['script'] === 'sub'"   (click)="setScript('sub')"   title="Subscript">  <i class="bi bi-subscript"></i></button>
+                            <button class="ribbon-btn" [class.active]="currentFormats()['script'] === 'super'" (click)="setScript('super')" title="Superscript"><i class="bi bi-superscript"></i></button>
+                            <div class="ribbon-color-btn" title="Text Color">
+                                <input type="color" class="color-input" [value]="currentFormats()['color'] || '#000000'" (input)="setColor($event)">
+                                <i class="bi bi-palette"></i>
+                            </div>
+                            <div class="ribbon-color-btn" title="Highlight">
+                                <input type="color" class="color-input" [value]="currentFormats()['background'] || '#ffffff'" (input)="setBackground($event)">
+                                <i class="bi bi-paint-bucket"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="ribbon-row">
-                        <button class="ribbon-btn" [class.active]="currentFormats()['bold']" (click)="toggleFormat('bold')" title="Bold"><i class="bi bi-type-bold"></i></button>
-                        <button class="ribbon-btn" [class.active]="currentFormats()['italic']" (click)="toggleFormat('italic')" title="Italic"><i class="bi bi-type-italic"></i></button>
-                        <button class="ribbon-btn" [class.active]="currentFormats()['underline']" (click)="toggleFormat('underline')" title="Underline"><i class="bi bi-type-underline"></i></button>
-                        <button class="ribbon-btn" [class.active]="currentFormats()['strike']" (click)="toggleFormat('strike')" title="Strikethrough"><i class="bi bi-type-strikethrough"></i></button>
-                        <button class="ribbon-btn" [class.active]="currentFormats()['script'] === 'sub'" (click)="setScript('sub')" title="Subscript"><i class="bi bi-subscript"></i></button>
-                        <button class="ribbon-btn" [class.active]="currentFormats()['script'] === 'super'" (click)="setScript('super')" title="Superscript"><i class="bi bi-superscript"></i></button>
-                        <div class="ribbon-color-btn" title="Text Color"><input type="color" class="color-input" [value]="currentFormats()['color'] || '#000000'" (input)="setColor($event)"><i class="bi bi-palette"></i></div>
-                        <div class="ribbon-color-btn" title="Highlight"><input type="color" class="color-input" [value]="currentFormats()['background'] || '#ffffff'" (input)="setBackground($event)"><i class="bi bi-paint-bucket"></i></div>
-                    </div>
-                </div><span class="ribbon-group-label">Font</span></div>
+                    <span class="ribbon-group-label">Font</span>
+                </div>
+
                 <div class="ribbon-separator"></div>
-                <div class="ribbon-group"><div class="ribbon-group-content">
-                    <div class="ribbon-row">
-                        <button class="ribbon-btn" [class.active]="!currentFormats()['align']" (click)="setAlign('')" title="Left"><i class="bi bi-text-left"></i></button>
-                        <button class="ribbon-btn" [class.active]="currentFormats()['align'] === 'center'" (click)="setAlign('center')" title="Center"><i class="bi bi-text-center"></i></button>
-                        <button class="ribbon-btn" [class.active]="currentFormats()['align'] === 'right'" (click)="setAlign('right')" title="Right"><i class="bi bi-text-right"></i></button>
-                        <button class="ribbon-btn" [class.active]="currentFormats()['align'] === 'justify'" (click)="setAlign('justify')" title="Justify"><i class="bi bi-justify"></i></button>
+
+                <div class="ribbon-group">
+                    <div class="ribbon-group-content">
+                        <div class="ribbon-row">
+                            <button class="ribbon-btn" [class.active]="!currentFormats()['align']"              (click)="setAlign('')"        title="Left">   <i class="bi bi-text-left"></i></button>
+                            <button class="ribbon-btn" [class.active]="currentFormats()['align'] === 'center'"  (click)="setAlign('center')"  title="Center"> <i class="bi bi-text-center"></i></button>
+                            <button class="ribbon-btn" [class.active]="currentFormats()['align'] === 'right'"   (click)="setAlign('right')"   title="Right">  <i class="bi bi-text-right"></i></button>
+                            <button class="ribbon-btn" [class.active]="currentFormats()['align'] === 'justify'" (click)="setAlign('justify')" title="Justify"><i class="bi bi-justify"></i></button>
+                        </div>
+                        <div class="ribbon-row">
+                            <button class="ribbon-btn" [class.active]="currentFormats()['list'] === 'bullet'"  (click)="setList('bullet')"  title="Bullets">   <i class="bi bi-list-ul"></i></button>
+                            <button class="ribbon-btn" [class.active]="currentFormats()['list'] === 'ordered'" (click)="setList('ordered')" title="Numbering">  <i class="bi bi-list-ol"></i></button>
+                            <button class="ribbon-btn" [class.active]="currentFormats()['list'] === 'check'"   (click)="setList('check')"   title="Checklist">  <i class="bi bi-list-check"></i></button>
+                            <button class="ribbon-btn" (click)="indent('-1')" title="Outdent"><i class="bi bi-text-indent-left"></i></button>
+                            <button class="ribbon-btn" (click)="indent('+1')" title="Indent"> <i class="bi bi-text-indent-right"></i></button>
+                        </div>
                     </div>
-                    <div class="ribbon-row">
-                        <button class="ribbon-btn" [class.active]="currentFormats()['list'] === 'bullet'" (click)="setList('bullet')" title="Bullets"><i class="bi bi-list-ul"></i></button>
-                        <button class="ribbon-btn" [class.active]="currentFormats()['list'] === 'ordered'" (click)="setList('ordered')" title="Numbering"><i class="bi bi-list-ol"></i></button>
-                        <button class="ribbon-btn" [class.active]="currentFormats()['list'] === 'check'" (click)="setList('check')" title="Checklist"><i class="bi bi-list-check"></i></button>
-                        <button class="ribbon-btn" (click)="indent('-1')" title="Outdent"><i class="bi bi-text-indent-left"></i></button>
-                        <button class="ribbon-btn" (click)="indent('+1')" title="Indent"><i class="bi bi-text-indent-right"></i></button>
-                    </div>
-                </div><span class="ribbon-group-label">Paragraph</span></div>
+                    <span class="ribbon-group-label">Paragraph</span>
+                </div>
+
                 <div class="ribbon-separator"></div>
-                <div class="ribbon-group"><div class="ribbon-group-content">
-                    <div class="ribbon-row"><select class="ribbon-select style-select" [ngModel]="getHeaderValue()" (ngModelChange)="setHeader($event)"><option value="">Normal</option><option value="1">Heading 1</option><option value="2">Heading 2</option><option value="3">Heading 3</option><option value="4">Heading 4</option><option value="5">Heading 5</option><option value="6">Heading 6</option></select></div>
-                    <div class="ribbon-row"><button class="ribbon-btn" (click)="clearFormatting()" title="Clear Formatting"><i class="bi bi-eraser"></i></button></div>
-                </div><span class="ribbon-group-label">Styles</span></div>
+
+                <div class="ribbon-group">
+                    <div class="ribbon-group-content">
+                        <div class="ribbon-row">
+                            <select class="ribbon-select style-select" [ngModel]="getHeaderValue()" (ngModelChange)="setHeader($event)">
+                                <option value="">Normal</option>
+                                <option value="1">Heading 1</option>
+                                <option value="2">Heading 2</option>
+                                <option value="3">Heading 3</option>
+                                <option value="4">Heading 4</option>
+                                <option value="5">Heading 5</option>
+                                <option value="6">Heading 6</option>
+                            </select>
+                        </div>
+                        <div class="ribbon-row">
+                            <button class="ribbon-btn" (click)="clearFormatting()" title="Clear Formatting"><i class="bi bi-eraser"></i></button>
+                        </div>
+                    </div>
+                    <span class="ribbon-group-label">Styles</span>
+                </div>
             }
+
+            <!-- ── Insert Tab ── -->
             @if (activeTab() === 'insert') {
-                <div class="ribbon-group"><div class="ribbon-group-content vertical"><button class="ribbon-btn tall" (click)="insertLink()"><i class="bi bi-link-45deg"></i><span>Link</span></button></div><span class="ribbon-group-label">Links</span></div>
-                <div class="ribbon-separator"></div>
-                <div class="ribbon-group"><div class="ribbon-group-content vertical"><button class="ribbon-btn tall" (click)="insertImage()"><i class="bi bi-image"></i><span>Image</span></button></div><span class="ribbon-group-label">Media</span></div>
-                <div class="ribbon-separator"></div>
-                <div class="ribbon-group"><div class="ribbon-group-content"><div class="ribbon-row">
-                    <button class="ribbon-btn" [class.active]="currentFormats()['blockquote']" (click)="insertBlockquote()" title="Blockquote"><i class="bi bi-quote"></i></button>
-                    <button class="ribbon-btn" [class.active]="currentFormats()['code-block']" (click)="insertCodeBlock()" title="Code Block"><i class="bi bi-code-square"></i></button>
-                </div></div><span class="ribbon-group-label">Blocks</span></div>
-            }
-            @if (activeTab() === 'layout') {
-                <div class="ribbon-group"><div class="ribbon-group-content">
-                    <div class="ribbon-row"><select class="ribbon-select layout-select" [ngModel]="pageLayout().margins" (ngModelChange)="setPageMargins($event)"><option value="normal">Normal (1")</option><option value="narrow">Narrow (0.5")</option><option value="wide">Wide (1.5")</option></select></div>
-                    <div class="ribbon-row layout-info"><i class="bi bi-border-outer"></i><span>Margins</span></div>
-                </div><span class="ribbon-group-label">Margins</span></div>
-                <div class="ribbon-separator"></div>
-                <div class="ribbon-group"><div class="ribbon-group-content">
-                    <div class="ribbon-row">
-                        <button class="ribbon-btn orientation-btn" [class.active]="pageLayout().orientation === 'portrait'" (click)="setPageOrientation('portrait')" title="Portrait"><i class="bi bi-phone"></i></button>
-                        <button class="ribbon-btn orientation-btn" [class.active]="pageLayout().orientation === 'landscape'" (click)="setPageOrientation('landscape')" title="Landscape"><i class="bi bi-phone-landscape"></i></button>
+                <div class="ribbon-group">
+                    <div class="ribbon-group-content vertical">
+                        <button class="ribbon-btn tall" (click)="insertLink()"><i class="bi bi-link-45deg"></i><span>Link</span></button>
                     </div>
-                    <div class="ribbon-row layout-info"><span>{{ pageLayout().orientation === 'portrait' ? 'Portrait' : 'Landscape' }}</span></div>
-                </div><span class="ribbon-group-label">Orientation</span></div>
+                    <span class="ribbon-group-label">Links</span>
+                </div>
+
                 <div class="ribbon-separator"></div>
-                <div class="ribbon-group"><div class="ribbon-group-content">
-                    <div class="ribbon-row"><select class="ribbon-select layout-select" [ngModel]="pageLayout().pageSize" (ngModelChange)="setPageSize($event)"><option value="letter">Letter (8.5×11)</option><option value="a4">A4 (210×297mm)</option><option value="legal">Legal (8.5×14)</option></select></div>
-                    <div class="ribbon-row layout-info"><i class="bi bi-file-earmark"></i><span>{{ getPageWidth() }}×{{ getPageHeight() }}px</span></div>
-                </div><span class="ribbon-group-label">Size</span></div>
+
+                <div class="ribbon-group">
+                    <div class="ribbon-group-content vertical">
+                        <button class="ribbon-btn tall" (click)="insertImage()"><i class="bi bi-image"></i><span>Image</span></button>
+                    </div>
+                    <span class="ribbon-group-label">Media</span>
+                </div>
+
+                <div class="ribbon-separator"></div>
+
+                <div class="ribbon-group">
+                    <div class="ribbon-group-content">
+                        <div class="ribbon-row">
+                            <button class="ribbon-btn" [class.active]="currentFormats()['blockquote']"  (click)="insertBlockquote()" title="Blockquote"><i class="bi bi-quote"></i></button>
+                            <button class="ribbon-btn" [class.active]="currentFormats()['code-block']"  (click)="insertCodeBlock()"  title="Code Block"><i class="bi bi-code-square"></i></button>
+                        </div>
+                    </div>
+                    <span class="ribbon-group-label">Blocks</span>
+                </div>
             }
+
+            <!-- ── Layout Tab ── -->
+            @if (activeTab() === 'layout') {
+                <div class="ribbon-group">
+                    <div class="ribbon-group-content">
+                        <div class="ribbon-row">
+                            <select class="ribbon-select layout-select" [ngModel]="pageLayout().margins" (ngModelChange)="setPageMargins($event)">
+                                <option value="normal">Normal (1")</option>
+                                <option value="narrow">Narrow (0.5")</option>
+                                <option value="wide">Wide (1.5")</option>
+                            </select>
+                        </div>
+                        <div class="ribbon-row layout-info"><i class="bi bi-border-outer"></i><span>Margins</span></div>
+                    </div>
+                    <span class="ribbon-group-label">Margins</span>
+                </div>
+
+                <div class="ribbon-separator"></div>
+
+                <div class="ribbon-group">
+                    <div class="ribbon-group-content">
+                        <div class="ribbon-row">
+                            <button class="ribbon-btn orientation-btn" [class.active]="pageLayout().orientation === 'portrait'"  (click)="setPageOrientation('portrait')"  title="Portrait"> <i class="bi bi-phone"></i></button>
+                            <button class="ribbon-btn orientation-btn" [class.active]="pageLayout().orientation === 'landscape'" (click)="setPageOrientation('landscape')" title="Landscape"><i class="bi bi-phone-landscape"></i></button>
+                        </div>
+                        <div class="ribbon-row layout-info"><span>{{ pageLayout().orientation === 'portrait' ? 'Portrait' : 'Landscape' }}</span></div>
+                    </div>
+                    <span class="ribbon-group-label">Orientation</span>
+                </div>
+
+                <div class="ribbon-separator"></div>
+
+                <div class="ribbon-group">
+                    <div class="ribbon-group-content">
+                        <div class="ribbon-row">
+                            <select class="ribbon-select layout-select" [ngModel]="pageLayout().pageSize" (ngModelChange)="setPageSize($event)">
+                                <option value="letter">Letter (8.5×11)</option>
+                                <option value="a4">A4 (210×297mm)</option>
+                                <option value="legal">Legal (8.5×14)</option>
+                            </select>
+                        </div>
+                        <div class="ribbon-row layout-info"><i class="bi bi-file-earmark"></i><span>{{ getPageWidth() }}×{{ getPageHeight() }}px</span></div>
+                    </div>
+                    <span class="ribbon-group-label">Size</span>
+                </div>
+            }
+
+            <!-- ── View Tab ── -->
             @if (activeTab() === 'view') {
-                <div class="ribbon-group"><div class="ribbon-group-content"><div class="ribbon-row zoom-row">
-                    <button class="ribbon-btn" (click)="zoomOut()"><i class="bi bi-dash-lg"></i></button>
-                    <span class="zoom-display">{{ zoom() }}%</span>
-                    <button class="ribbon-btn" (click)="zoomIn()"><i class="bi bi-plus-lg"></i></button>
-                    <button class="ribbon-btn" (click)="resetZoom()"><i class="bi bi-arrow-counterclockwise"></i></button>
-                </div></div><span class="ribbon-group-label">Zoom</span></div>
+                <div class="ribbon-group">
+                    <div class="ribbon-group-content">
+                        <div class="ribbon-row zoom-row">
+                            <button class="ribbon-btn" (click)="zoomOut()"><i class="bi bi-dash-lg"></i></button>
+                            <span class="zoom-display">{{ zoom() }}%</span>
+                            <button class="ribbon-btn" (click)="zoomIn()"><i class="bi bi-plus-lg"></i></button>
+                            <button class="ribbon-btn" (click)="resetZoom()"><i class="bi bi-arrow-counterclockwise"></i></button>
+                        </div>
+                    </div>
+                    <span class="ribbon-group-label">Zoom</span>
+                </div>
             }
+
         </div>
     </div>
 
-    <!-- ═══ Editor Workspace ═══ -->
+    <!-- ═══ Editor Workspace — the ONLY scrollable area ═══ -->
     <div class="editor-workspace" (scroll)="onWorkspaceScroll($event)">
         <div class="page-wrapper" [style.zoom]="zoom() / 100">
             <div class="page-surface">
@@ -217,4 +334,5 @@
             </div>
         </div>
     }
+
 </div>

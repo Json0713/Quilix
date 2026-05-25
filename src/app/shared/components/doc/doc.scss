@@ -1,6 +1,12 @@
 @import 'quill/dist/quill.snow.css';
 
-:host { display: block; height: 100%; }
+// ─────────────────────────────────────────────
+// Host & Root Container
+// ─────────────────────────────────────────────
+:host {
+    display: block;
+    height: 100%;
+}
 
 .doc-editor-container {
     height: 100%;
@@ -8,76 +14,213 @@
     flex-direction: column;
     background: var(--surface-main);
     color: var(--text-main);
-    overflow: hidden;
+    overflow: hidden; // Contain all children — only editor-workspace scrolls
 }
 
-// ═══ Title Bar ═══
+// ─────────────────────────────────────────────
+// Title Bar — non-scrolling, pinned at top
+// ─────────────────────────────────────────────
 .doc-title-bar {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0.4rem 1rem;
     border-bottom: 1px solid var(--border);
     background: var(--surface);
-    flex-shrink: 0;
+    min-width: 0;
 
-    .title-left { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 0; }
-    .doc-icon { font-size: 1.3rem; color: #3b82f6; flex-shrink: 0; }
+    .title-left {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .doc-icon {
+        font-size: 1.3rem;
+        color: #3b82f6;
+        flex-shrink: 0;
+    }
 
     .doc-title-input {
-        outline: none; box-shadow: none;
+        outline: none;
+        box-shadow: none;
         border: 1px solid transparent;
-        font-size: 1.1rem; font-weight: 600;
-        min-width: 120px; max-width: 500px;
-        background: transparent; color: var(--text-main);
-        padding: 2px 6px; border-radius: 4px;
-        transition: all 0.2s; text-overflow: ellipsis;
-        &:hover { border-color: var(--border); background: var(--surface-alt); }
-        &:focus { border-color: var(--action); background: var(--surface-main); max-width: none; }
-    }
-    .title-right { flex-shrink: 0; }
-    .save-status { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
-}
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.spin { animation: spin 1s linear infinite; }
+        font-size: 1.1rem;
+        font-weight: 600;
+        min-width: 0;
+        max-width: 500px;
+        width: 100%;
+        background: transparent;
+        color: var(--text-main);
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: border-color 0.2s, background-color 0.2s;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
 
-// ═══ Ribbon ═══
-.ribbon { flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--surface); }
-.ribbon-tabs { display: flex; padding: 0 0.75rem; border-bottom: 1px solid var(--border); }
-.ribbon-tab {
-    background: transparent; border: none;
-    padding: 0.4rem 1rem; font-size: 0.82rem; font-weight: 500;
-    color: var(--text-muted); cursor: pointer;
-    border-bottom: 2px solid transparent; transition: all 0.15s; margin-bottom: -1px;
-    &:hover { color: var(--text-main); background: var(--surface-alt); }
-    &.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+        &:hover {
+            border-color: var(--border);
+            background: var(--surface-alt);
+        }
+
+        &:focus {
+            border-color: var(--action);
+            background: var(--surface-main);
+            max-width: none;
+        }
+    }
+
+    .title-right {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .save-status {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        white-space: nowrap;
+    }
 }
+
+// ─────────────────────────────────────────────
+// Ribbon — non-scrolling, pinned below title bar
+// ─────────────────────────────────────────────
+.ribbon {
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.ribbon-tabs {
+    display: flex;
+    padding: 0 0.75rem;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+}
+
+.ribbon-tab {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    padding: 0.4rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, background-color 0.15s;
+    margin-bottom: -1px;
+    white-space: nowrap;
+
+    &:hover {
+        color: var(--text-main);
+        background: var(--surface-alt);
+    }
+
+    &.active {
+        color: #3b82f6;
+        border-bottom-color: #3b82f6;
+    }
+}
+
 .ribbon-panel {
     display: flex;
     align-items: stretch;
     padding: 0.4rem 0.75rem;
     height: 84px;
-    max-height: 84px;
     box-sizing: border-box;
     overflow-x: auto;
     overflow-y: hidden;
-    &::-webkit-scrollbar { height: 3px; }
-    &::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
 }
-.ribbon-separator { width: 1px; background: var(--border); margin: 0 0.5rem; flex-shrink: 0; }
-.ribbon-group { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
-.ribbon-group-content { display: flex; flex-direction: column; gap: 2px; flex: 1; &.vertical { flex-direction: row; align-items: center; gap: 0.25rem; .ribbon-separator { height: 32px; } } }
-.ribbon-row { display: flex; align-items: center; gap: 2px; }
-.ribbon-group-label { font-size: 0.65rem; color: var(--text-muted); text-align: center; white-space: nowrap; margin-top: auto; padding-top: 2px; }
+
+.ribbon-separator {
+    width: 1px;
+    background: var(--border);
+    margin: 0 0.5rem;
+    flex-shrink: 0;
+}
+
+.ribbon-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.ribbon-group-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+
+    &.vertical {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.25rem;
+
+        .ribbon-separator {
+            height: 32px;
+            width: 1px;
+            margin: 0 0.25rem;
+        }
+    }
+}
+
+.ribbon-row {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.ribbon-group-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-align: center;
+    white-space: nowrap;
+    margin-top: auto;
+    padding-top: 2px;
+}
 
 .ribbon-btn {
-    display: flex; align-items: center; justify-content: center;
-    background: transparent; border: 1px solid transparent;
-    border-radius: 4px; width: 28px; height: 28px;
-    cursor: pointer; color: var(--text-main); font-size: 0.9rem;
-    transition: all 0.12s; flex-shrink: 0;
-    &:hover { background: var(--surface-alt); border-color: var(--border); }
-    &.active { background: rgba(59, 130, 246, 0.12); border-color: rgba(59, 130, 246, 0.3); color: #3b82f6; }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+    flex-shrink: 0;
+
+    &:hover {
+        background: var(--surface-alt);
+        border-color: var(--border);
+    }
+
+    &.active {
+        background: rgba(59, 130, 246, 0.12);
+        border-color: rgba(59, 130, 246, 0.3);
+        color: #3b82f6;
+    }
+
     &.tall {
         width: auto;
         height: 48px;
@@ -86,37 +229,109 @@
         gap: 0.2rem;
         padding: 0.35rem 0.7rem;
         font-size: 0.75rem;
+
         i { font-size: 1.2rem; }
     }
 }
-.ribbon-select {
-    background: var(--surface-main); color: var(--text-main);
-    border: 1px solid var(--border); border-radius: 4px;
-    padding: 2px 4px; font-size: 0.78rem; height: 28px; cursor: pointer; outline: none;
-    &:focus { border-color: #3b82f6; }
-    &.font-family { width: 100px; } &.font-size { width: 72px; } &.style-select { width: 110px; } &.layout-select { width: 140px; }
-}
-.ribbon-color-btn {
-    position: relative; display: flex; align-items: center; justify-content: center;
-    width: 28px; height: 28px; border-radius: 4px; cursor: pointer;
-    border: 1px solid transparent; transition: all 0.12s;
-    &:hover { background: var(--surface-alt); border-color: var(--border); }
-    .color-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: none; padding: 0; }
-    i { font-size: 0.9rem; color: var(--text-main); pointer-events: none; }
-}
-.orientation-btn { width: 36px !important; i { font-size: 1.1rem; } }
-.layout-info { font-size: 0.7rem; color: var(--text-muted); gap: 0.3rem !important; i { font-size: 0.75rem; } }
-.zoom-row { gap: 0.4rem; }
-.zoom-display { font-size: 0.82rem; font-weight: 500; color: var(--text-main); min-width: 38px; text-align: center; }
 
-// ═══ Editor Workspace ═══
+.ribbon-select {
+    background: var(--surface-main);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 0.78rem;
+    height: 28px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s;
+
+    &:focus { border-color: #3b82f6; }
+
+    &.font-family  { width: 100px; }
+    &.font-size    { width: 72px; }
+    &.style-select { width: 110px; }
+    &.layout-select { width: 140px; }
+}
+
+.ribbon-color-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color 0.12s, border-color 0.12s;
+
+    &:hover {
+        background: var(--surface-alt);
+        border-color: var(--border);
+    }
+
+    .color-input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        border: none;
+        padding: 0;
+    }
+
+    i {
+        font-size: 0.9rem;
+        color: var(--text-main);
+        pointer-events: none;
+    }
+}
+
+.orientation-btn {
+    width: 36px !important;
+    i { font-size: 1.1rem; }
+}
+
+.layout-info {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    gap: 0.3rem !important;
+    i { font-size: 0.75rem; }
+}
+
+.zoom-row  { gap: 0.4rem; }
+.zoom-display {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-main);
+    min-width: 38px;
+    text-align: center;
+}
+
+// ─────────────────────────────────────────────
+// Editor Workspace — the ONLY scrollable area
+// ─────────────────────────────────────────────
 .editor-workspace {
-    flex: 1;
+    flex: 1 1 0;   // Grow to fill, min-height 0 so it can shrink
+    min-height: 0; // Critical for flex shrink below content height
     overflow: auto;
     background: var(--surface-alt);
     display: flex;
     justify-content: center;
-    min-height: 0;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    &::-webkit-scrollbar-track { background: var(--surface-alt); }
+    &::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 5px;
+        border: 2px solid var(--surface-alt);
+        &:hover { background: var(--text-muted); }
+    }
 }
 
 .page-wrapper {
@@ -127,24 +342,15 @@
     min-height: 100%;
 }
 
-// ═══ PAGE SURFACE — Clean Page Dividers ═══
-//
-// Instead of creating gaps between pages (which causes content to
-// appear in the "gap" zone), we use a continuous white surface with
-// subtle divider lines at each page boundary. Content flows
-// naturally. The divider lines visually indicate where page breaks
-// would occur when printed — the same approach used by Notion,
-// Confluence, and OnlyOffice web editors.
-//
+// ─────────────────────────────────────────────
+// Page Surface — continuous sheet with page-break guides
+// ─────────────────────────────────────────────
 .page-surface {
     --page-h: 1056px;
-    width: 816px; // Default Letter portrait width
+    width: 816px; // Default Letter portrait
     min-height: 1056px;
-
     position: relative;
     background: var(--surface-main);
-
-    // A subtle repeating divider line at each page boundary
     background-image:
         repeating-linear-gradient(
             to bottom,
@@ -153,14 +359,14 @@
             var(--border) calc(var(--page-h) - 1px),
             var(--border) var(--page-h)
         );
-
-    // Outer shadow for the paper look
     box-shadow:
-        0 1px 4px rgba(0,0,0,0.08),
-        0 4px 16px rgba(0,0,0,0.06);
+        0 1px 4px rgba(0, 0, 0, 0.08),
+        0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
-// ═══ Quill Overrides ═══
+// ─────────────────────────────────────────────
+// Quill Overrides — the toolbar is managed by the ribbon
+// ─────────────────────────────────────────────
 .ql-toolbar.ql-snow { display: none !important; }
 
 .ql-container.ql-snow {
@@ -171,12 +377,10 @@
 }
 
 .ql-editor {
-    // Dimensions & padding set dynamically by applyPageStyles()
-    // Defaults provided here to prevent layout shift/vertical text on load
-    width: 816px; 
+    // Width, min-height and padding are applied dynamically by applyPageStyles()
+    width: 816px;
     min-height: 1056px;
-    
-    background: transparent !important; // Let page-surface show through
+    background: transparent !important;
     color: var(--text-main);
     line-height: 1.8;
     overflow: visible !important;
@@ -186,9 +390,7 @@
         font-style: italic;
         pointer-events: none;
         position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
+        inset: 0 !important;
         padding: inherit !important;
         font-family: inherit;
         font-size: inherit;
@@ -196,13 +398,13 @@
         white-space: nowrap;
     }
 
-    h1 { font-size: 2rem; margin: 0.8em 0 0.4em; }
+    h1 { font-size: 2rem;   margin: 0.8em 0 0.4em; }
     h2 { font-size: 1.6rem; margin: 0.7em 0 0.35em; }
     h3 { font-size: 1.3rem; margin: 0.6em 0 0.3em; }
     h4 { font-size: 1.1rem; margin: 0.5em 0 0.25em; }
     h5 { font-size: 0.95rem; margin: 0.5em 0 0.25em; }
     h6 { font-size: 0.85rem; margin: 0.5em 0 0.2em; }
-    p { margin: 0 0 0.5em; }
+    p  { margin: 0 0 0.5em; }
 
     blockquote {
         border-left: 4px solid #3b82f6;
@@ -221,108 +423,64 @@
         overflow-x: auto;
     }
 
-    img { max-width: 100%; border-radius: 4px; }
+    img {
+        max-width: 100%;
+        border-radius: 4px;
+    }
 }
 
-// ═══ Status Bar ═══
+// ─────────────────────────────────────────────
+// Status Bar — non-scrolling, pinned at bottom
+// ─────────────────────────────────────────────
 .doc-status-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0.3rem 1rem; border-top: 1px solid var(--border);
-    background: var(--surface); flex-shrink: 0;
-    .status-left, .status-right { display: flex; align-items: center; gap: 0.5rem; }
-    .status-item { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; i { font-size: 0.8rem; } }
-    .status-divider { color: var(--border); font-size: 0.7rem; }
-    .zoom-status { cursor: pointer; border-radius: 3px; padding: 0 4px; &:hover { background: var(--surface-alt); color: var(--text-main); } }
-}
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.3rem 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    min-width: 0;
 
-// ═══ Mobile Responsiveness ═══
-@media (max-width: 768px) {
-    .hide-mobile { display: none !important; }
-
-    .doc-title-bar {
-        padding: 0.3rem 0.6rem;
-        .doc-title-input { font-size: 1rem; min-width: 80px; }
+    .status-left,
+    .status-right {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
-    .ribbon-tab { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
-    .ribbon-panel {
-        padding: 0.3rem 0.5rem;
-        min-height: 60px;
-        gap: 0.25rem;
-    }
-    .ribbon-group { gap: 1px; }
-    .ribbon-group-label { font-size: 0.6rem; }
-    .ribbon-btn {
-        width: 26px; height: 26px; font-size: 0.85rem;
-        &.tall { padding: 0.25rem 0.5rem; i { font-size: 1.1rem; } }
-    }
-    .ribbon-select {
-        height: 26px; font-size: 0.75rem;
-        &.font-family { width: 85px; }
-        &.font-size { width: 60px; }
-        &.style-select { width: 90px; }
-        &.layout-select { width: 110px; }
+    .status-item {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        white-space: nowrap;
+
+        i { font-size: 0.8rem; }
     }
 
-    .editor-workspace {
-        background: var(--surface-main); // Use main surface to blend better on mobile
-        display: block; // Remove flex centering on mobile to ensure width: 100% works easily
+    .status-divider {
+        color: var(--border);
+        font-size: 0.7rem;
     }
 
-    .page-wrapper {
-        width: 100%;
-        padding: 8px; // Minimal padding on mobile
-        zoom: 1 !important; // Reset zoom on mobile to ensure readable text
-        display: block; // Ensure it fills the width
-    }
+    .zoom-status {
+        cursor: pointer;
+        border-radius: 3px;
+        padding: 0 4px;
+        transition: background-color 0.15s, color 0.15s;
 
-    .page-surface {
-        width: 100% !important;
-        min-width: 0 !important;
-        box-shadow: none !important;
-        border: none !important;
-        background-image: 
-            repeating-linear-gradient(
-                to bottom,
-                transparent 0px,
-                transparent calc(var(--page-h) - 1px),
-                var(--border) calc(var(--page-h) - 1px),
-                var(--border) var(--page-h)
-            ) !important;
-        
-        // On mobile, the page divider should be more like a subtle guide
-        &::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background-image: radial-gradient(var(--border) 1px, transparent 1px);
-            background-size: 20px 20px;
-            opacity: 0.2; // Very subtle grid or similar? No, let's stick to the line.
+        &:hover {
+            background: var(--surface-alt);
+            color: var(--text-main);
         }
     }
-
-    .ql-editor {
-        width: 100% !important;
-        min-height: calc(100vh - 180px) !important;
-        font-size: 16px !important; // Standard mobile font size to prevent iOS zoom
-        
-        // Explicitly override inline padding from TS to prevent text being "pushed to middle"
-        padding-top: 24px !important;
-        padding-bottom: 24px !important;
-
-        .margin-normal & { padding-left: 20px !important; padding-right: 20px !important; }
-        .margin-narrow & { padding-left: 12px !important; padding-right: 12px !important; }
-        .margin-wide & { padding-left: 36px !important; padding-right: 36px !important; }
-    }
-
-    .doc-status-bar {
-        padding: 0.3rem 0.6rem;
-        .status-left, .status-right { gap: 0.35rem; }
-    }
 }
 
-/* ── Linked File Badge ── */
+// ─────────────────────────────────────────────
+// Linked File Badge
+// ─────────────────────────────────────────────
 .linked-file-badge {
     display: inline-flex;
     align-items: center;
@@ -338,12 +496,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     border: 1px solid rgba(0, 120, 212, 0.15);
-    margin-right: 12px;
-    transition: all 0.2s ease;
+    margin-right: 8px;
+    transition: max-width 0.2s ease, background-color 0.2s;
 
-    i {
-        font-size: 0.9rem;
-    }
+    i { font-size: 0.9rem; }
 
     &:hover {
         background-color: var(--action-light-hover, rgba(0, 120, 212, 0.15));
@@ -351,13 +507,12 @@
     }
 }
 
-/* ── Note Modals Design ── */
+// ─────────────────────────────────────────────
+// Modals (shared pattern)
+// ─────────────────────────────────────────────
 .note-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    inset: 0;
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(8px);
     z-index: 2000;
@@ -406,7 +561,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s;
+            transition: background-color 0.15s, color 0.15s;
 
             &:hover {
                 background-color: var(--bg-hover);
@@ -426,7 +581,8 @@
             letter-spacing: 0.5px;
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             width: 100%;
             padding: 8px 12px;
             background-color: var(--surface-alt);
@@ -437,9 +593,7 @@
             font-size: 0.9rem;
             transition: border-color 0.2s;
 
-            &:focus {
-                border-color: var(--action);
-            }
+            &:focus { border-color: var(--action); }
         }
     }
 
@@ -464,7 +618,7 @@
             padding: 10px 12px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: background-color 0.15s, border-color 0.15s;
 
             &:hover {
                 background-color: var(--surface-alt);
@@ -480,6 +634,7 @@
                 .file-icon {
                     font-size: 1.1rem;
                     color: var(--action);
+                    flex-shrink: 0;
                 }
 
                 .file-name-label {
@@ -496,12 +651,11 @@
                 font-size: 0.8rem;
                 color: var(--text-muted);
                 opacity: 0;
+                flex-shrink: 0;
                 transition: opacity 0.15s;
             }
 
-            &:hover .arrow-icon {
-                opacity: 1;
-            }
+            &:hover .arrow-icon { opacity: 1; }
         }
     }
 
@@ -520,8 +674,8 @@
             font-weight: 500;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.15s;
             border: 1px solid transparent;
+            transition: background-color 0.15s, filter 0.15s;
         }
 
         .btn-outline {
@@ -529,18 +683,111 @@
             border-color: var(--border);
             color: var(--text-main);
 
-            &:hover {
-                background-color: var(--bg-hover);
-            }
+            &:hover { background-color: var(--bg-hover); }
         }
 
         .btn-primary {
             background-color: var(--action);
             color: white;
 
-            &:hover {
-                filter: brightness(1.1);
-            }
+            &:hover { filter: brightness(1.1); }
         }
     }
 }
+
+// ─────────────────────────────────────────────
+// Mobile Responsiveness
+// ─────────────────────────────────────────────
+@media (max-width: 768px) {
+    .hide-mobile { display: none !important; }
+
+    .doc-title-bar {
+        padding: 0.3rem 0.6rem;
+        .doc-title-input { font-size: 1rem; }
+    }
+
+    .ribbon-tab    { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+    .ribbon-panel  { padding: 0.3rem 0.5rem; height: 72px; }
+    .ribbon-group  { gap: 1px; }
+    .ribbon-group-label { font-size: 0.6rem; }
+
+    .ribbon-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 0.85rem;
+        &.tall { padding: 0.25rem 0.5rem; i { font-size: 1.1rem; } }
+    }
+
+    .ribbon-select {
+        height: 26px;
+        font-size: 0.75rem;
+        &.font-family   { width: 85px; }
+        &.font-size     { width: 60px; }
+        &.style-select  { width: 90px; }
+        &.layout-select { width: 110px; }
+    }
+
+    .editor-workspace {
+        background: var(--surface-main);
+        display: block;
+    }
+
+    .page-wrapper {
+        width: 100%;
+        padding: 8px;
+        zoom: 1 !important;
+        display: block;
+    }
+
+    .page-surface {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-shadow: none !important;
+        background-image:
+            repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent calc(var(--page-h) - 1px),
+                var(--border) calc(var(--page-h) - 1px),
+                var(--border) var(--page-h)
+            ) !important;
+    }
+
+    .ql-editor {
+        width: 100% !important;
+        min-height: calc(100vh - 180px) !important;
+        font-size: 16px !important;
+        padding-top: 24px !important;
+        padding-bottom: 24px !important;
+
+        .margin-normal & { padding-left: 20px !important; padding-right: 20px !important; }
+        .margin-narrow & { padding-left: 12px !important; padding-right: 12px !important; }
+        .margin-wide   & { padding-left: 36px !important; padding-right: 36px !important; }
+    }
+
+    .doc-status-bar {
+        padding: 0.3rem 0.6rem;
+        .status-left,
+        .status-right { gap: 0.35rem; }
+    }
+}
+
+// ─────────────────────────────────────────────
+// Animations
+// ─────────────────────────────────────────────
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(16px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.spin { animation: spin 1s linear infinite; }
