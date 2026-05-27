@@ -156,9 +156,13 @@ export class DocComponent implements OnInit, OnDestroy, OnChanges {
     private lastSavedContent = '';
     private activeDocId: string | null = null;
     private isInitialized = false;
+    private userZoom = 100; // tracks the user's manual zoom preference
 
     // ── Page dimension helpers ────────────────────────────────────────────────
     getPageWidth(): number {
+        if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+            return Math.max(300, window.innerWidth - 24);
+        }
         const s = PAGE_SIZES[this.pageLayout().pageSize];
         return this.pageLayout().orientation === 'portrait' ? s.w : s.h;
     }
@@ -172,13 +176,40 @@ export class DocComponent implements OnInit, OnDestroy, OnChanges {
         return this.getPageHeight() + this.PAGE_GAP;
     }
 
-    getMargins() { return MARGIN_PRESETS[this.pageLayout().margins]; }
+    getMargins() {
+        if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+            return { top: 32, right: 16, bottom: 32, left: 16 };
+        }
+        return MARGIN_PRESETS[this.pageLayout().margins];
+    }
+
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
     ngOnInit() {
         this.initQuill();
         this.isInitialized = true;
         if (this.docId) this.setupDoc(this.docId);
+        this.updateMobileZoom();
+    }
+
+    @HostListener('window:resize')
+    onWindowResize() {
+        this.updateMobileZoom();
+    }
+
+    /** On narrow viewports, we keep the zoom at 100% so text remains readable
+     *  (no squashed desktop view), and instead make the page width and margins
+     *  fully responsive. */
+    private updateMobileZoom() {
+        const vw = window.innerWidth;
+
+        if (vw <= 768) {
+            this.zoom.set(100);
+        } else {
+            // Restore the user's manual preference on wider screens
+            this.zoom.set(this.userZoom);
+        }
+        this.applyPageStyles();
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -459,37 +490,48 @@ export class DocComponent implements OnInit, OnDestroy, OnChanges {
 
         // ── 3. Walk and push ──────────────────────────────────────────────
         //
-        // BOUNDARY: contentZoneEnd = pageH - marginBottom (e.g. 960px for
-        // normal margins on a Letter page). This is where the bottom margin
-        // begins — no new paragraph should START past this line.
+        // HOW THIS WORKS:
+        //   Each "page tile" = pageH (e.g. 1056px) + PAGE_GAP (32px) = 1088px.
+        //   Page N tile spans [N * tileH,  N * tileH + pageH)   (content zone)
+        //                  and [N * tileH + pageH, (N+1) * tileH)  (gap zone).
         //
-        // Rule: if an element's virtualTop >= contentZoneEnd, it's already
-        // inside the bottom margin zone and must be pushed to the next tile.
+        //   The content zone for text is further divided:
+        //     Top margin:    [pageStart,              pageStart + margins.top)
+        //     Writable area: [pageStart + margins.top, pageStart + pageH - margins.bottom)
+        //     Bottom margin: [pageStart + pageH - margins.bottom, pageStart + pageH)
         //
-        // This matches how Word/Docs handles page breaks:
-        //   - A paragraph that ENDS slightly past contentZoneEnd stays on the
-        //     current page (its top is still within the content zone).
-        //   - The NEXT paragraph that STARTS past contentZoneEnd goes to page 2.
+        //   An element whose virtualTop lands in the BOTTOM MARGIN zone gets
+        //   pushed to the start of the next tile (nextTileStart = (pageIdx+1)*tileH).
         //
-        // Tall single-paragraph edge case: if virtualTop < contentZoneEnd but
-        // the element is so tall that its bottom crosses the gap zone, only
-        // 32px (PAGE_GAP) of content is ever hidden — acceptable for a
-        // continuous-DOM editor without line-level splitting.
+        //   SAFETY GUARD: skip elements whose natural r.top is in the top margin
+        //   zone of any tile (r.top mod tileH < margins.top + slack). These cannot
+        //   possibly be in the bottom margin zone and should never be pushed —
+        //   this is what caused the "starts on 2nd page" bug where the first
+        //   element got inflated by a stale pushSoFar from a previous doc load.
         let pushSoFar = 0;
 
         for (const r of rects) {
-            const virtualTop    = r.top + pushSoFar;
-            const pageIdx       = Math.floor(virtualTop / tileH);
+            const virtualTop = r.top + pushSoFar;
 
-            // Where the bottom margin begins on this page
-            const contentZoneEnd = pageIdx * tileH + pageH - margins.bottom;
+            // Clamp to valid tile: which page does this element land on?
+            const pageIdx  = Math.floor(virtualTop / tileH);
+            const pageStart = pageIdx * tileH;
 
-            if (virtualTop >= contentZoneEnd && r.height <= pageH) {
+            // Where the bottom margin zone begins on this tile
+            const contentZoneEnd = pageStart + pageH - margins.bottom;
+
+            // GUARD: if this element's natural position within the tile
+            // is in the top-margin zone, it can't be a bottom-margin candidate.
+            // (r.top - pageStart * correction) — but since we work in virtual
+            // space after resets, use the simpler: element starts before the
+            // midpoint of the page → definitionally not in the bottom margin.
+            const tileRelative = virtualTop - pageStart;
+            const inTopHalf    = tileRelative < pageH / 2;
+
+            if (!inTopHalf && virtualTop >= contentZoneEnd && r.height <= pageH) {
                 const nextTileStart = (pageIdx + 1) * tileH;
                 const push          = nextTileStart - virtualTop;
 
-                // Use the raw inline margin-top (not computed) to avoid the
-                // margin-collapse double-count that causes jitter on deletion.
                 const inlineMt = r.node.style.marginTop
                     ? parseFloat(r.node.style.marginTop) || 0
                     : 0;
@@ -509,6 +551,7 @@ export class DocComponent implements OnInit, OnDestroy, OnChanges {
             this.pagesArray.set(Array.from({ length: pages }, (_, i) => i + 1));
         }
     }
+
 
 
 
@@ -544,6 +587,30 @@ export class DocComponent implements OnInit, OnDestroy, OnChanges {
     // ── Clipboard / History ───────────────────────────────────────────────────
     undo() { this.quill.history.undo(); }
     redo() { this.quill.history.redo(); }
+
+    // ── View / Zoom ───────────────────────────────────────────────────
+    zoomIn() {
+        const next = Math.min(this.zoom() + 10, 200);
+        this.userZoom = next;
+        this.zoom.set(next);
+    }
+    zoomOut() {
+        const next = Math.max(this.zoom() - 10, 50);
+        this.userZoom = next;
+        this.zoom.set(next);
+    }
+    resetZoom() {
+        this.userZoom = 100;
+        this.zoom.set(100);
+    }
+
+    onWorkspaceScroll(event: Event) {
+        const el        = event.target as HTMLElement;
+        const zoomScale = this.zoom() / 100;
+        const unit      = this.getTileHeight() * zoomScale;
+        this.currentPage.set(Math.max(1, Math.min(Math.floor(el.scrollTop / unit) + 1, this.totalPages())));
+        this.bubbleVisible.set(false);
+    }
 
     // ── Insert ────────────────────────────────────────────────────────────────
     insertLink() {
@@ -597,19 +664,6 @@ export class DocComponent implements OnInit, OnDestroy, OnChanges {
         this.layoutTimeout = setTimeout(() => this.docService.update(this.docId, { pageLayout: this.pageLayout() }), 500);
     }
 
-    // ── View / Zoom ───────────────────────────────────────────────────────────
-    zoomIn()    { this.zoom.update(z => Math.min(z + 10, 200)); }
-    zoomOut()   { this.zoom.update(z => Math.max(z - 10, 50));  }
-    resetZoom() { this.zoom.set(100); }
-
-    onWorkspaceScroll(event: Event) {
-        const el        = event.target as HTMLElement;
-        const mobile    = window.innerWidth <= 768;
-        const zoomScale = mobile ? 1 : this.zoom() / 100;
-        const unit      = this.getTileHeight() * zoomScale;
-        this.currentPage.set(Math.max(1, Math.min(Math.floor(el.scrollTop / unit) + 1, this.totalPages())));
-        this.bubbleVisible.set(false);
-    }
 
     // ── Stats ─────────────────────────────────────────────────────────────────
     private refreshCounts() {

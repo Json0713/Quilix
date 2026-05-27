@@ -386,24 +386,10 @@
     min-height: 0;
     overflow: auto;
     // The "desk" behind the pages — uses theme variable so it adapts to dark/light
-    background: var(--surface-alt);
+    background: var(--app-bg);
     display: flex;
     justify-content: center;
     position: relative; // needed for bubble toolbar positioning
-
-    &::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
-    }
-    &::-webkit-scrollbar-track {
-        background: var(--surface-alt);
-    }
-    &::-webkit-scrollbar-thumb {
-        background: var(--border);
-        border-radius: 5px;
-        border: 2px solid var(--surface-alt);
-        &:hover { background: var(--text-muted); }
-    }
 }
 
 .page-wrapper {
@@ -436,7 +422,7 @@
     min-height: var(--page-h);
     position: relative;
     flex-shrink: 0;
-    background-color: var(--surface);
+    background-color: var(--surface-main);
 
     // ─ Mask: make the gap zone transparent.
     mask-image: repeating-linear-gradient(
@@ -937,46 +923,96 @@
 }
 
 // ─────────────────────────────────────────────
-@media (max-width: 768px) {
-    .hide-mobile { display: none !important; }
-
-    .doc-title-bar {
-        padding: 5px 10px;
-        .doc-title-input { font-size: 0.95rem; }
-    }
-
-    .ribbon-tab    { padding: 0.35rem 0.6rem; font-size: 0.75rem; }
-    .ribbon-panel  { padding: 0.25rem 0.5rem; height: 70px; }
-    .ribbon-btn    { width: 26px; height: 26px; font-size: 0.82rem; &.tall { padding: 0.2rem 0.5rem; height: 44px; i { font-size: 1rem; } } }
-    .ribbon-select { height: 24px; font-size: 0.75rem; &.font-family { width: 90px; } &.font-size { width: 48px; } &.style-select { width: 90px; } &.layout-select { width: 110px; } }
-
+// Tablet — horizontal scroll keeps full page intact
+// ─────────────────────────────────────────────
+@media (max-width: 1024px) {
     .editor-workspace {
-        background: var(--surface-alt);
-        display: block;
+        overflow-x: auto;
+        overflow-y: auto;
     }
 
     .page-wrapper {
+        min-width: max-content;
+        padding: 24px 32px 40px;
+    }
+}
+
+// ─────────────────────────────────────────────
+// Mobile — Page width and margins are responsive
+// (zoom signal remains 100% so text is normal & readable)
+// ─────────────────────────────────────────────
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+
+    .doc-title-bar {
+        padding: 5px 10px;
+
+        .doc-title-input {
+            font-size: 0.95rem;
+        }
+    }
+
+    .ribbon-tab {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .ribbon-panel {
+        padding: 0.25rem 0.5rem;
+        height: 70px;
+    }
+
+    .ribbon-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 0.82rem;
+
+        &.tall {
+            padding: 0.2rem 0.5rem;
+            height: 44px;
+
+            i { font-size: 1rem; }
+        }
+    }
+
+    .ribbon-select {
+        height: 24px;
+        font-size: 0.75rem;
+
+        &.font-family   { width: 90px; }
+        &.font-size     { width: 48px; }
+        &.style-select  { width: 90px; }
+        &.layout-select { width: 110px; }
+    }
+
+    // Workspace: vertical scroll only; JS zoom handles the width fit
+    .editor-workspace {
+        overflow-x: hidden;
+        overflow-y: auto;
+        background: var(--surface-alt);
+    }
+
+    // Page wrapper: centre the zoomed page, no extra left/right padding
+    .page-wrapper {
         width: 100%;
-        padding: 8px;
-        zoom: 1 !important;
+        padding: 12px 0 24px;
+        min-width: unset !important;
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: flex-start;
         gap: 0;
     }
 
+    // Page surface: cancel the mask (gap zone is handled by solid
+    // background + 1px border-bottom separator per page instead)
     .page-surface {
-        width: 100% !important;
-        min-width: 0 !important;
-
-        // Cancel the desktop mask — it clips content on narrow screens
         mask-image: none !important;
         -webkit-mask-image: none !important;
-
-        // Cancel the desktop drop-shadow (was tied to the mask)
         filter: none !important;
 
-        // Simple flat paper look: solid background, 1px border at each page bottom
         background-color: var(--surface) !important;
         background-image: repeating-linear-gradient(
             to bottom,
@@ -987,19 +1023,19 @@
             transparent var(--page-h),
             transparent var(--page-unit)
         ) !important;
-        box-shadow: none !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
     }
 
-    .ql-editor {
-        width: 100% !important;
-        min-height: calc(100vh - 200px) !important;
-        font-size: 12pt !important;
-        padding: 20px !important;
+    .bubble-toolbar {
+        display: none !important;
     }
 
-    .bubble-toolbar { display: none; } // Too small on mobile — ribbon is sufficient
-    .doc-status-bar { padding: 0.25rem 0.6rem; }
+    .doc-status-bar {
+        padding: 0.25rem 0.6rem;
+        font-size: 0.72rem;
+    }
 }
+
 
 // ─────────────────────────────────────────────
 // Animations
