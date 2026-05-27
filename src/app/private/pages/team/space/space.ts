@@ -1,5 +1,6 @@
-import { Component, inject, signal, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, ViewChild, WritableSignal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { SpaceService } from '../../../../core/services/components/space.service';
 import { Space } from '../../../../core/interfaces/space';
@@ -8,7 +9,7 @@ import { FileSystemService } from '../../../../core/services/data/file-system.se
 import { AuthService } from '../../../../core/auth/auth.service';
 import { FileExplorerComponent } from '../../../../shared/components/space-manager/file-explorer/file-explorer';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
-import { CommonModule } from '@angular/common';
+
 import { PageHeaderActionsDirective } from '../../../../shared/components/page-header/page-header-actions.directive';
 import { SpaceCardComponent } from '../../../../shared/components/space-manager/space-card/space-card';
 import { FloatingWindowComponent } from '../../../../shared/components/floating-window/floating-window';
@@ -78,7 +79,7 @@ export class TeamSpace implements OnInit, OnDestroy {
     }
 
     private paramSub!: Subscription;
-    private spaceSub: any;
+    private spaceSub?: { unsubscribe: () => void };
 
     async ngOnInit() {
         const mode = await this.fileSystem.getStorageMode();
@@ -105,6 +106,7 @@ export class TeamSpace implements OnInit, OnDestroy {
             this.docVisible.set(false);
             this.settingsVisible.set(false);
 
+            // Tear down previous live subscription
             this.spaceSub?.unsubscribe();
 
             if (spaceId) {
@@ -163,26 +165,26 @@ export class TeamSpace implements OnInit, OnDestroy {
 
     // Window Actions
     toggleExplorer() {
-        this.handleWindowToggle(this.explorerVisible, 'quilix_explorer_state');
+        this.handleWindowToggle(this.explorerVisible, 'quilix_explorer_state_team');
     }
 
     toggleSheet() {
-        this.handleWindowToggle(this.sheetVisible, 'quilix_sheet_state');
+        this.handleWindowToggle(this.sheetVisible, 'quilix_sheet_state_team');
     }
 
     toggleNote() {
-        this.handleWindowToggle(this.noteVisible, 'quilix_note_state');
+        this.handleWindowToggle(this.noteVisible, 'quilix_note_state_team');
     }
 
     toggleDoc() {
-        this.handleWindowToggle(this.docVisible, 'quilix_doc_state');
+        this.handleWindowToggle(this.docVisible, 'quilix_doc_state_team');
     }
 
     toggleSettings() {
-        this.handleWindowToggle(this.settingsVisible, 'quilix_settings_state');
+        this.handleWindowToggle(this.settingsVisible, 'quilix_settings_state_team');
     }
 
-    private handleWindowToggle(visibilitySignal: any, id: string) {
+    private handleWindowToggle(visibilitySignal: WritableSignal<boolean>, id: string) {
         if (!visibilitySignal()) {
             visibilitySignal.set(true);
         } else if (!this.windowManager.isActive(id)) {

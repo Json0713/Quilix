@@ -32,7 +32,7 @@ export class DocListComponent implements OnInit, OnDestroy {
     @ViewChildren('renameInput') renameInputs!: QueryList<ElementRef>;
     @ViewChildren('createInput') createInputs!: QueryList<ElementRef>;
 
-    private sub: any;
+    private sub?: { unsubscribe: () => void };
 
     ngOnInit() {
         if (this.spaceId) {

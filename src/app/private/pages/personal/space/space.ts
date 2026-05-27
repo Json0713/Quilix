@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, ViewChild, WritableSignal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
@@ -78,7 +78,7 @@ export class PersonalSpace implements OnInit, OnDestroy {
     }
 
     private paramSub!: Subscription;
-    private spaceSub: any;
+    private spaceSub?: { unsubscribe: () => void };
 
     async ngOnInit() {
         const mode = await this.fileSystem.getStorageMode();
@@ -184,7 +184,7 @@ export class PersonalSpace implements OnInit, OnDestroy {
         this.handleWindowToggle(this.settingsVisible, 'quilix_settings_state');
     }
 
-    private handleWindowToggle(visibilitySignal: any, id: string) {
+    private handleWindowToggle(visibilitySignal: WritableSignal<boolean>, id: string) {
         if (!visibilitySignal()) {
             visibilitySignal.set(true);
         } else if (!this.windowManager.isActive(id)) {

@@ -70,11 +70,11 @@
                                                     <div class="ctx-header">
                                                         <small class="ctx-title">{{doc.name}}</small>
                                                     </div>
-                                                    <button class="ctx-item" (click)="startRename(doc)">
+                                                    <button class="ctx-item" (click)="startRename(doc, $event)">
                                                         <i class="bi bi-pencil-square text-primary me-2"></i> Rename
                                                     </button>
                                                     <div class="ctx-divider"></div>
-                                                    <button class="ctx-item text-danger" (click)="deleteDoc(doc)">
+                                                    <button class="ctx-item text-danger" (click)="deleteDoc(doc, $event)">
                                                         <i class="bi bi-trash3 me-2"></i> Delete
                                                     </button>
                                                 </div>
