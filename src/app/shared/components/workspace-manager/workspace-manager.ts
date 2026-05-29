@@ -264,7 +264,6 @@ export class WorkspaceManagerComponent implements OnInit {
     }
 
     // ── Re-auth (user-gesture triggered) ──
-
     async reconnectStorage() {
         if (this.isReauthing()) return;
         this.isReauthing.set(true);
@@ -306,7 +305,6 @@ export class WorkspaceManagerComponent implements OnInit {
     }
 
     // ── Selection methods ──
-
     toggleSelectionMode() {
         if (this.selectionMode()) {
             this.exitSelectionMode();
@@ -346,7 +344,6 @@ export class WorkspaceManagerComponent implements OnInit {
     }
 
     // ── Bulk trash ──
-
     async requestBulkTrash() {
         if (this.selectedCount() === 0) return;
 
@@ -384,7 +381,6 @@ export class WorkspaceManagerComponent implements OnInit {
     }
 
     // ── Bulk folder restore ──
-
     async bulkRestoreFolders() {
         if (this.isBulkProcessing() || !this.hasSelectedMissing()) return;
         this.isBulkProcessing.set(true);
@@ -411,7 +407,6 @@ export class WorkspaceManagerComponent implements OnInit {
     }
 
     // ── Single-item actions ──
-
     async restoreWorkspace(workspace: ManagedWorkspace) {
         if (workspace.isRestoring || !workspace.isMissingOnDisk) return;
 
@@ -474,7 +469,6 @@ export class WorkspaceManagerComponent implements OnInit {
     }
 
     // ── Actions ──
-
     async switchToWorkspace(workspace: ManagedWorkspace) {
         if (workspace.id === this.currentWorkspaceId()) return;
         if (workspace.isMissingOnDisk) return;
@@ -493,7 +487,6 @@ export class WorkspaceManagerComponent implements OnInit {
 
 
     // ── Drag & Drop ──
-
     onDrop(event: CdkDragDrop<ManagedWorkspace[]>) {
         if (event.previousIndex === event.currentIndex || this.selectionMode()) return;
 
