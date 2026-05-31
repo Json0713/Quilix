@@ -44,7 +44,7 @@ import { AlarmService } from '../../core/services/ui/alarm.service';
                 </div>
             }
 
-            <!-- MODAL VIEW (Native Pattern) -->
+            <!-- MODAL VIEW -->
             @if (isModal) {
                 <div class="widget-modal-wrapper" [class.is-mobile]="isMobile()">
                     <div class="widget-modal-header">
