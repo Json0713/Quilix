@@ -408,10 +408,7 @@
 //
 // The JS layout engine (runPagination) measures paragraph blocks and 
 // physically pushes them down if they cross a page gap.
-// 
-// This mask-image creates the actual visual gaps (making the bottom X pixels
-// of every tile transparent) revealing the workspace desk, while filter:drop-shadow
-// gives each page its own distinct shadow.
+//
 // ─────────────────────────────────────────────
 .page-surface {
     --page-h: 1056px;
