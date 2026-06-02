@@ -4,7 +4,8 @@
     height: 42px !important;
     min-height: 42px !important;
     background: var(--surface-main);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
     flex-shrink: 0;
     padding: 0 0.5rem;
     gap: 4px;
