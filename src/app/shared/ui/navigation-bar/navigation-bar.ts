@@ -182,10 +182,19 @@ export class NavigationBar implements OnInit, OnDestroy {
     enterEditMode() {
         this.isEditMode = true;
         
-        let url = this.router.url.split('?')[0];
-        if (url.startsWith('/')) {
-            url = url.substring(1);
+        let url = this.router.url;
+        const parsed = this.router.parseUrl(url);
+        
+        // If we are in the browser component, pre-fill with the actual external URL
+        if (parsed.root.children['primary']?.segments.some(s => s.path === 'browse') && parsed.queryParams['url']) {
+            url = parsed.queryParams['url'];
+        } else {
+            url = url.split('?')[0];
+            if (url.startsWith('/')) {
+                url = url.substring(1);
+            }
         }
+        
         this.editValue.set(url);
         
         this.highlightedIndex = -1;
@@ -435,7 +444,9 @@ export class NavigationBar implements OnInit, OnDestroy {
     }
 
     private generateBreadcrumbs() {
-        const url   = this.router.url.split('?')[0];
+        const fullUrl = this.router.url;
+        const parsed = this.router.parseUrl(fullUrl);
+        const url   = fullUrl.split('?')[0];
         const parts = url.split('/').filter(p => p);
 
         this.defaultBreadcrumbs = [];
@@ -450,7 +461,23 @@ export class NavigationBar implements OnInit, OnDestroy {
             });
 
             if (parts.length > 1) {
-                if (parts[1] === 'spaces' && parts.length > 2) {
+                if (parts[1] === 'browse' && parsed.queryParams['url']) {
+                    const browseUrl = parsed.queryParams['url'];
+                    try {
+                        const hostname = new URL(browseUrl).hostname;
+                        this.defaultBreadcrumbs.push({
+                            label: hostname,
+                            url: fullUrl,
+                            isLast: true
+                        });
+                    } catch (e) {
+                        this.defaultBreadcrumbs.push({
+                            label: 'Browser',
+                            url: fullUrl,
+                            isLast: true
+                        });
+                    }
+                } else if (parts[1] === 'spaces' && parts.length > 2) {
                     const spaceId = parts[2];
 
                     this.defaultBreadcrumbs.push({
