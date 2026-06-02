@@ -270,8 +270,10 @@ export class NavigationBar implements OnInit, OnDestroy {
         const ctx = this.context();
         
         // 1. Detect if this is an external web URL
-        const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/;
-        if (urlRegex.test(path) && !path.startsWith('/') && !path.startsWith('team') && !path.startsWith('personal')) {
+        const isHttpLiteral = /^https?:/i.test(path);
+        const isDomainPattern = /^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/.test(path);
+        
+        if ((isHttpLiteral || isDomainPattern) && !path.startsWith('/') && !path.startsWith('team') && !path.startsWith('personal')) {
             const fullUrl = path.startsWith('http') ? path : `https://${path}`;
             const browsePath = ctx ? `/${ctx}/browse` : `/team/browse`;
             
