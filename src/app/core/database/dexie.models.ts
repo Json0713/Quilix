@@ -70,3 +70,14 @@ export interface WidgetAlarm {
     ringtone: string;
     createdAt: number;
 }
+
+/** Represents a dynamically saved web application or site in the Browser App launcher. */
+export interface BrowserBookmark {
+    id: string; // Typically the domain or URL
+    title: string;
+    url: string;
+    icon: string;
+    category: 'Productivity' | 'Games' | 'Tools';
+    description: string;
+    createdAt: number;
+}

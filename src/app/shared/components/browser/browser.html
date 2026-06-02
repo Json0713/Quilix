@@ -1,5 +1,10 @@
 <div class="browser-container">
   @if (safeUrl) {
+    <div class="browser-actions">
+      <button class="fab-btn" [class.bookmarked]="isBookmarked" (click)="toggleBookmark()" [title]="isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'">
+        <i class="bi" [class.bi-bookmark-fill]="isBookmarked" [class.bi-bookmark]="!isBookmarked"></i>
+      </button>
+    </div>
     <iframe [src]="safeUrl" class="browser-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
   } @else {
     <div class="empty-state">

@@ -1,10 +1,10 @@
-<div class="store-state">
+<div class="store-state" [class.is-empty]="(bookmarks$ | async)?.length === 0">
   <div class="store-header">
     <div class="store-icon">
       <i class="bi bi-browser-chrome"></i>
     </div>
     <h2>Browser App</h2>
-    <p>Enter a URL to browse the web, or launch a safe app below.</p>
+    <p>Enter a URL to browse the web, or launch a saved app below.</p>
     
     <form class="search-form" (submit)="onSearchSubmit($event)">
       <div class="search-input-wrapper">
@@ -19,18 +19,23 @@
     </form>
   </div>
 
-  <div class="store-grid">
-    @for (app of recommendedApps; track app.title) {
-      <div class="app-card" (click)="launchApp(app.url)">
-        <div class="app-icon">
-          <i class="bi {{ app.icon }}"></i>
+  @if ((bookmarks$ | async)?.length) {
+    <div class="store-grid">
+      @for (app of bookmarks$ | async; track app.id) {
+        <div class="app-card" (click)="launchApp(app.url)">
+          <button class="remove-btn" (click)="removeBookmark(app.url, $event)" title="Remove bookmark">
+            <i class="bi bi-x"></i>
+          </button>
+          <div class="app-icon">
+            <i class="bi {{ app.icon }}"></i>
+          </div>
+          <div class="app-details">
+            <span class="app-category">{{ app.category }}</span>
+            <h3 class="app-title">{{ app.title }}</h3>
+            <p class="app-description">{{ app.description }}</p>
+          </div>
         </div>
-        <div class="app-details">
-          <span class="app-category">{{ app.category }}</span>
-          <h3 class="app-title">{{ app.title }}</h3>
-          <p class="app-description">{{ app.description }}</p>
-        </div>
-      </div>
-    }
-  </div>
+      }
+    </div>
+  }
 </div>

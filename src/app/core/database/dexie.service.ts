@@ -27,10 +27,10 @@ import { Task } from '../interfaces/task';
 import { SheetDocument } from '../interfaces/sheet';
 import { NoteDocument } from '../interfaces/note';
 import { DocDocument } from '../interfaces/doc';
-import { ContactMessage, Setting, ChatSession, ChatMessage, CanvasDocument, WidgetNote, WidgetAlarm } from './dexie.models';
+import { ContactMessage, Setting, ChatSession, ChatMessage, CanvasDocument, WidgetNote, WidgetAlarm, BrowserBookmark } from './dexie.models';
 
 // Re-export models so consumers can import from a single location if needed.
-export type { ContactMessage, Setting, ChatSession, ChatMessage, CanvasDocument, WidgetNote, WidgetAlarm };
+export type { ContactMessage, Setting, ChatSession, ChatMessage, CanvasDocument, WidgetNote, WidgetAlarm, BrowserBookmark };
 
 @Injectable({ providedIn: 'root' })
 export class DexieService extends Dexie {
@@ -56,6 +56,7 @@ export class DexieService extends Dexie {
     canvas_documents!: Table<CanvasDocument, string>;
     widget_notes!: Table<WidgetNote, string>;
     widget_alarms!: Table<WidgetAlarm, string>;
+    browser_bookmarks!: Table<BrowserBookmark, string>;
 
     constructor() {
         super('QuilixDB');
@@ -171,6 +172,11 @@ export class DexieService extends Dexie {
         // v20 - Docs Document Storage (full document editor)
         this.version(20).stores({
             docs: 'id, spaceId, updatedAt'
+        });
+
+        // v21 - Dynamic Browser Bookmarks
+        this.version(21).stores({
+            browser_bookmarks: 'id, category, createdAt'
         });
 
         // Open the database connection eagerly to reduce first-operation latency.
