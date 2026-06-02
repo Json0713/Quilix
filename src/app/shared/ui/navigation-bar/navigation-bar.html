@@ -43,7 +43,7 @@
                 #addressInput
                 type="text"
                 class="address-input"
-                [value]="editValue"
+                [value]="editValue()"
                 (input)="onAddressInput($event)"
                 (keydown)="onAddressKeydown($event)"
                 (blur)="onAddressBlur()"

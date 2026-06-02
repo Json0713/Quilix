@@ -7,6 +7,7 @@ export const TEAM_ROUTES: Routes = [
     children: [
       {
         path: '',
+        data: { label: 'Home', icon: 'bi-house' },
         loadComponent: () => import('./index/index').then(m => m.TeamIndex)
       },
 /*       {
@@ -15,22 +16,27 @@ export const TEAM_ROUTES: Routes = [
       }, */
       {
         path: 'settings',
+        data: { label: 'Settings', icon: 'bi-gear' },
         loadComponent: () => import('./settings/settings').then(m => m.TeamSettings)
       },
       {
         path: 'settings/data-management',
+        data: { label: 'Data Management', icon: 'bi-database' },
         loadComponent: () => import('./settings/data-management/data-management').then(m => m.TeamDataManagement)
       },
       {
         path: 'workspaces',
+        data: { label: 'Workspaces', icon: 'bi-archive' },
         loadComponent: () => import('./workspaces/workspaces').then(m => m.TeamWorkspaces)
       },
       {
         path: 'trash',
+        data: { label: 'Trash', icon: 'bi-trash3' },
         loadComponent: () => import('./trash/trash').then(m => m.TeamTrash)
       },
       {
         path: 'chat',
+        data: { label: 'Chat', icon: 'bi-chat-dots' },
         loadComponent: () => import('./chat/chat').then(m => m.TeamChat)
       },
       {

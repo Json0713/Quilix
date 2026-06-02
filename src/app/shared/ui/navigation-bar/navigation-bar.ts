@@ -22,6 +22,9 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { Space } from '../../../core/interfaces/space';
 import { ModalService } from '../../../services/ui/common/modal/modal';
 
+import { PERSONAL_ROUTES } from '../../../private/pages/personal/personal.routes';
+import { TEAM_ROUTES } from '../../../private/pages/team/team.routes';
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface Breadcrumb {
@@ -39,24 +42,29 @@ interface NavSuggestion {
     type: 'page' | 'space';
 }
 
-// Static pages per context
-const PERSONAL_PAGES: NavSuggestion[] = [
-    { label: 'Home',            path: '/personal',                          icon: 'bi bi-house',     type: 'page' },
-    { label: 'Chat',            path: '/personal/chat',                     icon: 'bi bi-chat-dots', type: 'page' },
-    { label: 'Workspaces',      path: '/personal/workspaces',               icon: 'bi bi-archive',   type: 'page' },
-    { label: 'Trash',           path: '/personal/trash',                    icon: 'bi bi-trash3',    type: 'page' },
-    { label: 'Settings',        path: '/personal/settings',                 icon: 'bi bi-gear',      type: 'page' },
-    { label: 'Data Management', path: '/personal/settings/data-management', icon: 'bi bi-database',  type: 'page' },
-];
+// ─── Dynamic Route Parsing ────────────────────────────────────────────────────
 
-const TEAM_PAGES: NavSuggestion[] = [
-    { label: 'Home',            path: '/team',                          icon: 'bi bi-house',     type: 'page' },
-    { label: 'Chat',            path: '/team/chat',                     icon: 'bi bi-chat-dots', type: 'page' },
-    { label: 'Workspaces',      path: '/team/workspaces',               icon: 'bi bi-archive',   type: 'page' },
-    { label: 'Trash',           path: '/team/trash',                    icon: 'bi bi-trash3',    type: 'page' },
-    { label: 'Settings',        path: '/team/settings',                 icon: 'bi bi-gear',      type: 'page' },
-    { label: 'Data Management', path: '/team/settings/data-management', icon: 'bi bi-database',  type: 'page' },
-];
+function buildNavSuggestions(routes: any[], prefix: string): NavSuggestion[] {
+    const suggestions: NavSuggestion[] = [];
+    const children = routes[0]?.children || [];
+    
+    for (const route of children) {
+        if (route.data && route.data.label) {
+            const pathSuffix = route.path ? `/${route.path}` : '';
+            suggestions.push({
+                label: route.data.label as string,
+                path: `/${prefix}${pathSuffix}`,
+                icon: (route.data.icon as string) || 'bi bi-folder',
+                type: 'page'
+            });
+        }
+    }
+    return suggestions;
+}
+
+// Automatically sync navigation bar with actual Angular Router configurations
+const PERSONAL_PAGES: NavSuggestion[] = buildNavSuggestions(PERSONAL_ROUTES, 'personal');
+const TEAM_PAGES: NavSuggestion[] = buildNavSuggestions(TEAM_ROUTES, 'team');
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -93,7 +101,7 @@ export class NavigationBar implements OnInit, OnDestroy {
 
     // ── Address bar state ──
     isEditMode = false;
-    editValue  = '';
+    editValue = signal('');
     highlightedIndex = -1;
 
     // ── Suggestions ──
@@ -101,7 +109,7 @@ export class NavigationBar implements OnInit, OnDestroy {
     private context = signal<'personal' | 'team' | ''>('');
 
     filteredSuggestions = computed<NavSuggestion[]>(() => {
-        const query = this.editValue.toLowerCase().trim();
+        const query = this.editValue().toLowerCase().trim();
         const ctx   = this.context();
 
         // When not searching, only show the default static pages for the current active context
@@ -120,10 +128,10 @@ export class NavigationBar implements OnInit, OnDestroy {
             return localStaticPages.slice(0, 6);
         }
 
-        // When actively searching, search globally across all contexts to maximize user convenience
-        const globalAll = [...PERSONAL_PAGES, ...TEAM_PAGES, ...localSpaceSuggestions];
+        // Search strictly across the current active context to avoid mixing roles
+        const contextAll = [...localStaticPages, ...localSpaceSuggestions];
 
-        return globalAll
+        return contextAll
             .filter(s =>
                 s.label.toLowerCase().includes(query) ||
                 s.path.toLowerCase().replace(/^\//, '').includes(query) // strip slash to match "team/chat" queries perfectly
@@ -178,7 +186,7 @@ export class NavigationBar implements OnInit, OnDestroy {
         if (url.startsWith('/')) {
             url = url.substring(1);
         }
-        this.editValue = url;
+        this.editValue.set(url);
         
         this.highlightedIndex = -1;
 
@@ -197,12 +205,12 @@ export class NavigationBar implements OnInit, OnDestroy {
 
     exitEditMode() {
         this.isEditMode       = false;
-        this.editValue        = '';
+        this.editValue.set('');
         this.highlightedIndex = -1;
     }
 
     onAddressInput(event: Event) {
-        this.editValue        = (event.target as HTMLInputElement).value;
+        this.editValue.set((event.target as HTMLInputElement).value);
         this.highlightedIndex = -1;
     }
 
@@ -215,7 +223,7 @@ export class NavigationBar implements OnInit, OnDestroy {
                 if (this.highlightedIndex >= 0 && suggestions[this.highlightedIndex]) {
                     this.commitNavigation(suggestions[this.highlightedIndex].path, suggestions[this.highlightedIndex]);
                 } else {
-                    this.commitNavigation(this.editValue.trim());
+                    this.commitNavigation(this.editValue().trim());
                 }
                 break;
             }
