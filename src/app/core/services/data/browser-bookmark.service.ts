@@ -57,7 +57,7 @@ export class BrowserBookmarkService {
    * and we haven't seeded before (using settings table as a flag).
    */
   private async seedDefaultsIfNeeded(): Promise<void> {
-    const SEED_KEY = 'browser_bookmarks_seeded_v3';
+    const SEED_KEY = 'browser_bookmarks_seeded_v4';
     const hasSeeded = await db.settings.get(SEED_KEY);
 
     if (hasSeeded) {
@@ -96,30 +96,30 @@ export class BrowserBookmarkService {
         createdAt: Date.now() + 3
       },
       {
-        id: 'https://smashkarts.io/',
-        url: 'https://smashkarts.io/',
-        title: 'Smash Karts',
-        icon: 'bi-controller',
+        id: 'https://slowroads.io/',
+        url: 'https://slowroads.io/',
+        title: 'Slow Roads',
+        icon: 'bi-car-front',
         category: 'Games',
-        description: '3D Multiplayer Kart Battle',
+        description: 'Endless 3D Driving',
         createdAt: Date.now() + 4
       },
       {
-        id: 'https://hole-io.com/',
-        url: 'https://hole-io.com/',
-        title: 'Hole.io',
-        icon: 'bi-record-circle',
+        id: 'https://sandspiel.club/',
+        url: 'https://sandspiel.club/',
+        title: 'Sandspiel',
+        icon: 'bi-droplet',
         category: 'Games',
-        description: 'Absorb the City!',
+        description: 'Falling Sand Physics',
         createdAt: Date.now() + 5
       },
       {
-        id: 'https://paper-io.com/',
-        url: 'https://paper-io.com/',
-        title: 'Paper.io 2',
-        icon: 'bi-palette',
+        id: 'https://voxiom.io/',
+        url: 'https://voxiom.io/',
+        title: 'Voxiom.io',
+        icon: 'bi-boxes',
         category: 'Games',
-        description: 'Conquer Territory',
+        description: 'Voxel Battle Royale',
         createdAt: Date.now() + 6
       }
     ];
