@@ -1,0 +1,11 @@
+<div class="browser-container">
+  @if (safeUrl) {
+    <iframe [src]="safeUrl" class="browser-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+  } @else {
+    <div class="empty-state">
+      <i class="bi bi-globe2 empty-icon"></i>
+      <h2>Browser</h2>
+      <p>Enter a web address in the address bar to browse.</p>
+    </div>
+  }
+</div>

@@ -56,6 +56,11 @@ export const PERSONAL_ROUTES: Routes = [
         loadComponent: () => import('../shared/doc-page/doc-page').then(m => m.DocPage)
       },
       {
+        path: 'browse',
+        data: { label: 'Browser', icon: 'bi-globe2' },
+        loadComponent: () => import('../../../shared/components/browser/browser').then(m => m.BrowserComponent)
+      },
+      {
         path: '**',
         loadComponent: () => import('../../../shared/components/404/404').then(m => m.PageNotFound)
       }

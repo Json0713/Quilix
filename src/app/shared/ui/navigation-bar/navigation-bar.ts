@@ -259,6 +259,27 @@ export class NavigationBar implements OnInit, OnDestroy {
         if (!path) { this.exitEditMode(); return; }
 
         const ctx = this.context();
+        
+        // 1. Detect if this is an external web URL
+        const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/;
+        if (urlRegex.test(path) && !path.startsWith('/') && !path.startsWith('team') && !path.startsWith('personal')) {
+            const fullUrl = path.startsWith('http') ? path : `https://${path}`;
+            const browsePath = ctx ? `/${ctx}/browse` : `/team/browse`;
+            
+            this.exitEditMode();
+            this.router.navigate([browsePath], { queryParams: { url: fullUrl } }).then(success => {
+                if (success) {
+                    try {
+                        const host = new URL(fullUrl).hostname;
+                        this.tabService.updateActiveTabRoute(`./browse?url=${encodeURIComponent(fullUrl)}`, host, 'bi bi-globe2');
+                    } catch (e) {
+                        this.tabService.updateActiveTabRoute(`./browse?url=${encodeURIComponent(fullUrl)}`, 'Browser', 'bi bi-globe2');
+                    }
+                }
+            });
+            return;
+        }
+
         const validRoots = ['team', 'personal', 'meta'];
         
         // Normalize: If they typed a path without a slash but it starts with a known root context,
