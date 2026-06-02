@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { QuilixAppStoreComponent } from '../../../shared/components/browser/quilix-app-store/quilix-app-store';
 
 export const TEAM_ROUTES: Routes = [
   {
@@ -23,6 +24,11 @@ export const TEAM_ROUTES: Routes = [
         path: 'settings/data-management',
         data: { label: 'Data Management', icon: 'bi-database' },
         loadComponent: () => import('./settings/data-management/data-management').then(m => m.TeamDataManagement)
+      },
+      {
+        path: 'store',
+        data: { label: 'App Store', icon: 'bi-controller' },
+        component: QuilixAppStoreComponent
       },
       {
         path: 'workspaces',

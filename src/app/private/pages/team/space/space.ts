@@ -1,5 +1,5 @@
 import { Component, inject, signal, OnInit, OnDestroy, ViewChild, WritableSignal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { SpaceService } from '../../../../core/services/components/space.service';
@@ -42,6 +42,7 @@ import { OfficeViewerComponent } from '../../../../shared/components/space-manag
 })
 export class TeamSpace implements OnInit, OnDestroy {
     private route = inject(ActivatedRoute);
+    private router = inject(Router);
     private spaceService = inject(SpaceService);
     private fileSystem = inject(FileSystemService);
     private authService = inject(AuthService);
@@ -182,6 +183,10 @@ export class TeamSpace implements OnInit, OnDestroy {
 
     toggleSettings() {
         this.handleWindowToggle(this.settingsVisible, 'quilix_settings_state_team');
+    }
+
+    launchAppStore() {
+        this.router.navigate(['/team/store']);
     }
 
     private handleWindowToggle(visibilitySignal: WritableSignal<boolean>, id: string) {

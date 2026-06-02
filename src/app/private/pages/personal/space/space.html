@@ -87,6 +87,19 @@
                         [borderRadius]="preferences().borderRadius"
                         (cardClick)="toggleSettings()">
                     </app-space-card>
+
+                    <!-- App Store Card -->
+                    <app-space-card
+                        title="App Store"
+                        subtitle="Explore recommended apps, tools, and games."
+                        icon="bi-controller"
+                        indicatorColor="#8b5cf6"
+                        previewBackground="linear-gradient(135deg, #8b5cf6, #7c3aed)"
+                        [layoutMode]="preferences().layoutMode"
+                        [iconSize]="preferences().iconSize"
+                        [borderRadius]="preferences().borderRadius"
+                        (cardClick)="launchAppStore()">
+                    </app-space-card>
                 </div>
 
                 <!-- Floating App Window (File Explorer) -->

@@ -1,0 +1,24 @@
+<div class="store-state">
+  <div class="store-header">
+    <div class="store-icon">
+      <i class="bi bi-controller"></i>
+    </div>
+    <h2>Quilix App Store</h2>
+    <p>Explore recommended apps, tools, and games. Instantly launch them without leaving Quilix.</p>
+  </div>
+
+  <div class="store-grid">
+    @for (app of recommendedApps; track app.title) {
+      <div class="app-card" (click)="launchApp(app.url)">
+        <div class="app-icon">
+          <i class="bi {{ app.icon }}"></i>
+        </div>
+        <div class="app-details">
+          <span class="app-category">{{ app.category }}</span>
+          <h3 class="app-title">{{ app.title }}</h3>
+          <p class="app-description">{{ app.description }}</p>
+        </div>
+      </div>
+    }
+  </div>
+</div>

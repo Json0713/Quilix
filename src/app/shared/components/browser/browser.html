@@ -3,9 +3,11 @@
     <iframe [src]="safeUrl" class="browser-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
   } @else {
     <div class="empty-state">
-      <i class="bi bi-globe2 empty-icon"></i>
-      <h2>Browser</h2>
-      <p>Enter a web address in the address bar to browse.</p>
+      <div class="empty-icon">
+        <i class="bi bi-globe2"></i>
+      </div>
+      <h2>Quilix Browser</h2>
+      <p>Enter a URL in the address bar to browse the web.</p>
     </div>
   }
 </div>

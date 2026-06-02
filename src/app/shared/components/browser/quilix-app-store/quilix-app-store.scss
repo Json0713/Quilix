@@ -1,0 +1,116 @@
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background-color: var(--surface-main);
+}
+
+.store-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 2rem;
+  overflow-y: auto;
+  
+  .store-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    max-width: 600px;
+    
+    .store-icon {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      opacity: 0.9;
+    }
+    
+    h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 0 0 0.5rem 0;
+    }
+    
+    p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+  }
+
+  .store-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1000px;
+
+    .app-card {
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &:hover {
+        transform: translateY(-4px);
+        background: var(--surface-active);
+        border-color: var(--primary);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        
+        .app-icon {
+          background: var(--primary);
+          color: #fff;
+        }
+      }
+
+      .app-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: var(--surface-active);
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+      }
+
+      .app-details {
+        display: flex;
+        flex-direction: column;
+        
+        .app-category {
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          color: var(--primary);
+          margin-bottom: 0.25rem;
+          letter-spacing: 0.5px;
+        }
+        
+        .app-title {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: var(--text-main);
+          margin: 0 0 0.25rem 0;
+        }
+        
+        .app-description {
+          font-size: 0.85rem;
+          color: var(--text-muted);
+          margin: 0;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+}
