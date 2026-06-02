@@ -41,19 +41,21 @@ interface NavSuggestion {
 
 // Static pages per context
 const PERSONAL_PAGES: NavSuggestion[] = [
-    { label: 'Home',       path: '/personal',            icon: 'bi bi-house',     type: 'page' },
-    { label: 'Chat',       path: '/personal/chat',       icon: 'bi bi-chat-dots', type: 'page' },
-    { label: 'Workspaces', path: '/personal/workspaces', icon: 'bi bi-archive',   type: 'page' },
-    { label: 'Trash',      path: '/personal/trash',      icon: 'bi bi-trash3',    type: 'page' },
-    { label: 'Settings',   path: '/personal/settings',   icon: 'bi bi-gear',      type: 'page' },
+    { label: 'Home',            path: '/personal',                          icon: 'bi bi-house',     type: 'page' },
+    { label: 'Chat',            path: '/personal/chat',                     icon: 'bi bi-chat-dots', type: 'page' },
+    { label: 'Workspaces',      path: '/personal/workspaces',               icon: 'bi bi-archive',   type: 'page' },
+    { label: 'Trash',           path: '/personal/trash',                    icon: 'bi bi-trash3',    type: 'page' },
+    { label: 'Settings',        path: '/personal/settings',                 icon: 'bi bi-gear',      type: 'page' },
+    { label: 'Data Management', path: '/personal/settings/data-management', icon: 'bi bi-database',  type: 'page' },
 ];
 
 const TEAM_PAGES: NavSuggestion[] = [
-    { label: 'Home',       path: '/team',            icon: 'bi bi-house',     type: 'page' },
-    { label: 'Chat',       path: '/team/chat',        icon: 'bi bi-chat-dots', type: 'page' },
-    { label: 'Workspaces', path: '/team/workspaces',  icon: 'bi bi-archive',   type: 'page' },
-    { label: 'Trash',      path: '/team/trash',       icon: 'bi bi-trash3',    type: 'page' },
-    { label: 'Settings',   path: '/team/settings',    icon: 'bi bi-gear',      type: 'page' },
+    { label: 'Home',            path: '/team',                          icon: 'bi bi-house',     type: 'page' },
+    { label: 'Chat',            path: '/team/chat',                     icon: 'bi bi-chat-dots', type: 'page' },
+    { label: 'Workspaces',      path: '/team/workspaces',               icon: 'bi bi-archive',   type: 'page' },
+    { label: 'Trash',           path: '/team/trash',                    icon: 'bi bi-trash3',    type: 'page' },
+    { label: 'Settings',        path: '/team/settings',                 icon: 'bi bi-gear',      type: 'page' },
+    { label: 'Data Management', path: '/team/settings/data-management', icon: 'bi bi-database',  type: 'page' },
 ];
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -102,27 +104,29 @@ export class NavigationBar implements OnInit, OnDestroy {
         const query = this.editValue.toLowerCase().trim();
         const ctx   = this.context();
 
-        const staticPages = ctx === 'personal' ? PERSONAL_PAGES
-                          : ctx === 'team'     ? TEAM_PAGES
-                          : [...PERSONAL_PAGES, ...TEAM_PAGES];
+        // When not searching, only show the default static pages for the current active context
+        const localStaticPages = ctx === 'personal' ? PERSONAL_PAGES
+                               : ctx === 'team'     ? TEAM_PAGES
+                               : [...PERSONAL_PAGES, ...TEAM_PAGES];
 
-        const spaceSuggestions: NavSuggestion[] = this.spaces().map(s => ({
+        const localSpaceSuggestions: NavSuggestion[] = this.spaces().map(s => ({
             label: s.name,
             path:  `/${ctx}/spaces/${s.id}`,
             icon:  'bi bi-folder',
             type:  'space' as const,
         }));
 
-        const all = [...staticPages, ...spaceSuggestions];
-
         if (!query || query === '/' || query === `/${ctx}` || query === ctx) {
-            return staticPages.slice(0, 6);
+            return localStaticPages.slice(0, 6);
         }
 
-        return all
+        // When actively searching, search globally across all contexts to maximize user convenience
+        const globalAll = [...PERSONAL_PAGES, ...TEAM_PAGES, ...localSpaceSuggestions];
+
+        return globalAll
             .filter(s =>
                 s.label.toLowerCase().includes(query) ||
-                s.path.toLowerCase().includes(query)
+                s.path.toLowerCase().replace(/^\//, '').includes(query) // strip slash to match "team/chat" queries perfectly
             )
             .slice(0, 8);
     });
