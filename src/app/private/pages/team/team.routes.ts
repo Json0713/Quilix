@@ -48,6 +48,10 @@ export const TEAM_ROUTES: Routes = [
       {
         path: 'spaces/:spaceId/doc/:docId',
         loadComponent: () => import('../shared/doc-page/doc-page').then(m => m.DocPage)
+      },
+      {
+        path: '**',
+        loadComponent: () => import('../../../shared/components/404/404').then(m => m.PageNotFound)
       }
     ]
   }

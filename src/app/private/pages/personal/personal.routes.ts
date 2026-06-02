@@ -21,6 +21,7 @@ export const PERSONAL_ROUTES: Routes = [
         path: 'settings/data-management',
         loadComponent: () => import('./settings/data-management/data-management').then(m => m.PersonalDataManagement)
       },
+
       {
         path: 'workspaces',
         loadComponent: () => import('./workspaces/workspaces').then(m => m.PersonalWorkspaces)
@@ -48,6 +49,11 @@ export const PERSONAL_ROUTES: Routes = [
       {
         path: 'spaces/:spaceId/doc/:docId',
         loadComponent: () => import('../shared/doc-page/doc-page').then(m => m.DocPage)
+      },
+
+      {
+        path: '**',
+        loadComponent: () => import('../../../shared/components/404/404').then(m => m.PageNotFound)
       }
     ]
   }
