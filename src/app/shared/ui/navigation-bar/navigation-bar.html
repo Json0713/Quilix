@@ -7,10 +7,10 @@
 
     <!-- Left: Navigation Controls -->
     <div class="nav-controls">
-        <button class="nav-btn" [class.disabled]="!canGoBack" (click)="goBack()" title="Back">
+        <button class="nav-btn" [class.disabled]="!canGoBack" (click)="goBack()" title="Back (Alt+Left)">
             <i class="bi bi-arrow-left"></i>
         </button>
-        <button class="nav-btn" [class.disabled]="!canGoForward" (click)="goForward()" title="Forward">
+        <button class="nav-btn" [class.disabled]="!canGoForward" (click)="goForward()" title="Forward (Alt+Right)">
             <i class="bi bi-arrow-right"></i>
         </button>
         <button class="nav-btn" (click)="refresh()" title="Refresh">
@@ -18,22 +18,64 @@
         </button>
     </div>
 
-    <!-- Center: Address Bar / Breadcrumbs -->
-    <div class="nav-address-bar">
-        <div class="breadcrumbs">
-            <!-- NATIVE ROUTER BREADCRUMBS (DEFAULT) -->
-            @for (crumb of defaultBreadcrumbs; track i; let i = $index) {
-                <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast"
-                    [class.deleted-space]="crumb.isDeleted" (click)="onBreadcrumbClick(crumb)">
-                    {{ crumb.label }}
-                </a>
-                @if (!crumb.isLast) {
-                    <i class="bi bi-chevron-right breadcrumb-separator"></i>
-                }
-            }
-        </div>
-    </div>
+    <!-- Center: Address Bar -->
+    <div #addressBarEl class="nav-address-bar" [class.edit-mode]="isEditMode">
 
+        <!-- DISPLAY MODE: Breadcrumbs (click to enter edit mode) -->
+        @if (!isEditMode) {
+            <div class="breadcrumbs" (click)="enterEditMode()" title="Click to navigate (Ctrl+L)">
+                @for (crumb of defaultBreadcrumbs; track i; let i = $index) {
+                    <a [routerLink]="crumb.url" class="breadcrumb-item" [class.last]="crumb.isLast"
+                        [class.deleted-space]="crumb.isDeleted" (click)="onBreadcrumbClick(crumb)">
+                        {{ crumb.label }}
+                    </a>
+                    @if (!crumb.isLast) {
+                        <i class="bi bi-chevron-right breadcrumb-separator"></i>
+                    }
+                }
+            </div>
+        }
+
+        <!-- EDIT MODE: Editable address input + suggestions -->
+        @if (isEditMode) {
+            <i class="bi bi-globe address-globe-icon"></i>
+            <input
+                #addressInput
+                type="text"
+                class="address-input"
+                [value]="editValue"
+                (input)="onAddressInput($event)"
+                (keydown)="onAddressKeydown($event)"
+                (blur)="onAddressBlur()"
+                autocomplete="off"
+                spellcheck="false"
+                aria-label="Address bar"
+                placeholder="Type a path or page name..."
+            />
+            <!-- Suggestions Dropdown (position:fixed to escape stacking context) -->
+            @if (filteredSuggestions().length > 0) {
+                <div class="suggestions-dropdown"
+                     [style.top.px]="dropdownTop"
+                     [style.left.px]="dropdownLeft"
+                     [style.width.px]="dropdownWidth">
+                    @for (suggestion of filteredSuggestions(); track suggestion.path; let i = $index) {
+                        <button
+                            class="suggestion-item"
+                            [class.highlighted]="highlightedIndex === i"
+                            (mousedown)="selectSuggestion(suggestion)"
+                            type="button">
+                            <i [class]="suggestion.icon + ' suggestion-icon'"></i>
+                            <span class="suggestion-label">{{ suggestion.label }}</span>
+                            <span class="suggestion-path">{{ suggestion.path }}</span>
+                            @if (suggestion.type === 'space') {
+                                <span class="suggestion-badge">Space</span>
+                            }
+                        </button>
+                    }
+                </div>
+            }
+        }
+    </div>
 
     <!-- Right: Global Search -->
     <div #navSearch class="nav-search" [class.mobile-search-active]="isMobileSearchActive">
@@ -62,4 +104,5 @@
             }
         </div>
     </div>
+
 </div>

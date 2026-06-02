@@ -17,7 +17,7 @@
     left: 0;
     right: 0;
     width: 100%;
-    z-index: 1100; // Below tab-bar (1200) but above content
+    z-index: 1150; // Below tab-bar (1200) but above sidebar (1100)
 
     .nav-mobile-toggle {
         display: none; // Hidden on desktop
@@ -80,33 +80,72 @@
         flex: 1;
         display: flex;
         align-items: center;
+        position: relative;
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(0, 0, 0, 0.08);
         border-radius: 8px;
         height: 34px;
         padding: 0 12px;
-        min-width: 0; // Allow shrinking
-        // box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-
-        // Smooth transition if we add focus states
-        transition: all 0.2s ease;
+        min-width: 0;
+        cursor: text;
+        transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 
         &:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(0, 0, 0, 0.12);
+            border-color: var(--border);
         }
 
+        // ── Edit / focus mode ──
+        &.edit-mode {
+            background: var(--surface-main);
+            border-color: var(--accent, #7c6cf0);
+            box-shadow: 0 0 0 2px rgba(124, 108, 240, 0.18);
+            cursor: default;
+        }
+
+        // Globe icon (shown in edit mode only)
+        .address-globe-icon {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+
+        // Editable address input
+        .address-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-weight: 400;
+            min-width: 0;
+            padding: 0;
+            font-family: inherit;
+
+            &::placeholder {
+                color: var(--text-muted);
+                opacity: 0.6;
+            }
+
+            &::selection {
+                background: rgba(124, 108, 240, 0.3);
+            }
+        }
+
+        // ── Breadcrumbs (display mode) ──
         .breadcrumbs {
             display: flex;
             align-items: center;
             gap: 0.4rem;
             overflow-x: auto;
-            white-space: nowrap; // Keep them inline
-            scrollbar-width: none; // Firefox
+            white-space: nowrap;
+            scrollbar-width: none;
             flex: 1;
 
             &::-webkit-scrollbar {
-                display: none; // Chrome/Safari
+                display: none;
             }
 
             .breadcrumb-item {
@@ -128,7 +167,7 @@
                 &.last {
                     color: var(--text-main);
                     font-weight: 600;
-                    pointer-events: none; // Don't allow clicking the current directory
+                    pointer-events: none;
                 }
 
                 &.deleted-space {
@@ -145,7 +184,100 @@
                 margin-top: 1px;
             }
         }
+
+        // ── Suggestions dropdown (position:fixed — escapes parent stacking context) ──
+        .suggestions-dropdown {
+            position: fixed;
+            // top / left / width are set by inline styles from getBoundingClientRect()
+            background: var(--surface-main);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
+            // Above sidebar / terminal / sheet (2000) but below toast / modal (10000)
+            z-index: 4000 !important;
+            overflow: hidden;
+            animation: suggestionsSlideIn 0.15s cubic-bezier(0.2, 0, 0, 1) forwards;
+
+            .suggestion-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                width: 100%;
+                padding: 9px 14px;
+                border: none;
+                background: transparent;
+                color: var(--text-muted);
+                font-size: 0.84rem;
+                text-align: left;
+                cursor: pointer;
+                transition: background 0.12s ease, color 0.12s ease;
+
+                &:hover,
+                &.highlighted {
+                    background: rgba(255, 255, 255, 0.06);
+                    color: var(--text-main);
+
+                    .suggestion-icon {
+                        opacity: 1;
+                        color: var(--accent, #7c6cf0);
+                    }
+
+                    .suggestion-path {
+                        opacity: 0.7;
+                    }
+                }
+
+                .suggestion-icon {
+                    font-size: 0.9rem;
+                    flex-shrink: 0;
+                    opacity: 0.55;
+                    transition: opacity 0.12s, color 0.12s;
+                    width: 16px;
+                    text-align: center;
+                }
+
+                .suggestion-label {
+                    flex: 1;
+                    font-weight: 500;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    color: var(--text-main);
+                }
+
+                .suggestion-path {
+                    font-size: 0.75rem;
+                    color: var(--text-muted);
+                    opacity: 0.5;
+                    flex-shrink: 0;
+                    max-width: 200px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    font-family: monospace;
+                    transition: opacity 0.12s;
+                }
+
+                .suggestion-badge {
+                    font-size: 0.65rem;
+                    background: rgba(124, 108, 240, 0.18);
+                    color: var(--accent, #7c6cf0);
+                    border-radius: 4px;
+                    padding: 1px 5px;
+                    flex-shrink: 0;
+                    font-weight: 600;
+                    letter-spacing: 0.02em;
+                }
+
+                // Subtle divider between pages and spaces
+                & + .suggestion-item[data-type="space"]:not([data-type="space"] ~ [data-type="space"]) {
+                    border-top: 1px solid rgba(255, 255, 255, 0.05);
+                }
+            }
+        }
     }
+
+
 
 
     .nav-search {
@@ -337,5 +469,16 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes suggestionsSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px) scale(0.99);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }

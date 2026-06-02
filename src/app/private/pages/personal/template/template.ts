@@ -96,13 +96,22 @@ export class PersonalTemplate implements OnDestroy {
 
   private async loadWorkspaceTabs(workspaceId?: string): Promise<void> {
     const wsId = workspaceId || (await this.authService.getCurrentWorkspace())?.id;
-    if (wsId) {
-      await this.tabService.loadTabs(wsId);
-      // Navigate to the last active tab's route to restore workspace state
+    if (!wsId) return;
+
+    await this.tabService.loadTabs(wsId);
+
+    const currentUrl = this.router.url.split('?')[0];
+    const isAtRoot = currentUrl === '/personal';
+
+    if (isAtRoot) {
+      // No child URL — restore the last active tab's route
       const activeTab = this.tabService.activeTab();
       if (activeTab && activeTab.route && activeTab.route !== './') {
         this.router.navigate([activeTab.route], { relativeTo: this.route });
       }
+    } else {
+      // User landed on a specific child URL — sync the tab signal to it
+      this.tabService.syncActiveTabToCurrentUrl(currentUrl);
     }
   }
 

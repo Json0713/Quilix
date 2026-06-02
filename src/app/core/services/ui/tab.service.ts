@@ -211,6 +211,27 @@ export class TabService {
         }
     }
 
+    /**
+     * Syncs the active tab signal to whichever tab matches the given absolute URL.
+     * Called on template init and after direct URL navigation — never triggers router.navigate().
+     */
+    syncActiveTabToCurrentUrl(absoluteUrl: string): void {
+        const cleanUrl = absoluteUrl.split('?')[0];
+
+        // Strip the /personal or /team prefix to get the relative portion
+        const stripped = cleanUrl.replace(/^\/(personal|team)/, '') || '/';
+        const route = stripped === '/' ? './' : '.' + stripped;
+
+        const match = this.tabs().find(t => t.route === route);
+        if (match && match.id !== this.activeTab()?.id) {
+            this.activeTab.set(match);
+            if (this.currentWorkspaceId) {
+                // Fire-and-forget persist
+                this.setSetting(`activeTab:${this.currentWorkspaceId}:${this.windowSessionId}`, match.id);
+            }
+        }
+    }
+
     // ── Reorder Tabs ──
     async updateTabOrders(orderedTabs: Tab[]): Promise<void> {
         // Re-assign order properties based on their new cleanly organized index
