@@ -115,7 +115,7 @@ export class NavigationBar implements OnInit, OnDestroy {
 
         const all = [...staticPages, ...spaceSuggestions];
 
-        if (!query || query === '/' || query === `/${ctx}`) {
+        if (!query || query === '/' || query === `/${ctx}` || query === ctx) {
             return staticPages.slice(0, 6);
         }
 
@@ -168,8 +168,14 @@ export class NavigationBar implements OnInit, OnDestroy {
     // ─── Address bar ─────────────────────────────────────────────────────────
 
     enterEditMode() {
-        this.isEditMode       = true;
-        this.editValue        = this.router.url.split('?')[0];
+        this.isEditMode = true;
+        
+        let url = this.router.url.split('?')[0];
+        if (url.startsWith('/')) {
+            url = url.substring(1);
+        }
+        this.editValue = url;
+        
         this.highlightedIndex = -1;
 
         // Compute the fixed-position anchor for the dropdown on the next tick
@@ -203,7 +209,7 @@ export class NavigationBar implements OnInit, OnDestroy {
             case 'Enter': {
                 event.preventDefault();
                 if (this.highlightedIndex >= 0 && suggestions[this.highlightedIndex]) {
-                    this.commitNavigation(suggestions[this.highlightedIndex].path);
+                    this.commitNavigation(suggestions[this.highlightedIndex].path, suggestions[this.highlightedIndex]);
                 } else {
                     this.commitNavigation(this.editValue.trim());
                 }
@@ -233,24 +239,60 @@ export class NavigationBar implements OnInit, OnDestroy {
     }
 
     selectSuggestion(suggestion: NavSuggestion) {
-        this.commitNavigation(suggestion.path);
+        this.commitNavigation(suggestion.path, suggestion);
     }
 
-    private commitNavigation(rawInput: string) {
+    private commitNavigation(rawInput: string, suggestion?: NavSuggestion) {
         let path = rawInput.trim();
         if (!path) { this.exitEditMode(); return; }
 
-        // Allow shorthand like "chat" → resolves to /{context}/chat
-        if (!path.startsWith('/')) {
-            const ctx = this.context();
+        const ctx = this.context();
+        const validRoots = ['team', 'personal', 'meta'];
+        
+        // Normalize: If they typed a path without a slash but it starts with a known root context,
+        // treat it as an absolute path by prepending a slash.
+        // e.g., "team/workspaces" -> "/team/workspaces"
+        const hasValidRootWithoutSlash = validRoots.some(root => path === root || path.startsWith(`${root}/`));
+        if (!path.startsWith('/') && hasValidRootWithoutSlash) {
+            path = `/${path}`;
+        }
+
+        if (path.startsWith('/')) {
+            // Check if the absolute path is attempting to navigate to a known root context
+            const hasValidRoot = validRoots.some(root => path === `/${root}` || path.startsWith(`/${root}/`));
+            
+            // If it's an unrecognized root (e.g. "/sample"), trap it inside the current context
+            // so it renders the local 404 template instead of redirecting globally.
+            if (!hasValidRoot && ctx) {
+                path = `/${ctx}${path}`;
+            }
+        } else {
+            // Allow shorthand like "chat" → resolves to /{context}/chat
             path = ctx ? `/${ctx}/${path}` : `/${path}`;
         }
 
         this.exitEditMode();
-        this.router.navigateByUrl(path);
+        this.router.navigateByUrl(path).then(success => {
+            if (success) {
+                let label = '';
+                let icon = 'bi bi-folder';
 
-        // Sync the tab state to the new URL
-        this.tabService.syncActiveTabToCurrentUrl(path);
+                if (suggestion) {
+                    label = suggestion.label;
+                    icon = suggestion.icon;
+                } else {
+                    const metadata = this.resolveRouteMetadata(path);
+                    label = metadata.label;
+                    icon = metadata.icon;
+                }
+
+                // Strip root prefix for the relative route saved in the tab
+                const stripped = path.replace(/^\/(personal|team)/, '') || '/';
+                const route = stripped === '/' ? './' : '.' + stripped;
+
+                this.tabService.updateActiveTabRoute(route, label, icon);
+            }
+        });
     }
 
     // ─── Navigation controls ──────────────────────────────────────────────────
@@ -310,10 +352,7 @@ export class NavigationBar implements OnInit, OnDestroy {
     // ─── Breadcrumbs ─────────────────────────────────────────────────────────
 
     onBreadcrumbClick(crumb: Breadcrumb) {
-        let icon = 'bi bi-folder';
-        if (crumb.label === 'Home')     icon = 'bi bi-house';
-        else if (crumb.label === 'Settings') icon = 'bi bi-gear';
-        else if (crumb.label === 'Trash')    icon = 'bi bi-trash3';
+        const { icon } = this.resolveRouteMetadata(crumb.url);
 
         let route = crumb.url;
         if (crumb.url === '/personal' || crumb.url === '/team') {
@@ -326,6 +365,34 @@ export class NavigationBar implements OnInit, OnDestroy {
     }
 
     // ─── Private helpers ─────────────────────────────────────────────────────
+
+    /** Resolves a human-readable label and icon from any absolute path using our constants as the single source of truth */
+    private resolveRouteMetadata(path: string): { label: string, icon: string } {
+        // 1. Check statically defined core pages
+        const staticMatch = [...PERSONAL_PAGES, ...TEAM_PAGES].find(p => p.path === path);
+        if (staticMatch) {
+            return { label: staticMatch.label, icon: staticMatch.icon };
+        }
+
+        const parts = path.split('/').filter(p => p);
+
+        // 2. Check dynamic spaces
+        if (parts.length > 2 && parts[parts.length - 2] === 'spaces') {
+            const spaceId = parts[parts.length - 1];
+            const space = this.spaces().find(s => s.id === spaceId);
+            return {
+                label: space ? space.name : `Space ${spaceId.substring(0, 4)}`,
+                icon: 'bi bi-folder'
+            };
+        }
+
+        // 3. Fallback for unrecognized dynamic pages
+        const last = parts[parts.length - 1] || 'Page';
+        return {
+            label: last.charAt(0).toUpperCase() + last.slice(1).replace('-', ' '),
+            icon: 'bi bi-folder'
+        };
+    }
 
     private updateContext() {
         const url = this.router.url;
