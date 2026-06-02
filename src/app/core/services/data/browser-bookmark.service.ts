@@ -57,7 +57,7 @@ export class BrowserBookmarkService {
    * and we haven't seeded before (using settings table as a flag).
    */
   private async seedDefaultsIfNeeded(): Promise<void> {
-    const SEED_KEY = 'browser_bookmarks_seeded_v4';
+    const SEED_KEY = 'browser_bookmarks_seeded_v9';
     const hasSeeded = await db.settings.get(SEED_KEY);
 
     if (hasSeeded) {
@@ -105,21 +105,21 @@ export class BrowserBookmarkService {
         createdAt: Date.now() + 4
       },
       {
-        id: 'https://sandspiel.club/',
-        url: 'https://sandspiel.club/',
-        title: 'Sandspiel',
-        icon: 'bi-droplet',
+        id: 'https://slopegame.io/',
+        url: 'https://slopegame.io/',
+        title: 'Slope',
+        icon: 'bi-box-arrow-down-right',
         category: 'Games',
-        description: 'Falling Sand Physics',
+        description: '3D Endless Runner',
         createdAt: Date.now() + 5
       },
       {
-        id: 'https://voxiom.io/',
-        url: 'https://voxiom.io/',
-        title: 'Voxiom.io',
-        icon: 'bi-boxes',
+        id: 'https://mikhad.github.io/wordle/',
+        url: 'https://mikhad.github.io/wordle/',
+        title: 'Wordle',
+        icon: 'bi-spellcheck',
         category: 'Games',
-        description: 'Voxel Battle Royale',
+        description: 'Daily Word Puzzle',
         createdAt: Date.now() + 6
       }
     ];
