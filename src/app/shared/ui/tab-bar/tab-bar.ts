@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Router, ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TabService } from '../../../core/services/ui/tab.service';
 import { Tab } from '../../../core/interfaces/tab';
@@ -7,7 +7,7 @@ import { Tab } from '../../../core/interfaces/tab';
 @Component({
     selector: 'app-tab-bar',
     standalone: true,
-    imports: [RouterLink, RouterLinkActive, DragDropModule],
+    imports: [DragDropModule],
     templateUrl: './tab-bar.html',
     styleUrl: './tab-bar.scss',
 })
@@ -21,13 +21,19 @@ export class TabBarComponent {
 
     async onTabClick(tab: Tab) {
         await this.tabService.activateTab(tab.id);
-        // routerLink on the <a> element handles actual navigation
+        
+        // Parse the route to extract native query parameters for Angular
+        const [path, queryStr] = tab.route.split('?');
+        const queryParams = queryStr ? Object.fromEntries(new URLSearchParams(queryStr)) : {};
+        
+        this.router.navigate([path], { relativeTo: this.route, queryParams });
     }
 
     async onNewTab() {
         const tab = await this.tabService.createTab();
-        // Navigate relative to the current layout route
-        this.router.navigate([tab.route], { relativeTo: this.route });
+        const [path, queryStr] = tab.route.split('?');
+        const queryParams = queryStr ? Object.fromEntries(new URLSearchParams(queryStr)) : {};
+        this.router.navigate([path], { relativeTo: this.route, queryParams });
     }
 
     async onCloseTab(tab: Tab, event: Event) {
@@ -35,8 +41,9 @@ export class TabBarComponent {
         event.preventDefault();
         const newRoute = await this.tabService.closeTab(tab.id);
         if (newRoute) {
-            // Navigate to the nearest tab's route, relative to current layout
-            this.router.navigate([newRoute], { relativeTo: this.route });
+            const [path, queryStr] = newRoute.split('?');
+            const queryParams = queryStr ? Object.fromEntries(new URLSearchParams(queryStr)) : {};
+            this.router.navigate([path], { relativeTo: this.route, queryParams });
         }
     }
 
@@ -73,7 +80,11 @@ export class TabBarComponent {
             localStorage.setItem(`quilix_tearoff_${tearOffId}`, JSON.stringify(transferData));
 
             // Construct strictly absolute web pathways mapping exact state plus ID
-            const tree = this.router.createUrlTree([tabToTear.route], { relativeTo: this.route, queryParams: { tearOffId } });
+            const [path, queryStr] = tabToTear.route.split('?');
+            const queryParams = queryStr ? Object.fromEntries(new URLSearchParams(queryStr)) : {};
+            queryParams['tearOffId'] = tearOffId;
+            
+            const tree = this.router.createUrlTree([path], { relativeTo: this.route, queryParams });
             const targetUrl = tree.toString();
 
             // Physically spawn a true separate Application Process view popup
@@ -82,7 +93,9 @@ export class TabBarComponent {
             // Terminate the local tab to simulate a physical transfer
             const newRoute = await this.tabService.closeTab(tabToTear.id);
             if (newRoute) {
-                this.router.navigate([newRoute], { relativeTo: this.route });
+                const [nPath, nQueryStr] = newRoute.split('?');
+                const nQueryParams = nQueryStr ? Object.fromEntries(new URLSearchParams(nQueryStr)) : {};
+                this.router.navigate([nPath], { relativeTo: this.route, queryParams: nQueryParams });
             }
             return;
         }

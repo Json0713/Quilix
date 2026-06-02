@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
 
 @Component({
   selector: 'app-not-found',
@@ -9,8 +10,13 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './404.html',
   styleUrls: ['./404.scss']
 })
-export class PageNotFound {
+export class PageNotFound implements OnInit {
   private router = inject(Router);
+  private breadcrumb = inject(BreadcrumbService);
+
+  ngOnInit() {
+    this.breadcrumb.setTitle('404 - Page Not Found');
+  }
 
   goHome() {
     // If we're inside /team, go to /team. If /personal, go to /personal
