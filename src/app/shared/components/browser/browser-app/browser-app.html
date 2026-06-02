@@ -1,10 +1,22 @@
 <div class="store-state">
   <div class="store-header">
     <div class="store-icon">
-      <i class="bi bi-controller"></i>
+      <i class="bi bi-browser-chrome"></i>
     </div>
-    <h2>Quilix App Store</h2>
-    <p>Explore recommended apps, tools, and games. Instantly launch them without leaving Quilix.</p>
+    <h2>Browser App</h2>
+    <p>Enter a URL to browse the web, or launch a safe app below.</p>
+    
+    <form class="search-form" (submit)="onSearchSubmit($event)">
+      <div class="search-input-wrapper">
+        <i class="bi bi-search search-icon"></i>
+        <input 
+          type="text" 
+          placeholder="Search or enter web address..." 
+          [value]="searchQuery" 
+          (input)="onSearchInput($event)"
+          class="search-input">
+      </div>
+    </form>
   </div>
 
   <div class="store-grid">

@@ -156,9 +156,9 @@ export class TabService {
         // If closing the active tab, activate the nearest one and return its route
         if (this.activeTab()?.id === tabId) {
             const newIdx = Math.min(idx, updated.length - 1);
-            const newTab = updated[newIdx];
-            await this.activateTab(newTab.id);
-            return newTab.route; // Caller navigates via routerLink
+            const nextTab = updated[newIdx];
+            await this.activateTab(nextTab.id);
+            return nextTab.route; // Caller navigates via routerLink
         }
 
         return null; // No navigation needed

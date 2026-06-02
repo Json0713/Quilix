@@ -7,6 +7,7 @@ import { Space } from '../../../../core/interfaces/space';
 
 import { FileSystemService } from '../../../../core/services/data/file-system.service';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { TabService } from '../../../../core/services/ui/tab.service';
 import { FileExplorerComponent } from '../../../../shared/components/space-manager/file-explorer/file-explorer';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 
@@ -48,6 +49,7 @@ export class TeamSpace implements OnInit, OnDestroy {
     private authService = inject(AuthService);
     private breadcrumbService = inject(BreadcrumbService);
     private windowManager = inject(WindowManagerService);
+    private tabService = inject(TabService);
     readonly preview = inject(PreviewService);
 
     space = signal<Space | null>(null);
@@ -186,7 +188,11 @@ export class TeamSpace implements OnInit, OnDestroy {
     }
 
     launchAppStore() {
-        this.router.navigate(['/team/store']);
+        this.router.navigate(['/team/store']).then(success => {
+            if (success) {
+                this.tabService.updateActiveTabRoute('./store', 'Browser App', 'bi-browser-chrome');
+            }
+        });
     }
 
     private handleWindowToggle(visibilitySignal: WritableSignal<boolean>, id: string) {

@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { QuilixAppStoreComponent } from '../../../shared/components/browser/quilix-app-store/quilix-app-store';
+import { BrowserAppComponent } from '../../../shared/components/browser/browser-app/browser-app';
 
 export const TEAM_ROUTES: Routes = [
   {
@@ -27,8 +27,8 @@ export const TEAM_ROUTES: Routes = [
       },
       {
         path: 'store',
-        data: { label: 'App Store', icon: 'bi-controller' },
-        component: QuilixAppStoreComponent
+        data: { label: 'Browser App', icon: 'bi-browser-chrome' },
+        component: BrowserAppComponent
       },
       {
         path: 'workspaces',
