@@ -1,14 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BreadcrumbService } from '../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { BrowserBookmarkService } from '../../../core/services/data/browser-bookmark.service';
+import { PageHeaderActionsDirective } from '../page-header/page-header-actions.directive';
 
 @Component({
   selector: 'app-browser',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PageHeaderActionsDirective],
   templateUrl: './browser.html',
   styleUrls: ['./browser.scss']
 })
@@ -18,9 +19,17 @@ export class BrowserComponent implements OnInit {
   private breadcrumb = inject(BreadcrumbService);
   private bookmarkService = inject(BrowserBookmarkService);
 
+  @ViewChild('browserFrame') browserFrame!: ElementRef<HTMLIFrameElement>;
+
   safeUrl: SafeResourceUrl | null = null;
   rawUrl = '';
   isBookmarked = false;
+  isFullscreen = false;
+
+  @HostListener('document:fullscreenchange')
+  onFullscreenChange() {
+    this.isFullscreen = !!document.fullscreenElement;
+  }
 
   ngOnInit() {
     this.breadcrumb.setTitle('Browser');
@@ -59,6 +68,29 @@ export class BrowserComponent implements OnInit {
         description: 'Saved from Browser'
       });
       this.isBookmarked = true;
+    }
+  }
+
+  async toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      if (this.browserFrame) {
+        this.browserFrame.nativeElement.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      }
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  reloadFrame() {
+    if (this.browserFrame) {
+      // Force reload by reassigning src
+      const currentSrc = this.browserFrame.nativeElement.src;
+      this.browserFrame.nativeElement.src = '';
+      setTimeout(() => {
+        this.browserFrame.nativeElement.src = currentSrc;
+      }, 50);
     }
   }
 }

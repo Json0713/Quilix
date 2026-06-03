@@ -1,11 +1,17 @@
 <div class="browser-container">
   @if (safeUrl) {
-    <div class="browser-actions">
-      <button class="fab-btn" [class.bookmarked]="isBookmarked" (click)="toggleBookmark()" [title]="isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'">
-        <i class="bi" [class.bi-bookmark-fill]="isBookmarked" [class.bi-bookmark]="!isBookmarked"></i>
+    <ng-template appPageHeaderActions>
+      <button class="header-action-btn" (click)="toggleBookmark()" [title]="isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'">
+        <i class="bi" [class.bi-bookmark-fill]="isBookmarked" [class.bi-bookmark]="!isBookmarked" [class.text-primary]="isBookmarked"></i>
       </button>
-    </div>
-    <iframe [src]="safeUrl" class="browser-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+      <button class="header-action-btn" (click)="reloadFrame()" title="Reload Frame">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+      <button class="header-action-btn" (click)="toggleFullscreen()" [title]="isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'">
+        <i class="bi" [class.bi-fullscreen-exit]="isFullscreen" [class.bi-fullscreen]="!isFullscreen"></i>
+      </button>
+    </ng-template>
+    <iframe #browserFrame [src]="safeUrl" class="browser-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
   } @else {
     <div class="empty-state">
       <div class="empty-icon">
