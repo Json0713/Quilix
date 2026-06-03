@@ -11,7 +11,16 @@
         <i class="bi" [class.bi-fullscreen-exit]="isFullscreen" [class.bi-fullscreen]="!isFullscreen"></i>
       </button>
     </ng-template>
-    <iframe #browserFrame [src]="safeUrl" class="browser-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    <iframe 
+      #browserFrame 
+      [src]="safeUrl" 
+      class="browser-frame" 
+      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock allow-downloads allow-presentation allow-orientation-lock allow-popups-to-escape-sandbox"
+      allow="accelerometer; ambient-light-sensor; autoplay; camera; clipboard-read; clipboard-write; display-capture; encrypted-media; fullscreen; geolocation; gyroscope; hid; microphone; midi; payment; picture-in-picture; pointer-lock; screen-wake-lock; usb; vr; web-share; xr-spatial-tracking"
+      allowfullscreen="true"
+      webkitallowfullscreen="true"
+      mozallowfullscreen="true">
+    </iframe>
   } @else {
     <div class="empty-state">
       <div class="empty-icon">
