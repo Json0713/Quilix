@@ -64,7 +64,7 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background-color: var(--primary);
+  background-color: var(--text-main);
   animation:
     breathe 1.4s ease-in-out infinite,
     colorShift 3s ease-in-out infinite;
@@ -89,10 +89,10 @@
 }
 
 @keyframes colorShift {
-  0%   { background-color: #1a3a3f; }
-  33%  { background-color: #244f55; }
-  66%  { background-color: #3fbac2; }
-  100% { background-color: #1a3a3f; }
+  0%   { background-color: var(--text-main); }
+  33%  { background-color: var(--text-alt); }
+  66%  { background-color: var(--text-muted); }
+  100% { background-color: var(--text-main); }
 }
 
 /* ── Accessibility: honour reduced-motion preference ─────────────────────── */

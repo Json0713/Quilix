@@ -61,8 +61,13 @@
       justify-content: center;
       gap: 48px;
 
-      /* Fully opaque solid fill — the SVG bg pattern must NOT bleed through */
-      background-color: #f6f8f7;
+      /* Solid, fully opaque — SVG pattern must NOT bleed through */
+      background-color: #f6f8f7;  /* light default */
+      
+      /* Dot animation colors (light theme) */
+      --splash-dot-1: #0f2e32; /* text-main */
+      --splash-dot-2: #59767d; /* text-alt */
+      --splash-dot-3: #6f8f95; /* text-muted */
 
       /* Smooth exit: fade-out + subtle scale-up */
       transition: opacity 250ms ease, transform 250ms ease;
@@ -70,6 +75,11 @@
 
     html.dark-theme #app-splash {
       background-color: #14141a;
+      
+      /* Dot animation colors (dark theme) */
+      --splash-dot-1: #ffffff;
+      --splash-dot-2: #d5e3e6;
+      --splash-dot-3: #9fb3b8;
     }
 
     /* Exit state — added by hideSplash() */
@@ -104,14 +114,10 @@
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background-color: #244f55;
+      background-color: var(--splash-dot-1);
       animation:
         splashBreathe    1.4s ease-in-out infinite,
         splashColorShift 3.0s ease-in-out infinite;
-    }
-
-    html.dark-theme #app-splash .splash-dot {
-      background-color: #3fbac2;
     }
 
     /* Staggered wave timing */
@@ -133,10 +139,10 @@
     }
 
     @keyframes splashColorShift {
-      0%   { background-color: #1a3a3f; }
-      33%  { background-color: #244f55; }
-      66%  { background-color: #3fbac2; }
-      100% { background-color: #1a3a3f; }
+      0%   { background-color: var(--splash-dot-1); }
+      33%  { background-color: var(--splash-dot-2); }
+      66%  { background-color: var(--splash-dot-3); }
+      100% { background-color: var(--splash-dot-1); }
     }
 
     /* ── Accessibility: honour reduced-motion preference ─────────────────── */
