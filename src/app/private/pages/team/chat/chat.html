@@ -94,7 +94,6 @@
             </button>
             <div class="toolbar-title">
                 @if (chat.activeSessionId()) {
-                    <span>{{ chat.sessions() | slice:0:1 | json }}</span>
                     @for (s of chat.sessions(); track s.id) {
                         @if (s.id === chat.activeSessionId()) {
                             <span class="active-title">{{ s.title }}</span>
@@ -110,7 +109,7 @@
         </div>
 
         <!-- Messages area -->
-        <div class="messages-area" #messagesContainer>
+        <div class="messages-area" #messagesContainer (scroll)="onScroll()">
 
             <!-- Empty state -->
             @if (!isInitializing() && !chat.activeSessionId() && chat.messages().length === 0) {

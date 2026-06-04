@@ -13,7 +13,8 @@ import { ChatMessage, ChatSession, CanvasDocument } from '../../../../core/datab
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 import { DropdownService } from '../../../../services/ui/common/dropdown/dropdown.service';
 import Quill from 'quill';
-import { Subject, debounceTime, takeUntil } from 'rxjs';
+import { Subject, debounceTime, takeUntil, filter } from 'rxjs';
+import { Router, NavigationEnd } from '@angular/router';
 
 
 @Component({
@@ -30,6 +31,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
     private tabService = inject(TabService);
     private cdr = inject(ChangeDetectorRef);
     public dropdownService = inject(DropdownService);
+    private router = inject(Router);
 
     // ── UI state ──────────────────────────────────────────────────────────
     inputText = '';
@@ -40,6 +42,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
     showCanvas = signal<boolean>(false);
     shouldScrollToBottom = false;
     isInitializing = signal<boolean>(true);
+    private savedScrollTop = -1;
 
     // ── Canvas state ──────────────────────────────────────────────────────
     confirmingDeleteId = signal<string | null>(null);
@@ -122,6 +125,23 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
         ).subscribe(() => {
             this.saveCanvasEdit();
         });
+
+        // Restore scroll position when returning to this cached component
+        this.router.events.pipe(
+            filter(event => event instanceof NavigationEnd),
+            takeUntil(this.destroy$)
+        ).subscribe(() => {
+            // Only restore if this component is the active route and we aren't explicitly forcing a scroll-to-bottom
+            if (this.router.url.includes('/chat') && !this.shouldScrollToBottom && this.savedScrollTop >= 0) {
+                // Defer to next tick to ensure the DOM is fully reattached
+                setTimeout(() => {
+                    const el = this.messagesContainer?.nativeElement;
+                    if (el) {
+                        el.scrollTop = this.savedScrollTop;
+                    }
+                }, 50);
+            }
+        });
     }
 
     async ngOnInit() {
@@ -158,6 +178,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
                     this.shouldScrollToBottom = true;
                 }
             }
+            this.loadDraft(this.chat.activeSessionId());
         }
         this.isInitializing.set(false);
     }
@@ -339,6 +360,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
         if (!text || this.chat.isLoading()) return;
 
         this.inputText = '';
+        this.saveDraft();
         this.shouldScrollToBottom = true;
 
         if (this.chatInput) {
@@ -357,6 +379,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
 
     onInput() {
         this.resizeTextarea();
+        this.saveDraft();
     }
 
     private resizeTextarea() {
@@ -379,6 +402,14 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
         const el = this.messagesContainer?.nativeElement;
         if (el) {
             el.scrollTo({ top: el.scrollHeight, behavior });
+            this.savedScrollTop = el.scrollHeight;
+        }
+    }
+
+    onScroll() {
+        const el = this.messagesContainer?.nativeElement;
+        if (el) {
+            this.savedScrollTop = el.scrollTop;
         }
     }
 
@@ -387,7 +418,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
     async newChat() {
         this.chat.clearActiveSession();
         localStorage.removeItem('quilix_personal_active_session');
-        this.inputText = '';
+        this.loadDraft(null);
         this.destroyQuill();
         this.confirmingDeleteId.set(null);
         setTimeout(() => this.chatInput?.nativeElement?.focus(), 100);
@@ -402,6 +433,7 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
         this.confirmingDeleteId.set(null);
         await this.chat.setActiveSession(session.id);
         localStorage.setItem('quilix_personal_active_session', session.id);
+        this.loadDraft(session.id);
         this.shouldScrollToBottom = true;
 
         if (window.innerWidth <= 770) {
@@ -591,5 +623,24 @@ export class PersonalChat implements OnInit, OnDestroy, AfterViewChecked {
         if (this.isCanvasDirty()) {
             $event.returnValue = true;
         }
+    }
+
+    // ── Drafts ────────────────────────────────────────────────────────────
+
+    private saveDraft() {
+        const id = this.chat.activeSessionId() || 'new';
+        const key = `quilix_personal_draft_${id}`;
+        if (this.inputText.trim() === '') {
+            localStorage.removeItem(key);
+        } else {
+            localStorage.setItem(key, this.inputText);
+        }
+    }
+
+    private loadDraft(id: string | null) {
+        const key = `quilix_personal_draft_${id || 'new'}`;
+        const draft = localStorage.getItem(key);
+        this.inputText = draft || '';
+        setTimeout(() => this.resizeTextarea(), 0);
     }
 }
