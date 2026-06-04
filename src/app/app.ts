@@ -1,6 +1,7 @@
-import { Component, signal, inject, HostListener } from '@angular/core';
-import { RouterOutlet, RouterModule } from '@angular/router';
+import { Component, signal, inject, OnInit } from '@angular/core';
+import { RouterOutlet, RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AppThemeService } from './core/services/ui/app-theme.service';
+import { filter, take } from 'rxjs';
 
 import { NetworkStatus } from './shared/ui/system/network-status/network-status';
 import { NetworkService } from './core/pwa/installer/network/network.service';
@@ -29,11 +30,12 @@ import { GlobalAlarmAlertComponent } from './shared/components/global-alarm-aler
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App {
+export class App implements OnInit {
 
   protected readonly title = signal('Quilix');
   readonly network = inject(NetworkService);
 
+  private router = inject(Router);
   private toastRelay = inject(ToastRelayService);
   private toast = inject(ToastService);
   private updates = inject(QuilixUpdateService);
@@ -58,6 +60,19 @@ export class App {
     this.shortcuts.init();
   }
 
+  ngOnInit(): void {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      take(1),
+    ).subscribe(() => {
+      try {
+        (window as Window & { hideSplash?: () => void }).hideSplash?.();
+      } catch {
+        // hideSplash is missing or already removed — safe to ignore.
+      }
+    });
+  }
+
   private async validateFileSystem() {
     const mode = await this.fileSystem.getStorageMode();
     if (mode === 'filesystem') {
@@ -78,6 +93,5 @@ export class App {
       }
     }
   }
-
 
 }

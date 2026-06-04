@@ -1,40 +1,86 @@
-.global-overlay {
+/**
+ * Global app loader — shown by LoaderService.show() for in-app loading states.
+ *
+ * Design mirrors the pre-Angular splash screen in index.html so the user
+ * sees a visually consistent experience whether the app is bootstrapping
+ * or performing an in-app async operation.
+ *
+ * Key differences from the old overlay:
+ * - Background is var(--app-bg) instead of a semi-transparent black backdrop.
+ *   This matches the actual page background, so it looks like a full page state
+ *   rather than a modal overlay.
+ * - Logo sits above the dots for brand consistency.
+ * - Fade-in animation prevents a jarring instant appearance on fast operations.
+ */
+
+.global-loader {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(1px);
+  z-index: 9999;
+
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  gap: 40px;
+
+  /* Fill the full viewport with the app's own background color — no backdrop */
+  background-color: var(--app-bg);
+
+  /* Graceful fade-in to avoid jarring flash for fast operations */
+  animation: loaderFadeIn 200ms ease forwards;
 }
+
+@keyframes loaderFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Logo ─────────────────────────────────────────────────────────────────── */
+
+.loader-logo {
+  width: 52px;
+  height: 52px;
+  color: var(--primary);
+  animation: loaderLogoIn 500ms ease forwards;
+  opacity: 0;
+}
+
+@keyframes loaderLogoIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* ── Dot loader ───────────────────────────────────────────────────────────── */
 
 .dot-loader {
   display: flex;
   gap: 12px;
+  opacity: 0;
+  animation: loaderLogoIn 500ms ease 150ms forwards;
 }
 
 .dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background-color: #1a3a3f;
+  background-color: var(--primary);
   animation:
     breathe 1.4s ease-in-out infinite,
     colorShift 3s ease-in-out infinite;
 }
 
-/* Wave delay */
-.dot:nth-child(1) { animation-delay: 0s; }
-.dot:nth-child(2) { animation-delay: 0.15s; }
-.dot:nth-child(3) { animation-delay: 0.3s; }
-.dot:nth-child(4) { animation-delay: 0.45s; }
-.dot:nth-child(5) { animation-delay: 0.6s; }
+/* Staggered wave */
+.dot:nth-child(1) { animation-delay: 0s,    0s;    }
+.dot:nth-child(2) { animation-delay: 0.15s, 0.15s; }
+.dot:nth-child(3) { animation-delay: 0.30s, 0.30s; }
+.dot:nth-child(4) { animation-delay: 0.45s, 0.45s; }
+.dot:nth-child(5) { animation-delay: 0.60s, 0.60s; }
 
 @keyframes breathe {
   0%, 100% {
     transform: scale(0.7);
-    opacity: 0.5;
+    opacity: 0.45;
   }
   50% {
     transform: scale(1.3);
@@ -43,16 +89,27 @@
 }
 
 @keyframes colorShift {
-  0% {
-    background-color: #1a3a3f;
+  0%   { background-color: #1a3a3f; }
+  33%  { background-color: #244f55; }
+  66%  { background-color: #3fbac2; }
+  100% { background-color: #1a3a3f; }
+}
+
+/* ── Accessibility: honour reduced-motion preference ─────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+    opacity: 0.8;
   }
-  33% {
-    background-color: #244f55;
+
+  .loader-logo,
+  .dot-loader {
+    animation: none;
+    opacity: 1;
   }
-  66% {
-    background-color: #3fbac2;
-  }
-  100% {
-    background-color: #1a3a3f;
+
+  .global-loader {
+    animation: none;
   }
 }
