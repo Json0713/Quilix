@@ -62,14 +62,14 @@
       gap: 48px;
 
       /* Fully opaque solid fill — the SVG bg pattern must NOT bleed through */
-      background-color: #d8e3e4;
+      background-color: #f6f8f7;
 
       /* Smooth exit: fade-out + subtle scale-up */
       transition: opacity 250ms ease, transform 250ms ease;
     }
 
     html.dark-theme #app-splash {
-      background-color: #060614;
+      background-color: #14141a;
     }
 
     /* Exit state — added by hideSplash() */
@@ -83,13 +83,13 @@
     #app-splash .splash-logo {
       width: 96px;
       height: 96px;
-      color: #244f55;
+      color: #0f2e32;
       opacity: 0;
       animation: splashFadeUp 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
     html.dark-theme #app-splash .splash-logo {
-      color: #3fbac2;
+      color: #ffffff;
     }
 
     /* ── Dot loader ─────────────────────────────────────────────────────── */

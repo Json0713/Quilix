@@ -6,7 +6,7 @@
  * or performing an in-app async operation.
  *
  * Key differences from the old overlay:
- * - Background is var(--app-bg) instead of a semi-transparent black backdrop.
+ * - Background is var(--surface-main) instead of a semi-transparent black backdrop.
  *   This matches the actual page background, so it looks like a full page state
  *   rather than a modal overlay.
  * - Logo sits above the dots for brand consistency.
@@ -25,7 +25,7 @@
   gap: 40px;
 
   /* Fill the full viewport with the app's own background color — no backdrop */
-  background-color: var(--app-bg);
+  background-color: var(--surface-main);
 
   /* Graceful fade-in to avoid jarring flash for fast operations */
   animation: loaderFadeIn 200ms ease forwards;
@@ -41,7 +41,7 @@
 .loader-logo {
   width: 52px;
   height: 52px;
-  color: var(--primary);
+  color: var(--text-main);
   animation: loaderLogoIn 500ms ease forwards;
   opacity: 0;
 }
