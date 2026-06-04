@@ -22,7 +22,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 40px;
+  gap: 24px;
 
   /* Fill the full viewport with the app's own background color — no backdrop */
   background-color: var(--surface-main);
@@ -49,7 +49,7 @@
 
 .dot-loader {
   display: flex;
-  gap: 12px;
+  gap: 24px;
   opacity: 0;
   animation: loaderDotsIn 500ms ease 150ms forwards;
 }

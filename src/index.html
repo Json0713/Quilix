@@ -59,7 +59,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 36px;
+      gap: 24px;
 
       /* Solid, fully opaque — SVG pattern must NOT bleed through */
       background-color: #f6f8f7;  /* light default */
@@ -104,7 +104,7 @@
     /* ── Dot loader ─────────────────────────────────────────────────────── */
     #app-splash .splash-dots {
       display: flex;
-      gap: 14px;
+      gap: 16px;
       opacity: 0;
       animation: splashDotsIn 500ms ease 150ms forwards;
     }
@@ -125,6 +125,7 @@
     #app-splash .splash-dot:nth-child(3) { animation-delay: 0.30s, 0.30s; }
     #app-splash .splash-dot:nth-child(4) { animation-delay: 0.45s, 0.45s; }
     #app-splash .splash-dot:nth-child(5) { animation-delay: 0.60s, 0.60s; }
+    #app-splash .splash-dot:nth-child(6) { animation-delay: 0.75s, 0.75s; }
 
     /* ── Keyframes ──────────────────────────────────────────────────────── */
     @keyframes splashDotsIn {
@@ -168,6 +169,7 @@
 
     <!-- Animated dot loader -->
     <div class="splash-dots">
+      <span class="splash-dot"></span>
       <span class="splash-dot"></span>
       <span class="splash-dot"></span>
       <span class="splash-dot"></span>
