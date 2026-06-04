@@ -4,7 +4,7 @@ import {
   provideZoneChangeDetection,
   isDevMode
 } from '@angular/core';
-import { provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
+import { provideRouter, withPreloading, PreloadAllModules, RouteReuseStrategy } from '@angular/router';
 import { provideServiceWorker } from '@angular/service-worker';
 
 import { routes } from './app.routes';
@@ -14,12 +14,21 @@ import {
   provideSupabaseClient
 } from './meta/core/supabase/supabase.client';
 import { MetaConfigService } from './meta/core/config/meta-config.service';
+import { TabRouteReuseStrategy } from './core/strategies/tab-route-reuse.strategy';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
+
+    // Tab-aware route reuse strategy: keeps page components alive in memory
+    // when navigating between tabs, eliminating the "reload on tab switch" effect.
+    // Pages are only freshly mounted when navigating via the sidebar on the same tab.
+    {
+      provide: RouteReuseStrategy,
+      useClass: TabRouteReuseStrategy,
+    },
 
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
