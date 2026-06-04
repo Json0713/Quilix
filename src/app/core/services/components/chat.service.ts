@@ -380,15 +380,39 @@ export class ChatService {
         this.lastUserMessage = userText.trim();
         await this.addMessage(sessionId, 'user', userText.trim());
 
-        // Auto-title: if this is the first user message, use it as the title
+        // Auto-title: if this is the first user message, generate a smart title
         const allMsgs = this.messages();
         const userMsgCount = allMsgs.filter(m => m.role === 'user').length;
         if (userMsgCount === 1) {
-            const autoTitle = userText.trim().substring(0, 60);
-            await this.renameSession(sessionId, autoTitle);
+            // Fire and forget smart title generation in the background
+            this.generateSmartTitle(sessionId, userText.trim());
         }
 
         await this.callChatApi(sessionId);
+    }
+
+    /** Ask the AI to generate a concise title for the chat based on the first message */
+    private async generateSmartTitle(sessionId: string, userText: string): Promise<void> {
+        try {
+            const prompt = `Generate a short, concise, and descriptive title (max 5 words) for a chat that starts with this message: "${userText}". Only return the title itself without any quotes, preambles, or markdown.`;
+            const response = await fetch(this.apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                let title = data.reply?.trim();
+                if (title) {
+                    // Remove any wrapping quotes the AI might have still added
+                    title = title.replace(/^["']|["']$/g, '');
+                    await this.renameSession(sessionId, title);
+                }
+            }
+        } catch (err) {
+            console.error('[ChatService] Failed to generate smart title:', err);
+        }
     }
 
     /** Inner logic to send current history to API and handle response */
