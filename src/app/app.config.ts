@@ -22,9 +22,6 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
 
-    // Tab-aware route reuse strategy: keeps page components alive in memory
-    // when navigating between tabs, eliminating the "reload on tab switch" effect.
-    // Pages are only freshly mounted when navigating via the sidebar on the same tab.
     {
       provide: RouteReuseStrategy,
       useClass: TabRouteReuseStrategy,
