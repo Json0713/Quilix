@@ -20,7 +20,9 @@ export class TabBarComponent {
     activeTab = this.tabService.activeTab;
 
     async onTabClick(tab: Tab) {
-        await this.tabService.activateTab(tab.id);
+        // Pass isUserTabSwitch = true: this is an explicit tab-bar click on an existing tab,
+        // which should preserve any stateful page content (e.g. the chat session).
+        await this.tabService.activateTab(tab.id, true);
         
         // Parse the route to extract native query parameters for Angular
         const [path, queryStr] = tab.route.split('?');

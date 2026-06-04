@@ -10,6 +10,13 @@ export class TabService {
     /** Currently active tab */
     activeTab = signal<Tab | null>(null);
 
+    /**
+     * True when the last navigation was a tab-bar click (switching to an existing tab).
+     * False when the last navigation was a sidebar/content-level route change on the same tab.
+     * Consumed and reset by components that need to distinguish the two cases (e.g. ChatComponent).
+     */
+    lastNavigationWasTabSwitch = false;
+
     private currentWorkspaceId: string | null = null;
 
     // Explicit UUID identifying this specific OS Window context (Survives Refresh, Isolated from Popups)
@@ -126,9 +133,20 @@ export class TabService {
 
     // ── Activate a tab (state only — navigation handled by routerLink) ──
 
-    async activateTab(tabId: string): Promise<void> {
+    /**
+     * @param tabId           The ID of the tab to activate.
+     * @param isUserTabSwitch True only when triggered by an explicit tab-bar click.
+     *                        False (default) for programmatic activations (new tab, close tab).
+     *                        Controls lastNavigationWasTabSwitch so chat can distinguish
+     *                        tab-switching from same-tab sidebar navigation.
+     */
+    async activateTab(tabId: string, isUserTabSwitch = false): Promise<void> {
         const tab = this.tabs().find(t => t.id === tabId);
         if (!tab) return;
+
+        // Only mark as a tab switch when the user explicitly clicked an existing tab,
+        // not when a tab is programmatically activated (e.g. after create or close).
+        this.lastNavigationWasTabSwitch = isUserTabSwitch;
 
         this.activeTab.set(tab);
 
@@ -169,6 +187,9 @@ export class TabService {
     async updateActiveTabRoute(route: string, label: string, icon: string): Promise<void> {
         const tab = this.activeTab();
         if (!tab) return;
+
+        // Mark that we arrived here via a same-tab sidebar navigation, not a tab-bar click
+        this.lastNavigationWasTabSwitch = false;
 
         const updated: Tab = { ...tab, route, label, icon };
 

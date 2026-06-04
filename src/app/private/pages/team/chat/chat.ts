@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { BreadcrumbService } from '../../../../services/ui/common/breadcrumb/breadcrumb.service';
 import { ChatService } from '../../../../core/services/components/chat.service';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { TabService } from '../../../../core/services/ui/tab.service';
 import { ChatMessage, ChatSession, CanvasDocument } from '../../../../core/database/dexie.models';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 import { DropdownService } from '../../../../services/ui/common/dropdown/dropdown.service';
@@ -26,6 +27,7 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
     private breadcrumb = inject(BreadcrumbService);
     protected chat = inject(ChatService);
     private auth = inject(AuthService);
+    private tabService = inject(TabService);
     private cdr = inject(ChangeDetectorRef);
     public dropdownService = inject(DropdownService);
 
@@ -131,14 +133,23 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
             this.chat.setWorkspace(workspace.id);
         }
 
-        // Internal Navigation Check:
-        const isInternalNavigation = !!this.chat.activeSessionId();
+        // Distinguish tab switching from same-tab sidebar navigation:
+        // - Tab switch (lastNavigationWasTabSwitch = true): user clicked the chat tab in the tab bar.
+        //   The session should be preserved exactly as the user left it.
+        // - Sidebar navigation (lastNavigationWasTabSwitch = false): user clicked "Ask Quilix" in
+        //   the sidebar while already on this tab, navigating from another page on the same tab.
+        //   The chat should reset to a fresh new-chat state.
+        // Consume and reset the flag immediately so it never bleeds into subsequent navigations.
+        const isTabSwitch = this.tabService.lastNavigationWasTabSwitch;
+        this.tabService.lastNavigationWasTabSwitch = false;
 
         await this.chat.loadSessions();
 
-        if (isInternalNavigation) {
+        if (!isTabSwitch && this.chat.activeSessionId()) {
+            // Same-tab sidebar navigation — reset to new chat
             this.newChat();
         } else {
+            // Tab switch or fresh load — restore the last active session
             const savedSessionId = localStorage.getItem('quilix_team_active_session');
             if (savedSessionId) {
                 const sessions = this.chat.sessions();
