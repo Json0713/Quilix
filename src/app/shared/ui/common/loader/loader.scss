@@ -5,12 +5,6 @@
  * sees a visually consistent experience whether the app is bootstrapping
  * or performing an in-app async operation.
  *
- * Key differences from the old overlay:
- * - Background is var(--surface-main) instead of a semi-transparent black backdrop.
- *   This matches the actual page background, so it looks like a full page state
- *   rather than a modal overlay.
- * - Logo sits above the dots for brand consistency.
- * - Fade-in animation prevents a jarring instant appearance on fast operations.
  */
 
 .global-loader {
