@@ -91,11 +91,10 @@
 
     /* ── Logo ───────────────────────────────────────────────────────────── */
     #app-splash .splash-logo {
-      width: 96px;
-      height: 96px;
+      width: 144px;
+      height: 144px;
       color: #0f2e32;
-      opacity: 0;
-      animation: splashFadeUp 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      /* No entrance animation — ensures seamless handoff from the native PWA splash */
     }
 
     html.dark-theme #app-splash .splash-logo {
@@ -107,7 +106,7 @@
       display: flex;
       gap: 14px;
       opacity: 0;
-      animation: splashFadeUp 500ms cubic-bezier(0.22, 1, 0.36, 1) 250ms forwards;
+      animation: splashDotsIn 500ms ease 150ms forwards;
     }
 
     #app-splash .splash-dot {
@@ -128,8 +127,8 @@
     #app-splash .splash-dot:nth-child(5) { animation-delay: 0.60s, 0.60s; }
 
     /* ── Keyframes ──────────────────────────────────────────────────────── */
-    @keyframes splashFadeUp {
-      from { opacity: 0; transform: translateY(14px); }
+    @keyframes splashDotsIn {
+      from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0);    }
     }
 
