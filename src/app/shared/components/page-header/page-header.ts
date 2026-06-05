@@ -20,9 +20,6 @@ export class PageHeaderComponent {
   private router = inject(Router);
 
   constructor() {
-    // Clear page-specific header actions on every navigation start.
-    // If the destination page has actions, its directive will re-register them.
-    // If it's a cached page being restored, its ngDoCheck will seamlessly re-register them.
     this.router.events.pipe(
       filter(event => event instanceof NavigationStart)
     ).subscribe(() => {
