@@ -69,7 +69,7 @@
                                     <span class="setting-desc">Choose the appearance of the app</span>
                                 </div>
                                 <div class="setting-control">
-                                    <select class="custom-select" [(ngModel)]="theme">
+                                    <select class="custom-select" [ngModel]="theme" (ngModelChange)="onThemeChange($event)">
                                         <option value="system">System</option>
                                         <option value="dark">Dark</option>
                                         <option value="light">Light</option>
@@ -108,11 +108,24 @@
                                 <!-- Memory List -->
                                 <div class="memory-list">
                                     @for (memory of memoryList; track $index; let i = $index) {
-                                        <div class="memory-item">
-                                            <div class="memory-text">{{ memory }}</div>
-                                            <button class="icon-btn danger-text" (click)="removeMemory(i)" title="Delete memory">
-                                                <i class="bi bi-trash3"></i>
-                                            </button>
+                                        <div class="memory-item" [class.confirming]="confirmDeleteIndex === i">
+                                            @if (confirmDeleteIndex === i) {
+                                                <div class="memory-confirm-card">
+                                                    <div class="confirm-message">
+                                                        <i class="bi bi-exclamation-triangle-fill"></i>
+                                                        <span>Permanently delete this memory?</span>
+                                                    </div>
+                                                    <div class="confirm-actions">
+                                                        <button class="text-btn" (click)="cancelRemoveMemory()">Cancel</button>
+                                                        <button class="danger-btn sm-btn" (click)="removeMemory(i)">Delete</button>
+                                                    </div>
+                                                </div>
+                                            } @else {
+                                                <div class="memory-text">{{ memory }}</div>
+                                                <button class="icon-btn danger-text" (click)="confirmRemoveMemory(i)" title="Delete memory">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            }
                                         </div>
                                     }
                                     @if (memoryList.length === 0) {
@@ -132,9 +145,24 @@
                                     <span class="setting-desc">Permanently delete all chat sessions and canvas documents in the current workspace.</span>
                                 </div>
                                 <div class="setting-control">
-                                    <button class="danger-btn" (click)="clearAllChats()">Clear all chats</button>
+                                    <button class="danger-btn" (click)="initiateClearChats()" [disabled]="confirmClearChats">Clear all chats</button>
                                 </div>
                             </div>
+
+                            @if (confirmClearChats) {
+                                <div class="warning-alert-box">
+                                    <div class="inline-confirm-card warning-theme">
+                                        <div class="confirm-message">
+                                            <i class="bi bi-exclamation-triangle-fill"></i>
+                                            <span>Are you sure? This will permanently delete all chat history in this workspace.</span>
+                                        </div>
+                                        <div class="confirm-actions">
+                                            <button class="text-btn" (click)="cancelClearChats()">Cancel</button>
+                                            <button class="warning-btn sm-btn" (click)="confirmAndClearAllChats()">Yes, Clear</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     }
 

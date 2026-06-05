@@ -222,6 +222,50 @@
     }
 }
 
+.warning-alert-box {
+    background: rgba(234, 179, 8, 0.05);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    animation: slideUp 0.2s ease-out;
+}
+
+.inline-confirm-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+    animation: fadeIn 0.2s ease-out;
+
+    &.warning-theme {
+        .confirm-message {
+            color: #eab308;
+        }
+    }
+
+    .confirm-message {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        line-height: 1.4;
+        
+        i {
+            margin-top: 0.15rem; /* Align icon with first line of wrapped text */
+        }
+    }
+
+    .confirm-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        align-self: flex-end;
+    }
+}
+
 /* UI Controls */
 .custom-select {
     background: rgba(0, 0, 0, 0.2);
@@ -329,11 +373,39 @@
         background: rgba(255, 255, 255, 0.05);
     }
 
+    &.confirming {
+        background: rgba(239, 68, 68, 0.05);
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
     .memory-text {
         font-size: 0.9rem;
         line-height: 1.4;
         flex: 1;
         word-break: break-word;
+    }
+
+    .memory-confirm-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        animation: fadeIn 0.2s ease-out;
+
+        .confirm-message {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #ef4444;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .confirm-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
     }
 }
 
@@ -488,6 +560,39 @@
     &:disabled {
         opacity: 0.7;
         cursor: default;
+    }
+}
+
+.text-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted, #a0a0a0);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-main, #fff);
+    }
+}
+
+.warning-btn {
+    background: #eab308;
+    color: #111;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #facc15;
     }
 }
 

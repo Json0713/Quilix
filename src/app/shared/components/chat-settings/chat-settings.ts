@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../../../core/services/components/chat.service';
 import { db } from '../../../core/database/dexie.service';
+import { AppThemeService } from '../../../core/services/ui/app-theme.service';
 
 @Component({
     selector: 'app-chat-settings',
@@ -13,6 +14,7 @@ import { db } from '../../../core/database/dexie.service';
 })
 export class ChatSettingsComponent implements OnInit {
     private chat = inject(ChatService);
+    private themeService = inject(AppThemeService);
 
     @Input() visible = false;
     @Output() visibleChange = new EventEmitter<boolean>();
@@ -24,6 +26,8 @@ export class ChatSettingsComponent implements OnInit {
     newMemoryText = '';
     isSavingMemory = false;
     memoryError: string | null = null;
+    confirmDeleteIndex: number | null = null;
+    confirmClearChats = false;
 
     // Storage
     storageStats = { totalBytes: 0, messagesBytes: 0, canvasBytes: 0, messageCount: 0, canvasCount: 0 };
@@ -31,10 +35,13 @@ export class ChatSettingsComponent implements OnInit {
     storagePercentage = 0;
     isLoadingStorage = false;
 
-    // Theme mock
+    // Theme
     theme: 'system' | 'light' | 'dark' = 'system';
 
     async ngOnInit() {
+        // Initialize theme state
+        this.theme = this.themeService.theme();
+
         // Load the general memory from Dexie
         const memorySetting = await db.settings.get('chat_general_memory');
         if (memorySetting && memorySetting.value) {
@@ -94,8 +101,17 @@ export class ChatSettingsComponent implements OnInit {
         }
     }
 
+    confirmRemoveMemory(index: number) {
+        this.confirmDeleteIndex = index;
+    }
+
+    cancelRemoveMemory() {
+        this.confirmDeleteIndex = null;
+    }
+
     removeMemory(index: number) {
         this.memoryList.splice(index, 1);
+        this.confirmDeleteIndex = null;
         this.saveMemory();
     }
 
@@ -107,11 +123,22 @@ export class ChatSettingsComponent implements OnInit {
         }, 800);
     }
 
-    async clearAllChats() {
-        const confirmDelete = confirm('Are you sure you want to clear all chat history for this workspace? This cannot be undone.');
-        if (confirmDelete) {
-            await this.chat.clearAllChats();
-            this.close();
-        }
+    initiateClearChats() {
+        this.confirmClearChats = true;
+    }
+
+    cancelClearChats() {
+        this.confirmClearChats = false;
+    }
+
+    async confirmAndClearAllChats() {
+        await this.chat.clearAllChats();
+        this.confirmClearChats = false;
+        this.close();
+    }
+
+    onThemeChange(newTheme: 'system' | 'light' | 'dark') {
+        this.theme = newTheme;
+        this.themeService.apply(newTheme);
     }
 }
