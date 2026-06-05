@@ -69,11 +69,24 @@
                                     <span class="setting-desc">Choose the appearance of the app</span>
                                 </div>
                                 <div class="setting-control">
-                                    <select class="custom-select" [ngModel]="theme" (ngModelChange)="onThemeChange($event)">
-                                        <option value="system">System</option>
-                                        <option value="dark">Dark</option>
-                                        <option value="light">Light</option>
-                                    </select>
+                                    <div class="custom-dropdown-container">
+                                        <button class="custom-dropdown-btn" [class.open]="themeDropdownOpen" (click)="toggleThemeDropdown($event)">
+                                            <span>
+                                                @if (theme === 'system') { System }
+                                                @else if (theme === 'dark') { Dark }
+                                                @else { Light }
+                                            </span>
+                                            <i class="bi bi-chevron-down"></i>
+                                        </button>
+                                        
+                                        @if (themeDropdownOpen) {
+                                            <div class="custom-dropdown-menu" (click)="$event.stopPropagation()">
+                                                <button class="dropdown-item" [class.active]="theme === 'system'" (click)="onThemeChange('system')">System</button>
+                                                <button class="dropdown-item" [class.active]="theme === 'dark'" (click)="onThemeChange('dark')">Dark</button>
+                                                <button class="dropdown-item" [class.active]="theme === 'light'" (click)="onThemeChange('light')">Light</button>
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>

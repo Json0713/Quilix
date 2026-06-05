@@ -37,6 +37,7 @@ export class ChatSettingsComponent implements OnInit {
 
     // Theme
     theme: 'system' | 'light' | 'dark' = 'system';
+    themeDropdownOpen = false;
 
     async ngOnInit() {
         // Initialize theme state
@@ -84,6 +85,16 @@ export class ChatSettingsComponent implements OnInit {
         if (this.visible) {
             this.close();
         }
+    }
+
+    @HostListener('document:click')
+    closeDropdowns() {
+        this.themeDropdownOpen = false;
+    }
+
+    toggleThemeDropdown(event: Event) {
+        event.stopPropagation();
+        this.themeDropdownOpen = !this.themeDropdownOpen;
     }
 
     setTab(tab: 'general' | 'personalization' | 'data' | 'storage') {
@@ -147,5 +158,6 @@ export class ChatSettingsComponent implements OnInit {
     onThemeChange(newTheme: 'system' | 'light' | 'dark') {
         this.theme = newTheme;
         this.themeService.apply(newTheme);
+        this.themeDropdownOpen = false;
     }
 }
