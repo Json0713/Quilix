@@ -94,9 +94,16 @@
                                            placeholder="E.g. I am a senior developer..." 
                                            maxlength="255"
                                            [(ngModel)]="newMemoryText"
+                                           (input)="memoryError = null"
                                            (keyup.enter)="addMemory()">
                                     <button class="primary-btn sm-btn" (click)="addMemory()" [disabled]="!newMemoryText.trim() || newMemoryText.length > 255">Add</button>
                                 </div>
+
+                                @if (memoryError) {
+                                    <div class="memory-error">
+                                        <i class="bi bi-exclamation-circle"></i> {{ memoryError }}
+                                    </div>
+                                }
 
                                 <!-- Memory List -->
                                 <div class="memory-list">

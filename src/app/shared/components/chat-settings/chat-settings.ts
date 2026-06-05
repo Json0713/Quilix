@@ -23,6 +23,7 @@ export class ChatSettingsComponent implements OnInit {
     memoryList: string[] = [];
     newMemoryText = '';
     isSavingMemory = false;
+    memoryError: string | null = null;
 
     // Storage
     storageStats = { totalBytes: 0, messagesBytes: 0, canvasBytes: 0, messageCount: 0, canvasCount: 0 };
@@ -80,14 +81,16 @@ export class ChatSettingsComponent implements OnInit {
 
     addMemory() {
         const text = this.newMemoryText.trim();
+        this.memoryError = null; // Clear previous errors
+
         if (text && text.length <= 255) {
-            // Prevent exact duplicates to keep the list clean and professional
             if (!this.memoryList.includes(text)) {
                 this.memoryList.unshift(text);
                 this.saveMemory();
+                this.newMemoryText = '';
+            } else {
+                this.memoryError = 'This memory has already been added.';
             }
-            // Clear the input even if it was a duplicate
-            this.newMemoryText = '';
         }
     }
 
