@@ -79,10 +79,15 @@ export class ChatSettingsComponent implements OnInit {
     }
 
     addMemory() {
-        if (this.newMemoryText.trim()) {
-            this.memoryList.unshift(this.newMemoryText.trim());
+        const text = this.newMemoryText.trim();
+        if (text && text.length <= 255) {
+            // Prevent exact duplicates to keep the list clean and professional
+            if (!this.memoryList.includes(text)) {
+                this.memoryList.unshift(text);
+                this.saveMemory();
+            }
+            // Clear the input even if it was a duplicate
             this.newMemoryText = '';
-            this.saveMemory();
         }
     }
 

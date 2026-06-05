@@ -92,14 +92,15 @@
                                 <div class="memory-input-group">
                                     <input type="text" class="memory-input-single" 
                                            placeholder="E.g. I am a senior developer..." 
+                                           maxlength="255"
                                            [(ngModel)]="newMemoryText"
                                            (keyup.enter)="addMemory()">
-                                    <button class="primary-btn sm-btn" (click)="addMemory()" [disabled]="!newMemoryText.trim()">Add</button>
+                                    <button class="primary-btn sm-btn" (click)="addMemory()" [disabled]="!newMemoryText.trim() || newMemoryText.length > 255">Add</button>
                                 </div>
 
                                 <!-- Memory List -->
                                 <div class="memory-list">
-                                    @for (memory of memoryList; track memory; let i = $index) {
+                                    @for (memory of memoryList; track $index; let i = $index) {
                                         <div class="memory-item">
                                             <div class="memory-text">{{ memory }}</div>
                                             <button class="icon-btn danger-text" (click)="removeMemory(i)" title="Delete memory">
