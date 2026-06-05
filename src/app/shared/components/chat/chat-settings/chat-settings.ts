@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ChatService } from '../../../core/services/components/chat.service';
-import { db } from '../../../core/database/dexie.service';
-import { AppThemeService } from '../../../core/services/ui/app-theme.service';
+import { ChatService } from '../../../../core/services/components/chat.service';
+import { db } from '../../../../core/database/dexie.service';
+import { AppThemeService } from '../../../../core/services/ui/app-theme.service';
 
 @Component({
     selector: 'app-chat-settings',

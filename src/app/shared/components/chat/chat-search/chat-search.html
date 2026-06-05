@@ -1,0 +1,90 @@
+@if (visible) {
+<div class="chat-search-backdrop" (click)="close()">
+    <div class="chat-search-modal" (click)="$event.stopPropagation()">
+        
+        <!-- Search Input Header -->
+        <div class="search-header">
+            <div class="search-input-wrapper">
+                <i class="bi bi-search search-icon"></i>
+                <input 
+                    #searchInput
+                    type="text" 
+                    class="search-input" 
+                    placeholder="Search across all chats..." 
+                    [(ngModel)]="searchQuery"
+                    (input)="onSearchInput()"
+                    [disabled]="isSearching()">
+                @if (searchQuery) {
+                    <button class="clear-btn" (click)="searchQuery = ''; onSearchInput(); searchInput.focus()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                }
+            </div>
+            <button class="close-btn" (click)="close()" title="Close search (Esc)">
+                Esc
+            </button>
+        </div>
+
+        <!-- Search Results Area -->
+        <div class="search-results-area scroll-area">
+            
+            <!-- Loading State -->
+            @if (isSearching()) {
+                <div class="search-state">
+                    <div class="spinner"></div>
+                    <p>Searching workspace...</p>
+                </div>
+            }
+
+            <!-- Empty / No Results State -->
+            @if (!isSearching() && searchQuery.trim() && results().length === 0) {
+                <div class="search-state">
+                    <i class="bi bi-search"></i>
+                    <p>No chats or messages found for "{{ searchQuery }}"</p>
+                </div>
+            }
+
+            <!-- Idle State -->
+            @if (!isSearching() && !searchQuery.trim()) {
+                <div class="search-state idle">
+                    <i class="bi bi-chat-text"></i>
+                    <p>Type to search your conversation history</p>
+                </div>
+            }
+
+            <!-- Results List -->
+            @if (!isSearching() && results().length > 0) {
+                <div class="results-list">
+                    @for (result of results(); track result.session.id) {
+                        <div class="result-card" (click)="selectResult(result.session.id)">
+                            
+                            <!-- Session Title Header -->
+                            <div class="result-session-header">
+                                <i class="bi bi-chat-square-text"></i>
+                                <span class="session-title">{{ result.session.title || 'New Chat' }}</span>
+                                <span class="session-date">{{ result.session.updatedAt | date:'shortDate' }}</span>
+                            </div>
+
+                            <!-- Matched Messages Preview -->
+                            @if (result.matchedMessages.length > 0) {
+                                <div class="matched-messages">
+                                    @for (msg of result.matchedMessages; track msg.id) {
+                                        <div class="message-preview" [class.user-msg]="msg.role === 'user'">
+                                            <span class="role-badge">{{ msg.role === 'user' ? 'You' : 'Quilix' }}</span>
+                                            <span class="preview-content">{{ msg.content }}</span>
+                                        </div>
+                                    }
+                                    @if (result.matchedMessages.length === 3) {
+                                        <div class="more-matches-indicator">...and possibly more</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        
+    </div>
+</div>
+}

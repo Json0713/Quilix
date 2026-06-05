@@ -15,13 +15,14 @@ import { DropdownService } from '../../../../services/ui/common/dropdown/dropdow
 import Quill from 'quill';
 import { Subject, debounceTime, takeUntil, filter } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
-import { ChatSettingsComponent } from '../../../../shared/components/chat-settings/chat-settings';
+import { ChatSettingsComponent } from '../../../../shared/components/chat/chat-settings/chat-settings';
+import { ChatSearchComponent } from '../../../../shared/components/chat/chat-search/chat-search';
 
 
 @Component({
     selector: 'app-team-chat',
     standalone: true,
-    imports: [CommonModule, FormsModule, MarkdownPipe, ChatSettingsComponent],
+    imports: [CommonModule, FormsModule, MarkdownPipe, ChatSettingsComponent, ChatSearchComponent],
     templateUrl: './chat.html',
     styleUrl: './chat.scss',
 })
@@ -41,7 +42,9 @@ export class TeamChat implements OnInit, OnDestroy, AfterViewChecked {
     originalEditingContent = '';
     showHistory = signal<boolean>(localStorage.getItem('quilix_team_sidebar_open') === 'true');
     showCanvas = signal<boolean>(false);
+    // Modals
     showSettings = false;
+    showSearch = false;
     shouldScrollToBottom = false;
     isInitializing = signal<boolean>(true);
     private savedScrollTop = -1;
