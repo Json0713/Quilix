@@ -1,0 +1,120 @@
+@if (visible) {
+<div class="chat-settings-backdrop" (click)="close()">
+    <div class="chat-settings-modal" (click)="$event.stopPropagation()">
+        
+        <!-- Mobile Header (Only visible on small screens) -->
+        <div class="mobile-header">
+            <h3>Settings</h3>
+            <button class="close-btn" (click)="close()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="settings-layout">
+            <!-- Sidebar Navigation -->
+            <nav class="settings-sidebar">
+                <div class="desktop-header">
+                    <h3>Settings</h3>
+                </div>
+                <ul class="nav-list">
+                    <li>
+                        <button class="nav-item" [class.active]="activeTab === 'general'" (click)="setTab('general')">
+                            <i class="bi bi-gear"></i>
+                            General
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-item" [class.active]="activeTab === 'personalization'" (click)="setTab('personalization')">
+                            <i class="bi bi-person-lines-fill"></i>
+                            Personalization
+                        </button>
+                    </li>
+                    <li>
+                        <button class="nav-item" [class.active]="activeTab === 'data'" (click)="setTab('data')">
+                            <i class="bi bi-shield-lock"></i>
+                            Data controls
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="settings-content">
+                <div class="content-header desktop-only">
+                    <h2 class="content-title">
+                        @if (activeTab === 'general') { General }
+                        @if (activeTab === 'personalization') { Personalization }
+                        @if (activeTab === 'data') { Data controls }
+                    </h2>
+                    <button class="close-btn" (click)="close()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <div class="content-body scroll-area">
+                    
+                    <!-- General Tab -->
+                    @if (activeTab === 'general') {
+                        <div class="settings-section">
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <label>Theme</label>
+                                    <span class="setting-desc">Choose the appearance of the app</span>
+                                </div>
+                                <div class="setting-control">
+                                    <select class="custom-select" [(ngModel)]="theme">
+                                        <option value="system">System</option>
+                                        <option value="dark">Dark</option>
+                                        <option value="light">Light</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Personalization Tab -->
+                    @if (activeTab === 'personalization') {
+                        <div class="settings-section">
+                            <div class="setting-header">
+                                <label>Custom Instructions & Memory</label>
+                                <p class="setting-desc">What would you like Quilix to know about you to provide better responses? This information is injected into every chat.</p>
+                            </div>
+                            <div class="setting-body">
+                                <textarea class="memory-input" 
+                                          placeholder="E.g. I am a senior full-stack developer. Give me concise answers with TypeScript code. Don't explain basic concepts."
+                                          rows="6"
+                                          [(ngModel)]="generalMemory"></textarea>
+                                <div class="save-action">
+                                    <button class="primary-btn" (click)="saveMemory()" [disabled]="isSavingMemory">
+                                        @if (isSavingMemory) {
+                                            <i class="bi bi-check2"></i> Saved
+                                        } @else {
+                                            Save Memory
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Data Controls Tab -->
+                    @if (activeTab === 'data') {
+                        <div class="settings-section">
+                            <div class="setting-row destructive-row">
+                                <div class="setting-info">
+                                    <label>Clear Chat History</label>
+                                    <span class="setting-desc">Permanently delete all chat sessions and canvas documents in the current workspace.</span>
+                                </div>
+                                <div class="setting-control">
+                                    <button class="danger-btn" (click)="clearAllChats()">Clear all chats</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+}

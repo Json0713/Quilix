@@ -148,7 +148,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // ── Validate body ───────────────────────────────────────────────────────
-  const { messages } = req.body || {};
+  const { messages, generalMemory } = req.body || {};
 
   if (!Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'messages[] is required.' });
@@ -185,11 +185,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
+      let dynamicInstruction = SYSTEM_INSTRUCTION;
+      if (generalMemory && typeof generalMemory === 'string' && generalMemory.trim().length > 0) {
+        dynamicInstruction += `\n\nUSER MEMORY (IMPORTANT CONTEXT):\nThe user has provided the following custom instructions/preferences. You must adhere to these across all conversations:\n${generalMemory.trim()}`;
+      }
+
       const response = await ai.models.generateContent({
         model: 'gemini-flash-lite-latest',
         contents,
         config: {
-          systemInstruction: SYSTEM_INSTRUCTION,
+          systemInstruction: dynamicInstruction,
           maxOutputTokens: 2048,
           temperature: 0.7,
           topP: 0.9,

@@ -437,10 +437,13 @@ export class ChatService {
         }
 
         try {
+            const generalMemorySetting = await db.settings.get('chat_general_memory');
+            const generalMemory = generalMemorySetting?.value || '';
+
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: history }),
+                body: JSON.stringify({ messages: history, generalMemory }),
             });
 
             if (response.status === 429) {
@@ -478,6 +481,33 @@ export class ChatService {
         await db.chat_messages.delete(messageId);
         // Update local signal if active
         this.messages.update(msgs => msgs.filter(m => m.id !== messageId));
+    }
+
+    /** Clear all chat sessions, messages, and canvas docs for the current workspace. */
+    async clearAllChats(): Promise<void> {
+        if (!this.currentWorkspaceId) return;
+
+        const sessionsToDelete = await db.chat_sessions
+            .where('workspaceId')
+            .equals(this.currentWorkspaceId)
+            .toArray();
+
+        const sessionIds = sessionsToDelete.map(s => s.id);
+
+        if (sessionIds.length > 0) {
+            await db.chat_messages.where('sessionId').anyOf(sessionIds).delete();
+            await db.canvas_documents.where('sessionId').anyOf(sessionIds).delete();
+            await db.chat_sessions.bulkDelete(sessionIds);
+        }
+
+        this.activeSessionId.set(null);
+        this.messages.set([]);
+        this.canvasDocs.set([]);
+        this.activeCanvasId.set(null);
+        this.error.set(null);
+        this.lastUserMessage = null;
+
+        await this.loadSessions();
     }
 
     /** Delete a specific message and all subsequent messages in the current session. */
