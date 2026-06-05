@@ -133,8 +133,8 @@
 
             <!-- Messages -->
             @for (message of chat.messages(); track trackMessage($index, message)) {
-                <div class="message-row" [class.user]="message.role === 'user'" [class.model]="message.role === 'model'">
-                    <div class="message-bubble">
+                <div class="message-row" [id]="'msg-' + message.id" [class.user]="message.role === 'user'" [class.model]="message.role === 'model'">
+                    <div class="message-bubble" [class.highlighted-search]="chat.searchHighlight()?.messageId === message.id">
                         @if (editingMessageId === message.id) {
                             <div class="inline-edit-container">
                                 <textarea [(ngModel)]="editingContent" class="inline-edit-textarea" rows="4"></textarea>

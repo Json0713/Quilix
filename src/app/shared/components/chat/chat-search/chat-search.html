@@ -12,8 +12,7 @@
                     class="search-input" 
                     placeholder="Search across all chats..." 
                     [(ngModel)]="searchQuery"
-                    (input)="onSearchInput()"
-                    [disabled]="isSearching()">
+                    (input)="onSearchInput()">
                 @if (searchQuery) {
                     <button class="clear-btn" (click)="searchQuery = ''; onSearchInput(); searchInput.focus()">
                         <i class="bi bi-x-lg"></i>
@@ -69,7 +68,7 @@
                             @if (result.matchedMessages.length > 0) {
                                 <div class="matched-messages">
                                     @for (msg of result.matchedMessages; track msg.id) {
-                                        <div class="message-preview" [class.user-msg]="msg.role === 'user'">
+                                        <div class="message-preview" [class.user-msg]="msg.role === 'user'" (click)="$event.stopPropagation(); selectResult(result.session.id, msg.id)">
                                             <span class="role-badge">{{ msg.role === 'user' ? 'You' : 'Quilix' }}</span>
                                             <span class="preview-content">{{ msg.content }}</span>
                                         </div>

@@ -57,6 +57,7 @@ export class ChatService {
     readonly isLoading = signal<boolean>(false);
     readonly loadingSessionId = signal<string | null>(null);
     readonly error = signal<string | null>(null);
+    readonly searchHighlight = signal<{ messageId?: string, term?: string } | null>(null);
     private lastUserMessage: string | null = null;
 
     // ── Workspace scope ───────────────────────────────────────────────────────

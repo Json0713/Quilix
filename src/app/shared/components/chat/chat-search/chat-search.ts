@@ -63,8 +63,11 @@ export class ChatSearchComponent implements AfterViewInit {
         this.visibleChange.emit(this.visible);
     }
 
-    async selectResult(sessionId: string) {
+    async selectResult(sessionId: string, messageId?: string) {
         this.sessionSelected.emit(sessionId);
+        
+        this.chat.searchHighlight.set({ messageId, term: this.searchQuery.trim() });
+        
         await this.chat.setActiveSession(sessionId);
         this.close();
     }
