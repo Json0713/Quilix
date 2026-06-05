@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject, signal, effect, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal, effect, ElementRef, ViewChild, AfterViewInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../../../../core/services/components/chat.service';
@@ -61,6 +61,13 @@ export class ChatSearchComponent implements AfterViewInit {
         this.searchQuery = '';
         this.results.set([]);
         this.visibleChange.emit(this.visible);
+    }
+
+    @HostListener('document:keydown.escape')
+    onEscape() {
+        if (this.visible) {
+            this.close();
+        }
     }
 
     async selectResult(sessionId: string, messageId?: string) {

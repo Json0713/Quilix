@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../../../../core/services/components/chat.service';
@@ -77,6 +77,13 @@ export class ChatSettingsComponent implements OnInit {
     close() {
         this.visible = false;
         this.visibleChange.emit(this.visible);
+    }
+
+    @HostListener('document:keydown.escape')
+    onEscape() {
+        if (this.visible) {
+            this.close();
+        }
     }
 
     setTab(tab: 'general' | 'personalization' | 'data' | 'storage') {

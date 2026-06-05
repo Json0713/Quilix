@@ -61,6 +61,8 @@
     transform: translateX(-50%);
     width: 90%;
     max-width: 650px;
+    height: 75vh;
+    min-height: 500px;
     max-height: calc(100vh - 120px);
     background: var(--surface-main, #1e1e24);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -155,8 +157,9 @@
 
 .search-results-area {
     padding: 1rem;
-    min-height: 200px;
     flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .search-state {
@@ -164,7 +167,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 200px;
+    flex: 1;
     color: var(--text-muted, #a0a0a0);
     gap: 1rem;
     animation: fadeIn 0.3s ease;
