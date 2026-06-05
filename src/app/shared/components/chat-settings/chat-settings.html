@@ -35,6 +35,12 @@
                             Data controls
                         </button>
                     </li>
+                    <li>
+                        <button class="nav-item" [class.active]="activeTab === 'storage'" (click)="setTab('storage')">
+                            <i class="bi bi-hdd"></i>
+                            Storage
+                        </button>
+                    </li>
                 </ul>
             </nav>
 
@@ -45,6 +51,7 @@
                         @if (activeTab === 'general') { General }
                         @if (activeTab === 'personalization') { Personalization }
                         @if (activeTab === 'data') { Data controls }
+                        @if (activeTab === 'storage') { Storage }
                     </h2>
                     <button class="close-btn" (click)="close()">
                         <i class="bi bi-x-lg"></i>
@@ -76,22 +83,33 @@
                     @if (activeTab === 'personalization') {
                         <div class="settings-section">
                             <div class="setting-header">
-                                <label>Custom Instructions & Memory</label>
-                                <p class="setting-desc">What would you like Quilix to know about you to provide better responses? This information is injected into every chat.</p>
+                                <label>Collected Memories</label>
+                                <p class="setting-desc">Quilix uses this information to personalize responses across all your chats. You can add new memories or delete existing ones to steer its behavior.</p>
                             </div>
                             <div class="setting-body">
-                                <textarea class="memory-input" 
-                                          placeholder="E.g. I am a senior full-stack developer. Give me concise answers with TypeScript code. Don't explain basic concepts."
-                                          rows="6"
-                                          [(ngModel)]="generalMemory"></textarea>
-                                <div class="save-action">
-                                    <button class="primary-btn" (click)="saveMemory()" [disabled]="isSavingMemory">
-                                        @if (isSavingMemory) {
-                                            <i class="bi bi-check2"></i> Saved
-                                        } @else {
-                                            Save Memory
-                                        }
-                                    </button>
+                                
+                                <!-- Add memory input -->
+                                <div class="memory-input-group">
+                                    <input type="text" class="memory-input-single" 
+                                           placeholder="E.g. I am a senior developer..." 
+                                           [(ngModel)]="newMemoryText"
+                                           (keyup.enter)="addMemory()">
+                                    <button class="primary-btn sm-btn" (click)="addMemory()" [disabled]="!newMemoryText.trim()">Add</button>
+                                </div>
+
+                                <!-- Memory List -->
+                                <div class="memory-list">
+                                    @for (memory of memoryList; track memory; let i = $index) {
+                                        <div class="memory-item">
+                                            <div class="memory-text">{{ memory }}</div>
+                                            <button class="icon-btn danger-text" (click)="removeMemory(i)" title="Delete memory">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                    @if (memoryList.length === 0) {
+                                        <div class="empty-memory">No memories added yet. Add some facts about yourself!</div>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -107,6 +125,42 @@
                                 </div>
                                 <div class="setting-control">
                                     <button class="danger-btn" (click)="clearAllChats()">Clear all chats</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Storage Tab -->
+                    @if (activeTab === 'storage') {
+                        <div class="settings-section storage-section">
+                            <div class="storage-header">
+                                <span class="storage-used">{{ formatBytes(storageStats.totalBytes) }} of {{ formatBytes(storageLimit) }} used</span>
+                            </div>
+                            
+                            <div class="storage-progress-container">
+                                <div class="storage-progress-bar" [style.width.%]="storagePercentage"></div>
+                            </div>
+
+                            <div class="manage-storage-header">
+                                <h3>Manage storage</h3>
+                                <p>Manage your library to free up storage and avoid hitting the limit.</p>
+                            </div>
+
+                            <div class="storage-breakdown">
+                                <div class="breakdown-item">
+                                    <div class="breakdown-info">
+                                        <span class="breakdown-title">Messages</span>
+                                        <span class="breakdown-desc">{{ formatBytes(storageStats.messagesBytes) }} • {{ storageStats.messageCount }} messages</span>
+                                    </div>
+                                    <i class="bi bi-chevron-right"></i>
+                                </div>
+
+                                <div class="breakdown-item">
+                                    <div class="breakdown-info">
+                                        <span class="breakdown-title">Canvas Documents</span>
+                                        <span class="breakdown-desc">{{ formatBytes(storageStats.canvasBytes) }} • {{ storageStats.canvasCount }} documents</span>
+                                    </div>
+                                    <i class="bi bi-chevron-right"></i>
                                 </div>
                             </div>
                         </div>

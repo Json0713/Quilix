@@ -187,7 +187,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       let dynamicInstruction = SYSTEM_INSTRUCTION;
       if (generalMemory && typeof generalMemory === 'string' && generalMemory.trim().length > 0) {
-        dynamicInstruction += `\n\nUSER MEMORY (IMPORTANT CONTEXT):\nThe user has provided the following custom instructions/preferences. You must adhere to these across all conversations:\n${generalMemory.trim()}`;
+        let parsedMemory: string[];
+        try {
+            parsedMemory = JSON.parse(generalMemory);
+        } catch {
+            // fallback to string if not valid JSON
+            parsedMemory = [generalMemory];
+        }
+
+        if (Array.isArray(parsedMemory) && parsedMemory.length > 0) {
+            const memoryList = parsedMemory.map(item => `- ${item}`).join('\n');
+            dynamicInstruction += `\n\nUSER MEMORY (IMPORTANT CONTEXT):\nThe user has provided the following custom instructions and facts. You must adhere to these across all conversations:\n${memoryList}`;
+        }
       }
 
       const response = await ai.models.generateContent({

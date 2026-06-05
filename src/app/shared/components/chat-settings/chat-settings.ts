@@ -17,11 +17,18 @@ export class ChatSettingsComponent implements OnInit {
     @Input() visible = false;
     @Output() visibleChange = new EventEmitter<boolean>();
 
-    activeTab: 'general' | 'personalization' | 'data' = 'general';
+    activeTab: 'general' | 'personalization' | 'data' | 'storage' = 'general';
 
     // Settings
-    generalMemory = '';
+    memoryList: string[] = [];
+    newMemoryText = '';
     isSavingMemory = false;
+
+    // Storage
+    storageStats = { totalBytes: 0, messagesBytes: 0, canvasBytes: 0, messageCount: 0, canvasCount: 0 };
+    storageLimit = 250 * 1024 * 1024; // 250 MB
+    storagePercentage = 0;
+    isLoadingStorage = false;
 
     // Theme mock
     theme: 'system' | 'light' | 'dark' = 'system';
@@ -29,9 +36,34 @@ export class ChatSettingsComponent implements OnInit {
     async ngOnInit() {
         // Load the general memory from Dexie
         const memorySetting = await db.settings.get('chat_general_memory');
-        if (memorySetting) {
-            this.generalMemory = memorySetting.value;
+        if (memorySetting && memorySetting.value) {
+            try {
+                const parsed = JSON.parse(memorySetting.value);
+                if (Array.isArray(parsed)) {
+                    this.memoryList = parsed;
+                } else {
+                    this.memoryList = [memorySetting.value];
+                }
+            } catch {
+                this.memoryList = [memorySetting.value];
+            }
         }
+    }
+
+    async loadStorageStats() {
+        this.isLoadingStorage = true;
+        this.storageStats = await this.chat.getStorageUsage();
+        this.storagePercentage = Math.min(100, (this.storageStats.totalBytes / this.storageLimit) * 100);
+        this.isLoadingStorage = false;
+    }
+
+    formatBytes(bytes: number, decimals = 2) {
+        if (!+bytes) return '0 Bytes';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
     }
 
     close() {
@@ -39,13 +71,29 @@ export class ChatSettingsComponent implements OnInit {
         this.visibleChange.emit(this.visible);
     }
 
-    setTab(tab: 'general' | 'personalization' | 'data') {
+    setTab(tab: 'general' | 'personalization' | 'data' | 'storage') {
         this.activeTab = tab;
+        if (tab === 'storage') {
+            this.loadStorageStats();
+        }
+    }
+
+    addMemory() {
+        if (this.newMemoryText.trim()) {
+            this.memoryList.unshift(this.newMemoryText.trim());
+            this.newMemoryText = '';
+            this.saveMemory();
+        }
+    }
+
+    removeMemory(index: number) {
+        this.memoryList.splice(index, 1);
+        this.saveMemory();
     }
 
     async saveMemory() {
         this.isSavingMemory = true;
-        await db.settings.put({ key: 'chat_general_memory', value: this.generalMemory.trim() });
+        await db.settings.put({ key: 'chat_general_memory', value: JSON.stringify(this.memoryList) });
         setTimeout(() => {
             this.isSavingMemory = false;
         }, 800);

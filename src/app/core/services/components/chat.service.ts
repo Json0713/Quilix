@@ -364,6 +364,14 @@ export class ChatService {
     async send(userText: string): Promise<void> {
         if (!userText.trim()) return;
 
+        // Check storage limit before sending (250 MB limit)
+        const storage = await this.getStorageUsage();
+        const LIMIT_250_MB = 250 * 1024 * 1024;
+        if (storage.totalBytes > LIMIT_250_MB) {
+            this.error.set('Storage limit reached (250MB). Please delete some chat history or canvas documents in settings to continue.');
+            return;
+        }
+
         let sessionId = this.activeSessionId();
 
         // Auto-create session if needed
@@ -481,6 +489,39 @@ export class ChatService {
         await db.chat_messages.delete(messageId);
         // Update local signal if active
         this.messages.update(msgs => msgs.filter(m => m.id !== messageId));
+    }
+
+    /** Calculate the total byte size of chat storage for the active workspace. */
+    async getStorageUsage(): Promise<{ totalBytes: number, messagesBytes: number, canvasBytes: number, messageCount: number, canvasCount: number }> {
+        if (!this.currentWorkspaceId) {
+            return { totalBytes: 0, messagesBytes: 0, canvasBytes: 0, messageCount: 0, canvasCount: 0 };
+        }
+
+        const sessions = await db.chat_sessions.where('workspaceId').equals(this.currentWorkspaceId).toArray();
+        const sessionIds = sessions.map(s => s.id);
+
+        let messagesBytes = 0;
+        let canvasBytes = 0;
+        let messageCount = 0;
+        let canvasCount = 0;
+
+        if (sessionIds.length > 0) {
+            const messages = await db.chat_messages.where('sessionId').anyOf(sessionIds).toArray();
+            messageCount = messages.length;
+            messagesBytes = new Blob([JSON.stringify(messages)]).size;
+
+            const canvases = await db.canvas_documents.where('sessionId').anyOf(sessionIds).toArray();
+            canvasCount = canvases.length;
+            canvasBytes = new Blob([JSON.stringify(canvases)]).size;
+        }
+
+        return {
+            totalBytes: messagesBytes + canvasBytes,
+            messagesBytes,
+            canvasBytes,
+            messageCount,
+            canvasCount
+        };
     }
 
     /** Clear all chat sessions, messages, and canvas docs for the current workspace. */
