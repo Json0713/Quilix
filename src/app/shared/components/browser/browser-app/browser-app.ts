@@ -6,11 +6,12 @@ import { TabService } from '../../../../core/services/ui/tab.service';
 import { BrowserBookmarkService } from '../../../../core/services/data/browser-bookmark.service';
 import { BrowserBookmark } from '../../../../core/database/dexie.models';
 import { Observable } from 'rxjs';
+import { BrowserDashboardComponent } from '../browser-dashboard/browser-dashboard';
 
 @Component({
   selector: 'app-browser-app',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, BrowserDashboardComponent],
   templateUrl: './browser-app.html',
   styleUrls: ['./browser-app.scss']
 })

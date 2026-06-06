@@ -1,0 +1,93 @@
+<div class="dashboard-container">
+  
+  <div class="dashboard-grid">
+    
+    <!-- LEFT COLUMN: Weather & Calendar -->
+    <div class="side-column">
+      
+      <!-- WEATHER WIDGET -->
+      <div class="dashboard-card weather-card">
+        <h3>Today</h3>
+        @if (weather(); as w) {
+          <div class="weather-content">
+            <div class="weather-icon"><i class="bi {{ w.icon }}"></i></div>
+            <div class="weather-details">
+              <span class="temp">{{ w.temperature }}&deg;C</span>
+              <span class="condition">{{ w.condition }}</span>
+            </div>
+          </div>
+        } @else {
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <span>Loading weather...</span>
+          </div>
+        }
+      </div>
+
+      <!-- CALENDAR WIDGET -->
+      <div class="dashboard-card calendar-card">
+        <h3>Upcoming Events</h3>
+        @if (upcomingEvents().length > 0) {
+          <div class="events-list">
+            @for (event of upcomingEvents(); track event.id) {
+              <div class="event-item">
+                <div class="event-date">
+                  <span class="month">{{ event.date | date:'MMM' }}</span>
+                  <span class="day">{{ event.date | date:'dd' }}</span>
+                </div>
+                <div class="event-details">
+                  <span class="event-title">{{ event.title || 'Untitled Event' }}</span>
+                  @if (event.content) {
+                    <span class="event-desc">{{ event.content }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <i class="bi bi-calendar-x"></i>
+            <p>No upcoming events.</p>
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: News Feed -->
+    <div class="main-column">
+      <div class="section-header">
+        <h3>Trending</h3>
+        <button class="personalize-btn"><i class="bi bi-sliders"></i> Personalize</button>
+      </div>
+      
+      <div class="news-grid">
+        @if (isLoadingNews()) {
+          <div class="loading-state" style="grid-column: 1 / -1;">
+            <div class="spinner"></div>
+            <span>Fetching top tech news...</span>
+          </div>
+        } @else {
+          @for (article of newsArticles(); track article.url) {
+            <div class="news-card" (click)="openArticle(article.url)">
+              <div class="news-image-wrapper">
+                <div class="news-image" [style.background-image]="'url(' + article.imageUrl + ')'">
+                  <span class="category-badge">{{ article.category }}</span>
+                </div>
+              </div>
+              <div class="news-content">
+                <h4>{{ article.title }}</h4>
+                <div class="news-meta">
+                  <span class="source">{{ article.source }}</span>
+                  <span class="time">{{ article.time }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+  </div>
+
+</div>
