@@ -366,19 +366,27 @@
   height: 80px;
 }
 
-.end-of-feed {
-  display: flex;
-  flex-direction: column;
+.retry-btn {
+  margin-top: 1.5rem;
+  padding: 0;
+  background: transparent;
+  color: var(--accent);
+  border: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 3rem 0;
-  color: var(--text-muted);
-  
-  i {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    color: var(--accent);
-    opacity: 0.5;
+  gap: 0.35rem;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+
+  & i {
+    font-size: 1.5rem;
+  }
+
+  &:hover {
+    color: var(--text-main);
   }
 }
 

@@ -52,6 +52,7 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
   isLoadingNews = signal(true);
   isLoadingMore = signal(false);
   hasMoreNews = signal(true);
+  errorLoadingNews = signal(false);
 
   @ViewChild('scrollAnchor', { static: false }) scrollAnchor!: ElementRef;
   private observer: IntersectionObserver | null = null;
@@ -87,8 +88,21 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
     }
   }
 
+  changeCategory(category: NewsCategory) {
+    if (this.activeCategory().id === category.id && this.allArticles.length > 0) return;
+    
+    // Scroll to top of the dashboard feed seamlessly
+    const scrollContainer = document.querySelector('.store-state');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    this.fetchNews(category);
+  }
+
   async fetchNews(category: NewsCategory) {
     this.isLoadingNews.set(true);
+    this.errorLoadingNews.set(false);
     this.activeCategory.set(category);
     this.allArticles = [];
     this.displayedArticles.set([]);
@@ -98,7 +112,7 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
       const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(category.rssUrl)}`);
       const data = await res.json();
       
-      if (data.items) {
+      if (data.items && data.items.length > 0) {
         this.allArticles = data.items.map((item: any) => ({
           title: item.title,
           source: data.feed?.title || 'News',
@@ -108,10 +122,17 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
           url: item.link
         })).filter((a: any) => a.imageUrl); // require image for better UI
         
-        this.loadMore();
+        if (this.allArticles.length === 0) {
+          this.errorLoadingNews.set(true);
+        } else {
+          this.loadMore();
+        }
+      } else {
+        this.errorLoadingNews.set(true);
       }
     } catch (e) {
       console.error("Failed to fetch news", e);
+      this.errorLoadingNews.set(true);
     } finally {
       this.isLoadingNews.set(false);
       setTimeout(() => this.observeAnchor(), 100);

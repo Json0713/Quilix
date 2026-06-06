@@ -67,7 +67,7 @@
             <button 
               class="tab-btn" 
               [class.active]="activeCategory().id === cat.id"
-              (click)="fetchNews(cat)">
+              (click)="changeCategory(cat)">
               {{ cat.name }}
             </button>
           }
@@ -79,6 +79,15 @@
           <div class="loading-state" style="grid-column: 1 / -1;">
             <div class="spinner"></div>
             <span>Fetching {{ activeCategory().name.toLowerCase() }} news...</span>
+          </div>
+        } @else if (errorLoadingNews()) {
+          <div class="empty-state" style="grid-column: 1 / -1; padding: 4rem 0;">
+            <i class="bi bi-exclamation-triangle"></i>
+            <h4>Oops! Couldn't load news.</h4>
+            <p>We're having trouble fetching the latest {{ activeCategory().name.toLowerCase() }} news. Please click retry or come back later.</p>
+            <button class="retry-btn" (click)="fetchNews(activeCategory())">
+              <i class="bi bi-arrow-clockwise"></i> Retry
+            </button>
           </div>
         } @else {
           @for (article of displayedArticles(); track article.url) {
@@ -100,18 +109,11 @@
         }
       </div>
 
-      @if (!isLoadingNews() && hasMoreNews()) {
+      @if (!isLoadingNews() && !errorLoadingNews() && hasMoreNews()) {
         <div #scrollAnchor class="infinite-scroll-anchor">
           @if (isLoadingMore()) {
             <div class="spinner small"></div>
           }
-        </div>
-      }
-      
-      @if (!isLoadingNews() && !hasMoreNews()) {
-        <div class="end-of-feed">
-          <i class="bi bi-check-circle"></i>
-          <span>You're all caught up!</span>
         </div>
       }
     </div>
