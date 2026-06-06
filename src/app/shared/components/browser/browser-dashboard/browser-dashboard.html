@@ -56,20 +56,33 @@
 
     <!-- RIGHT COLUMN: News Feed -->
     <div class="main-column">
-      <div class="section-header">
-        <h3>Trending</h3>
-        <button class="personalize-btn"><i class="bi bi-sliders"></i> Personalize</button>
+      <div class="feed-header-sticky">
+        <div class="section-header">
+          <h3>Trending</h3>
+          <button class="personalize-btn"><i class="bi bi-sliders"></i> Personalize</button>
+        </div>
+
+        <div class="category-tabs thin-scroll">
+          @for (cat of categories; track cat.id) {
+            <button 
+              class="tab-btn" 
+              [class.active]="activeCategory().id === cat.id"
+              (click)="fetchNews(cat)">
+              {{ cat.name }}
+            </button>
+          }
+        </div>
       </div>
       
       <div class="news-grid">
         @if (isLoadingNews()) {
           <div class="loading-state" style="grid-column: 1 / -1;">
             <div class="spinner"></div>
-            <span>Fetching top tech news...</span>
+            <span>Fetching {{ activeCategory().name.toLowerCase() }} news...</span>
           </div>
         } @else {
-          @for (article of newsArticles(); track article.url) {
-            <div class="news-card" (click)="openArticle(article.url)">
+          @for (article of displayedArticles(); track article.url) {
+            <div class="news-card animate-fade-in" (click)="openArticle(article.url)">
               <div class="news-image-wrapper">
                 <div class="news-image" [style.background-image]="'url(' + article.imageUrl + ')'">
                   <span class="category-badge">{{ article.category }}</span>
@@ -86,6 +99,21 @@
           }
         }
       </div>
+
+      @if (!isLoadingNews() && hasMoreNews()) {
+        <div #scrollAnchor class="infinite-scroll-anchor">
+          @if (isLoadingMore()) {
+            <div class="spinner small"></div>
+          }
+        </div>
+      }
+      
+      @if (!isLoadingNews() && !hasMoreNews()) {
+        <div class="end-of-feed">
+          <i class="bi bi-check-circle"></i>
+          <span>You're all caught up!</span>
+        </div>
+      }
     </div>
 
   </div>

@@ -12,11 +12,11 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: 2rem;
   
   @media (max-width: 850px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -189,6 +189,16 @@
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
 /* NEWS FEED */
+.feed-header-sticky {
+  position: sticky;
+  top: 4.5rem; /* Adjusted to sit exactly flush beneath the search bar without a gap */
+  z-index: 15;
+  background: var(--surface-main);
+  padding-top: 1rem;
+  margin-top: -1rem;
+  padding-bottom: 0.5rem;
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -222,9 +232,48 @@
   }
 }
 
+.category-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  scrollbar-width: thin;
+  max-width: 100%; /* explicitly prevent expanding past parent */
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+}
+
+.tab-btn {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.4rem 1.25rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--border);
+    color: var(--text-main);
+  }
+
+  &.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+}
+
 .news-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  /* Using min(100%, 340px) ensures it shrinks below 340px on ultra-small screens to prevent horizontal overflow */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
   gap: 1.5rem;
 }
 
@@ -288,6 +337,7 @@
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2; /* Added standard property to clear linter warning */
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -304,4 +354,44 @@
       color: var(--accent);
     }
   }
+}
+
+/* INFINITE SCROLL */
+.infinite-scroll-anchor {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0;
+  height: 80px;
+}
+
+.end-of-feed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  color: var(--text-muted);
+  
+  i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+    opacity: 0.5;
+  }
+}
+
+.spinner.small {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
