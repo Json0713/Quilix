@@ -22,7 +22,7 @@
   .store-header {
     text-align: center;
     margin-bottom: 3rem;
-    max-width: 600px;
+    max-width: 1800px;
     
     .store-icon {
       font-size: 3rem;
@@ -108,7 +108,7 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
     width: 100%;
-    max-width: 1000px;
+    max-width: 1800px;
 
     .app-card {
       background: var(--surface);
