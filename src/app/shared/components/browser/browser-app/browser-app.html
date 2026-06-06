@@ -5,19 +5,19 @@
     </div>
     <h2>Browser App</h2>
     <p>Enter a URL to browse the web, or launch a saved app below.</p>
-    
-    <form class="search-form" (submit)="onSearchSubmit($event)">
-      <div class="search-input-wrapper">
-        <i class="bi bi-search search-icon"></i>
-        <input 
-          type="text" 
-          placeholder="Search or enter web address..." 
-          [value]="searchQuery" 
-          (input)="onSearchInput($event)"
-          class="search-input">
-      </div>
-    </form>
   </div>
+    
+  <form class="search-form" (submit)="onSearchSubmit($event)">
+    <div class="search-input-wrapper">
+      <i class="bi bi-search search-icon"></i>
+      <input 
+        type="text" 
+        placeholder="Search or enter web address..." 
+        [value]="searchQuery" 
+        (input)="onSearchInput($event)"
+        class="search-input">
+    </div>
+  </form>
 
   @if ((bookmarks$ | async)?.length) {
     <div class="store-grid">
