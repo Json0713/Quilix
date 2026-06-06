@@ -57,7 +57,7 @@ export class BrowserBookmarkService {
    * and we haven't seeded before (using settings table as a flag).
    */
   private async seedDefaultsIfNeeded(): Promise<void> {
-    const SEED_KEY = 'browser_bookmarks_seeded_v9';
+    const SEED_KEY = 'browser_bookmarks_seeded_v13';
     const hasSeeded = await db.settings.get(SEED_KEY);
 
     if (hasSeeded) {
@@ -87,12 +87,12 @@ export class BrowserBookmarkService {
         createdAt: Date.now() + 2
       },
       {
-        id: 'http://slither.com/io',
-        url: 'http://slither.com/io',
-        title: 'Slither.io',
-        icon: 'bi-bug',
+        id: 'https://typings.gg/',
+        url: 'https://typings.gg/',
+        title: 'Typings.gg',
+        icon: 'bi-keyboard',
         category: 'Games',
-        description: 'Classic Snake MMO',
+        description: 'Minimal Typing Test',
         createdAt: Date.now() + 3
       },
       {
@@ -105,12 +105,12 @@ export class BrowserBookmarkService {
         createdAt: Date.now() + 4
       },
       {
-        id: 'https://slopegame.io/',
-        url: 'https://slopegame.io/',
-        title: 'Slope',
-        icon: 'bi-box-arrow-down-right',
+        id: 'https://2048game.com/',
+        url: 'https://2048game.com/',
+        title: '2048',
+        icon: 'bi-grid-3x3',
         category: 'Games',
-        description: '3D Endless Runner',
+        description: 'Number Puzzle Game',
         createdAt: Date.now() + 5
       },
       {
