@@ -125,20 +125,21 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
     this.fetchNews(category);
   }
 
-  async getUserCountry(): Promise<string | null> {
-    const cacheKey = 'user_country_location';
+  async getUserLocationInfo(): Promise<{ name: string, code: string } | null> {
+    const cacheKey = 'user_location_info_v2';
     const cached = sessionStorage.getItem(cacheKey);
-    if (cached) return cached;
+    if (cached) return JSON.parse(cached);
     try {
       const res = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client');
       if (!res.ok) return null;
       const data = await res.json();
-      if (data.countryName) {
-        sessionStorage.setItem(cacheKey, data.countryName);
-        return data.countryName;
+      if (data.countryName && data.countryCode) {
+        const info = { name: data.countryName, code: data.countryCode };
+        sessionStorage.setItem(cacheKey, JSON.stringify(info));
+        return info;
       }
     } catch (e) {
-      console.warn("Could not fetch user location for local news", e);
+      console.warn("Could not fetch user location", e);
     }
     return null;
   }
@@ -176,9 +177,9 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
 
       let fetchLocal: Promise<any> = Promise.resolve({ items: [] });
       if (category.id === 'top') {
-         const country = await this.getUserCountry();
-         if (country) {
-            const localRssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(country + ' news')}`;
+         const location = await this.getUserLocationInfo();
+         if (location && location.name) {
+            const localRssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(location.name + ' news')}`;
             fetchLocal = fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(localRssUrl)}`)
               .then(res => res.ok ? res.json() : { items: [] })
               .catch(() => ({ items: [] }));
@@ -348,10 +349,41 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
       today.setHours(0,0,0,0);
 
       // Filter notes that are today or in the future
-      const upcoming = allNotes.filter(note => {
+      let upcoming: WidgetNote[] = allNotes.filter(note => {
         const noteDate = new Date(note.date + 'T00:00:00');
         return noteDate >= today;
       });
+
+      // Fetch public holidays based on user's country
+      const location = await this.getUserLocationInfo();
+      if (location && location.code) {
+        try {
+          const res = await fetch(`https://date.nager.at/api/v3/NextPublicHolidays/${location.code}`);
+          if (res.ok) {
+            const holidays = await res.json();
+            const holidayNotes: WidgetNote[] = holidays.map((h: any) => ({
+              id: 'holiday-' + h.date + '-' + Math.random().toString(),
+              date: h.date,
+              title: h.localName,
+              content: h.name === h.localName ? "Public Holiday" : `Public Holiday (${h.name})`,
+              priority: 'low',
+              reminderEnabled: false,
+              reminderTime: '',
+              createdAt: Date.now()
+            }) as WidgetNote).filter((note: WidgetNote) => {
+              const noteDate = new Date(note.date + 'T00:00:00');
+              return noteDate >= today;
+            });
+            
+            // Merge holidays but prefer user notes on the same day
+            const existingDates = new Set(upcoming.map(n => n.date));
+            const filteredHolidays = holidayNotes.filter(h => !existingDates.has(h.date));
+            upcoming = [...upcoming, ...filteredHolidays];
+          }
+        } catch (e) {
+          console.warn("Failed to fetch public holidays", e);
+        }
+      }
 
       // Sort by closest date first
       upcoming.sort((a, b) => a.date.localeCompare(b.date));
