@@ -19,7 +19,7 @@ const CATEGORIES: NewsCategory[] = [
   { id: 'tech', name: 'Technology', rssUrl: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml' },
   { id: 'science', name: 'Science', rssUrl: 'https://rss.nytimes.com/services/xml/rss/nyt/Science.xml' },
   { id: 'business', name: 'Business', rssUrl: 'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml' },
-  { id: 'sports', name: 'Sports', rssUrl: 'https://rss.nytimes.com/services/xml/rss/nyt/Sports.xml' }
+  { id: 'sports', name: 'Sports', rssUrl: 'https://www.espn.com/espn/rss/news' }
 ];
 
 interface NewsArticle {
@@ -151,7 +151,7 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
     this.displayedArticles.set([]);
     this.hasMoreNews.set(true);
     
-    const cacheKey = `news_category_${category.id}`;
+    const cacheKey = `news_category_v2_${category.id}`;
     const cachedNews = this.getCache(cacheKey);
     if (cachedNews) {
       this.allArticles = cachedNews;
