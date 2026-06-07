@@ -1,4 +1,5 @@
-<div class="terminal-panel" [class.is-open]="terminal.isOpen()" [class.is-maximized]="isMaximized()" [class.sidebar-hidden]="!isSidebarVisible()">
+<div class="terminal-wrapper" [class.is-open]="terminal.isOpen()" [class.is-maximized]="isMaximized()" [class.sidebar-hidden]="!isSidebarVisible()">
+    <div class="terminal-panel">
     <div class="terminal-header">
         <div class="tabs-scroll-wrapper">
             <div class="tabs">
@@ -97,4 +98,5 @@
             </div>
         }
     }
+    </div>
 </div>

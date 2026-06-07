@@ -8,7 +8,12 @@
       <!-- WEATHER WIDGET -->
       <div class="dashboard-card weather-card">
         <h3>Today</h3>
-        @if (weather(); as w) {
+        @if (weatherError()) {
+          <div class="empty-state">
+            <i class="bi bi-cloud-slash"></i>
+            <p>Weather unavailable offline</p>
+          </div>
+        } @else if (weather(); as w) {
           <div class="weather-content">
             <div class="weather-icon"><i class="bi {{ w.icon }}"></i></div>
             <div class="weather-details">
@@ -27,7 +32,12 @@
       <!-- CALENDAR WIDGET -->
       <div class="dashboard-card calendar-card">
         <h3>Upcoming Events</h3>
-        @if (upcomingEvents().length > 0) {
+        @if (calendarError()) {
+          <div class="empty-state">
+            <i class="bi bi-exclamation-circle"></i>
+            <p>Couldn't load calendar</p>
+          </div>
+        } @else if (upcomingEvents().length > 0) {
           <div class="events-list">
             @for (event of upcomingEvents(); track event.id) {
               <div class="event-item">
@@ -76,15 +86,15 @@
       
       <div class="news-grid">
         @if (isLoadingNews()) {
-          <div class="loading-state" style="grid-column: 1 / -1;">
+          <div class="loading-state" style="grid-column: 1 / -1; min-height: 50vh;">
             <div class="spinner"></div>
             <span>Fetching {{ activeCategory().name.toLowerCase() }} news...</span>
           </div>
         } @else if (errorLoadingNews()) {
-          <div class="empty-state" style="grid-column: 1 / -1; padding: 4rem 0;">
-            <i class="bi bi-exclamation-triangle"></i>
+          <div class="empty-state" style="grid-column: 1 / -1; min-height: 50vh;">
+            <i class="bi bi-wifi-off"></i>
             <h4>Oops! Couldn't load news.</h4>
-            <p>We're having trouble fetching the latest {{ activeCategory().name.toLowerCase() }} news. Please click retry or come back later.</p>
+            <p>We're having trouble fetching the latest {{ activeCategory().name.toLowerCase() }} news. Please check your internet connection and try again.</p>
             <button class="retry-btn" (click)="fetchNews(activeCategory())">
               <i class="bi bi-arrow-clockwise"></i> Retry
             </button>

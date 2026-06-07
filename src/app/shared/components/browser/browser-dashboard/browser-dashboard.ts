@@ -53,6 +53,8 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
   isLoadingMore = signal(false);
   hasMoreNews = signal(true);
   errorLoadingNews = signal(false);
+  weatherError = signal(false);
+  calendarError = signal(false);
 
   @ViewChild('scrollAnchor', { static: false }) scrollAnchor!: ElementRef;
   private observer: IntersectionObserver | null = null;
@@ -88,13 +90,36 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
     }
   }
 
+  private getCache(key: string) {
+    try {
+      const item = sessionStorage.getItem(key);
+      if (item) {
+        const parsed = JSON.parse(item);
+        // Expiry of 30 mins
+        if (new Date().getTime() - parsed.timestamp < 30 * 60 * 1000) {
+          return parsed.data;
+        }
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  private setCache(key: string, data: any) {
+    try {
+      sessionStorage.setItem(key, JSON.stringify({
+        timestamp: new Date().getTime(),
+        data
+      }));
+    } catch(e) {}
+  }
+
   changeCategory(category: NewsCategory) {
     if (this.activeCategory().id === category.id && this.allArticles.length > 0) return;
     
-    // Scroll to top of the dashboard feed seamlessly
-    const scrollContainer = document.querySelector('.store-state');
-    if (scrollContainer) {
-      scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to the top of the news feed seamlessly
+    const newsSection = document.querySelector('.main-column');
+    if (newsSection) {
+      newsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     this.fetchNews(category);
@@ -108,8 +133,25 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
     this.displayedArticles.set([]);
     this.hasMoreNews.set(true);
     
+    const cacheKey = `news_category_${category.id}`;
+    const cachedNews = this.getCache(cacheKey);
+    if (cachedNews) {
+      this.allArticles = cachedNews;
+      this.loadMore();
+      this.isLoadingNews.set(false);
+      setTimeout(() => this.observeAnchor(), 100);
+      return;
+    }
+
+    if (!navigator.onLine) {
+      this.errorLoadingNews.set(true);
+      this.isLoadingNews.set(false);
+      return;
+    }
+
     try {
       const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(category.rssUrl)}`);
+      if (!res.ok) throw new Error('News fetch failed');
       const data = await res.json();
       
       if (data.items && data.items.length > 0) {
@@ -125,6 +167,7 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
         if (this.allArticles.length === 0) {
           this.errorLoadingNews.set(true);
         } else {
+          this.setCache(cacheKey, this.allArticles);
           this.loadMore();
         }
       } else {
@@ -182,6 +225,19 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   async fetchWeather() {
+    this.weatherError.set(false);
+    
+    const cachedWeather = this.getCache('weather_widget_data');
+    if (cachedWeather) {
+      this.weather.set(cachedWeather);
+      return;
+    }
+
+    if (!navigator.onLine) {
+      this.weatherError.set(true);
+      return;
+    }
+
     try {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -194,12 +250,14 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
       }
     } catch (e) {
       console.error("Geolocation failed", e);
+      this.weatherError.set(true);
     }
   }
 
   private async loadWeatherForCoords(lat: number, lng: number) {
     try {
       const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true`);
+      if (!res.ok) throw new Error('Weather fetch failed');
       const data = await res.json();
       
       const current = data.current_weather;
@@ -214,17 +272,22 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
       else if (code >= 71 && code <= 77) { condition = "Snow"; icon = "bi-snow"; }
       else if (code >= 95) { condition = "Thunderstorm"; icon = "bi-cloud-lightning-rain"; }
 
-      this.weather.set({
+      const weatherData = {
         temperature: Math.round(current.temperature),
         condition,
         icon
-      });
+      };
+
+      this.weather.set(weatherData);
+      this.setCache('weather_widget_data', weatherData);
     } catch (e) {
       console.error("Failed to fetch weather", e);
+      this.weatherError.set(true);
     }
   }
 
   async fetchCalendarEvents() {
+    this.calendarError.set(false);
     try {
       const allNotes = await this.db.widget_notes.toArray();
       const today = new Date();
@@ -243,6 +306,7 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
       this.upcomingEvents.set(upcoming.slice(0, 3));
     } catch (e) {
       console.error("Failed to fetch calendar events", e);
+      this.calendarError.set(true);
     }
   }
 }

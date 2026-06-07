@@ -1,37 +1,46 @@
-.terminal-panel {
+.terminal-wrapper {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 300px;
-    /* Fixed height for VSCode style */
-    background-color: var(--app-bg);
-    color: var(--text-main);
-    font-family: 'Courier New', Courier, monospace;
+    height: 0;
+    overflow: hidden;
     z-index: 1000;
-    /* Underneath modal backdrops (1040/1050) */
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    border-top: 1px solid var(--bs-gray-800);
-
-    transform: translateY(100%);
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
     &.is-open {
-        transform: translateY(0);
+        height: 300px;
     }
 
     &.is-maximized {
         height: 100%;
         top: 0;
         bottom: 0;
-        z-index: 1055; /* Force above navbar/modals when maximized */
+        z-index: 1055;
     }
 
     &.sidebar-hidden .instance-sidebar {
         display: none !important;
     }
+}
+
+.terminal-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 300px;
+    background-color: var(--app-bg);
+    color: var(--text-main);
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--bs-gray-800);
+}
+
+.terminal-wrapper.is-maximized .terminal-panel {
+    height: 100%;
 }
 
 .terminal-header {
@@ -306,13 +315,19 @@
 }
 
 @media (max-width: 768px) {
+    .terminal-wrapper {
+        &.is-open:not(.is-maximized) {
+            height: 60vh;
+        }
+    }
+
     .terminal-panel {
         height: 60vh;
+    }
 
-        &:not(.is-maximized) {
-            border-top-left-radius: 16px;
-            border-top-right-radius: 16px;
-        }
+    .terminal-wrapper:not(.is-maximized) .terminal-panel {
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
     }
 
     .instance-sidebar {
