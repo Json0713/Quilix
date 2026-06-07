@@ -55,6 +55,8 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
   errorLoadingNews = signal(false);
   weatherError = signal(false);
   calendarError = signal(false);
+  
+  activeMobileWidget = signal<'weather' | 'calendar'>('weather');
 
   @ViewChild('scrollAnchor', { static: false }) scrollAnchor!: ElementRef;
   private observer: IntersectionObserver | null = null;

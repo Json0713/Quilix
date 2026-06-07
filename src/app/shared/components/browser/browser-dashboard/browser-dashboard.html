@@ -5,8 +5,14 @@
     <!-- LEFT COLUMN: Weather & Calendar -->
     <div class="side-column">
       
+      <!-- Mobile Widget Toggle -->
+      <div class="mobile-widget-toggle">
+        <button [class.active]="activeMobileWidget() === 'weather'" (click)="activeMobileWidget.set('weather')">Weather</button>
+        <button [class.active]="activeMobileWidget() === 'calendar'" (click)="activeMobileWidget.set('calendar')">Upcoming Events</button>
+      </div>
+
       <!-- WEATHER WIDGET -->
-      <div class="dashboard-card weather-card">
+      <div class="dashboard-card weather-card" [class.mobile-hidden]="activeMobileWidget() !== 'weather'">
         <h3>Today</h3>
         @if (weatherError()) {
           <div class="empty-state">
@@ -30,7 +36,7 @@
       </div>
 
       <!-- CALENDAR WIDGET -->
-      <div class="dashboard-card calendar-card">
+      <div class="dashboard-card calendar-card" [class.mobile-hidden]="activeMobileWidget() !== 'calendar'">
         <h3>Upcoming Events</h3>
         @if (calendarError()) {
           <div class="empty-state">
