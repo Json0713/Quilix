@@ -125,6 +125,24 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
     this.fetchNews(category);
   }
 
+  async getUserCountry(): Promise<string | null> {
+    const cacheKey = 'user_country_location';
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) return cached;
+    try {
+      const res = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client');
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (data.countryName) {
+        sessionStorage.setItem(cacheKey, data.countryName);
+        return data.countryName;
+      }
+    } catch (e) {
+      console.warn("Could not fetch user location for local news", e);
+    }
+    return null;
+  }
+
   async fetchNews(category: NewsCategory) {
     this.isLoadingNews.set(true);
     this.errorLoadingNews.set(false);
@@ -150,17 +168,43 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
     }
 
     try {
-      const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(category.rssUrl)}`);
-      if (!res.ok) throw new Error('News fetch failed');
-      const data = await res.json();
+      const fetchPrimary = fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(category.rssUrl)}`)
+        .then(res => {
+          if (!res.ok) throw new Error('News fetch failed');
+          return res.json();
+        });
+
+      let fetchLocal: Promise<any> = Promise.resolve({ items: [] });
+      if (category.id === 'top') {
+         const country = await this.getUserCountry();
+         if (country) {
+            const localRssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(country + ' news')}`;
+            fetchLocal = fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(localRssUrl)}`)
+              .then(res => res.ok ? res.json() : { items: [] })
+              .catch(() => ({ items: [] }));
+         }
+      }
+
+      const [primaryData, localData] = await Promise.all([fetchPrimary, fetchLocal]);
       
-      if (data.items && data.items.length > 0) {
-        this.allArticles = data.items.map((item: any) => ({
+      let mergedItems: any[] = [];
+      const primaryItems = primaryData.items || [];
+      const localItems = localData.items || [];
+
+      // Interleave items: 1 primary, 1 local, 1 primary, 1 local...
+      const maxLength = Math.max(primaryItems.length, localItems.length);
+      for (let i = 0; i < maxLength; i++) {
+        if (i < primaryItems.length) mergedItems.push({...primaryItems[i], isLocal: false});
+        if (i < localItems.length) mergedItems.push({...localItems[i], isLocal: true});
+      }
+
+      if (mergedItems.length > 0) {
+        this.allArticles = mergedItems.map((item: any) => ({
           title: item.title,
-          source: data.feed?.title || 'News',
+          source: item.isLocal ? (localData.feed?.title || 'Local News').replace(' - Google News', '') : (primaryData.feed?.title || 'News'),
           time: this.timeSince(new Date(item.pubDate)),
           imageUrl: this.extractImage(item),
-          category: category.name,
+          category: item.isLocal ? 'Local News' : category.name,
           url: item.link
         })).filter((a: any) => a.imageUrl); // require image for better UI
         
@@ -182,12 +226,22 @@ export class BrowserDashboardComponent implements OnInit, AfterViewInit, OnDestr
     }
   }
 
+  getPlaceholderImage(): string {
+    const images = [
+      'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&q=80&w=400&h=250',
+      'https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&q=80&w=400&h=250',
+      'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=400&h=250',
+      'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?auto=format&fit=crop&q=80&w=400&h=250'
+    ];
+    return images[Math.floor(Math.random() * images.length)];
+  }
+
   extractImage(item: any): string {
     if (item.enclosure && item.enclosure.link) return item.enclosure.link;
     if (item.thumbnail) return item.thumbnail;
     const imgMatch = item.description?.match(/<img[^>]+src="([^">]+)"/);
     if (imgMatch) return imgMatch[1];
-    return 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&q=80&w=400&h=250';
+    return this.getPlaceholderImage();
   }
 
   timeSince(date: Date) {
