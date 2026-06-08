@@ -146,12 +146,16 @@
 
     /* Platform Specific Hovers */
     &.github:hover {
-        color: #fff;
+        color: var(--text-main);
         text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
 
         html.light-theme & {
             color: #24292e;
             text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        i {
+            color: inherit;
         }
     }
 
