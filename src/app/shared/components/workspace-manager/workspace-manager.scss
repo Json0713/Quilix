@@ -342,6 +342,8 @@
     z-index: 3000 !important;
     cursor: grabbing;
     backdrop-filter: blur(12px);
+    overflow: hidden !important;
+    margin: 0 !important;
 
     // Ensure it looks like the list item
     ::ng-deep .workspace-row {
@@ -349,6 +351,7 @@
         border: 1px solid var(--border) !important;
         width: 100% !important;
         margin: 0 !important;
+        overflow: hidden !important;
     }
 }
 
