@@ -169,7 +169,7 @@
                     [isSelected]="isSelected(ws.id)" [isMenuOpen]="openMenuId() === 'track-' + ws.id"
                     [viewMode]="viewMode()" (restoreWorkspace)="restoreWorkspace($event)"
                     (trashWorkspace)="trashWorkspace($event)" (switchWorkspace)="switchToWorkspace($event)"
-                    (renameWorkspace)="renameWorkspace($event)" (toggleSelect)="toggleSelect($event)"
+                    (renameWorkspace)="renameWorkspace($event)" (detailsWorkspace)="openWorkspaceDetails($event)" (toggleSelect)="toggleSelect($event)"
                     (toggleMenu)="toggleMenu('track-' + ws.id, $event)">
                 </app-workspace-card>
                 }
@@ -180,7 +180,7 @@
                     [isSelected]="isSelected(ws.id)" [isMenuOpen]="openMenuId() === 'track-' + ws.id"
                     [viewMode]="viewMode()" (restoreWorkspace)="restoreWorkspace($event)"
                     (trashWorkspace)="trashWorkspace($event)" (switchWorkspace)="switchToWorkspace($event)"
-                    (renameWorkspace)="renameWorkspace($event)" (toggleSelect)="toggleSelect($event)"
+                    (renameWorkspace)="renameWorkspace($event)" (detailsWorkspace)="openWorkspaceDetails($event)" (toggleSelect)="toggleSelect($event)"
                     (toggleMenu)="toggleMenu('track-' + ws.id, $event)">
                     <div class="drag-handle" dragHandle cdkDragHandle>
                         <i class="bi bi-grip-vertical"></i>

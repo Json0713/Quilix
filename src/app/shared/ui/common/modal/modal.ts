@@ -7,6 +7,7 @@ import { TaskDetailComponent } from '../../tasks/task-detail/task-detail';
 import { CreateWorkspaceComponent } from '../../../components/workspace-manager/create-workspace/create-workspace';
 import { EditWorkspaceComponent } from '../../../components/workspace-manager/edit-workspace/edit-workspace';
 import { DetailsView } from '../../../components/space-manager/file-explorer/details-view/details-view';
+import { WorkspaceDetailsComponent } from '../../../components/workspace-manager/workspace-details/workspace-details';
 import { GlobalSearchComponent } from '../../../components/global-search/global-search';
 import { Router, NavigationStart } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -16,7 +17,7 @@ import { SharedCalendarWidget } from '../../../widgets/calendar-widget';
 @Component({
   selector: 'app-modal',
   standalone: true,
-  imports: [CommonModule, Import, TaskDetailComponent, CreateWorkspaceComponent, EditWorkspaceComponent, DetailsView, GlobalSearchComponent, SharedClockWidget, SharedCalendarWidget],
+  imports: [CommonModule, Import, TaskDetailComponent, CreateWorkspaceComponent, EditWorkspaceComponent, DetailsView, WorkspaceDetailsComponent, GlobalSearchComponent, SharedClockWidget, SharedCalendarWidget],
   templateUrl: './modal.html',
   styleUrl: './modal.scss',
 })

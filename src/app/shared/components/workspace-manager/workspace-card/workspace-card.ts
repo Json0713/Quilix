@@ -27,6 +27,7 @@ export class WorkspaceCardComponent implements OnChanges {
     @Output() switchWorkspace = new EventEmitter<ManagedWorkspace>();
     @Output() toggleSelect = new EventEmitter<string>();
     @Output() renameWorkspace = new EventEmitter<ManagedWorkspace>();
+    @Output() detailsWorkspace = new EventEmitter<ManagedWorkspace>();
     @Output() toggleMenu = new EventEmitter<Event>();
 
     ngOnChanges(changes: SimpleChanges): void {

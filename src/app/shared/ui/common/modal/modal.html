@@ -32,6 +32,8 @@
         <app-edit-workspace></app-edit-workspace>
       } @else if (modal.modal()?.view === 'details') {
         <app-details-view [entry]="modal.modal()!.explorerEntryData!"></app-details-view>
+      } @else if (modal.modal()?.view === 'workspace-details') {
+        <app-workspace-details [workspace]="modal.modal()!.workspaceData!"></app-workspace-details>
       } @else if (modal.modal()?.view === 'global-search') {
         <app-global-search />
       } @else if (modal.modal()?.view === 'clock') {

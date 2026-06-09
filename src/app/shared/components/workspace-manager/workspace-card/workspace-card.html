@@ -78,6 +78,11 @@
                 </button>
                 }
 
+                <button class="dropdown-item" (click)="detailsWorkspace.emit(workspace)">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Details</span>
+                </button>
+
                 <button class="dropdown-item" (click)="renameWorkspace.emit(workspace)">
                     <i class="bi bi-pencil"></i>
                     <span>Rename</span>

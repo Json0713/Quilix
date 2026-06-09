@@ -189,6 +189,10 @@ export class WorkspaceManagerComponent implements OnInit {
         }
     }
 
+    openWorkspaceDetails(workspace: ManagedWorkspace) {
+        this.modalService.openWorkspaceDetails(workspace);
+    }
+
     @HostListener('window:focus')
     async onWindowFocus() {
         // PREVENTION: Don't trigger background load if we are currently re-authenticating 

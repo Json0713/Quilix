@@ -127,6 +127,17 @@ export class ModalService {
       explorerEntryData: entry
     });
   }
+
+  openWorkspaceDetails(workspace: Workspace): void {
+    this._closeExistingGracefully();
+    this._modal.set({
+      id: ++this.id,
+      type: 'custom',
+      title: 'Workspace Details',
+      view: 'workspace-details',
+      workspaceData: workspace
+    });
+  }
   
   openGlobalSearch(): void {
     this._closeExistingGracefully();
