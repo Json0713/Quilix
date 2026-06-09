@@ -1,17 +1,23 @@
 <div class="workspace-row" [class.view-card]="viewMode === 'card'" [class.missing]="workspace.isMissingOnDisk"
     [class.selected]="isSelected" [class.current]="isCurrent" [class.in-select-mode]="isSelectionMode" [class.menu-open]="isMenuOpen"
-    (click)="isSelectionMode ? toggleSelect.emit(workspace.id) : null">
+    (click)="isSelectionMode && !isCurrent ? toggleSelect.emit(workspace.id) : null">
 
     <!-- Col: Name / Identifier -->
     <div class="col-name">
         @if (isSelectionMode) {
-        <div class="workspace-checkbox" (click)="$event.stopPropagation(); toggleSelect.emit(workspace.id)" [class.checked]="isSelected">
-            <i class="bi" [class.bi-check-square-fill]="isSelected" [class.bi-square]="!isSelected"></i>
-        </div>
+            @if (!isCurrent) {
+            <div class="workspace-checkbox" (click)="$event.stopPropagation(); toggleSelect.emit(workspace.id)" [class.checked]="isSelected">
+                <i class="bi" [class.bi-check-square-fill]="isSelected" [class.bi-square]="!isSelected"></i>
+            </div>
+            } @else {
+            <div class="workspace-checkbox" style="visibility: hidden; pointer-events: none;">
+                <i class="bi bi-square"></i>
+            </div>
+            }
         } @else if (!isSelectionMode) {
-        @if (!isCurrent) {
-        <ng-content select="[dragHandle]"></ng-content>
-        }
+            @if (!isCurrent) {
+            <ng-content select="[dragHandle]"></ng-content>
+            }
         }
 
         <div class="icon-wrapper">
