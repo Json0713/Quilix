@@ -26,11 +26,18 @@
 
         <span class="workspace-title" [title]="workspace.name">{{ workspace.name }}</span>
 
-        @if (isCurrent) {
-        <span class="current-badge">
-            <i class="bi bi-broadcast"></i> CURRENT
-        </span>
-        }
+        <div class="workspace-badges">
+            @if (isCurrent) {
+            <span class="current-badge">
+                <i class="bi bi-broadcast"></i> CURRENT
+            </span>
+            }
+            @if (workspace.isMissingOnDisk) {
+            <span class="missing-badge">
+                <i class="bi bi-exclamation-triangle-fill"></i> MISSING
+            </span>
+            }
+        </div>
     </div>
 
     <div class="col-metadata">
