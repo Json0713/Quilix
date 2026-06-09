@@ -6,23 +6,22 @@
     [class.modal-xl]="modal.modal()?.view === 'task'"
     [class.modal-search]="['global-search', 'clock', 'calendar'].includes(modal.modal()?.view || '')">
 
-    <!-- CLOSE BUTTON -->
+    <!-- HEADER -->
     @if (!['global-search', 'clock', 'calendar'].includes(modal.modal()?.view || '')) {
-    <button type="button" class="modal-close" aria-label="Close modal" (click)="cancel()">
-      <i class="bi bi-x-lg"></i>
-    </button>
-    }
-
-    <!-- TITLE -->
-    @if (!['global-search', 'clock', 'calendar'].includes(modal.modal()?.view || '')) {
-    <h3 class="modal-title">
-      {{ modal.modal()?.title }}
-    </h3>
+    <div class="modal-header">
+      <h3 class="modal-title">
+        {{ modal.modal()?.title }}
+      </h3>
+      <button type="button" class="modal-close" aria-label="Close modal" (click)="cancel()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
     }
 
     @switch (modal.modal()?.type) {
 
     @case ('custom') {
+      <div class="modal-body">
       @if (modal.modal()?.view === 'import') {
         <app-import />
       } @else if (modal.modal()?.view === 'task') {
@@ -40,52 +39,57 @@
       } @else if (modal.modal()?.view === 'calendar') {
         <app-shared-calendar-widget [isModal]="true" />
       }
+      </div>
     }
 
     @default {
 
-    <!-- (info / success / warning / error) -->
-    @if (
-    modal.modal()?.notice &&
-    !noticeDismissed &&
-    modal.modal()?.notice?.scope !== 'always'
-    ) {
-    <div class="modal-notice" [attr.data-type]="modal.modal()?.notice?.type">
-      <i class="bi modal-notice-icon" [ngClass]="{
-                  'bi-info-circle': modal.modal()?.notice?.type === 'info',
-                  'bi-check-circle': modal.modal()?.notice?.type === 'success',
-                  'bi-exclamation-circle': modal.modal()?.notice?.type === 'warning',
-                  'bi-x-circle': modal.modal()?.notice?.type === 'error'
-                }"></i>
+    <!-- BODY -->
+    <div class="modal-body">
+      @if (
+      modal.modal()?.notice &&
+      !noticeDismissed &&
+      modal.modal()?.notice?.scope !== 'always'
+      ) {
+      <div class="modal-notice" [attr.data-type]="modal.modal()?.notice?.type">
+        <i class="bi modal-notice-icon" [ngClass]="{
+                    'bi-info-circle': modal.modal()?.notice?.type === 'info',
+                    'bi-check-circle': modal.modal()?.notice?.type === 'success',
+                    'bi-exclamation-circle': modal.modal()?.notice?.type === 'warning',
+                    'bi-x-circle': modal.modal()?.notice?.type === 'error'
+                  }"></i>
 
-      <span class="modal-notice-text">
-        {{ modal.modal()?.notice?.message }}
-      </span>
+        <span class="modal-notice-text">
+          {{ modal.modal()?.notice?.message }}
+        </span>
 
-      @if (modal.modal()?.notice?.scope === 'once') {
-      <button type="button" class="modal-notice-close" aria-label="Dismiss notice" (click)="dismissNotice()">
-        <i class="bi bi-x"></i>
-      </button>
+        @if (modal.modal()?.notice?.scope === 'once') {
+        <button type="button" class="modal-notice-close" aria-label="Dismiss notice" (click)="dismissNotice()">
+          <i class="bi bi-x"></i>
+        </button>
+        }
+      </div>
       }
+
+      <!-- MESSAGE -->
+      <p class="modal-message">
+        {{ modal.modal()?.message }}
+      </p>
     </div>
-    }
 
-    <!-- MESSAGE -->
-    <p class="modal-message">
-      {{ modal.modal()?.message }}
-    </p>
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <div class="modal-actions">
+        @if (modal.modal()?.type === 'confirm') {
+        <button class="btn secondary" (click)="cancel()">
+          {{ modal.modal()?.cancelText }}
+        </button>
+        }
 
-    <!-- ACTIONS -->
-    <div class="modal-actions">
-      @if (modal.modal()?.type === 'confirm') {
-      <button class="btn secondary" (click)="cancel()">
-        {{ modal.modal()?.cancelText }}
-      </button>
-      }
-
-      <button class="btn primary" (click)="confirm()">
-        {{ modal.modal()?.confirmText }}
-      </button>
+        <button class="btn primary" (click)="confirm()">
+          {{ modal.modal()?.confirmText }}
+        </button>
+      </div>
     </div>
     }
 

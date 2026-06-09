@@ -25,25 +25,42 @@
   background: var(--surface-main);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 32px;
+  /* No padding here — sections own their own padding so borders are edge-to-edge */
+  padding: 0;
   width: 100%;
   max-width: 480px;
+  max-height: 85vh;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
   animation: scaleIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  overflow: hidden; /* clip child content to border-radius */
 
   &.modal-xl {
     max-width: 1000px;
-    padding: 0;
+    max-height: none;
     /* Let edge-to-edge content dictate */
-    overflow: hidden;
-    /* Round edges explicitly */
 
     .modal-title {
       display: none;
       /* Hide generic title for massive detailed views */
+    }
+
+    .modal-header {
+      border-bottom: none;
+      padding: 14px;
+      padding-bottom: 0;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+    }
+
+    .modal-body {
+      overflow: visible;
+      padding: 0;
     }
 
     app-task-detail {
@@ -52,20 +69,34 @@
   }
 
   &.modal-search {
-    padding: 0;
     border: none;
     background: transparent;
     box-shadow: none;
     max-width: none;
+    max-height: none;
     width: auto;
+
+    .modal-body {
+      overflow: visible;
+      padding: 0;
+    }
   }
+}
+
+/* HEADER */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  /* Padding inside the header so border spans full card width */
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 /* CLOSE BUTTON */
 .modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
   width: 34px;
   height: 34px;
   border-radius: 999px;
@@ -75,6 +106,7 @@
   display: grid;
   place-items: center;
   cursor: pointer;
+  flex-shrink: 0;
 
   transition:
     background 0.15s ease,
@@ -104,22 +136,55 @@
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 0.75rem;
-  padding-right: 2rem;
-  /* space for X button */
+  margin: 0;
+}
+
+/* BODY — scrollable content zone */
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  /* Padding inside the body, not on the card, so borders span full width */
+  padding: 20px 24px;
+
+  /* Custom thin scrollbar */
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.25);
+    }
+  }
+}
+
+/* FOOTER */
+.modal-footer {
+  flex-shrink: 0;
+  /* Padding inside footer so border spans full card width */
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
 }
 
 /* MESSAGE */
 .modal-message {
   font-size: 0.9rem;
   word-spacing: 0.05em;
-
   line-height: 1.6;
   color: var(--text-main);
-  margin-bottom: 1.5rem;
+  margin: 0;
 
   white-space: pre-line;
-  line-height: 1.6;
+  overflow-wrap: break-word; /* force long unbroken strings (URLs, paths) to wrap */
+  word-break: break-word;    /* fallback for older browsers */
 }
 
 .modal-message::first-line {
@@ -210,10 +275,9 @@
 
   border-radius: 10px;
   font-size: 0.85rem;
-  line-height: 1.5;
+  line-height: 1.6;
 
   white-space: pre-line;
-  line-height: 1.6;
 
   &[data-type='info'] {
     background: rgba(63, 186, 194, 0.12);
@@ -285,12 +349,17 @@
 /* RESPONSIVENESS */
 @media (max-width: 768px) {
   .modal-card {
-    padding: 24px;
-    gap: 16px;
-
+    /* Card itself has no padding — sections handle their own */
     &.modal-xl app-task-detail {
       padding: 24px;
     }
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }
 
@@ -300,11 +369,17 @@
   }
 
   .modal-card {
-    padding: 20px;
     border-radius: 14px;
 
     &.modal-xl app-task-detail {
       padding: 20px;
     }
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
