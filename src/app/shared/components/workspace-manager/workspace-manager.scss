@@ -377,7 +377,6 @@
 }
 
 // ── Animations ──
-
 @keyframes slideInDown {
     from {
         transform: translateY(-10px);
@@ -414,8 +413,7 @@
     animation: spin 1s linear infinite;
 }
 
-// ── Responsive ──
-
+// ── Responsive ─
 @media (max-width: 1024px) {
     .workspace-table .table-header {
         grid-template-columns: minmax(180px, 2fr) 100px 120px 80px 100px 48px;
