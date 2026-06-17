@@ -11,11 +11,16 @@
             </div>
         </div>
         <div class="tools">
-            <button class="tool-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Sidebar"><i class="bi bi-layout-sidebar"></i></button>
+            <!-- Tab specific tools -->
             @if (activeTab() === 'terminal') {
+                <button class="tool-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Sidebar"><i class="bi bi-layout-sidebar"></i></button>
                 <button (click)="terminal.createInstance()" title="New Terminal"><i class="bi bi-plus-lg"></i></button>
+                <button (click)="terminal.clear()" title="Clear Terminal"><i class="bi bi-trash"></i></button>
             }
-            <button (click)="terminal.clear()" title="Clear Terminal"><i class="bi bi-trash"></i></button>
+            
+            <div class="tools-divider" style="width: 1px; height: 16px; background-color: var(--bs-gray-700); margin: 0 4px;"></div>
+            
+            <!-- Global Window Controls -->
             <button (click)="toggleMaximize()" [title]="isMaximized() ? 'Restore Down' : 'Maximize'"><i class="bi" [ngClass]="isMaximized() ? 'bi-fullscreen-exit' : 'bi-fullscreen'"></i></button>
             <button (click)="terminal.toggle()" title="Close Panel"><i class="bi bi-x-lg"></i></button>
         </div>
