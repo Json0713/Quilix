@@ -31,7 +31,14 @@ export interface ManagedWorkspace extends Workspace {
 @Component({
     selector: 'app-workspace-manager',
     standalone: true,
-    imports: [CommonModule, DragDropModule, WorkspaceMetrics, ActivityGraph, WorkspaceCardComponent, PageHeaderActionsDirective],
+    imports: [
+        CommonModule,
+        DragDropModule,
+        WorkspaceMetrics,
+        ActivityGraph,
+        WorkspaceCardComponent,
+        PageHeaderActionsDirective
+    ],
     templateUrl: './workspace-manager.html',
     styleUrl: './workspace-manager.scss',
 })
